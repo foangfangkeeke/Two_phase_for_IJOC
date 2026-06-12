@@ -25,6 +25,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/utils
     ${CMAKE_CURRENT_SOURCE_DIR}/src/problem/wireless
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/problem/wireless_reform
     ${CMAKE_CURRENT_SOURCE_DIR}/src/algorithm
     ${GUROBI_INCLUDE_DIR}
 )
@@ -33,9 +34,11 @@ add_executable(wireless
     src/main.cpp
     src/utils/solver_config.cpp
     src/problem/wireless/wireless.cpp
+    src/problem/wireless_reform/wireless_reform.cpp
     src/algorithm/using_solver.cpp
     src/algorithm/benders_core.cpp
     src/algorithm/barp_s_integer_l_shaped.cpp
+    src/algorithm/lshape_station.cpp
 )
 
 set_target_properties(wireless PROPERTIES

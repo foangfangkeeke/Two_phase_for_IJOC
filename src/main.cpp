@@ -1,4 +1,5 @@
 #include "barp_s_integer_l_shaped.hpp"
+#include "lshape_station.hpp"
 #include "gurobi_c++.h"
 #include "milp_solver.hpp"
 #include "solver_config.hpp"
@@ -50,6 +51,26 @@ int main(int argc, char* argv[])
             solver.SetAlgorithm(std::make_unique<UsingSolver>(WIRELESS_CHARGING_NO_PLUGIN, dataFolder));
         } else if (algLower == "l2") {
             solver.SetAlgorithm(std::make_unique<WirelessNoPlugInIntegerLShaped>(dataFolder));
+        } else {
+            cout << "invalid algorithm " << alg << " for problem " << pb << endl;
+            return 0;
+        }
+
+        try {
+            return solver.Run() == OK ? 0 : 1;
+        } catch (const std::exception& e) {
+            cout << "Error: " << e.what() << endl;
+            return 1;
+        }
+    }
+
+    if (pbLower == "wireless_reform") {
+        MILPSolver solver;
+        solver.SetSolverConfig(LoadSolverConfig());
+
+        if (algLower == "sg-full") {
+            solver.SetAlgorithm(std::make_unique<LShapeStation>(
+                WIRELESS_CAPACITY_REFORM, dataFolder, true, true, 5000));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;
             return 0;
