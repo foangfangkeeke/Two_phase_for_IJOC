@@ -1,3 +1,4 @@
+#include "barp_s_integer_l_shaped.hpp"
 #include "gurobi_c++.h"
 #include "milp_solver.hpp"
 #include "solver_config.hpp"
@@ -47,6 +48,8 @@ int main(int argc, char* argv[])
 
         if (algLower == "solver") {
             solver.SetAlgorithm(std::make_unique<UsingSolver>(WIRELESS_CHARGING_NO_PLUGIN, dataFolder));
+        } else if (algLower == "l2") {
+            solver.SetAlgorithm(std::make_unique<WirelessNoPlugInIntegerLShaped>(dataFolder));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;
             return 0;

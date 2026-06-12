@@ -34,6 +34,8 @@ add_executable(wireless
     src/utils/solver_config.cpp
     src/problem/wireless/wireless.cpp
     src/algorithm/using_solver.cpp
+    src/algorithm/benders_core.cpp
+    src/algorithm/barp_s_integer_l_shaped.cpp
 )
 
 set_target_properties(wireless PROPERTIES
