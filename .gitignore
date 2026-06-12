@@ -1,0 +1,9 @@
+out/build/
+out/Release/
+out/Debug/
+logs/
+gurobi_log.txt
+*.ilp
+*.lp
+debug_model.lp
+debug.log
