@@ -71,6 +71,9 @@ int main(int argc, char* argv[])
         if (algLower == "sg-full") {
             solver.SetAlgorithm(std::make_unique<LShapeStation>(
                 WIRELESS_CAPACITY_REFORM, dataFolder, true, true, 5000));
+        } else if (algLower == "sg-perstation") {
+            solver.SetAlgorithm(std::make_unique<LShapeStation>(
+                WIRELESS_CAPACITY_REFORM, dataFolder, true, true, 5000, 1e-6, true));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;
             return 0;

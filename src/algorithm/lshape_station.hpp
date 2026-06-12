@@ -14,7 +14,7 @@ public:
     // useImprovedCuts=true,  twoPhase=true  => SG-full
     LShapeStation(ProblemType problemType, std::string dataFolder = "test_data",
         bool useImprovedCuts = false, bool twoPhase = false,
-        int maxIters = 500, double tol = 1e-6);
+        int maxIters = 500, double tol = 1e-6, bool perStationMode = false);
     Status Initialize() override;
     Status Solve() override;
     ~LShapeStation() override;
@@ -46,6 +46,7 @@ private:
     double tolerance;
     bool useImprovedCuts;
     bool twoPhase;
+    bool perStationMode;
 
     std::unique_ptr<GRBEnv> env;
     std::shared_ptr<GRBModel> model;

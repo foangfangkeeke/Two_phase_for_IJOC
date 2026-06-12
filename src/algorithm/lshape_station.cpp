@@ -15,7 +15,7 @@
 
 namespace {
 
-using DataInitFactory = std::function<std::unique_ptr<IDataInit_LShape>(const std::string&)>;
+using DataInitFactory = std::function<std::unique_ptr<IDataInit_LShape>(const std::string&, bool)>;
 using SubFactory = std::function<std::unique_ptr<ISubProblem_LShape>()>;
 
 struct SubProblemEvalResult {
@@ -45,8 +45,8 @@ static const std::map<ProblemType, std::tuple<DataInitFactory, SubFactory>> kStr
     {
         WIRELESS_CAPACITY_REFORM,
         std::make_tuple(
-            [](const std::string& dataFolder) {
-                return std::make_unique<WirelessReformDataInit>(dataFolder);
+            [](const std::string& dataFolder, bool perStation) {
+                return std::make_unique<WirelessReformDataInit>(dataFolder, perStation);
             },
             []() { return std::make_unique<WirelessStationGroupSubProblem>(); })
     }
@@ -82,10 +82,11 @@ struct LShapeStation::StationSubProblemState {
 // --- Constructor ---
 
 LShapeStation::LShapeStation(ProblemType problemType, std::string dataFolder,
-    bool useImprovedCuts, bool twoPhase, int maxIters, double tol)
+    bool useImprovedCuts, bool twoPhase, int maxIters, double tol, bool perStationMode)
     : problemType(problemType), dataFolder(std::move(dataFolder)),
       maxIters(maxIters), tolerance(tol),
       useImprovedCuts(useImprovedCuts), twoPhase(twoPhase),
+      perStationMode(perStationMode),
       globalLowerBound(0.0), bestUpperBound(std::numeric_limits<double>::infinity()),
       bestLowerBound(-std::numeric_limits<double>::infinity()),
       incumbentSecondStageValue(std::numeric_limits<double>::infinity())
@@ -113,7 +114,7 @@ Status LShapeStation::Initialize()
         throw std::invalid_argument("Unsupported problem type for station-group Benders");
     }
 
-    dataIniter = std::get<0>(it->second)(dataFolder);
+    dataIniter = std::get<0>(it->second)(dataFolder, perStationMode);
     problemData = std::make_unique<ProblemData>();
     const auto dataInitStart = Tools::Clock::now();
     dataIniter->DataInit(*problemData);

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include "lshape.hpp"
 
 // Battery RHS constraint: RHS = beta * routeE + constant
@@ -21,7 +22,7 @@ struct StationGroupInfo {
 
 class WirelessReformDataInit : public IDataInit_LShape {
 public:
-    explicit WirelessReformDataInit(std::string dataFolder = "test_data");
+    explicit WirelessReformDataInit(std::string dataFolder = "test_data", bool perStationMode = false);
     void DataInit(ProblemData& data) override;
     std::vector<ProblemDataConstr> ConstrInit(ProblemData& data) override;
     std::vector<double> BuildWarmStartMasterValues(const ProblemData& data) const override;
@@ -30,6 +31,7 @@ public:
 
 private:
     std::string dataFolder;
+    bool perStationMode;
 };
 
 class WirelessStationGroupSubProblem : public ISubProblem_LShape {
