@@ -27,6 +27,44 @@ using linkTimeType = unordered_map<int, unordered_map<int, double>>;
 using stationTimeType = vector<vector<int>>;
 using stringCfgType = vector<vector<string>>;
 
+// Build flat array index: capIdx[scenario][routeId] → [(capacity, masterVarIndex), ...]
+// Replaces O(masterVars) string scanning with direct [scenario][routeId] array lookup.
+static auto BuildCapacityVarIndex(const vector<ProblemDataVar>& masterVars)
+    -> vector<vector<vector<pair<int, size_t>>>>
+{
+    // First pass: determine dimensions
+    int maxSc = -1, maxRid = -1;
+    for (const auto& var : masterVars) {
+        const string& name = var.name;
+        if (name.rfind("sc", 0) != 0) continue;
+        size_t ePos = name.find("_E_r");
+        if (ePos == string::npos) continue;
+        size_t capPos = name.find("_cap", ePos + 4);
+        if (capPos == string::npos) continue;
+        int sc = stoi(name.substr(2, ePos - 2));
+        int rid = stoi(name.substr(ePos + 4, capPos - (ePos + 4)));
+        if (sc > maxSc) maxSc = sc;
+        if (rid > maxRid) maxRid = rid;
+    }
+    vector<vector<vector<pair<int, size_t>>>> idx(
+        static_cast<size_t>(maxSc + 1),
+        vector<vector<pair<int, size_t>>>(static_cast<size_t>(maxRid + 1)));
+    // Second pass: fill entries
+    for (size_t j = 0; j < masterVars.size(); ++j) {
+        const string& name = masterVars[j].name;
+        if (name.rfind("sc", 0) != 0) continue;
+        size_t ePos = name.find("_E_r");
+        if (ePos == string::npos) continue;
+        size_t capPos = name.find("_cap", ePos + 4);
+        if (capPos == string::npos) continue;
+        int sc = stoi(name.substr(2, ePos - 2));
+        int rid = stoi(name.substr(ePos + 4, capPos - (ePos + 4)));
+        int cap = stoi(name.substr(capPos + 4));
+        idx[static_cast<size_t>(sc)][static_cast<size_t>(rid)].emplace_back(cap, j);
+    }
+    return idx;
+}
+
 namespace {
 inline fs::path ResolveDataFolderPath(const string& dataFolder) {
     return fs::path(__FILE__).parent_path().parent_path().parent_path().parent_path() / "data" / dataFolder;
@@ -164,24 +202,16 @@ static string MakeWirelessBatteryRhsConstrName(int routeId, size_t serial)
     return string(kWirelessBatteryRhsConstrPrefix) + to_string(routeId) + "_" + to_string(serial);
 }
 
-static vector<double> ComputeRouteEPerRoute(const vector<ProblemDataVar>& masterVars,
-    const vector<double>& zValues, size_t scenarioIdx, int numRoutes)
+static vector<double> ComputeRouteEPerRoute(const vector<double>& zValues,
+    size_t scenarioIdx, int numRoutes,
+    const vector<vector<vector<pair<int, size_t>>>>& capIdx)
 {
     vector<double> routeE(static_cast<size_t>(numRoutes), 0.0);
-    for (size_t j = 0; j < masterVars.size(); ++j) {
-        const string& name = masterVars[j].name;
-        if (name.find("_E_r") != string::npos && name.find("_cap") != string::npos) {
-            size_t scPos = 2;
-            size_t ePos = name.find("_E_r");
-            int varScIdx = stoi(name.substr(scPos, ePos - scPos));
-            if (static_cast<size_t>(varScIdx) != scenarioIdx) continue;
-
-            size_t rPos = ePos + 4;
-            size_t capPos = name.find("_cap", rPos);
-            int routeId = stoi(name.substr(rPos, capPos - rPos));
-            int capacity = stoi(name.substr(capPos + 4));
-
-            routeE[static_cast<size_t>(routeId)] += static_cast<double>(capacity) * zValues[j];
+    if (scenarioIdx >= capIdx.size()) return routeE;
+    const auto& scVec = capIdx[scenarioIdx];
+    for (size_t rid = 0; rid < scVec.size(); ++rid) {
+        for (const auto& [capacity, j] : scVec[rid]) {
+            routeE[rid] += static_cast<double>(capacity) * zValues[j];
         }
     }
     return routeE;
@@ -196,57 +226,41 @@ static void UpdateBatteryRhsConstrs(vector<BatteryRhsConstr>& constrs, const vec
 }
 
 static void ExtractBatteryRhsDuals(const vector<BatteryRhsConstr>& batteryRhs,
-    const vector<ProblemDataVar>& masterVars, const vector<double>& zValues,
-    size_t scenarioIdx, LShapeCutInfo& cutInfo)
+    const vector<double>& zValues,
+    size_t scenarioIdx, LShapeCutInfo& cutInfo,
+    const vector<vector<vector<pair<int, size_t>>>>& capIdx)
 {
+    if (scenarioIdx >= capIdx.size()) return;
+    const auto& scVec = capIdx[scenarioIdx];
     for (const auto& brc : batteryRhs) {
         const double pi = brc.constr.get(GRB_DoubleAttr_Pi);
-        for (size_t j = 0; j < masterVars.size(); ++j) {
-            const string& name = masterVars[j].name;
-            if (name.find("_E_r") != string::npos && name.find("_cap") != string::npos) {
-                size_t scPos = 2;
-                size_t ePos = name.find("_E_r");
-                int varScIdx = stoi(name.substr(scPos, ePos - scPos));
-                if (static_cast<size_t>(varScIdx) != scenarioIdx) continue;
-
-                size_t rPos = ePos + 4;
-                size_t capPos = name.find("_cap", rPos);
-                int routeId = stoi(name.substr(rPos, capPos - rPos));
-                int capacity = stoi(name.substr(capPos + 4));
-
-                if (routeId == brc.routeId) {
-                    cutInfo.yCoeffs[j] += pi * brc.beta * static_cast<double>(capacity);
-                    cutInfo.constant -= pi * brc.beta * static_cast<double>(capacity) * zValues[j];
-                }
-            }
+        if (std::fabs(pi) < 1e-14) continue;
+        const size_t rid = static_cast<size_t>(brc.routeId);
+        if (rid >= scVec.size()) continue;
+        for (const auto& [capacity, j] : scVec[rid]) {
+            const double coeff = pi * brc.beta * static_cast<double>(capacity);
+            cutInfo.yCoeffs[j] += coeff;
+            cutInfo.constant -= coeff * zValues[j];
         }
     }
 }
 
 static void ExtractBatteryRhsFarkasDuals(const vector<BatteryRhsConstr>& batteryRhs,
-    const vector<ProblemDataVar>& masterVars, const vector<double>& zValues,
-    size_t scenarioIdx, LShapeCutInfo& cutInfo)
+    const vector<double>& zValues,
+    size_t scenarioIdx, LShapeCutInfo& cutInfo,
+    const vector<vector<vector<pair<int, size_t>>>>& capIdx)
 {
+    if (scenarioIdx >= capIdx.size()) return;
+    const auto& scVec = capIdx[scenarioIdx];
     for (const auto& brc : batteryRhs) {
         const double lambda = brc.constr.get(GRB_DoubleAttr_FarkasDual);
-        for (size_t j = 0; j < masterVars.size(); ++j) {
-            const string& name = masterVars[j].name;
-            if (name.find("_E_r") != string::npos && name.find("_cap") != string::npos) {
-                size_t scPos = 2;
-                size_t ePos = name.find("_E_r");
-                int varScIdx = stoi(name.substr(scPos, ePos - scPos));
-                if (static_cast<size_t>(varScIdx) != scenarioIdx) continue;
-
-                size_t rPos = ePos + 4;
-                size_t capPos = name.find("_cap", rPos);
-                int routeId = stoi(name.substr(rPos, capPos - rPos));
-                int capacity = stoi(name.substr(capPos + 4));
-
-                if (routeId == brc.routeId) {
-                    cutInfo.yCoeffs[j] += lambda * brc.beta * static_cast<double>(capacity);
-                    cutInfo.constant -= lambda * brc.beta * static_cast<double>(capacity) * zValues[j];
-                }
-            }
+        if (std::fabs(lambda) < 1e-14) continue;
+        const size_t rid = static_cast<size_t>(brc.routeId);
+        if (rid >= scVec.size()) continue;
+        for (const auto& [capacity, j] : scVec[rid]) {
+            const double coeff = lambda * brc.beta * static_cast<double>(capacity);
+            cutInfo.yCoeffs[j] += coeff;
+            cutInfo.constant -= coeff * zValues[j];
         }
     }
 }
@@ -1445,6 +1459,11 @@ void WirelessStationGroupSubProblem::InitSubProblem(const ProblemData& problemDa
     qLowerBound = 0.0;
     lowerBoundCutAdded = false;
 
+    // Build flat array index for capacity master vars (one-time: [scenario][routeId] → varIdx)
+    if (capacityVarIdx.empty()) {
+        capacityVarIdx = BuildCapacityVarIndex(masterVars);
+    }
+
     auto& facilityRhsConstrs = context.EnsureConstrGroup(kWirelessFacilityRhsConstrGroup);
     SetWirelessFacilityRhsConstrs(facilityRhsConstrs, 0.0);
     numRoutes = routeIdByEB.size() > 0 ? *max_element(routeIdByEB.begin(), routeIdByEB.end()) + 1 : 1;
@@ -1515,8 +1534,9 @@ Status WirelessStationGroupSubProblem::SolveRelaxedModel(
         }
 
         // Update battery RHS
-        vector<double> routeE = ComputeRouteEPerRoute(masterVars, zValues,
-            static_cast<size_t>(sgInfo.scenarioIndex), numRoutes);
+        vector<double> routeE = ComputeRouteEPerRoute(zValues,
+            static_cast<size_t>(sgInfo.scenarioIndex), numRoutes,
+            capacityVarIdx);
         UpdateBatteryRhsConstrs(relaxedBatteryConstrs, routeE);
 
         relaxedModel->set(GRB_IntParam_Method, 1);
@@ -1544,8 +1564,9 @@ Status WirelessStationGroupSubProblem::SolveRelaxedModel(
             }
 
             // Battery duals
-            ExtractBatteryRhsDuals(relaxedBatteryConstrs, masterVars, zValues,
-                static_cast<size_t>(sgInfo.scenarioIndex), cutInfo);
+            ExtractBatteryRhsDuals(relaxedBatteryConstrs, zValues,
+                static_cast<size_t>(sgInfo.scenarioIndex), cutInfo,
+                capacityVarIdx);
 
             return OK;
         }
@@ -1575,26 +1596,9 @@ Status WirelessStationGroupSubProblem::SolveRelaxedModel(
                             }
                         }
 
-                        for (auto& brc : relaxedBatteryConstrs) {
-                            const double lambda = brc.constr.get(GRB_DoubleAttr_FarkasDual);
-                            for (size_t j = 0; j < masterVars.size(); ++j) {
-                                const string& name = masterVars[j].name;
-                                if (name.find("_E_r") != string::npos && name.find("_cap") != string::npos) {
-                                    size_t scPos = 2;
-                                    size_t ePos = name.find("_E_r");
-                                    int varScIdx = stoi(name.substr(scPos, ePos - scPos));
-                                    if (static_cast<size_t>(varScIdx) != sgInfo.scenarioIndex) continue;
-                                    size_t rPos = ePos + 4;
-                                    size_t capPos = name.find("_cap", rPos);
-                                    int routeId = stoi(name.substr(rPos, capPos - rPos));
-                                    int capacity = stoi(name.substr(capPos + 4));
-                                    if (routeId == brc.routeId) {
-                                        cutInfo.yCoeffs[j] += lambda * brc.beta * static_cast<double>(capacity);
-                                        cutInfo.constant -= lambda * brc.beta * static_cast<double>(capacity) * zValues[j];
-                                    }
-                                }
-                            }
-                        }
+                        ExtractBatteryRhsFarkasDuals(relaxedBatteryConstrs, zValues,
+                            static_cast<size_t>(sgInfo.scenarioIndex), cutInfo,
+                            capacityVarIdx);
                         subObj = GRB_INFINITY;
                         return OK;
                     }
@@ -1681,8 +1685,9 @@ void WirelessStationGroupSubProblem::UpdateSubProblem(const ProblemData& problem
     SetWirelessFacilityRhsConstrs(facilityRhsConstrs, zValues);
 
     // Compute routeE per route from zValues and update battery RHS constraints
-    vector<double> routeE = ComputeRouteEPerRoute(masterVars, zValues,
-        static_cast<size_t>(sgInfo.scenarioIndex), numRoutes);
+    vector<double> routeE = ComputeRouteEPerRoute(zValues,
+        static_cast<size_t>(sgInfo.scenarioIndex), numRoutes,
+        capacityVarIdx);
     UpdateBatteryRhsConstrs(batteryRhsConstrs, routeE);
 
     subModel.update();
@@ -1739,8 +1744,9 @@ Status WirelessStationGroupSubProblem::SolveSubProblem(const ProblemData& proble
                 }
 
                 // Battery Farkas duals
-                ExtractBatteryRhsFarkasDuals(batteryRhsConstrs, masterVars, zValues,
-                    static_cast<size_t>(sgInfo.scenarioIndex), cutInfo);
+                ExtractBatteryRhsFarkasDuals(batteryRhsConstrs, zValues,
+                    static_cast<size_t>(sgInfo.scenarioIndex), cutInfo,
+                    capacityVarIdx);
 
                 subObj = GRB_INFINITY;
                 return OK;

@@ -66,4 +66,7 @@ private:
     std::unique_ptr<GRBModel> relaxedModel;
     std::vector<GRBConstr> relaxedFacilityConstrs;
     std::vector<BatteryRhsConstr> relaxedBatteryConstrs;
+
+    // [scenarioIdx][routeId] → [(capacity, masterVarIndex), ...]  flat array, no hashing
+    std::vector<std::vector<std::vector<std::pair<int, size_t>>>> capacityVarIdx;
 };
