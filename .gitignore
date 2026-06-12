@@ -7,3 +7,4 @@ gurobi_log.txt
 *.lp
 debug_model.lp
 debug.log
+data/tower_data/

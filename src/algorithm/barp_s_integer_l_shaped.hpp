@@ -1,0 +1,121 @@
+#pragma once
+
+#include "milp_solver.hpp"
+#include "benders_decomposition.hpp"
+
+#include <chrono>
+#include <memory>
+#include <vector>
+#include <string>
+
+class ProblemData;
+class GRBEnv;
+class GRBModel;
+class GRBVar;
+
+using IntegerLShapedCutInfo = BendersCutInfo;
+using IntegerLShapedSubProblemContext = BendersSubProblemContext;
+
+class IDataInitializationStrategy_IntegerLShaped {
+public:
+    virtual void DataInit(ProblemData& data) = 0;
+    virtual std::vector<ProblemDataConstr> ConstrInit(ProblemData& data) = 0;
+    virtual std::vector<double> BuildWarmStartMasterValues(const ProblemData& data) const = 0;
+    virtual bool IsWarmStartMasterFeasible(const ProblemData& data, const std::vector<double>& zValues,
+        double tolerance) const = 0;
+    virtual ~IDataInitializationStrategy_IntegerLShaped() = default;
+};
+
+class ISubProblemStrategy_IntegerLShaped {
+public:
+    virtual int ScenarioCount(const ProblemData& problemData) const = 0;
+
+    virtual void InitSubProblem(
+        const ProblemData& problemData, int scenarioIndex, GRBModel& subModel,
+        IntegerLShapedSubProblemContext& context) = 0;
+
+    virtual void UpdateSubProblem(
+        const ProblemData& problemData, GRBModel& subModel, IntegerLShapedSubProblemContext& context,
+        const std::vector<double>& zValues) = 0;
+
+    virtual Status SolveSubProblem(
+        const ProblemData& problemData, GRBModel& subModel, IntegerLShapedSubProblemContext& context,
+        const std::vector<double>& zValues, IntegerLShapedCutInfo& cutInfo, double& subObj) = 0;
+
+    virtual Status SolveRelaxedSubProblem(
+        const ProblemData& problemData, GRBModel& subModel, IntegerLShapedSubProblemContext& context,
+        const std::vector<double>& zValues, IntegerLShapedCutInfo& cutInfo, double& subObj) = 0;
+
+    virtual void SetLowerBound(double lowerBound) {}
+
+    virtual std::unique_ptr<ISubProblemStrategy_IntegerLShaped> Clone() const = 0;
+    virtual ~ISubProblemStrategy_IntegerLShaped() = default;
+};
+
+class IntegerLShaped : public IMILPAlgorithmStrategy {
+public:
+    IntegerLShaped(ProblemType problemType, std::string dataFolder = "test_data", int maxIters = 500, double tol = 1e-6);
+    Status Initialize() override;
+    Status Solve() override;
+    ~IntegerLShaped() override;
+
+private:
+    struct ScenarioSubProblem;
+
+    struct CutEval {
+        GRBLinExpr expr = 0.0;
+        double lhsAtCurrent = 0.0;
+        std::string name;
+    };
+
+    CutEval BuildImprovedCut(const std::vector<double>& zValues, const std::vector<double>& zCurrent,
+        double delta, double lowerBound, int iter) const;
+
+    CutEval BuildPriorityCut(const std::vector<double>& zValues, const std::vector<double>& zCurrent,
+        double delta, double lowerBound, int iter) const;
+
+    CutEval BuildClassicCut(const std::vector<double>& zValues, const std::vector<double>& zCurrent,
+        double delta, double lowerBound, int iter) const;
+
+    CutEval BuildContinuousCut(const IntegerLShapedCutInfo& cutInfo, const std::vector<double>& zCurrent,
+        int iter, int scenarioIndex = -1) const;
+
+    Status EvaluateSubProblems(const std::vector<double>& zValues, bool relaxed,
+        IntegerLShapedCutInfo& cutInfo, double& subObj, std::vector<double>* scenarioSubObjs = nullptr,
+        std::vector<IntegerLShapedCutInfo>* scenarioCutInfos = nullptr);
+
+    Status ApplyWarmStart();
+
+    void UpdateIncumbent(const std::vector<double>& zValues, double secondStageValue);
+
+    void PrintBestSolution() const;
+
+    ProblemType problemType;
+    std::string dataFolder;
+    int maxIters;
+    double tolerance;
+
+    std::unique_ptr<GRBEnv> env;
+    std::shared_ptr<GRBModel> model;
+    std::unique_ptr<ProblemData> problemData;
+    std::unique_ptr<IDataInitializationStrategy_IntegerLShaped> dataIniter;
+    std::unique_ptr<ISubProblemStrategy_IntegerLShaped> subProblemStrategy;
+    std::vector<std::unique_ptr<ScenarioSubProblem>> subProblems;
+    std::vector<GRBVar> zVars;
+    std::vector<GRBVar> relaxedThetaVars;
+    GRBVar theta;
+
+    double globalLowerBound;
+    double bestUpperBound;
+    double bestLowerBound;
+    std::vector<double> incumbentZValues;
+    double incumbentSecondStageValue;
+    std::chrono::steady_clock::time_point algorithmStart;
+};
+
+class WirelessNoPlugInIntegerLShaped : public IntegerLShaped {
+public:
+    explicit WirelessNoPlugInIntegerLShaped(std::string dataFolder = "test_data", int maxIters = 500, double tol = 1e-6)
+        : IntegerLShaped(WIRELESS_CHARGING_NO_PLUGIN, dataFolder, maxIters, tol) {}
+};
+

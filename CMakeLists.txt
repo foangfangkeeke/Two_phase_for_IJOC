@@ -24,12 +24,16 @@ set(GUROBI_CORE_LIB "${GUROBI_LIB_DIR}/gurobi120.lib")
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/utils
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/problem/wireless
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/algorithm
     ${GUROBI_INCLUDE_DIR}
 )
 
 add_executable(wireless
     src/main.cpp
     src/utils/solver_config.cpp
+    src/problem/wireless/wireless.cpp
+    src/algorithm/using_solver.cpp
 )
 
 set_target_properties(wireless PROPERTIES

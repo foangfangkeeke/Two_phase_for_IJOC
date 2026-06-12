@@ -1,9 +1,12 @@
 #include "gurobi_c++.h"
+#include "milp_solver.hpp"
 #include "solver_config.hpp"
 #include "tools.hpp"
+#include "using_solver.hpp"
 
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <string>
 #ifdef _WIN32
 #include <windows.h>
@@ -20,8 +23,8 @@ int main(int argc, char* argv[])
 
     cout << fixed << setprecision(6);
 
-    string alg = "none";
-    string pb = "none";
+    string alg = "solver";
+    string pb = "wireless";
     string dataType = "test";
     for (int idx = 1; idx < argc; ++idx) {
         string arg = argv[idx];
@@ -36,8 +39,28 @@ int main(int argc, char* argv[])
 
     const string algLower = Tools::ToLower(alg);
     const string pbLower = Tools::ToLower(pb);
+    const string dataFolder = dataType + "_data";
 
-    cout << "No experiments registered yet." << endl;
+    if (pbLower == "wireless") {
+        MILPSolver solver;
+        solver.SetSolverConfig(LoadSolverConfig());
+
+        if (algLower == "solver") {
+            solver.SetAlgorithm(std::make_unique<UsingSolver>(WIRELESS_CHARGING_NO_PLUGIN, dataFolder));
+        } else {
+            cout << "invalid algorithm " << alg << " for problem " << pb << endl;
+            return 0;
+        }
+
+        try {
+            return solver.Run() == OK ? 0 : 1;
+        } catch (const std::exception& e) {
+            cout << "Error: " << e.what() << endl;
+            return 1;
+        }
+    }
+
+    cout << "No experiments registered for problem " << pb << endl;
     cout << "Usage: wireless.exe --pb <problem> --alg <algorithm> --data <test|tower>" << endl;
     return 0;
 }

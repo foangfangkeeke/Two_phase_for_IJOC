@@ -1,0 +1,21 @@
+# OperationCfg
+# priceOfPowerDay,priceOfPowerNight,priceOfUnitBat,socMax,socMin,capacityMin,capacityMax
+1.0,0.2,1000,0.9,0.1,10,80
+# timeMin,timeMax,timeInterval
+0,1440,1
+# curbWeight,weightPerEnergy,mu,g
+9,0,0.2,2.083333333
+
+# ChargerCfg
+3
+# chargeRate
+2,1,0.5
+# chargeEfficiency
+0.95,0.9,0.85
+# priceOfUnitCharger,priceOfInverterPerkW
+1000,5000,10000,1
+
+# ChargerNums
+2
+4,2
+7,1
