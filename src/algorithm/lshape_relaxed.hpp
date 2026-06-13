@@ -16,9 +16,16 @@ public:
     Status Solve() override;
     ~LShapeRelaxed() override;
 
-    // Expose Phase 1 results for downstream use (e.g., Phase 2 warm start)
+    // Expose Phase 1 results and internals for Phase 2 reuse
     const std::vector<double>& GetIncumbentZValues() const { return incumbentZValues; }
     double GetBestUpperBound() const { return bestUpperBound; }
+    double GetBestLowerBound() const { return bestLowerBound; }
+    std::shared_ptr<GRBModel> GetModel() const { return model; }
+    std::vector<GRBVar>& GetZVars() { return zVars; }
+    const std::vector<std::vector<GRBVar>>& GetRouteThetaVars() const { return routeThetaVars; }
+    ProblemData* GetProblemData() const { return problemData.get(); }
+    std::unique_ptr<GRBEnv> ReleaseEnv() { return std::move(env); }
+    std::unique_ptr<ProblemData> ReleaseProblemData() { return std::move(problemData); }
 
 private:
     struct RouteSubProblemState;
