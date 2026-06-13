@@ -37,6 +37,7 @@ private:
 class WirelessStationGroupSubProblem : public ISubProblem_LShape {
 public:
     void SetStationGroupInfo(const StationGroupInfo& info) { sgInfo = info; }
+    void SetRelaxChargerCapacity(bool relax) { relaxChargerCapacity = relax; }
 
     int ScenarioCount(const ProblemData& problemData) const override;
     void InitSubProblem(const ProblemData& problemData, int scenarioIndex, GRBModel& subModel,
@@ -62,6 +63,7 @@ private:
     bool lowerBoundReady = false;
     double qLowerBound = 0.0;
     bool lowerBoundCutAdded = false;
+    bool relaxChargerCapacity = false;
     int numRoutes = 0;
     std::vector<BatteryRhsConstr> batteryRhsConstrs;
     std::vector<int> routeIdByEB;

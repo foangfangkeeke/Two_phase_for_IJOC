@@ -1,4 +1,6 @@
 #include "barp_s_integer_l_shaped.hpp"
+#include "lshape_relaxed.hpp"
+#include "lshape_relaxed_station.hpp"
 #include "lshape_station.hpp"
 #include "gurobi_c++.h"
 #include "milp_solver.hpp"
@@ -74,6 +76,12 @@ int main(int argc, char* argv[])
         } else if (algLower == "sg-perstation") {
             solver.SetAlgorithm(std::make_unique<LShapeStation>(
                 WIRELESS_CAPACITY_REFORM, dataFolder, true, true, 5000, 1e-6, true));
+        } else if (algLower == "sg-relax") {
+            solver.SetAlgorithm(std::make_unique<LShapeRelaxed>(
+                WIRELESS_CAPACITY_REFORM, dataFolder, 5000));
+        } else if (algLower == "sg-relax-station") {
+            solver.SetAlgorithm(std::make_unique<LShapeRelaxedStation>(
+                WIRELESS_CAPACITY_REFORM, dataFolder, 5000));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;
             return 0;

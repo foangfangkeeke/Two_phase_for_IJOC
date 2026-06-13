@@ -241,8 +241,29 @@ Status LShapeStation::EvaluateSubProblems(const std::vector<double>& zValues,
 
 // --- WarmStart / UpdateIncumbent / PrintBestSolution ---
 
+void LShapeStation::SetExternalWarmStart(const std::vector<double>& zValues, double upperBound)
+{
+    externalWarmStartReady_ = true;
+    externalWarmStartZValues_ = zValues;
+    externalWarmStartUpperBound_ = upperBound;
+}
+
 Status LShapeStation::ApplyWarmStart()
 {
+    if (externalWarmStartReady_) {
+        for (size_t i = 0; i < zVars.size(); ++i)
+            zVars[i].set(GRB_DoubleAttr_Start, externalWarmStartZValues_[i]);
+        // IMPORTANT: Phase 1 UB is NOT valid for Phase 2 (charger capacity constraints
+        // are stricter). Phase 1 cost is a lower bound for Phase 2, not an upper bound.
+        // Keep bestUpperBound at infinity; it will be set when Phase 2 finds a feasible solution.
+        bestUpperBound = 1e9;  // effectively infinite, same as default warm start
+        globalLowerBound = std::max(0.0, externalWarmStartUpperBound_ * 0.99);
+        for (auto& sub : subProblems) sub->strategy->SetLowerBound(0.0);
+        std::cout << "Station-group Benders warm-started from Phase 1 solution"
+                  << ", Phase1_obj=" << externalWarmStartUpperBound_
+                  << ", init_LB=" << globalLowerBound << std::endl;
+        return OK;
+    }
     bestUpperBound = 1e9;
     globalLowerBound = 0.0;
     for (auto& sub : subProblems) sub->strategy->SetLowerBound(0.0);

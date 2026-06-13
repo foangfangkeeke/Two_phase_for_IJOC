@@ -19,6 +19,9 @@ public:
     Status Solve() override;
     ~LShapeStation() override;
 
+    // Accept warm-start solution from Phase 1 (e.g., sg-relax)
+    void SetExternalWarmStart(const std::vector<double>& zValues, double upperBound);
+
 private:
     struct StationSubProblemState;
 
@@ -63,4 +66,9 @@ private:
     std::vector<double> incumbentZValues;
     double incumbentSecondStageValue;
     std::chrono::steady_clock::time_point algorithmStart;
+
+    // External warm start (e.g., from Phase 1 sg-relax)
+    bool externalWarmStartReady_ = false;
+    std::vector<double> externalWarmStartZValues_;
+    double externalWarmStartUpperBound_ = 0.0;
 };

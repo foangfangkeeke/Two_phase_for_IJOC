@@ -941,14 +941,15 @@ static void InitWirelessMasterData(ProblemData& data, const string& dataFolder, 
     data.addData("wireless_station_groups", stationGroups);
     data.addData("wireless_per_station_mode", perStationMode);
 
-    // Valid inequality: capacity lower bound from worst-EB energy balance
     // Valid inequality: facility-aware energy budget from worst-EB on each route
-    {
+    // Only active for per-station mode where the route→charger station binding is known.
+    // sg-relax and sg-full use the reference logic without this inequality.
+    if (perStationMode) {
         vector<vector<double>> ebTotalC, ebFastFree;
         vector<vector<vector<string>>> ebFacNames;
         vector<vector<vector<double>>> ebFacCharges;
         ComputeRouteEnergyBudget(dataFolder, scenarios,
-            perStationMode ? &routeChargerStation : nullptr,
+            &routeChargerStation,
             ebTotalC, ebFastFree, ebFacNames, ebFacCharges);
         data.addData("wireless_eb_totalC", ebTotalC);
         data.addData("wireless_eb_fastFree", ebFastFree);
@@ -1081,7 +1082,8 @@ static bool BuildWirelessOperationalSubproblem(const string& dataRootFolder, con
     vector<BatteryRhsConstr>& batteryRhsOut,
     vector<int>& routeIdByEBOut,
     const vector<int>* activeEbIndices = nullptr,
-    const vector<int>* routeChargerStation = nullptr)
+    const vector<int>* routeChargerStation = nullptr,
+    bool relaxChargerCapacity = false)
 {
     ModelData data(dataRootFolder, scenario);
 
@@ -1306,84 +1308,105 @@ static bool BuildWirelessOperationalSubproblem(const string& dataRootFolder, con
         }
     }
 
-    // --- Time-indexed charger occupancy at fast-charging stations (matching wireless.cpp) ---
-    // Per-station mode: only create occupancy variables for the bound station; non-bound
-    // stations have charge==0 and their occupancy variables are degenerate (zero objective,
-    // free within [0,chargerCount]), which makes dual simplex stall badly on feasible LPs.
+    // --- Fast-charging station constraints ---
     int boundStation = -1;
     if (routeChargerStation && !ebIndices.empty()) {
         int firstRouteId = schedulingCfg.routeIdByEBs.at(static_cast<size_t>(ebIndices[0]));
         boundStation = (*routeChargerStation)[static_cast<size_t>(firstRouteId)];
     }
-    unordered_map<int, unordered_map<int, unordered_map<int, unordered_map<int, GRBVar>>>> x_bns_t;
-    unordered_map<int, vector<GRBLinExpr>> chargerOccupy;
-    for (int station : networkCfg.chargerPhys) {
-        if (routeChargerStation && station != boundStation) continue;
-        chargerOccupy[station].resize(static_cast<size_t>(operationCfg.timeMax - operationCfg.timeMin));
-    }
 
-    for (int ebIdx : ebIndices) {
-        int eb = schedulingCfg.EBs[ebIdx];
-        for (int tripIdx = 0; tripIdx < schedulingCfg.tripEBs[ebIdx].size(); tripIdx++) {
-            int trip = schedulingCfg.tripEBs[ebIdx][tripIdx];
-            for (int stationIdx = 0; stationIdx < schedulingCfg.stationTrips[trip].size(); stationIdx++) {
-                int station = schedulingCfg.stationTrips[trip][stationIdx];
-                if (!networkCfg.chargerPhys.count(station)) continue;
-                if (routeChargerStation && station != boundStation) continue;
-                int arrTime = schedulingCfg.stationArrTimes[trip][stationIdx];
-                int depTime = schedulingCfg.stationDepTimes[trip][stationIdx];
-                for (int time = arrTime; time < depTime; time++) {
-                    x_bns_t[eb][trip][station][time] = model.addVar(0, 1, 0, GRB_BINARY,
-                        namePrefix + "x_b" + to_string(eb) + "_n" + to_string(trip) + "_s" + to_string(station)
-                        + "_i" + to_string(stationIdx) + "_t" + to_string(time));
+    if (!relaxChargerCapacity) {
+        // Full model: time-indexed charger occupancy (EBs compete for charger slots)
+        unordered_map<int, unordered_map<int, unordered_map<int, unordered_map<int, GRBVar>>>> x_bns_t;
+        unordered_map<int, vector<GRBLinExpr>> chargerOccupy;
+        for (int station : networkCfg.chargerPhys) {
+            if (routeChargerStation && station != boundStation) continue;
+            chargerOccupy[station].resize(static_cast<size_t>(operationCfg.timeMax - operationCfg.timeMin));
+        }
+
+        for (int ebIdx : ebIndices) {
+            int eb = schedulingCfg.EBs[ebIdx];
+            for (int tripIdx = 0; tripIdx < schedulingCfg.tripEBs[ebIdx].size(); tripIdx++) {
+                int trip = schedulingCfg.tripEBs[ebIdx][tripIdx];
+                for (int stationIdx = 0; stationIdx < schedulingCfg.stationTrips[trip].size(); stationIdx++) {
+                    int station = schedulingCfg.stationTrips[trip][stationIdx];
+                    if (!networkCfg.chargerPhys.count(station)) continue;
+                    if (routeChargerStation && station != boundStation) continue;
+                    int arrTime = schedulingCfg.stationArrTimes[trip][stationIdx];
+                    int depTime = schedulingCfg.stationDepTimes[trip][stationIdx];
+                    for (int time = arrTime; time < depTime; time++) {
+                        x_bns_t[eb][trip][station][time] = model.addVar(0, 1, 0, GRB_BINARY,
+                            namePrefix + "x_b" + to_string(eb) + "_n" + to_string(trip) + "_s" + to_string(station)
+                            + "_i" + to_string(stationIdx) + "_t" + to_string(time));
+                    }
                 }
             }
         }
-    }
 
-    for (int ebIdx : ebIndices) {
-        int eb = schedulingCfg.EBs[ebIdx];
-        for (int tripIdx = 0; tripIdx < schedulingCfg.tripEBs[ebIdx].size(); tripIdx++) {
-            int trip = schedulingCfg.tripEBs[ebIdx][tripIdx];
-            for (int stationIdx = 0; stationIdx < schedulingCfg.stationTrips[trip].size(); stationIdx++) {
-                int station = schedulingCfg.stationTrips[trip][stationIdx];
-                if (!networkCfg.chargerPhys.count(station)) continue;
-                if (routeChargerStation && station != boundStation) continue;
-                int arrTime = schedulingCfg.stationArrTimes[trip][stationIdx];
-                int depTime = schedulingCfg.stationDepTimes[trip][stationIdx];
-                for (int time = arrTime; time < depTime; time++)
-                    chargerOccupy[station][time - operationCfg.timeMin] += x_bns_t[eb][trip][station][time];
+        for (int ebIdx : ebIndices) {
+            int eb = schedulingCfg.EBs[ebIdx];
+            for (int tripIdx = 0; tripIdx < schedulingCfg.tripEBs[ebIdx].size(); tripIdx++) {
+                int trip = schedulingCfg.tripEBs[ebIdx][tripIdx];
+                for (int stationIdx = 0; stationIdx < schedulingCfg.stationTrips[trip].size(); stationIdx++) {
+                    int station = schedulingCfg.stationTrips[trip][stationIdx];
+                    if (!networkCfg.chargerPhys.count(station)) continue;
+                    if (routeChargerStation && station != boundStation) continue;
+                    int arrTime = schedulingCfg.stationArrTimes[trip][stationIdx];
+                    int depTime = schedulingCfg.stationDepTimes[trip][stationIdx];
+                    for (int time = arrTime; time < depTime; time++)
+                        chargerOccupy[station][time - operationCfg.timeMin] += x_bns_t[eb][trip][station][time];
+                }
             }
         }
-    }
 
-    for (int station : networkCfg.chargerPhys) {
-        if (routeChargerStation && station != boundStation) continue;
-        auto it = networkCfg.chargerNums.find(station);
-        int chargerCount = (it != networkCfg.chargerNums.end()) ? it->second : 1;
-        for (int time = operationCfg.timeMin; time < operationCfg.timeMax; time++) {
-            int timeIdx = time - operationCfg.timeMin;
-            if (chargerOccupy[station][timeIdx].size() > 0)
-                model.addConstr(chargerOccupy[station][timeIdx] <= chargerCount,
-                    namePrefix + "constChargerNum_s" + to_string(station) + "_t" + to_string(time));
+        for (int station : networkCfg.chargerPhys) {
+            if (routeChargerStation && station != boundStation) continue;
+            auto it = networkCfg.chargerNums.find(station);
+            int chargerCount = (it != networkCfg.chargerNums.end()) ? it->second : 1;
+            for (int time = operationCfg.timeMin; time < operationCfg.timeMax; time++) {
+                int timeIdx = time - operationCfg.timeMin;
+                if (chargerOccupy[station][timeIdx].size() > 0)
+                    model.addConstr(chargerOccupy[station][timeIdx] <= chargerCount,
+                        namePrefix + "constChargerNum_s" + to_string(station) + "_t" + to_string(time));
+            }
         }
-    }
 
-    for (int ebIdx : ebIndices) {
-        int eb = schedulingCfg.EBs[ebIdx];
-        for (int tripIdx = 0; tripIdx < schedulingCfg.tripEBs[ebIdx].size(); tripIdx++) {
-            int trip = schedulingCfg.tripEBs[ebIdx][tripIdx];
-            for (int stationIdx = 0; stationIdx < schedulingCfg.stationTrips[trip].size(); stationIdx++) {
-                int station = schedulingCfg.stationTrips[trip][stationIdx];
-                if (!networkCfg.chargerPhys.count(station)) continue;
-                if (routeChargerStation && station != boundStation) continue;
-                string sub = "_b" + to_string(eb) + "_n" + to_string(trip) + "_s" + to_string(station) + "_i" + to_string(stationIdx);
-                GRBVar charge = charge_bns[ebIdx][tripIdx][station];
-                GRBLinExpr occupyTime;
-                for (int time = schedulingCfg.stationArrTimes[trip][stationIdx];
-                         time < schedulingCfg.stationDepTimes[trip][stationIdx]; time++)
-                    occupyTime += x_bns_t[eb][trip][station][time];
-                model.addConstr(charge <= chargerCfg.chargeRate[0] * occupyTime, "constrChargeFast" + sub);
+        for (int ebIdx : ebIndices) {
+            int eb = schedulingCfg.EBs[ebIdx];
+            for (int tripIdx = 0; tripIdx < schedulingCfg.tripEBs[ebIdx].size(); tripIdx++) {
+                int trip = schedulingCfg.tripEBs[ebIdx][tripIdx];
+                for (int stationIdx = 0; stationIdx < schedulingCfg.stationTrips[trip].size(); stationIdx++) {
+                    int station = schedulingCfg.stationTrips[trip][stationIdx];
+                    if (!networkCfg.chargerPhys.count(station)) continue;
+                    if (routeChargerStation && station != boundStation) continue;
+                    string sub = "_b" + to_string(eb) + "_n" + to_string(trip) + "_s" + to_string(station) + "_i" + to_string(stationIdx);
+                    GRBVar charge = charge_bns[ebIdx][tripIdx][station];
+                    GRBLinExpr occupyTime;
+                    for (int time = schedulingCfg.stationArrTimes[trip][stationIdx];
+                             time < schedulingCfg.stationDepTimes[trip][stationIdx]; time++)
+                        occupyTime += x_bns_t[eb][trip][station][time];
+                    model.addConstr(charge <= chargerCfg.chargeRate[0] * occupyTime, "constrChargeFast" + sub);
+                }
+            }
+        }
+    } else {
+        // Relaxed: no charger capacity limits, charge freely within dwell time
+        for (int ebIdx : ebIndices) {
+            int eb = schedulingCfg.EBs[ebIdx];
+            for (int tripIdx = 0; tripIdx < schedulingCfg.tripEBs[ebIdx].size(); tripIdx++) {
+                int trip = schedulingCfg.tripEBs[ebIdx][tripIdx];
+                for (int stationIdx = 0; stationIdx < schedulingCfg.stationTrips[trip].size(); stationIdx++) {
+                    int station = schedulingCfg.stationTrips[trip][stationIdx];
+                    if (!networkCfg.chargerPhys.count(station)) continue;
+                    if (routeChargerStation && station != boundStation) continue;
+                    int stayTime = schedulingCfg.stationDepTimes[trip][stationIdx]
+                                 - schedulingCfg.stationArrTimes[trip][stationIdx];
+                    string sub = "_b" + to_string(eb) + "_n" + to_string(trip) + "_s" + to_string(station)
+                               + "_i" + to_string(stationIdx);
+                    GRBVar charge = charge_bns[ebIdx][tripIdx][station];
+                    model.addConstr(charge <= chargerCfg.chargeRate[0] * static_cast<double>(stayTime),
+                        "constrChargeFastRelaxed" + sub);
+                }
             }
         }
     }
@@ -1592,7 +1615,8 @@ static bool BuildWirelessChargingLShapedSubProblem(
     const vector<ProblemDataVar>& masterVars, GRBModel& subModel, LShapeSubProblemContext& context,
     vector<BatteryRhsConstr>& batteryRhsOut, vector<int>& routeIdByEBOut,
     const vector<int>* activeEbIndices = nullptr,
-    const vector<int>* routeChargerStation = nullptr)
+    const vector<int>* routeChargerStation = nullptr,
+    bool relaxChargerCapacity = false)
 {
     context.Clear();
     context.EnsureConstrGroup(kWirelessFacilityRhsConstrGroup).clear();
@@ -1604,7 +1628,7 @@ static bool BuildWirelessChargingLShapedSubProblem(
     }
     if (!BuildWirelessOperationalSubproblem(dataRootFolder, scenarios[scenarioIdx], scenarioIdx,
             masterVars, subModel, context, obj, facilityRhsSerial, batteryRhsOut, routeIdByEBOut,
-            activeEbIndices, routeChargerStation)) {
+            activeEbIndices, routeChargerStation, relaxChargerCapacity)) {
         return false;
     }
     subModel.setObjective(obj, GRB_MINIMIZE);
@@ -1705,7 +1729,8 @@ void WirelessStationGroupSubProblem::InitSubProblem(const ProblemData& problemDa
 
     bool built = BuildWirelessChargingLShapedSubProblem(dataRootFolder, scenarios,
         static_cast<size_t>(this->sgInfo.scenarioIndex), masterVars, subModel, context,
-        batteryRhsConstrs, routeIdByEB, &sgInfo.ebIndices, routeCharger);
+        batteryRhsConstrs, routeIdByEB, &sgInfo.ebIndices, routeCharger,
+        this->relaxChargerCapacity);
     if (!built) {
         throw std::runtime_error("Failed to build wireless charging L-shaped sub-problem.");
     }
