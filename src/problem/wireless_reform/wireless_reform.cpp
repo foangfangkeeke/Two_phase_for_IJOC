@@ -681,6 +681,122 @@ static void PrintWirelessScenarioSummary(const vector<WirelessScenarioConfig>& s
     }
 }
 
+// Energy budget per (scenario, route): for the EB with the most trips, compute
+//   totalC  = fixed energy consumed (kWh) — start + inter-station + end
+//   fastChargeFree = max charge from always-available fast chargers (kWh)
+//   facCharges[f] = (facilityVarName, max charge kWh) for each wireless facility visited
+//
+// Valid inequality (facility-aware):
+//   socDelta * sum(cap * z_cap) + sum(facCharge_f * w_f) >= totalC - fastChargeFree
+//
+// In perStation mode, only the route's bound chargerPhys counts as fast-charge-free;
+// other chargerPhys stations contribute nothing (their charge==0 in the subproblem).
+static void ComputeRouteEnergyBudget(
+    const string& dataFolder,
+    const vector<WirelessScenarioConfig>& scenarios,
+    const vector<vector<int>>* routeChargerStation,
+    vector<vector<double>>& outTotalC,
+    vector<vector<double>>& outFastChargeFree,
+    vector<vector<vector<string>>>& outFacNames,
+    vector<vector<vector<double>>>& outFacCharges)
+{
+    const size_t nSc = scenarios.size();
+    outTotalC.resize(nSc);
+    outFastChargeFree.resize(nSc);
+    outFacNames.resize(nSc);
+    outFacCharges.resize(nSc);
+
+    for (size_t scIdx = 0; scIdx < nSc; ++scIdx) {
+        ModelData md(dataFolder, scenarios[scIdx]);
+        const auto& sc = md.GetSchedulingCfg();
+        const auto& oc = md.GetOperationCfg();
+        const auto& cc = md.GetChargerCfg();
+        const auto& nc = md.GetNetworkCfg();
+
+        const double cPerKm = oc.curbWeight * oc.mu * oc.g / 3.6;
+        const int nRoutes = sc.numRoutes;
+        outTotalC[scIdx].resize(nRoutes, 0.0);
+        outFastChargeFree[scIdx].resize(nRoutes, 0.0);
+        outFacNames[scIdx].resize(nRoutes);
+        outFacCharges[scIdx].resize(nRoutes);
+
+        for (int r = 0; r < nRoutes; ++r) {
+            // Bound chargerPhys station for per-station mode
+            int bound = -1;
+            if (routeChargerStation && scIdx < routeChargerStation->size()
+                && r < static_cast<int>((*routeChargerStation)[scIdx].size()))
+                bound = (*routeChargerStation)[scIdx][r];
+
+            // Find EB with most trips on this route
+            int worstEB = -1, maxTrips = -1;
+            for (int eb = 0; eb < sc.numEB; ++eb) {
+                if (sc.routeIdByEBs[eb] == r && sc.tripNumEBs[eb] > maxTrips) {
+                    maxTrips = sc.tripNumEBs[eb];
+                    worstEB = eb;
+                }
+            }
+            if (worstEB < 0) continue;
+
+            const auto& trips = sc.tripEBs[worstEB];
+            double totalC = nc.startDistanceEBs[worstEB] * cPerKm;
+            double fastFree = 0.0;
+            // Facility name -> accumulated max charge (summed over all visits/traversals)
+            unordered_map<string, double> facAcc;
+
+            for (size_t ti = 0; ti < trips.size(); ++ti) {
+                int trip = trips[ti];
+                const auto& stations = sc.stationTrips[trip];
+                for (size_t si = 0; si < stations.size(); ++si) {
+                    int station = stations[si];
+                    int arrTime = sc.stationArrTimes[trip][si];
+                    int depTime = sc.stationDepTimes[trip][si];
+                    int stayTime = depTime - arrTime;
+
+                    if (nc.chargerPhys.count(station)) {
+                        // Fast charger: free (always available) if bound station or sg-full
+                        if (!routeChargerStation || station == bound)
+                            fastFree += cc.chargeRate[0] * stayTime * cc.chargeEfficiency[0];
+                    } else {
+                        // Static wireless: depends on w_station_s{station}
+                        string facName = "w_station_s" + to_string(station);
+                        facAcc[facName] += cc.chargeRate[1] * stayTime * cc.chargeEfficiency[1];
+                    }
+
+                    // Inter-station movement
+                    int nextTrip, nextStation, nextArrTime;
+                    if (si + 1 < stations.size()) {
+                        nextTrip = trip;
+                        nextStation = stations[si + 1];
+                        nextArrTime = sc.stationArrTimes[nextTrip][si + 1];
+                    } else if (ti + 1 < trips.size()) {
+                        nextTrip = trips[ti + 1];
+                        nextStation = sc.stationTrips[nextTrip][0];
+                        nextArrTime = sc.stationArrTimes[nextTrip][0];
+                    } else {
+                        continue;
+                    }
+
+                    double dist = nc.linkDistances.at(station).at(nextStation);
+                    totalC += dist * cPerKm;
+
+                    // Dynamic wireless on link: depends on w_link_l{from}To{to}
+                    int travelTime = nextArrTime - depTime;
+                    string linkName = "w_link_l" + to_string(station) + "To" + to_string(nextStation);
+                    facAcc[linkName] += cc.chargeRate[2] * travelTime * cc.chargeEfficiency[2];
+                }
+            }
+            totalC += nc.endDistanceEBs[worstEB] * cPerKm;
+
+            outTotalC[scIdx][r] = totalC;
+            outFastChargeFree[scIdx][r] = fastFree;
+            for (const auto& [name, charge] : facAcc) {
+                outFacNames[scIdx][r].push_back(name);
+                outFacCharges[scIdx][r].push_back(charge);
+            }
+        }
+    }
+}
+
 static void InitWirelessMasterData(ProblemData& data, const string& dataFolder, const string& usageLabel,
     bool perStationMode = false)
 {
@@ -825,6 +941,21 @@ static void InitWirelessMasterData(ProblemData& data, const string& dataFolder, 
     data.addData("wireless_station_groups", stationGroups);
     data.addData("wireless_per_station_mode", perStationMode);
 
+    // Valid inequality: capacity lower bound from worst-EB energy balance
+    // Valid inequality: facility-aware energy budget from worst-EB on each route
+    {
+        vector<vector<double>> ebTotalC, ebFastFree;
+        vector<vector<vector<string>>> ebFacNames;
+        vector<vector<vector<double>>> ebFacCharges;
+        ComputeRouteEnergyBudget(dataFolder, scenarios,
+            perStationMode ? &routeChargerStation : nullptr,
+            ebTotalC, ebFastFree, ebFacNames, ebFacCharges);
+        data.addData("wireless_eb_totalC", ebTotalC);
+        data.addData("wireless_eb_fastFree", ebFastFree);
+        data.addData("wireless_eb_facNames", ebFacNames);
+        data.addData("wireless_eb_facCharges", ebFacCharges);
+    }
+
     std::cout << "Loaded wireless charging data for " << usageLabel << "." << std::endl;
     PrintWirelessScenarioSummary(scenarios);
     std::cout << "masterVars=" << masterVars.size() << std::endl;
@@ -844,11 +975,24 @@ static std::vector<ProblemDataConstr> BuildWirelessMasterConstrs(const ProblemDa
 
     vector<ProblemDataConstr> constrs;
 
+    // Read energy-budget valid inequality data, if available
+    vector<vector<double>> ebTotalC, ebFastFree;
+    vector<vector<vector<string>>> ebFacNames;
+    vector<vector<vector<double>>> ebFacCharges;
+    try { ebTotalC = data.getData<vector<vector<double>>>("wireless_eb_totalC"); }
+    catch (...) {}
+    if (!ebTotalC.empty()) {
+        ebFastFree = data.getData<vector<vector<double>>>("wireless_eb_fastFree");
+        ebFacNames = data.getData<vector<vector<vector<string>>>>("wireless_eb_facNames");
+        ebFacCharges = data.getData<vector<vector<vector<double>>>>("wireless_eb_facCharges");
+    }
+
     // For each scenario and each route, add "select exactly one capacity" constraint
     for (size_t scIdx = 0; scIdx < scenarios.size(); ++scIdx) {
         ModelData scenarioData(dataFolder, scenarios[scIdx]);
         const SchedulingCfg& schedulingCfg = scenarioData.GetSchedulingCfg();
         const OperationCfg& operationCfg = scenarioData.GetOperationCfg();
+        const double socDelta = operationCfg.socMax - operationCfg.socMin;
 
         for (int routeId = 0; routeId < schedulingCfg.numRoutes; ++routeId) {
             ProblemDataConstr constr;
@@ -867,6 +1011,43 @@ static std::vector<ProblemDataConstr> BuildWirelessMasterConstrs(const ProblemDa
             }
 
             constrs.push_back(constr);
+
+            // --- Facility-aware energy budget valid inequality ---
+            // socDelta * sum(cap * z_cap) + sum(charge_f * w_f) >= totalC - fastChargeFree
+            if (!ebTotalC.empty() && scIdx < ebTotalC.size()
+                && routeId < static_cast<int>(ebTotalC[scIdx].size())) {
+                double totalC = ebTotalC[scIdx][routeId];
+                double fastFree = ebFastFree[scIdx][routeId];
+                double rhs = totalC - fastFree;
+                if (rhs > 1e-9) {
+                    ProblemDataConstr ebConstr;
+                    ebConstr.coeffs.assign(masterVars.size(), 0.0);
+                    ebConstr.sense = '>';
+                    ebConstr.rhs = rhs;
+                    ebConstr.name = "energyBudget_sc" + to_string(scIdx) + "_r" + to_string(routeId);
+
+                    // Capacity variables: coeff = cap * socDelta
+                    for (int cap = static_cast<int>(operationCfg.capacityMin);
+                         cap <= static_cast<int>(operationCfg.capacityMax); cap += 10) {
+                        string vn = "sc" + to_string(scIdx) + "_E_r" + to_string(routeId)
+                                  + "_cap" + to_string(cap);
+                        auto it = masterIdxByName.find(vn);
+                        if (it != masterIdxByName.end())
+                            ebConstr.coeffs[it->second] = static_cast<double>(cap) * socDelta;
+                    }
+
+                    // Facility variables: coeff = accumulated max charge at this facility
+                    const auto& names = ebFacNames[scIdx][routeId];
+                    const auto& charges = ebFacCharges[scIdx][routeId];
+                    for (size_t fi = 0; fi < names.size(); ++fi) {
+                        auto it = masterIdxByName.find(names[fi]);
+                        if (it != masterIdxByName.end())
+                            ebConstr.coeffs[it->second] += charges[fi];
+                    }
+
+                    constrs.push_back(ebConstr);
+                }
+            }
         }
     }
 
