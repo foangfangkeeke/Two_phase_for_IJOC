@@ -427,14 +427,17 @@ Status LShapeRelaxedStation::Solve()
                       << ", mip_eval_ms=" << Tools::ElapsedMs(masterEnd, iterEnd)
                       << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
             std::cout << "Phase 2 converged." << std::endl;
+            std::cout << "UB: " << bestUpperBound_ << ", LB: " << bestLowerBound_ << std::endl;
             if (!incumbentZValues_.empty()) {
                 std::cout << "Active master variables:" << std::endl;
                 for (size_t i = 0; i < zVars_.size(); ++i)
                     if (incumbentZValues_[i] > 0.5)
                         std::cout << zVars_[i].get(GRB_StringAttr_VarName) << std::endl;
                 std::cout << "Q(z): " << incumbentQ_ << std::endl;
-                std::cout << "objective: " << bestUpperBound_ << std::endl;
             }
+            const auto solveEnd = Tools::Clock::now();
+            std::cout << "Phase 2 final elapsed time: "
+                      << Tools::ElapsedMs(solveStart, solveEnd) << " ms" << std::endl;
             return OK;
             }
         }  // iter > 0
@@ -445,6 +448,7 @@ Status LShapeRelaxedStation::Solve()
                   << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
     }
 
+    std::cout << "UB: " << bestUpperBound_ << ", LB: " << bestLowerBound_ << std::endl;
     std::cout << "Phase 2 reached max iterations: " << maxIters << std::endl;
     return ERROR;
 }

@@ -283,9 +283,9 @@ void LShapeStation::UpdateIncumbent(const std::vector<double>& zValues, double s
 
 void LShapeStation::PrintBestSolution() const
 {
+    std::cout << "UB: " << bestUpperBound
+              << ", LB: " << bestLowerBound << std::endl;
     if (!std::isfinite(bestUpperBound)) return;
-    std::cout << "Best solution found: objective=" << bestUpperBound
-              << " (lower_bound=" << bestLowerBound << ")" << std::endl;
     std::cout << "Active master variables:" << std::endl;
     for (size_t idx = 0; idx < zVars.size(); ++idx) {
         if (incumbentZValues[idx] > 0.5) {
@@ -487,7 +487,10 @@ Status LShapeStation::Solve()
             std::cout << ", master_ms=" << masterMs << ", integer_ms=" << integerMs
                       << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
             PrintBestSolution();
+            const auto solveEnd = Tools::Clock::now();
             std::cout << "Station-group Benders converged." << std::endl;
+            std::cout << "Station-group Benders final elapsed time: "
+                      << Tools::ElapsedMs(solveStart, solveEnd) << " ms" << std::endl;
             return OK;
         }
 
@@ -504,6 +507,7 @@ Status LShapeStation::Solve()
                   << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
     }
 
+    PrintBestSolution();
     std::cout << "Station-group Benders reached max iterations: " << maxIters << std::endl;
     return ERROR;
 }

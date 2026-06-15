@@ -618,7 +618,7 @@ void IntegerLShaped::PrintBestSolution() const
         std::cout << zVars[idx].get(GRB_StringAttr_VarName) << std::endl;
     }
     std::cout << "Q(z): " << incumbentSecondStageValue << std::endl;
-    std::cout << "objective: " << bestUpperBound << std::endl;
+    std::cout << "UB: " << bestUpperBound << ", LB: " << bestLowerBound << std::endl;
 }
 
 IntegerLShaped::~IntegerLShaped() = default;

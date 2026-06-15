@@ -47,13 +47,17 @@ Status UsingSolver::Solve()
     model->optimize();
 
     int solveStatus = model->get(GRB_IntAttr_Status);
+    const auto solveEnd = Tools::Clock::now();
     if (solveStatus == GRB_OPTIMAL || (solveStatus == GRB_TIME_LIMIT && model->get(GRB_IntAttr_SolCount) > 0)) {
-        std::cout << "Current objective: " << model->get(GRB_DoubleAttr_ObjVal) << std::endl;
-        const auto solveEnd = Tools::Clock::now();
+        double ub = model->get(GRB_DoubleAttr_ObjVal);
+        double lb = model->get(GRB_DoubleAttr_ObjBound);
+        std::cout << "UB: " << ub << ", LB: " << lb << std::endl;
         std::cout << "UsingSolver final solve time: " << Tools::ElapsedMs(solveStart, solveEnd) << " ms" << std::endl;
         return OK;
     }
 
+    double lb = model->get(GRB_DoubleAttr_ObjBound);
+    std::cout << "UB: inf, LB: " << lb << " (no feasible solution)" << std::endl;
     std::cerr << "Not solved to optimality, status: " << solveStatus << std::endl;
     return ERROR;
 }
