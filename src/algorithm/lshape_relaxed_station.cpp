@@ -141,6 +141,8 @@ Status LShapeRelaxedStation::Initialize()
     subProblems_.reserve(stationGroups.size());
 
     const auto phase2InitStart = Tools::Clock::now();
+
+    // ── Pass 1 (serial): Create GRBEnv + GRBModel (license init not thread-safe) ──
     for (size_t idx = 0; idx < stationGroups.size(); ++idx) {
         std::cout << "Phase 2 init sub-problem " << idx << "/" << stationGroups.size()
                   << " sc=" << stationGroups[idx].scenarioIndex
@@ -166,12 +168,33 @@ Status LShapeRelaxedStation::Initialize()
         sub->model->set(GRB_IntParam_Method, solverConfig.method);
         sub->model->set(GRB_IntParam_Threads, solverConfig.threads);
         sub->context.Clear();
-        sub->strategy->InitSubProblem(*problemData_, static_cast<int>(idx),
-            *sub->model, sub->context);
-        std::cout << "  done, cols=" << sub->model->get(GRB_IntAttr_NumVars)
-                  << " rows=" << sub->model->get(GRB_IntAttr_NumConstrs) << std::endl;
         subProblems_.push_back(std::move(sub));
     }
+
+    // ── Pass 2 (parallel): InitSubProblem on independent models ──
+    {
+        std::vector<std::future<void>> initFutures;
+        initFutures.reserve(subProblems_.size());
+        const ProblemData* pd = problemData_;
+        for (size_t idx = 0; idx < subProblems_.size(); ++idx) {
+            initFutures.push_back(std::async(std::launch::async,
+                [pd, idx, sub = subProblems_[idx].get()]() {
+                    sub->strategy->InitSubProblem(*pd, static_cast<int>(idx),
+                        *sub->model, sub->context);
+                }));
+        }
+        for (size_t idx = 0; idx < initFutures.size(); ++idx) {
+            try {
+                initFutures[idx].get();
+            } catch (const std::exception& e) {
+                std::cerr << "Phase 2 sub-problem init failed for " << idx << ": " << e.what() << std::endl;
+                return ERROR;
+            }
+            std::cout << "  done, cols=" << subProblems_[idx]->model->get(GRB_IntAttr_NumVars)
+                      << " rows=" << subProblems_[idx]->model->get(GRB_IntAttr_NumConstrs) << std::endl;
+        }
+    }
+
     const auto phase2InitEnd = Tools::Clock::now();
 
     std::cout << "Phase 2 station-group sub-problems count=" << subProblems_.size()
