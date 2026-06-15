@@ -814,9 +814,13 @@ static void InitWirelessMasterData(ProblemData& data, const string& dataFolder, 
     routeCounts.reserve(scenarios.size());
     routeIdByEBsPerScenario.reserve(scenarios.size());
     scenarioProbabilities.reserve(scenarios.size());
+
+    // Build ModelData cache once per scenario (avoids repeated file I/O below)
+    vector<ModelData> modelDataCache;
+    modelDataCache.reserve(scenarios.size());
     for (const auto& scenario : scenarios) {
-        ModelData scenarioData(dataFolder, scenario);
-        const SchedulingCfg& schedulingCfg = scenarioData.GetSchedulingCfg();
+        modelDataCache.emplace_back(dataFolder, scenario);
+        const SchedulingCfg& schedulingCfg = modelDataCache.back().GetSchedulingCfg();
         routeCounts.push_back(schedulingCfg.numRoutes);
         routeIdByEBsPerScenario.push_back(schedulingCfg.routeIdByEBs);
         scenarioProbabilities.push_back(scenario.probability);
@@ -826,12 +830,13 @@ static void InitWirelessMasterData(ProblemData& data, const string& dataFolder, 
     data.addData("wireless_scenario_probabilities", scenarioProbabilities);
     data.addData("wireless_route_facility_var_names",
         BuildRouteFacilityVarNames(dataFolder, scenarios, masterVars));
+    data.addData("wireless_model_data_cache", modelDataCache);
 
     // --- Paper2: Build station-group info ---
     // Build route→chargerStation assignment: first chargerPhys station on each route
     vector<vector<int>> routeChargerStation(scenarios.size());
     for (size_t scIdx = 0; scIdx < scenarios.size(); ++scIdx) {
-        ModelData scenarioData(dataFolder, scenarios[scIdx]);
+        const auto& scenarioData = modelDataCache[scIdx];
         const auto& schedCfg = scenarioData.GetSchedulingCfg();
         const auto& netCfg = scenarioData.GetNetworkCfg();
         routeChargerStation[scIdx].assign(static_cast<size_t>(schedCfg.numRoutes), -1);
@@ -860,7 +865,7 @@ static void InitWirelessMasterData(ProblemData& data, const string& dataFolder, 
     // Build station groups
     vector<StationGroupInfo> stationGroups;
     for (size_t scIdx = 0; scIdx < scenarios.size(); ++scIdx) {
-        ModelData scenarioData(dataFolder, scenarios[scIdx]);
+        const auto& scenarioData = modelDataCache[scIdx];
         const auto& schedCfg = scenarioData.GetSchedulingCfg();
         const auto& netCfg = scenarioData.GetNetworkCfg();
 
@@ -989,8 +994,9 @@ static std::vector<ProblemDataConstr> BuildWirelessMasterConstrs(const ProblemDa
     }
 
     // For each scenario and each route, add "select exactly one capacity" constraint
+    const auto& modelDataCache = data.getData<vector<ModelData>>("wireless_model_data_cache");
     for (size_t scIdx = 0; scIdx < scenarios.size(); ++scIdx) {
-        ModelData scenarioData(dataFolder, scenarios[scIdx]);
+        const auto& scenarioData = modelDataCache[scIdx];
         const SchedulingCfg& schedulingCfg = scenarioData.GetSchedulingCfg();
         const OperationCfg& operationCfg = scenarioData.GetOperationCfg();
         const double socDelta = operationCfg.socMax - operationCfg.socMin;
@@ -1083,9 +1089,10 @@ static bool BuildWirelessOperationalSubproblem(const string& dataRootFolder, con
     vector<int>& routeIdByEBOut,
     const vector<int>* activeEbIndices = nullptr,
     const vector<int>* routeChargerStation = nullptr,
-    bool relaxChargerCapacity = false)
+    bool relaxChargerCapacity = false,
+    const ModelData* cachedData = nullptr)
 {
-    ModelData data(dataRootFolder, scenario);
+    ModelData data = cachedData ? *cachedData : ModelData(dataRootFolder, scenario);
 
     OperationCfg operationCfg = data.GetOperationCfg();
     ChargerCfg chargerCfg = data.GetChargerCfg();
@@ -1616,7 +1623,8 @@ static bool BuildWirelessChargingLShapedSubProblem(
     vector<BatteryRhsConstr>& batteryRhsOut, vector<int>& routeIdByEBOut,
     const vector<int>* activeEbIndices = nullptr,
     const vector<int>* routeChargerStation = nullptr,
-    bool relaxChargerCapacity = false)
+    bool relaxChargerCapacity = false,
+    const ModelData* cachedData = nullptr)
 {
     context.Clear();
     context.EnsureConstrGroup(kWirelessFacilityRhsConstrGroup).clear();
@@ -1628,7 +1636,7 @@ static bool BuildWirelessChargingLShapedSubProblem(
     }
     if (!BuildWirelessOperationalSubproblem(dataRootFolder, scenarios[scenarioIdx], scenarioIdx,
             masterVars, subModel, context, obj, facilityRhsSerial, batteryRhsOut, routeIdByEBOut,
-            activeEbIndices, routeChargerStation, relaxChargerCapacity)) {
+            activeEbIndices, routeChargerStation, relaxChargerCapacity, cachedData)) {
         return false;
     }
     subModel.setObjective(obj, GRB_MINIMIZE);
@@ -1662,8 +1670,9 @@ std::vector<double> WirelessReformDataInit::BuildWarmStartMasterValues(
 
     // For battery capacity variables, set only one capacity per route to 1
     // Find the middle capacity as default
+    const auto& modelDataCache = data.getData<vector<ModelData>>("wireless_model_data_cache");
     for (size_t scIdx = 0; scIdx < scenarios.size(); ++scIdx) {
-        ModelData scenarioData(dataFolder, scenarios[scIdx]);
+        const auto& scenarioData = modelDataCache[scIdx];
         const OperationCfg& operationCfg = scenarioData.GetOperationCfg();
         const SchedulingCfg& schedulingCfg = scenarioData.GetSchedulingCfg();
 
@@ -1727,10 +1736,13 @@ void WirelessStationGroupSubProblem::InitSubProblem(const ProblemData& problemDa
         } catch (...) {}
     }
 
+    const auto& modelDataCache = problemData.getData<vector<ModelData>>("wireless_model_data_cache");
+    const ModelData* cachedData = (static_cast<size_t>(this->sgInfo.scenarioIndex) < modelDataCache.size())
+        ? &modelDataCache[static_cast<size_t>(this->sgInfo.scenarioIndex)] : nullptr;
     bool built = BuildWirelessChargingLShapedSubProblem(dataRootFolder, scenarios,
         static_cast<size_t>(this->sgInfo.scenarioIndex), masterVars, subModel, context,
         batteryRhsConstrs, routeIdByEB, &sgInfo.ebIndices, routeCharger,
-        this->relaxChargerCapacity);
+        this->relaxChargerCapacity, cachedData);
     if (!built) {
         throw std::runtime_error("Failed to build wireless charging L-shaped sub-problem.");
     }
