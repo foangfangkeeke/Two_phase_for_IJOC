@@ -345,8 +345,46 @@ Status LShapeRelaxedStation::Solve()
         }
 
         if (spAnyInfeasible) {
-            // MIP infeasible — shouldn't happen if LP was feasible, but handle gracefully
-            std::cout << "Phase 2 iter " << iter << ", MIP infeasible (unexpected)" << std::endl;
+            // MIP infeasible — add feasibility cut + strengthened no-good (matching sg-full)
+            int feasCount = 0;
+            std::set<std::string> addedFeasCuts;
+            for (size_t idx = 0; idx < mipCutInfos.size(); ++idx) {
+                if (mipCutInfos[idx].isOptimalityCut) continue;
+                const std::string sig = MakeFeasibilityCutSignature(mipCutInfos[idx]);
+                if (addedFeasCuts.insert(sig).second) {
+                    AddFeasibilityCut(*model_, mipCutInfos[idx], zVars_,
+                        "p2_mip_feas_" + std::to_string(iter) + "_" + std::to_string(idx));
+                    ++feasCount;
+                }
+                // Strengthened no-good (matching sg-full)
+                const auto& sgInfo = stationGroups[idx];
+                std::vector<std::string> sgFacNames;
+                int scIdx = sgInfo.scenarioIndex;
+                for (int rid : sgInfo.routeIds) {
+                    const auto& rn = facilityVarNames.at(static_cast<size_t>(scIdx))
+                        .at(static_cast<size_t>(rid));
+                    sgFacNames.insert(sgFacNames.end(), rn.begin(), rn.end());
+                }
+                const BendersCutInfo noGood = BuildStationGroupStrengthenedNoGoodCut(
+                    masterVars, zValues, scIdx, sgInfo.routeIds, sgFacNames);
+                const std::string ngSig = MakeFeasibilityCutSignature(noGood);
+                if (addedFeasCuts.insert(ngSig).second) {
+                    AddFeasibilityCut(*model_, noGood, zVars_,
+                        "p2_mip_nogood_" + std::to_string(iter) + "_" + std::to_string(idx));
+                    ++feasCount;
+                }
+            }
+            model_->update();
+            std::cout << "Phase 2 iter " << iter << ", MIP infeasible, feasibility cut x" << feasCount;
+            if (std::isfinite(bestUpperBound_)) {
+                double denom = std::max(1.0, std::fabs(bestUpperBound_));
+                std::cout << ", UB=" << bestUpperBound_ << ", LB=" << bestLowerBound_
+                          << ", gap=" << (bestUpperBound_ - bestLowerBound_) / denom * 100.0 << "%";
+            }
+            const auto iterEnd = Tools::Clock::now();
+            std::cout << ", master_ms=" << masterMs
+                      << ", mip_eval_ms=" << Tools::ElapsedMs(masterEnd, iterEnd)
+                      << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
             continue;
         }
 
