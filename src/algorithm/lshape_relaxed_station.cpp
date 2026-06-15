@@ -140,6 +140,7 @@ Status LShapeRelaxedStation::Initialize()
     subProblems_.clear();
     subProblems_.reserve(stationGroups.size());
 
+    const auto phase2InitStart = Tools::Clock::now();
     for (size_t idx = 0; idx < stationGroups.size(); ++idx) {
         std::cout << "Phase 2 init sub-problem " << idx << "/" << stationGroups.size()
                   << " sc=" << stationGroups[idx].scenarioIndex
@@ -161,6 +162,9 @@ Status LShapeRelaxedStation::Initialize()
         sub->model = std::make_unique<GRBModel>(*sub->env);
         sub->model->set(GRB_IntParam_OutputFlag, 0);
         sub->model->set(GRB_DoubleParam_MIPGap, 0.0);
+        sub->model->set(GRB_IntParam_Presolve, solverConfig.presolve);
+        sub->model->set(GRB_IntParam_Method, solverConfig.method);
+        sub->model->set(GRB_IntParam_Threads, solverConfig.threads);
         sub->context.Clear();
         sub->strategy->InitSubProblem(*problemData_, static_cast<int>(idx),
             *sub->model, sub->context);
@@ -168,9 +172,11 @@ Status LShapeRelaxedStation::Initialize()
                   << " rows=" << sub->model->get(GRB_IntAttr_NumConstrs) << std::endl;
         subProblems_.push_back(std::move(sub));
     }
+    const auto phase2InitEnd = Tools::Clock::now();
 
     std::cout << "Phase 2 station-group sub-problems count=" << subProblems_.size()
-              << ", master constraints=" << model_->get(GRB_IntAttr_NumConstrs) << std::endl;
+              << ", master constraints=" << model_->get(GRB_IntAttr_NumConstrs)
+              << ", init_elapsed_ms=" << Tools::ElapsedMs(phase2InitStart, phase2InitEnd) << std::endl;
 
     initialized = true;
     return OK;
