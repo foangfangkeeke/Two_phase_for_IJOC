@@ -43,6 +43,7 @@ private:
     Status ApplyWarmStart();
     void UpdateIncumbent(const std::vector<double>& zValues, double secondStageValue);
     void PrintBestSolution() const;
+    std::string AlgorithmLabel() const;
 
     ProblemType problemType;
     std::string dataFolder;

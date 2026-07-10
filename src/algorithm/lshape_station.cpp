@@ -94,6 +94,18 @@ LShapeStation::LShapeStation(ProblemType problemType, std::string dataFolder,
 
 LShapeStation::~LShapeStation() = default;
 
+std::string LShapeStation::AlgorithmLabel() const
+{
+    if (twoPhase) {
+        return useImprovedCuts
+            ? "Lifted two-phase ILS with strengthened cuts"
+            : "Lifted two-phase ILS";
+    }
+    return useImprovedCuts
+        ? "Lifted ILS with strengthened cuts"
+        : "Lifted ILS";
+}
+
 // --- Initialize ---
 
 Status LShapeStation::Initialize()
@@ -111,7 +123,7 @@ Status LShapeStation::Initialize()
 
     auto it = kStrategyMap.find(problemType);
     if (it == kStrategyMap.end()) {
-        throw std::invalid_argument("Unsupported problem type for station-group Benders");
+        throw std::invalid_argument("Unsupported problem type for lifted ILS");
     }
 
     dataIniter = std::get<0>(it->second)(dataFolder, perStationMode);
@@ -141,7 +153,8 @@ Status LShapeStation::Initialize()
     model->addConstr(thetaSum <= theta, "theta_multi_sum");
 
     const auto dataInitEnd = Tools::Clock::now();
-    std::cout << "Station-group Benders data/master initialization elapsed_ms="
+    const std::string label = AlgorithmLabel();
+    std::cout << label << " data/master initialization elapsed_ms="
               << Tools::ElapsedMs(dataInitStart, dataInitEnd) << std::endl;
 
     const auto subProblemsInitStart = Tools::Clock::now();
@@ -169,7 +182,7 @@ Status LShapeStation::Initialize()
     }
 
     const auto subProblemsInitEnd = Tools::Clock::now();
-    std::cout << "Station-group Benders sub-problems init count=" << subProblems.size()
+    std::cout << label << " operational sub-problems init count=" << subProblems.size()
               << " elapsed_ms=" << Tools::ElapsedMs(subProblemsInitStart, subProblemsInitEnd) << std::endl;
 
     model->update();
@@ -198,7 +211,7 @@ Status LShapeStation::EvaluateSubProblems(const std::vector<double>& zValues,
     bool relaxed)
 {
     if (subProblems.empty()) {
-        std::cerr << "Station-group sub-problems are not initialized" << std::endl;
+        std::cerr << AlgorithmLabel() << " operational sub-problems are not initialized" << std::endl;
         return ERROR;
     }
 
@@ -259,7 +272,7 @@ Status LShapeStation::ApplyWarmStart()
         bestUpperBound = 1e9;  // effectively infinite, same as default warm start
         globalLowerBound = std::max(0.0, externalWarmStartUpperBound_ * 0.99);
         for (auto& sub : subProblems) sub->strategy->SetLowerBound(0.0);
-        std::cout << "Station-group Benders warm-started from Phase 1 solution"
+        std::cout << AlgorithmLabel() << " warm-started from Phase 1 solution"
                   << ", Phase1_obj=" << externalWarmStartUpperBound_
                   << ", init_LB=" << globalLowerBound << std::endl;
         return OK;
@@ -311,7 +324,7 @@ Status LShapeStation::Solve()
     for (int iter = 0; iter < maxIters; ++iter) {
         const double elapsedSec = Tools::ElapsedMs(algorithmStart, Tools::Clock::now()) / 1000.0;
         if (elapsedSec >= solverConfig.timeLimit) {
-            std::cout << "Station-group Benders reached time limit: " << solverConfig.timeLimit << "s" << std::endl;
+            std::cout << AlgorithmLabel() << " reached time limit: " << solverConfig.timeLimit << "s" << std::endl;
             return ERROR;
         }
 
@@ -323,7 +336,7 @@ Status LShapeStation::Solve()
         int masterStatus = model->get(GRB_IntAttr_Status);
         if (!(masterStatus == GRB_OPTIMAL ||
               (masterStatus == GRB_TIME_LIMIT && model->get(GRB_IntAttr_SolCount) > 0))) {
-            std::cerr << "Station-group Benders master problem not solved, status: " << masterStatus << std::endl;
+            std::cerr << AlgorithmLabel() << " master problem not solved, status: " << masterStatus << std::endl;
             return ERROR;
         }
 
@@ -389,7 +402,7 @@ Status LShapeStation::Solve()
             }
 
             if (rspAnyInfeasible) {
-                std::cout << "Station-group Benders iter " << iter << ", feasibility cut from relaxation x" << feasCount;
+                std::cout << AlgorithmLabel() << " iter " << iter << ", feasibility cut from relaxation x" << feasCount;
                 if (std::isfinite(bestUpperBound)) {
                     const double denom = std::max(1.0, std::fabs(bestUpperBound));
                     std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound
@@ -414,7 +427,7 @@ Status LShapeStation::Solve()
         const auto integerEnd = Tools::Clock::now();
         const long long integerMs = Tools::ElapsedMs(integerStart, integerEnd);
         if (secondStageStatus != OK) {
-            std::cerr << "Station-group Benders second-stage evaluation failed in iteration " << iter << std::endl;
+            std::cerr << AlgorithmLabel() << " second-stage evaluation failed in iteration " << iter << std::endl;
             return ERROR;
         }
 
@@ -454,7 +467,7 @@ Status LShapeStation::Solve()
         }
 
         if (mipAnyInfeasible) {
-            std::cout << "Station-group Benders iter " << iter << ", feasibility cut x" << feasCount;
+            std::cout << AlgorithmLabel() << " iter " << iter << ", feasibility cut x" << feasCount;
             if (std::isfinite(bestUpperBound)) {
                 const double denom = std::max(1.0, std::fabs(bestUpperBound));
                 std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound
@@ -472,7 +485,7 @@ Status LShapeStation::Solve()
             UpdateIncumbent(zValues, aggregatedQValue);
         }
 
-        std::cout << "Station-group Benders iter " << iter
+        std::cout << AlgorithmLabel() << " iter " << iter
                   << ", theta=" << thetaValue << ", Q(z)=" << aggregatedQValue;
         if (std::isfinite(bestUpperBound)) {
             const double denom = std::max(1.0, std::fabs(bestUpperBound));
@@ -488,8 +501,8 @@ Status LShapeStation::Solve()
                       << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
             PrintBestSolution();
             const auto solveEnd = Tools::Clock::now();
-            std::cout << "Station-group Benders converged." << std::endl;
-            std::cout << "Station-group Benders final elapsed time: "
+            std::cout << AlgorithmLabel() << " converged." << std::endl;
+            std::cout << AlgorithmLabel() << " final elapsed time: "
                       << Tools::ElapsedMs(solveStart, solveEnd) << " ms" << std::endl;
             return OK;
         }
@@ -508,6 +521,6 @@ Status LShapeStation::Solve()
     }
 
     PrintBestSolution();
-    std::cout << "Station-group Benders reached max iterations: " << maxIters << std::endl;
+    std::cout << AlgorithmLabel() << " reached max iterations: " << maxIters << std::endl;
     return ERROR;
 }

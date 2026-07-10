@@ -97,10 +97,20 @@ In short: first remove invalid public logic and misleading paths, then remove in
 - [ ] Decide whether to keep or remove legacy `wireless --alg l2`.
 - [ ] Decide whether to keep `wireless` as a legacy problem alias after all experiments migrate to `wireless_reform`.
 
+### File split / code organization
+
+- [ ] Split materially different algorithms into independent files instead of relying on large flag branches.
+- [ ] Keep shared utilities in common files only when the behavior is genuinely identical across variants.
+- [ ] Separate `lifted-ils` from `lifted-two-phase` if the Phase 1 relaxation branch remains substantial.
+- [ ] Keep `full` separate from ablation variants because it has the sequential Phase 1/Phase 2 wrapper and strengthened cuts.
+- [ ] Keep station-group data structures as implementation internals unless they become part of a public algorithm interface.
+- [ ] Update `CMakeLists.txt` whenever a new algorithm file is introduced.
+
 ### Terminology and output cleanup
 
 - [x] Print `no incumbent found` instead of `no feasible solution` when `UB = inf`.
 - [x] Report Phase 1, Phase 2, and total two-phase elapsed time.
+- [x] Rename `LShapeStation` runtime output from `Station-group Benders` to lifted-ILS labels.
 - [ ] Standardize all algorithm headers and result logs across `solver`, `natural-ils`, `lifted-ils`, `lifted-two-phase`, and `full`.
 - [ ] Rename internal comments that still make station-group terminology sound like a paper-level formulation rather than an implementation unit.
 
