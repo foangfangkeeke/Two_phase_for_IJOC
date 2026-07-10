@@ -57,7 +57,7 @@ Status UsingSolver::Solve()
     }
 
     double lb = model->get(GRB_DoubleAttr_ObjBound);
-    std::cout << "UB: inf, LB: " << lb << " (no feasible solution)" << std::endl;
+    std::cout << "UB: inf, LB: " << lb << " (no incumbent found)" << std::endl;
     std::cerr << "Not solved to optimality, status: " << solveStatus << std::endl;
     return ERROR;
 }

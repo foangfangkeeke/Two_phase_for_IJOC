@@ -85,7 +85,9 @@ Status LShapeRelaxedStation::Initialize()
 {
     if (initialized) return OK;
 
-    // ── Phase 1: sg-relax ──
+    fullAlgorithmStart_ = Tools::Clock::now();
+
+    // ── Phase 1: operational relaxation ──
     LShapeRelaxed phase1(problemType, dataFolder, maxIters, tolerance);
     phase1.SetSolverConfig(solverConfig);
 
@@ -94,6 +96,9 @@ Status LShapeRelaxedStation::Initialize()
 
     s = phase1.Solve();
     if (s != OK) { std::cerr << "Phase 1 solve failed" << std::endl; return s; }
+    const auto phase1End = Tools::Clock::now();
+    phase1ElapsedMs_ = Tools::ElapsedMs(fullAlgorithmStart_, phase1End);
+    std::cout << "Phase 1 elapsed time: " << phase1ElapsedMs_ << " ms" << std::endl;
 
     // Capture Phase 1 state before phase1 goes out of scope
     phase1ZValues = phase1.GetIncumbentZValues();
@@ -114,7 +119,7 @@ Status LShapeRelaxedStation::Initialize()
     // Phase 1 UB is NOT valid for Phase 2 (different sub-problems have different costs)
     bestUpperBound_ = std::numeric_limits<double>::infinity();
 
-    std::cout << std::endl << "── Phase 2: sg-full (reusing Phase 1 master + all cuts) ──" << std::endl;
+    std::cout << std::endl << "── Phase 2: MIP verification (reusing Phase 1 master + all cuts) ──" << std::endl;
 
     // ── Build station-group sub-problems ──
     const auto& stationGroups = problemData_->getData<std::vector<StationGroupInfo>>(
@@ -125,7 +130,7 @@ Status LShapeRelaxedStation::Initialize()
         return ERROR;
     }
 
-    // Add groupThetaVars (one per station group, like sg-full)
+    // Add one Phase 2 theta variable per station group.
     groupThetaVars_.clear();
     groupThetaVars_.reserve(stationGroups.size());
     GRBLinExpr groupThetaSum = 0.0;
@@ -232,6 +237,12 @@ Status LShapeRelaxedStation::Solve()
         const double elapsedSec = Tools::ElapsedMs(algorithmStart_, Tools::Clock::now()) / 1000.0;
         if (elapsedSec >= solverConfig.timeLimit) {
             std::cout << "Phase 2 reached time limit: " << solverConfig.timeLimit << "s" << std::endl;
+            const auto solveEnd = Tools::Clock::now();
+            const long long phase2Ms = Tools::ElapsedMs(solveStart, solveEnd);
+            const long long totalMs = Tools::ElapsedMs(fullAlgorithmStart_, solveEnd);
+            std::cout << "Two-phase total elapsed time: " << totalMs
+                      << " ms (phase1=" << phase1ElapsedMs_
+                      << " ms, phase2=" << phase2Ms << " ms)" << std::endl;
             return ERROR;
         }
 
@@ -255,13 +266,13 @@ Status LShapeRelaxedStation::Solve()
             fixedCost += zVars_[i].get(GRB_DoubleAttr_Obj) * zValues[i];
         }
         const double thetaValue = theta_.get(GRB_DoubleAttr_X);
-        const double objVal = fixedCost + thetaValue;
-        bestLowerBound_ = std::max(bestLowerBound_, objVal);
+        const double masterBound = model_->get(GRB_DoubleAttr_ObjBound);
+        bestLowerBound_ = std::max(bestLowerBound_, masterBound);
 
         // ── RSP: LP relaxation of station-group sub-problems ──
         bool rspAnyInfeasible = false;
         {
-            // Evaluate LP relaxation (same as sg-full twoPhase=true)
+            // Evaluate LP relaxation for lower-bounding before MIP verification.
             std::vector<std::future<SubProblemEvalResult>> futures;
             futures.reserve(subProblems_.size());
             const ProblemData* pd = problemData_;
@@ -295,7 +306,7 @@ Status LShapeRelaxedStation::Solve()
                             "p2_feas_" + std::to_string(iter) + "_" + std::to_string(idx));
                         ++feasCount;
                     }
-                    // Strengthened no-good (matching sg-full)
+                    // Strengthened no-good cut for the current station-group scope.
                     const auto& sgInfo = stationGroups[idx];
                     std::vector<std::string> sgFacNames;
                     int scIdx = sgInfo.scenarioIndex;
@@ -374,7 +385,7 @@ Status LShapeRelaxedStation::Solve()
         }
 
         if (spAnyInfeasible) {
-            // MIP infeasible — add feasibility cut + strengthened no-good (matching sg-full)
+            // MIP infeasible: add feasibility cut plus strengthened no-good cut.
             int feasCount = 0;
             std::set<std::string> addedFeasCuts;
             for (size_t idx = 0; idx < mipCutInfos.size(); ++idx) {
@@ -385,7 +396,7 @@ Status LShapeRelaxedStation::Solve()
                         "p2_mip_feas_" + std::to_string(iter) + "_" + std::to_string(idx));
                     ++feasCount;
                 }
-                // Strengthened no-good (matching sg-full)
+                // Strengthened no-good cut for the current station-group scope.
                 const auto& sgInfo = stationGroups[idx];
                 std::vector<std::string> sgFacNames;
                 int scIdx = sgInfo.scenarioIndex;
@@ -433,7 +444,7 @@ Status LShapeRelaxedStation::Solve()
                       << ", gap=" << (bestUpperBound_ - bestLowerBound_) / denom * 100.0 << "%";
         }
 
-        // Add MIP integer optimality cuts (matching sg-full lines 494-499)
+        // Add MIP integer optimality cuts to the corresponding Phase 2 theta variables.
         // These tighten the LB on the NEXT master re-solve.
         for (size_t idx = 0; idx < mipCutInfos.size(); ++idx) {
             if (!mipCutInfos[idx].isOptimalityCut) continue;
@@ -465,8 +476,12 @@ Status LShapeRelaxedStation::Solve()
                 std::cout << "Q(z): " << incumbentQ_ << std::endl;
             }
             const auto solveEnd = Tools::Clock::now();
-            std::cout << "Phase 2 final elapsed time: "
-                      << Tools::ElapsedMs(solveStart, solveEnd) << " ms" << std::endl;
+            const long long phase2Ms = Tools::ElapsedMs(solveStart, solveEnd);
+            const long long totalMs = Tools::ElapsedMs(fullAlgorithmStart_, solveEnd);
+            std::cout << "Phase 2 final elapsed time: " << phase2Ms << " ms" << std::endl;
+            std::cout << "Two-phase total elapsed time: " << totalMs
+                      << " ms (phase1=" << phase1ElapsedMs_
+                      << " ms, phase2=" << phase2Ms << " ms)" << std::endl;
             return OK;
             }
         }  // iter > 0
@@ -479,6 +494,12 @@ Status LShapeRelaxedStation::Solve()
 
     std::cout << "UB: " << bestUpperBound_ << ", LB: " << bestLowerBound_ << std::endl;
     std::cout << "Phase 2 reached max iterations: " << maxIters << std::endl;
+    const auto solveEnd = Tools::Clock::now();
+    const long long phase2Ms = Tools::ElapsedMs(solveStart, solveEnd);
+    const long long totalMs = Tools::ElapsedMs(fullAlgorithmStart_, solveEnd);
+    std::cout << "Two-phase total elapsed time: " << totalMs
+              << " ms (phase1=" << phase1ElapsedMs_
+              << " ms, phase2=" << phase2Ms << " ms)" << std::endl;
     return ERROR;
 }
 

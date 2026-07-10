@@ -1,5 +1,4 @@
 #include "barp_s_integer_l_shaped.hpp"
-#include "lshape_relaxed.hpp"
 #include "lshape_relaxed_station.hpp"
 #include "lshape_station.hpp"
 #include "gurobi_c++.h"
@@ -55,7 +54,7 @@ int main(int argc, char* argv[])
             solver.SetAlgorithm(std::make_unique<WirelessNoPlugInIntegerLShaped>(dataFolder));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;
-            return 0;
+            return 1;
         }
 
         try {
@@ -70,21 +69,26 @@ int main(int argc, char* argv[])
         MILPSolver solver;
         solver.SetSolverConfig(LoadSolverConfig());
 
-        if (algLower == "sg-full") {
+        if (algLower == "solver") {
+            // Direct EF-MILP baseline. The lifted reformulation is a decomposition
+            // device, so the direct solver remains the original extensive form.
+            solver.SetAlgorithm(std::make_unique<UsingSolver>(WIRELESS_CHARGING_NO_PLUGIN, dataFolder));
+        } else if (algLower == "natural-ils") {
+            // Natural ILS baseline before lifting scenario battery variables.
+            solver.SetAlgorithm(std::make_unique<WirelessNoPlugInIntegerLShaped>(dataFolder));
+        } else if (algLower == "lifted-ils") {
             solver.SetAlgorithm(std::make_unique<LShapeStation>(
-                WIRELESS_CAPACITY_REFORM, dataFolder, true, true, 5000));
-        } else if (algLower == "sg-perstation") {
+                WIRELESS_CAPACITY_REFORM, dataFolder, false, false, 5000));
+        } else if (algLower == "lifted-two-phase") {
             solver.SetAlgorithm(std::make_unique<LShapeStation>(
-                WIRELESS_CAPACITY_REFORM, dataFolder, true, true, 5000, 1e-6, true));
-        } else if (algLower == "sg-relax") {
-            solver.SetAlgorithm(std::make_unique<LShapeRelaxed>(
-                WIRELESS_CAPACITY_REFORM, dataFolder, 5000));
-        } else if (algLower == "sg-relax-station") {
+                WIRELESS_CAPACITY_REFORM, dataFolder, false, true, 5000));
+        } else if (algLower == "full") {
             solver.SetAlgorithm(std::make_unique<LShapeRelaxedStation>(
                 WIRELESS_CAPACITY_REFORM, dataFolder, 5000));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;
-            return 0;
+            cout << "valid wireless_reform algorithms: solver, natural-ils, lifted-ils, lifted-two-phase, full" << endl;
+            return 1;
         }
 
         try {
@@ -97,5 +101,5 @@ int main(int argc, char* argv[])
 
     cout << "No experiments registered for problem " << pb << endl;
     cout << "Usage: wireless.exe --pb <problem> --alg <algorithm> --data <test|tower>" << endl;
-    return 0;
+    return 1;
 }

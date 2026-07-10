@@ -10,8 +10,9 @@
 
 class LShapeStation : public IMILPAlgorithmStrategy {
 public:
-    // useImprovedCuts=false, twoPhase=false => SG-basic
-    // useImprovedCuts=true,  twoPhase=true  => SG-full
+    // useImprovedCuts=false, twoPhase=false => lifted-ils
+    // useImprovedCuts=false, twoPhase=true  => lifted-two-phase
+    // useImprovedCuts=true variants are retained for internal comparisons.
     LShapeStation(ProblemType problemType, std::string dataFolder = "test_data",
         bool useImprovedCuts = false, bool twoPhase = false,
         int maxIters = 500, double tol = 1e-6, bool perStationMode = false);
@@ -19,7 +20,7 @@ public:
     Status Solve() override;
     ~LShapeStation() override;
 
-    // Accept warm-start solution from Phase 1 (e.g., sg-relax)
+    // Accept warm-start solution from an external Phase 1 relaxation.
     void SetExternalWarmStart(const std::vector<double>& zValues, double upperBound);
 
 private:
@@ -67,7 +68,7 @@ private:
     double incumbentSecondStageValue;
     std::chrono::steady_clock::time_point algorithmStart;
 
-    // External warm start (e.g., from Phase 1 sg-relax)
+    // External warm start from a Phase 1 relaxation.
     bool externalWarmStartReady_ = false;
     std::vector<double> externalWarmStartZValues_;
     double externalWarmStartUpperBound_ = 0.0;

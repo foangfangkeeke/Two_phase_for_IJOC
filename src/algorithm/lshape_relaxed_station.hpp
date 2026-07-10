@@ -11,10 +11,10 @@
 struct StationGroupInfo;
 
 /// Two-phase Benders algorithm:
-///   Phase 1: sg-relax (no charger capacity, per-route LP sub-problems)
+///   Phase 1: operational relaxation with per-route LP sub-problems.
 ///   Phase 2: Reuses Phase 1 master model (with accumulated cuts),
-///            replaces sub-problems with station-group LPs (sg-full, full charger capacity),
-///            continues Benders iterations mapping station-group cuts to routeThetaVars.
+///            replaces sub-problems with station-group MIPs (full charger capacity),
+///            continues Benders iterations with one theta variable per station group.
 class LShapeRelaxedStation : public IMILPAlgorithmStrategy {
 public:
     LShapeRelaxedStation(ProblemType problemType, std::string dataFolder = "test_data",
@@ -40,7 +40,7 @@ private:
     std::unique_ptr<ProblemData> problemDataOwned_;
     std::shared_ptr<GRBModel> model_;
     std::vector<GRBVar> zVars_;
-    std::vector<GRBVar> groupThetaVars_;  // one per station group (sg-full style)
+    std::vector<GRBVar> groupThetaVars_;  // one theta per Phase 2 station group
     GRBVar theta_;
     ProblemData* problemData_ = nullptr;
 
@@ -54,4 +54,6 @@ private:
     std::vector<double> incumbentZValues_;
     double incumbentQ_ = 0.0;
     std::chrono::steady_clock::time_point algorithmStart_;
+    std::chrono::steady_clock::time_point fullAlgorithmStart_;
+    long long phase1ElapsedMs_ = 0;
 };

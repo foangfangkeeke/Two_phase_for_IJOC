@@ -753,7 +753,7 @@ static void ComputeRouteEnergyBudget(
                     int stayTime = depTime - arrTime;
 
                     if (nc.chargerPhys.count(station)) {
-                        // Fast charger: free (always available) if bound station or sg-full
+                        // Fast charger is available when this station is in the active subproblem scope.
                         if (!routeChargerStation || station == bound)
                             fastFree += cc.chargeRate[0] * stayTime * cc.chargeEfficiency[0];
                     } else {
@@ -948,7 +948,7 @@ static void InitWirelessMasterData(ProblemData& data, const string& dataFolder, 
 
     // Valid inequality: facility-aware energy budget from worst-EB on each route
     // Only active for per-station mode where the route→charger station binding is known.
-    // sg-relax and sg-full use the reference logic without this inequality.
+    // The main lifted variants use the reference logic without this inequality.
     if (perStationMode) {
         vector<vector<double>> ebTotalC, ebFastFree;
         vector<vector<vector<string>>> ebFacNames;
