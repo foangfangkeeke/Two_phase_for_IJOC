@@ -101,6 +101,7 @@ In short: first remove invalid public logic and misleading paths, then remove in
 
 - [ ] Split materially different algorithms into independent files instead of relying on large flag branches.
 - [x] Add independent public entry classes/files for `lifted-ils` and `lifted-two-phase`.
+- [x] Make `lifted-ils` a self-contained implementation instead of a wrapper around `LShapeStation`.
 - [x] Remove unused strengthened/per-station branches from the lifted-ILS engine.
 - [ ] Keep shared utilities in common files only when the behavior is genuinely identical across variants.
 - [ ] Separate `lifted-ils` from `lifted-two-phase` if the Phase 1 relaxation branch remains substantial.
