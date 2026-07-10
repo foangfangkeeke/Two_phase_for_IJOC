@@ -15,7 +15,7 @@
 
 namespace {
 
-using DataInitFactory = std::function<std::unique_ptr<IDataInit_LShape>(const std::string&, bool)>;
+using DataInitFactory = std::function<std::unique_ptr<IDataInit_LShape>(const std::string&)>;
 using SubFactory = std::function<std::unique_ptr<ISubProblem_LShape>()>;
 
 struct SubProblemEvalResult {
@@ -45,8 +45,8 @@ static const std::map<ProblemType, std::tuple<DataInitFactory, SubFactory>> kStr
     {
         WIRELESS_CAPACITY_REFORM,
         std::make_tuple(
-            [](const std::string& dataFolder, bool perStation) {
-                return std::make_unique<WirelessReformDataInit>(dataFolder, perStation);
+            [](const std::string& dataFolder) {
+                return std::make_unique<WirelessReformDataInit>(dataFolder);
             },
             []() { return std::make_unique<WirelessStationGroupSubProblem>(); })
     }
@@ -82,11 +82,10 @@ struct LShapeStation::StationSubProblemState {
 // --- Constructor ---
 
 LShapeStation::LShapeStation(ProblemType problemType, std::string dataFolder,
-    bool useImprovedCuts, bool twoPhase, int maxIters, double tol, bool perStationMode)
+    bool twoPhase, int maxIters, double tol)
     : problemType(problemType), dataFolder(std::move(dataFolder)),
       maxIters(maxIters), tolerance(tol),
-      useImprovedCuts(useImprovedCuts), twoPhase(twoPhase),
-      perStationMode(perStationMode),
+      twoPhase(twoPhase),
       globalLowerBound(0.0), bestUpperBound(std::numeric_limits<double>::infinity()),
       bestLowerBound(-std::numeric_limits<double>::infinity()),
       incumbentSecondStageValue(std::numeric_limits<double>::infinity())
@@ -96,14 +95,7 @@ LShapeStation::~LShapeStation() = default;
 
 std::string LShapeStation::AlgorithmLabel() const
 {
-    if (twoPhase) {
-        return useImprovedCuts
-            ? "Lifted two-phase ILS with strengthened cuts"
-            : "Lifted two-phase ILS";
-    }
-    return useImprovedCuts
-        ? "Lifted ILS with strengthened cuts"
-        : "Lifted ILS";
+    return twoPhase ? "Lifted two-phase ILS" : "Lifted ILS";
 }
 
 // --- Initialize ---
@@ -126,7 +118,7 @@ Status LShapeStation::Initialize()
         throw std::invalid_argument("Unsupported problem type for lifted ILS");
     }
 
-    dataIniter = std::get<0>(it->second)(dataFolder, perStationMode);
+    dataIniter = std::get<0>(it->second)(dataFolder);
     problemData = std::make_unique<ProblemData>();
     const auto dataInitStart = Tools::Clock::now();
     dataIniter->DataInit(*problemData);
@@ -360,11 +352,6 @@ Status LShapeStation::Solve()
             const long long relaxedMs = Tools::ElapsedMs(relaxedStart, relaxedEnd);
             if (relaxedStatus != OK) return ERROR;
 
-            const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
-            const auto& stationGroups = problemData->getData<std::vector<StationGroupInfo>>("wireless_station_groups");
-            const auto& facilityVarNames = problemData->getData<std::vector<std::vector<std::vector<std::string>>>>(
-                "wireless_route_facility_var_names");
-
             int feasCount = 0;
             int optCount = 0;
             std::set<std::string> addedFeasCuts;
@@ -376,20 +363,6 @@ Status LShapeStation::Solve()
                     if (addedFeasCuts.insert(sig).second) {
                         AddFeasibilityCut(*model, relaxedGroupCutInfos[idx], zVars,
                             "sg_relaxed_feasibility_" + std::to_string(iter) + "_sub_" + std::to_string(idx));
-                        ++feasCount;
-                    }
-                    if (useImprovedCuts) {
-                        const auto& sgInfo = stationGroups[idx];
-                        std::vector<std::string> sgFacilityVarNames;
-                        int scIdx = sgInfo.scenarioIndex;
-                        for (int rid : sgInfo.routeIds) {
-                            const auto& routeNames = facilityVarNames.at(static_cast<size_t>(scIdx)).at(static_cast<size_t>(rid));
-                            sgFacilityVarNames.insert(sgFacilityVarNames.end(), routeNames.begin(), routeNames.end());
-                        }
-                        const BendersCutInfo noGoodCut = BuildStationGroupStrengthenedNoGoodCut(
-                            masterVars, zValues, sgInfo.scenarioIndex, sgInfo.routeIds, sgFacilityVarNames);
-                        AddFeasibilityCut(*model, noGoodCut, zVars,
-                            "sg_strengthened_nogood_" + std::to_string(iter) + "_sub_" + std::to_string(idx));
                         ++feasCount;
                     }
                 } else if (groupThetaVars[idx].get(GRB_DoubleAttr_X) + tolerance < relaxedGroupQValues[idx]) {
@@ -436,10 +409,6 @@ Status LShapeStation::Solve()
         bool mipAnyInfeasible = false;
         {
             std::set<std::string> addedFeasibilityCuts;
-            const auto& mVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
-            const auto& sGroups = problemData->getData<std::vector<StationGroupInfo>>("wireless_station_groups");
-            const auto& fVarNames = problemData->getData<std::vector<std::vector<std::vector<std::string>>>>(
-                "wireless_route_facility_var_names");
             for (size_t idx = 0; idx < groupCutInfos.size(); ++idx) {
                 if (groupCutInfos[idx].isOptimalityCut) continue;
                 mipAnyInfeasible = true;
@@ -447,20 +416,6 @@ Status LShapeStation::Solve()
                 if (addedFeasibilityCuts.insert(cutSignature).second) {
                     AddFeasibilityCut(*model, groupCutInfos[idx], zVars,
                         "sg_feasibility_" + std::to_string(iter) + "_sub_" + std::to_string(idx));
-                    ++feasCount;
-                }
-                if (useImprovedCuts) {
-                    const auto& sgInfo = sGroups[idx];
-                    std::vector<std::string> sgFacilityVarNames;
-                    int scIdx = sgInfo.scenarioIndex;
-                    for (int rid : sgInfo.routeIds) {
-                        const auto& routeNames = fVarNames.at(static_cast<size_t>(scIdx)).at(static_cast<size_t>(rid));
-                        sgFacilityVarNames.insert(sgFacilityVarNames.end(), routeNames.begin(), routeNames.end());
-                    }
-                    const BendersCutInfo noGoodCut = BuildStationGroupStrengthenedNoGoodCut(
-                        mVars, zValues, sgInfo.scenarioIndex, sgInfo.routeIds, sgFacilityVarNames);
-                    AddFeasibilityCut(*model, noGoodCut, zVars,
-                        "sg_strengthened_nogood_" + std::to_string(iter) + "_sub_" + std::to_string(idx));
                     ++feasCount;
                 }
             }

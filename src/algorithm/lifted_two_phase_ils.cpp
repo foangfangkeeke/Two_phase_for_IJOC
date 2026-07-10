@@ -4,7 +4,7 @@
 
 LiftedTwoPhaseILS::LiftedTwoPhaseILS(ProblemType problemType, std::string dataFolder,
     int maxIters, double tol)
-    : engine_(problemType, std::move(dataFolder), false, true, maxIters, tol)
+    : engine_(problemType, std::move(dataFolder), true, maxIters, tol)
 {}
 
 Status LiftedTwoPhaseILS::Initialize()

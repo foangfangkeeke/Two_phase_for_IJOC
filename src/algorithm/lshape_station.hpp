@@ -10,12 +10,10 @@
 
 class LShapeStation : public IMILPAlgorithmStrategy {
 public:
-    // useImprovedCuts=false, twoPhase=false => lifted-ils
-    // useImprovedCuts=false, twoPhase=true  => lifted-two-phase
-    // useImprovedCuts=true variants are retained for internal comparisons.
+    // twoPhase=false => lifted-ils
+    // twoPhase=true  => lifted-two-phase
     LShapeStation(ProblemType problemType, std::string dataFolder = "test_data",
-        bool useImprovedCuts = false, bool twoPhase = false,
-        int maxIters = 500, double tol = 1e-6, bool perStationMode = false);
+        bool twoPhase = false, int maxIters = 500, double tol = 1e-6);
     Status Initialize() override;
     Status Solve() override;
     ~LShapeStation() override;
@@ -49,9 +47,7 @@ private:
     std::string dataFolder;
     int maxIters;
     double tolerance;
-    bool useImprovedCuts;
     bool twoPhase;
-    bool perStationMode;
 
     std::unique_ptr<GRBEnv> env;
     std::shared_ptr<GRBModel> model;

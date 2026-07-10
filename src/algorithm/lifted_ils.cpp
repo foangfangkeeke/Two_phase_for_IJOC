@@ -4,7 +4,7 @@
 
 LiftedILS::LiftedILS(ProblemType problemType, std::string dataFolder,
     int maxIters, double tol)
-    : engine_(problemType, std::move(dataFolder), false, false, maxIters, tol)
+    : engine_(problemType, std::move(dataFolder), false, maxIters, tol)
 {}
 
 Status LiftedILS::Initialize()

@@ -101,6 +101,7 @@ In short: first remove invalid public logic and misleading paths, then remove in
 
 - [ ] Split materially different algorithms into independent files instead of relying on large flag branches.
 - [x] Add independent public entry classes/files for `lifted-ils` and `lifted-two-phase`.
+- [x] Remove unused strengthened/per-station branches from the lifted-ILS engine.
 - [ ] Keep shared utilities in common files only when the behavior is genuinely identical across variants.
 - [ ] Separate `lifted-ils` from `lifted-two-phase` if the Phase 1 relaxation branch remains substantial.
 - [ ] Keep `full` separate from ablation variants because it has the sequential Phase 1/Phase 2 wrapper and strengthened cuts.
