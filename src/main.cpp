@@ -1,6 +1,7 @@
 #include "barp_s_integer_l_shaped.hpp"
+#include "lifted_ils.hpp"
+#include "lifted_two_phase_ils.hpp"
 #include "lshape_relaxed_station.hpp"
-#include "lshape_station.hpp"
 #include "gurobi_c++.h"
 #include "milp_solver.hpp"
 #include "solver_config.hpp"
@@ -77,11 +78,11 @@ int main(int argc, char* argv[])
             // Natural ILS baseline before lifting scenario battery variables.
             solver.SetAlgorithm(std::make_unique<WirelessNoPlugInIntegerLShaped>(dataFolder));
         } else if (algLower == "lifted-ils") {
-            solver.SetAlgorithm(std::make_unique<LShapeStation>(
-                WIRELESS_CAPACITY_REFORM, dataFolder, false, false, 5000));
+            solver.SetAlgorithm(std::make_unique<LiftedILS>(
+                WIRELESS_CAPACITY_REFORM, dataFolder, 5000));
         } else if (algLower == "lifted-two-phase") {
-            solver.SetAlgorithm(std::make_unique<LShapeStation>(
-                WIRELESS_CAPACITY_REFORM, dataFolder, false, true, 5000));
+            solver.SetAlgorithm(std::make_unique<LiftedTwoPhaseILS>(
+                WIRELESS_CAPACITY_REFORM, dataFolder, 5000));
         } else if (algLower == "full") {
             solver.SetAlgorithm(std::make_unique<LShapeRelaxedStation>(
                 WIRELESS_CAPACITY_REFORM, dataFolder, 5000));
