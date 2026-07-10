@@ -45,8 +45,11 @@ Current uncommitted work mainly performs naming / entry-point cleanup and output
 - `src/algorithm/lshape_relaxed_station.hpp`
   - Comments now describe Phase 2 as station-group MIP verification, not LP.
 
-- `src/algorithm/lshape_station.hpp`
-  - Comments now align variants with `lifted-ils` and `lifted-two-phase`.
+- `src/algorithm/lifted_ils.cpp/hpp`
+  - Self-contained lifted ILS implementation.
+
+- `src/algorithm/lifted_two_phase_ils.cpp/hpp`
+  - Self-contained lifted two-phase ILS implementation.
 
 - `PROJECT_SUMMARY.md`
   - Untracked project narrative / task document.
@@ -99,21 +102,23 @@ In short: first remove invalid public logic and misleading paths, then remove in
 
 ### File split / code organization
 
-- [ ] Split materially different algorithms into independent files instead of relying on large flag branches.
+- [x] Split materially different algorithms into independent files instead of relying on large flag branches.
 - [x] Add independent public entry classes/files for `lifted-ils` and `lifted-two-phase`.
 - [x] Make `lifted-ils` a self-contained implementation instead of a wrapper around `LShapeStation`.
+- [x] Make `lifted-two-phase` a self-contained implementation instead of a wrapper around `LShapeStation`.
+- [x] Remove the obsolete shared `LShapeStation` engine.
 - [x] Remove unused strengthened/per-station branches from the lifted-ILS engine.
 - [ ] Keep shared utilities in common files only when the behavior is genuinely identical across variants.
-- [ ] Separate `lifted-ils` from `lifted-two-phase` if the Phase 1 relaxation branch remains substantial.
+- [x] Separate `lifted-ils` from `lifted-two-phase`.
 - [ ] Keep `full` separate from ablation variants because it has the sequential Phase 1/Phase 2 wrapper and strengthened cuts.
 - [ ] Keep station-group data structures as implementation internals unless they become part of a public algorithm interface.
-- [ ] Update `CMakeLists.txt` whenever a new algorithm file is introduced.
+- [x] Update `CMakeLists.txt` whenever a new algorithm file is introduced.
 
 ### Terminology and output cleanup
 
 - [x] Print `no incumbent found` instead of `no feasible solution` when `UB = inf`.
 - [x] Report Phase 1, Phase 2, and total two-phase elapsed time.
-- [x] Rename `LShapeStation` runtime output from `Station-group Benders` to lifted-ILS labels.
+- [x] Replace obsolete `LShapeStation` runtime output with algorithm-specific lifted-ILS labels.
 - [ ] Standardize all algorithm headers and result logs across `solver`, `natural-ils`, `lifted-ils`, `lifted-two-phase`, and `full`.
 - [ ] Rename internal comments that still make station-group terminology sound like a paper-level formulation rather than an implementation unit.
 

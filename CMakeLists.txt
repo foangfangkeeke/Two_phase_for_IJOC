@@ -41,7 +41,6 @@ add_executable(wireless
     src/algorithm/barp_s_integer_l_shaped.cpp
     src/algorithm/lifted_ils.cpp
     src/algorithm/lifted_two_phase_ils.cpp
-    src/algorithm/lshape_station.cpp
     src/algorithm/lshape_relaxed.cpp
     src/algorithm/lshape_relaxed_station.cpp
 )
