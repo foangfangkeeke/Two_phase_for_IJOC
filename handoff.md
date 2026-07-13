@@ -1,232 +1,220 @@
 # Handoff
 
-## Current intent
+For the full paper-facing methodology narrative and mathematical formulation, see [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md).
 
-The project is being reorganized around a defensible paper narrative for wireless charging facility deployment and adaptive battery configuration under service-plan uncertainty.
+## 1. Current intent
 
-The intended experimental / algorithm ladder is:
+Wireless charging facility deployment and adaptive battery configuration under service-plan uncertainty. Five-algorithm ladder:
 
-1. `solver`: direct extensive-form MILP baseline.
-2. `natural-ils`: natural integer L-shaped baseline with master `w` only and scenario subproblem jointly optimizing battery configuration `z_omega` and charging operation `y_omega`.
-3. `lifted-ils`: lifted reformulation, with scenario-dependent battery variables lifted to the master, but no two-phase relaxation.
-4. `lifted-two-phase`: lifted reformulation plus LP-first / MIP-verification two-phase structure, without strengthened cuts.
-5. `full`: lifted reformulation plus two-phase structure plus strengthened cuts.
+1. `solver` — direct extensive-form MILP baseline.
+2. `natural-ils` — natural ILS: `w` in master, `z_ω` + `y_ω` in subproblem（naive, no LP pruning）.
+3. `lifted-ils` — lifted reformulation, single-phase MIP, classic cuts.
+4. `lifted-two-phase` — lifted + two-phase (LP→MIP), classic cuts.
+5. `full` — lifted + two-phase + strengthened feasibility and optimality cuts（optimality pending in the current implementation）.
 
-Important modeling interpretation:
+## 2. Final intended algorithm ladder
 
-- `w` is the only cross-scenario here-and-now strategic decision.
-- Battery variables `z_{omega,r,cap}` are scenario-dependent adaptive recourse decisions.
-- Lifting `z_omega` into the master is an exact reformulation / decomposition device, not a change in decision timing.
-- The master is not a pure first-stage problem; it contains first-stage facility variables and lifted scenario-dependent battery variables.
-- Plug-in / fast chargers are exogenous existing charging opportunities and only appear as operational subproblem constraints.
+| CLI | Class | ProblemType | Description |
+|-----|-------|-------------|-------------|
+| `--alg solver` | `UsingSolver` | `WIRELESS_CHARGING_NO_PLUGIN` | Direct extensive-form MILP |
+| `--alg natural-ils` | `NaturalILS` | `WIRELESS_CHARGING_NO_PLUGIN` | Natural ILS, naive, no LP pruning |
+| `--alg lifted-ils` | `LiftedILS` | `WIRELESS_CAPACITY_REFORM` | Lifted, single-phase MIP |
+| `--alg lifted-two-phase` | `LiftedTwoPhaseILS` | `WIRELESS_CAPACITY_REFORM` | Lifted + two-phase, classic cuts |
+| `--alg full` | `FullMethod` | `WIRELESS_CAPACITY_REFORM` | Lifted + two-phase + strengthened feasibility and optimality cuts |
 
-## Current code status
+## 3. Target code architecture
 
-Current uncommitted work mainly performs naming / entry-point cleanup and output clarification:
+Below is the target state. See §4 for the delta from current code.
 
-- `src/main.cpp`
-  - Public `wireless_reform` CLI now exposes:
-    - `solver`
-    - `natural-ils`
-    - `lifted-ils`
-    - `lifted-two-phase`
-    - `full`
-  - `wireless_reform --alg solver` maps to `UsingSolver(WIRELESS_CHARGING_NO_PLUGIN, dataFolder)`.
-  - This is intentional: `reform` is a decomposition reformulation, not a separate direct-solver problem type.
-  - Invalid problem / algorithm choices now return exit code `1`.
+### 3.1 Algorithm files (`src/algorithm/`)
 
-- `src/algorithm/using_solver.cpp`
-  - Solver timeout with no incumbent now prints `no incumbent found`, not `no feasible solution`.
+| File | Role |
+|------|------|
+| `using_solver.cpp/hpp` | Solver baseline |
+| `natural_ils.cpp/hpp` | Natural ILS baseline（naive, no LP pruning） |
+| `lifted_ils.cpp/hpp` | Lifted ILS（self-contained） |
+| `lifted_two_phase_ils.cpp/hpp` | Lifted two-phase ILS（self-contained） |
+| `full_method.cpp/hpp` | Full method: Phase 1 route relaxation + Phase 2 per-scenario MIP + strengthened feasibility and optimality cuts |
+| `lshape_relaxed.cpp/hpp` | Phase 1 route relaxation component（internal） |
+| `lshape_monotonicity_cut.hpp` | Scenario-level monotonicity-strengthened feasibility/optimality cut utilities（target name） |
+| `benders_core.cpp` | Shared Benders utilities |
+| `benders_decomposition.hpp` | Shared interfaces |
 
-- `src/algorithm/lshape_relaxed_station.cpp`
-  - Adds Phase 1 elapsed time and total two-phase elapsed time reporting.
-  - Updates Phase 2 lower-bound tracking to use Gurobi `ObjBound` instead of the current incumbent objective value.
+### 3.2 Problem types and model mapping
 
-- `src/algorithm/lshape_relaxed_station.hpp`
-  - Comments now describe Phase 2 as station-group MIP verification, not LP.
+| Enum | Source | Key features |
+|------|--------|-------------|
+| `WIRELESS_CHARGING_NO_PLUGIN` | `wireless.cpp` | Full plug-in capacity + scheduling binaries. Enum name misleading; model contains plug-in constraints. |
+| `WIRELESS_CAPACITY_REFORM` | `wireless_reform.cpp` | Same physical model, different data initialization. `reform` is a decomposition device, not a separate problem type. |
 
-- `src/algorithm/lifted_ils.cpp/hpp`
-  - Self-contained lifted ILS implementation.
+Both model the same system with capacity constraints and scheduling binaries. Consistency must be verified before reporting ablation results.
 
-- `src/algorithm/lifted_two_phase_ils.cpp/hpp`
-  - Self-contained lifted two-phase ILS implementation.
+### 3.3 Target key behaviors
 
-- `PROJECT_SUMMARY.md`
-  - Untracked project narrative / task document.
-  - It records the current methodology logic and the desired algorithm ladder.
+- Solver timeout with no incumbent prints `no incumbent found`, not `no feasible solution`.
+- Phase 1 and Phase 2 elapsed times reported separately; Phase 2 LB uses Gurobi `ObjBound`.
+- Each scenario → one operational subproblem（no station-group decomposition）.
+- Natural ILS is a naive baseline: no LP-relaxation pruning, no relaxed warm start.
+- Solver uses Gurobi internal parallelism. Benders variants: one Gurobi thread per subproblem, concurrent subproblem evaluations capped at available hardware cores. If the machine budget is N physical cores, at most N subproblems are evaluated concurrently.
 
-## Build command
+## 4. Current implementation status
 
-On Windows, do not run `run.bat` directly through PowerShell.
+### 4.1 Implemented
 
-Use:
+- [x] Five algorithm CLI names exposed in `main.cpp`.
+- [x] `lifted-ils`, `lifted-two-phase` as self-contained implementations.
+- [x] `LShapeStation` shared engine removed.
+- [x] `full` as independent file.
+- [x] Strengthened feasibility cut via `BuildStationGroupStrengthenedNoGoodCut`.
+- [x] `no incumbent found` output for solver timeout.
+- [x] Phase 1/Phase 2 timing reporting.
+- [x] Old `sg-*` CLI names removed.
+
+### 4.2 Partially implemented
+
+- [ ] Station-group decomposition still present in `lifted_ils`, `lifted_two_phase_ils`, `lshape_relaxed_station`（should be removed）.
+- [ ] Natural-ILS still has LP-relaxation pruning and relaxed warm start（should be removed to make it a naive baseline）.
+- [ ] Legacy file names remain: `barp_s_integer_l_shaped` → `natural_ils`, `lshape_relaxed_station` → `full_method`, `lshape_station_cut` → `lshape_monotonicity_cut`.
+
+### 4.3 Not yet implemented
+
+- [ ] Monotonicity-strengthened optimality cut（reuses same indicator as feasibility cut）.
+- [ ] Standardized log output across all five algorithms.
+- [ ] `tower_10` scenario config.
+- [ ] `PROJECT_SUMMARY.md` committed.
+
+## 5. Known inconsistencies and risks
+
+### 5.1 `WIRELESS_CHARGING_NO_PLUGIN` consistency
+
+Enum name misleading. Must verify `wireless.cpp` and `wireless_reform.cpp` model the same physical system: plug-in constraints, wireless facility constraints, battery/SoC constraints, battery cost scaling, scenario data, objective components.
+
+### 5.2 Natural-ILS purity
+
+`barp_s_integer_l_shaped.cpp` has LP-relaxation pruning (`kPruneByUb`) and relaxed warm start. These make it not a naive baseline. Ablation comparison natural-ils → lifted-two-phase mixes two differences: (a) decomposition structure, (b) LP acceleration strategy. Remove or disable before ablation runs.
+
+### 5.3 Station-group removal
+
+Code still uses `stationGroups`/`groupThetaVars`/`StationGroupInfo`. Paper formulation is per-scenario. Remove these structures from `lifted_ils.cpp`, `lifted_two_phase_ils.cpp`, and `lshape_relaxed_station.cpp`; rename `BuildStationGroupStrengthenedNoGoodCut` and related utilities to scenario-level monotonicity-cut terminology.
+
+### 5.4 Strengthened optimality cut
+
+Same monotonicity indicator as feasibility cut. Feasibility: `indicator ≥ 1`. Optimality: `θ ≥ Q* − δ · indicator`. Currently only feasibility version implemented.
+
+### 5.5 Solver thread policy
+
+All methods use same hardware budget. Solver uses Gurobi internal parallelism. Benders variants: Threads=1 per subproblem, `std::async` concurrency capped at available cores.
+
+## 6. Build and run instructions
+
+### 6.1 Build
 
 ```bat
 cmd.exe /d /s /c "call .\run.bat <nul"
 ```
 
-`run.bat` was adjusted so `SCRIPT_DIR` does not keep the trailing backslash, because the trailing backslash can break quoted CMake arguments.
+Requires: Windows 11, MSVC 2022, CMake ≥ 3.20, Gurobi 12.0+. Output: `out/build/x64/Release/wireless.exe`.
 
-## Should step 1 delete invalid code logic?
+### 6.2 CLI commands
 
-Yes, but only for logic that is already confirmed invalid or misleading.
+```bash
+# Full method
+./wireless.exe --pb wireless_reform --alg full --data tower
 
-The first cleanup step should delete or hide:
+# Ablation
+./wireless.exe --pb wireless_reform --alg solver --data tower
+./wireless.exe --pb wireless_reform --alg natural-ils --data tower
+./wireless.exe --pb wireless_reform --alg lifted-ils --data tower
+./wireless.exe --pb wireless_reform --alg lifted-two-phase --data tower
+```
 
-- obsolete public algorithm names such as `sg-full`, `sg-relax`, `sg-relax-station`, and `sg-perstation`;
-- any direct `WIRELESS_CAPACITY_REFORM` solver path, because reformulation is the ILS/decomposition restructuring, not a new direct solver;
-- comments or docs implying that `reform` is a separate direct formulation;
-- result wording that treats `UB = inf` as infeasibility rather than no incumbent found.
+### 6.3 Config files
 
-The first cleanup step should not yet delete:
+- `solverCfg.txt` — Gurobi default settings except MIPGap, TimeLimit, and thread policy. Thread policy: solver uses Gurobi internal parallelism; Benders variants use one thread per subproblem, with concurrent subproblem evaluations capped by the hardware-core budget（see §8）.
+- `data/{type}_data/globalCfg.txt` — operational and charger parameters.
+- `data/{type}_data/scenarioCfg.txt` — scenario list and probabilities.
+- `data/{type}_data/{scenario}/scenarioMiscCfg.txt` — routes, EBs, timetables.
 
-- classes that are still needed to implement `lifted-ils`, `lifted-two-phase`, or `full`;
-- internal station-group code used by the full method;
-- older baseline code before verifying it is not used by `solver` or `natural-ils`;
-- any historical implementation that may be needed for ablation until its replacement is confirmed.
+## 7. Experiment execution plan
 
-In short: first remove invalid public logic and misleading paths, then remove internal dead code after dependency tracing.
+### 7.1 Phase A: full-method ceiling（7200s）
 
-## Next-step plan
+`full` @ 7200s on `tower_small` → `tower_medium` → `tower_5` → `tower_10` → `tower_20`. Stop when convergence fails. Largest converging case = main table upper bound.
 
-## Checklist
+### 7.2 Phase B: 600s scan
+
+All five algorithms @ 600s on all viable instances. 2-3 runs each. Goal: find break point where solver/natural-ils fail but `full` still works.
+
+### 7.3 Phase C: 7200s main table
+
+3-4 instances around break point. All algorithms @ 7200s, ≥3 runs per cell. Report mean ± std or min/median/max.
+
+### 7.4 Ablation table
+
+`natural-ils` → `lifted-ils` → `lifted-two-phase` → `full` on `tower_5` @ 7200s.
+
+### 7.5 Per-run output fields
+
+UB, LB, gap, wall-clock time, iteration count, Phase 1 time, Phase 2 time, LP cut count, feasibility cut count, optimality cut count, incumbent status（found/none）, termination status（converged/timeout/error）.
+
+## 8. Solver parameter policy
+
+All algorithms use Gurobi 12.0 default settings except MIPGap, TimeLimit, and method-specific thread allocation under a common hardware budget. All methods use the same wall-clock time limit, MIPGap, and total hardware budget.
+
+The extensive-form solver uses Gurobi internal parallelism. Decomposition-based methods use one Gurobi thread per subproblem and cap the number of concurrent subproblem evaluations at the same hardware budget. If the machine budget is N physical cores, at most N subproblems should be evaluated concurrently.
+
+Paper states: "All methods are given access to the same hardware. The solver uses Gurobi's internal parallelism. Benders variants use one thread per subproblem and exploit parallelism through concurrent subproblem evaluation, capped at the available core count."
+
+## 9. Checklist
 
 ### Public path cleanup
 
-- [x] Expose the five paper-facing algorithm names in `main.cpp`.
-- [x] Map `wireless_reform --alg solver` to the original direct EF-MILP baseline.
-- [x] Remove the misleading direct `WIRELESS_CAPACITY_REFORM` solver path.
-- [x] Replace user-facing `sg-relax` / `sg-full` labels in the two-phase wrapper.
-- [ ] Decide whether to keep or remove legacy `wireless --alg l2`.
-- [ ] Decide whether to keep `wireless` as a legacy problem alias after all experiments migrate to `wireless_reform`.
+- [x] Five algorithm names exposed in `main.cpp`.
+- [x] Old `sg-*` labels replaced.
+- [ ] Decide legacy `wireless --alg l2` fate.
 
 ### File split / code organization
 
-- [x] Split materially different algorithms into independent files instead of relying on large flag branches.
-- [x] Add independent public entry classes/files for `lifted-ils` and `lifted-two-phase`.
-- [x] Make `lifted-ils` a self-contained implementation instead of a wrapper around `LShapeStation`.
-- [x] Make `lifted-two-phase` a self-contained implementation instead of a wrapper around `LShapeStation`.
-- [x] Remove the obsolete shared `LShapeStation` engine.
-- [x] Remove unused strengthened/per-station branches from the lifted-ILS engine.
-- [ ] Keep shared utilities in common files only when the behavior is genuinely identical across variants.
-- [x] Separate `lifted-ils` from `lifted-two-phase`.
-- [ ] Keep `full` separate from ablation variants because it has the sequential Phase 1/Phase 2 wrapper and strengthened cuts.
-- [ ] Keep station-group data structures as implementation internals unless they become part of a public algorithm interface.
-- [x] Update `CMakeLists.txt` whenever a new algorithm file is introduced.
+- [x] Independent files for `lifted-ils`, `lifted-two-phase`.
+- [x] `LShapeStation` removed.
+- [x] `full` independent.
+- [ ] Remove station-group decomposition from all Benders variants.
+- [ ] Rename: `barp_s_integer_l_shaped` → `natural_ils`, `lshape_relaxed_station` → `full_method`, `lshape_station_cut` → `lshape_monotonicity_cut`.
+- [ ] Shared utilities limited to genuinely identical behavior.
 
 ### Terminology and output cleanup
 
-- [x] Print `no incumbent found` instead of `no feasible solution` when `UB = inf`.
-- [x] Report Phase 1, Phase 2, and total two-phase elapsed time.
-- [x] Replace obsolete `LShapeStation` runtime output with algorithm-specific lifted-ILS labels.
-- [ ] Standardize all algorithm headers and result logs across `solver`, `natural-ils`, `lifted-ils`, `lifted-two-phase`, and `full`.
-- [ ] Rename internal comments that still make station-group terminology sound like a paper-level formulation rather than an implementation unit.
+- [x] `no incumbent found` output.
+- [x] Phase 1/Phase 2 timing.
+- [ ] Standardize log output across all five algorithms.
+- [ ] Remove station-group terminology from code comments and logs.
 
-### Model consistency checks
+### Model consistency
 
-- [ ] Verify whether `WIRELESS_CHARGING_NO_PLUGIN` is only a legacy enum name or actually changes plug-in / fast-charger modeling.
+- [ ] Verify `WIRELESS_CHARGING_NO_PLUGIN` vs actual plug-in modeling.
 - [ ] Compare objective terms between `wireless.cpp` and `wireless_reform.cpp`.
-- [ ] Compare battery cost scaling by scenario fleet size.
-- [ ] Compare plug-in / fast-charger capacity constraints.
-- [ ] Compare wireless station / link availability constraints.
-- [ ] Compare SoC and energy conservation constraints.
+- [ ] Compare battery cost scaling, plug-in constraints, wireless constraints, SoC.
 
-### Algorithm contribution checks
+### Algorithm contributions
 
-- [x] Lifted reformulation is represented by lifted scenario-dependent battery variables in the master.
-- [x] Two-phase structure is represented by Phase 1 operational relaxation followed by Phase 2 MIP verification.
-- [x] Strengthened feasibility cut is implemented through station-group strengthened no-good cuts.
-- [ ] Implement monotonicity-strengthened optimality cut if it will be claimed as part of the strengthened-cut contribution.
-- [ ] Add ablation output that separates `lifted-ils`, `lifted-two-phase`, and `full`.
+- [x] Lifted reformulation implemented.
+- [x] Two-phase structure implemented.
+- [x] Strengthened feasibility cut implemented.
+- [ ] Remove LP-relaxation pruning from natural-ILS.
+- [ ] Implement monotonicity-strengthened optimality cut.
 
 ### Experiment readiness
 
-- [ ] Use a unified final-paper time limit, currently planned as 7200s.
-- [ ] Ensure `UB = inf` rows are labeled as no incumbent, not infeasible.
-- [ ] Avoid numerical gap reporting when no UB exists unless explicitly defined.
-- [ ] Print enough fields for automated tables: UB, LB, gap, time, iterations, cut counts, Phase 1 time, Phase 2 time, incumbent status.
+- [ ] Phase A/B/C execution.
+- [ ] Ablation table.
+- [ ] `tower_10` config.
+- [ ] Standardized per-run output.
+- [ ] ≥3 runs per cell with spread reporting.
 
-### Step 1: Clean public algorithm paths
+## 10. Immediate priorities
 
-Goal: make the five algorithm names the only supported experiment-facing names.
-
-Tasks:
-
-- Keep `solver`, `natural-ils`, `lifted-ils`, `lifted-two-phase`, and `full`.
-- Remove or reject old `sg-*` algorithm names from `main.cpp`.
-- Confirm `wireless_reform --alg solver` maps to the original direct EF-MILP baseline.
-- Confirm `wireless_reform --alg natural-ils` maps to the original natural ILS baseline.
-- Keep old `wireless --alg solver/l2` only as legacy aliases if useful, or remove later after experiments are migrated.
-
-### Step 2: Align names, logs, and docs
-
-Goal: make runtime output match the paper structure.
-
-Tasks:
-
-- Rename log labels from `sg-relax`, `sg-full`, and station-group-first language to:
-  - Phase 1 operational relaxation
-  - Phase 2 MIP verification
-  - lifted ILS
-  - lifted two-phase
-  - full method
-- Keep station-group terminology as implementation detail only.
-- Ensure all timeout / no-incumbent messages are consistent.
-
-### Step 3: Verify baseline model consistency
-
-Goal: make the experimental comparison defensible.
-
-Tasks:
-
-- Compare `wireless.cpp` baseline and `wireless_reform.cpp` lifted variants for:
-  - plug-in / fast-charger constraints;
-  - wireless facility constraints;
-  - battery capacity and SoC constraints;
-  - battery cost scaling by scenario fleet size;
-  - scenario data and probabilities;
-  - objective components.
-- Decide whether `WIRELESS_CHARGING_NO_PLUGIN` is just a legacy enum name or actually lacks plug-in logic.
-- If the baseline omits plug-in logic while the proposed method includes it, either align the code or separate the comparison clearly.
-
-### Step 4: Implement missing contribution logic if claimed
-
-Goal: make the three claimed contributions match code and experiments.
-
-Current contribution mapping:
-
-- Lifted reformulation: implemented through lifted `z_omega` in the master.
-- Two-phase method: implemented through Phase 1 relaxation followed by Phase 2 MIP verification.
-- Strengthened cuts:
-  - strengthened feasibility cut appears implemented;
-  - monotonicity-strengthened optimality cut is not yet fully implemented if the code still uses a classic Hamming-distance integer optimality cut.
-
-Before claiming both strengthened feasibility and optimality cuts as one proved contribution, implement and test the monotonicity-strengthened optimality cut.
-
-### Step 5: Prepare experimental output
-
-Goal: make results table generation straightforward.
-
-Tasks:
-
-- Standardize printed fields:
-  - algorithm name;
-  - dataset;
-  - UB;
-  - LB;
-  - gap;
-  - incumbent status;
-  - iteration count;
-  - Phase 1 time;
-  - Phase 2 time;
-  - total time;
-  - number of LP cuts;
-  - number of integer feasibility cuts;
-  - number of integer optimality cuts.
-- Use 7200s as the final paper time limit unless a separate run-to-convergence table is explicitly used.
-
-## Immediate recommendation
-
-Do Step 1 next.
-
-Do not start by deleting entire source files. Start by deleting or rejecting invalid entry points and misleading code paths, then use `rg` to trace which internal classes are still reachable from the five intended algorithms.
+1. Remove LP-pruning from `natural-ils` — restores naive baseline.
+2. Remove station-group decomposition — unify to per-scenario subproblems.
+3. Rename legacy files.
+4. Implement monotonicity-strengthened optimality cut — so that `full` matches its target definition（strengthened feasibility and optimality cuts）.
+5. Run experiment plan Phases A→B→C.
