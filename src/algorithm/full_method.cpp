@@ -1,6 +1,6 @@
-#include "lshape_relaxed_station.hpp"
+#include "full_method.hpp"
 #include "lshape_relaxed.hpp"
-#include "lshape_station_cut.hpp"
+#include "lshape_monotonicity_cut.hpp"
 #include "wireless_reform.hpp"
 #include "tools.hpp"
 

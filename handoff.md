@@ -148,7 +148,7 @@ Paper states: "All methods are given access to the same hardware. The solver use
 - [x] `LShapeStation` removed.
 - [x] `full` independent.
 - [ ] Remove station-group decomposition from all Benders variants.
-- [ ] Rename: `barp_s_integer_l_shaped` → `natural_ils`, `lshape_relaxed_station` → `full_method`, `lshape_station_cut` → `lshape_monotonicity_cut`.
+- [x] Rename: `barp_s_integer_l_shaped` → `natural_ils`, `lshape_relaxed_station` → `full_method`, `lshape_station_cut` → `lshape_monotonicity_cut`.
 - [ ] Shared utilities limited to genuinely identical behavior.
 
 ### Terminology and output cleanup
@@ -186,10 +186,9 @@ Paper states: "All methods are given access to the same hardware. The solver use
 
 ## 9. Immediate priorities
 
-1. Rename legacy files (`barp_s_integer_l_shaped` → `natural_ils`, `lshape_relaxed_station` → `full_method`, `lshape_station_cut` → `lshape_monotonicity_cut`).
-2. Remove LP-relaxation pruning from `natural-ils` — restores naive baseline.
-3. Remove station-group decomposition — unify to per-scenario subproblems.
-4. Implement monotonicity-strengthened optimality cut — so that `full` matches its target definition (strengthened feasibility and optimality cuts).
-5. Complete outer-loop TimeLimit and convergence-gap control (Phase 2 sub MIPGap = 0, master ObjBound as LB, 0.01% outer-loop test).
-6. Generate `tower_10` scenario config.
-7. Run experiment plan Stage 1 & Stage 2.
+1. Remove LP-relaxation pruning from `natural-ils` — restores naive baseline.
+2. Remove station-group decomposition — unify to per-scenario subproblems.
+3. Implement monotonicity-strengthened optimality cut — so that `full` matches its target definition (strengthened feasibility and optimality cuts).
+4. Complete outer-loop TimeLimit and convergence-gap control (Phase 2 sub MIPGap = 0, master ObjBound as LB, 0.01% outer-loop test).
+5. Generate `tower_10` scenario config.
+6. Run experiment plan Stage 1 & Stage 2.

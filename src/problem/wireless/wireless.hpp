@@ -1,6 +1,6 @@
 #include <string>
 #include "using_solver.hpp"
-#include "barp_s_integer_l_shaped.hpp"
+#include "natural_ils.hpp"
 
 class WirelessChargingDataInitializationStrategy_Solver : public IDataInitializationStrategy_Solver {
 public:

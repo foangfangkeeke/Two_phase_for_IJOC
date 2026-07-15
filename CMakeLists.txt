@@ -38,11 +38,11 @@ add_executable(wireless
     src/problem/wireless_reform/wireless_reform_route.cpp
     src/algorithm/using_solver.cpp
     src/algorithm/benders_core.cpp
-    src/algorithm/barp_s_integer_l_shaped.cpp
+    src/algorithm/natural_ils.cpp
     src/algorithm/lifted_ils.cpp
     src/algorithm/lifted_two_phase_ils.cpp
     src/algorithm/lshape_relaxed.cpp
-    src/algorithm/lshape_relaxed_station.cpp
+    src/algorithm/full_method.cpp
 )
 
 set_target_properties(wireless PROPERTIES
