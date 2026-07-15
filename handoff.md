@@ -169,7 +169,7 @@ Paper states: "All methods are given access to the same hardware. The solver use
 - [x] Lifted reformulation implemented.
 - [x] Two-phase structure implemented.
 - [x] Strengthened feasibility cut implemented.
-- [ ] Remove LP-relaxation pruning from natural-ILS.
+- [x] Remove LP-relaxation pruning from natural-ILS.
 - [ ] Implement monotonicity-strengthened optimality cut.
 
 ### Experiment readiness
@@ -186,9 +186,8 @@ Paper states: "All methods are given access to the same hardware. The solver use
 
 ## 9. Immediate priorities
 
-1. Remove LP-relaxation pruning from `natural-ils` — restores naive baseline.
-2. Remove station-group decomposition — unify to per-scenario subproblems.
-3. Implement monotonicity-strengthened optimality cut — so that `full` matches its target definition (strengthened feasibility and optimality cuts).
-4. Complete outer-loop TimeLimit and convergence-gap control (Phase 2 sub MIPGap = 0, master ObjBound as LB, 0.01% outer-loop test).
-5. Generate `tower_10` scenario config.
-6. Run experiment plan Stage 1 & Stage 2.
+1. Remove station-group decomposition — unify to per-scenario subproblems.
+2. Implement monotonicity-strengthened optimality cut — so that `full` matches its target definition (strengthened feasibility and optimality cuts).
+3. Complete outer-loop TimeLimit and convergence-gap control (Phase 2 sub MIPGap = 0, master ObjBound as LB, 0.01% outer-loop test).
+4. Generate `tower_10` scenario config.
+5. Run experiment plan Stage 1 & Stage 2.

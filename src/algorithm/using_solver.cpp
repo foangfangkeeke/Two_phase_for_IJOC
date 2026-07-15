@@ -52,7 +52,7 @@ Status UsingSolver::Solve()
         double ub = model->get(GRB_DoubleAttr_ObjVal);
         double lb = model->get(GRB_DoubleAttr_ObjBound);
         std::cout << "UB: " << ub << ", LB: " << lb << std::endl;
-        std::cout << "UsingSolver final solve time: " << Tools::ElapsedMs(solveStart, solveEnd) << " ms" << std::endl;
+        std::cout << "Solver final solve time: " << Tools::ElapsedMs(solveStart, solveEnd) << " ms" << std::endl;
         return OK;
     }
 

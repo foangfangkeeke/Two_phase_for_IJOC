@@ -102,7 +102,6 @@ private:
     std::unique_ptr<ISubProblemStrategy_IntegerLShaped> subProblemStrategy;
     std::vector<std::unique_ptr<ScenarioSubProblem>> subProblems;
     std::vector<GRBVar> zVars;
-    std::vector<GRBVar> relaxedThetaVars;
     GRBVar theta;
 
     double globalLowerBound;

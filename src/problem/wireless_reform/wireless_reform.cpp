@@ -1646,12 +1646,12 @@ static bool BuildWirelessChargingLShapedSubProblem(
 }
 
 WirelessReformDataInit::WirelessReformDataInit(
-    std::string dataFolder, bool perStationMode)
-    : dataFolder(std::move(dataFolder)), perStationMode(perStationMode) {}
+    std::string dataFolder)
+    : dataFolder(std::move(dataFolder)) {}
 
 void WirelessReformDataInit::DataInit(ProblemData& data)
 {
-    InitWirelessMasterData(data, dataFolder, "integer L-shaped decomposition", perStationMode);
+    InitWirelessMasterData(data, dataFolder, "integer L-shaped decomposition");
 }
 
 std::vector<ProblemDataConstr> WirelessReformDataInit::ConstrInit(ProblemData& data)

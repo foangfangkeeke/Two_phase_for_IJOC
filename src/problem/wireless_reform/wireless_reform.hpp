@@ -22,7 +22,7 @@ struct StationGroupInfo {
 
 class WirelessReformDataInit : public IDataInit_LShape {
 public:
-    explicit WirelessReformDataInit(std::string dataFolder = "test_data", bool perStationMode = false);
+    explicit WirelessReformDataInit(std::string dataFolder = "test_data");
     void DataInit(ProblemData& data) override;
     std::vector<ProblemDataConstr> ConstrInit(ProblemData& data) override;
     std::vector<double> BuildWarmStartMasterValues(const ProblemData& data) const override;
@@ -31,7 +31,6 @@ public:
 
 private:
     std::string dataFolder;
-    bool perStationMode;
 };
 
 class WirelessStationGroupSubProblem : public ISubProblem_LShape {

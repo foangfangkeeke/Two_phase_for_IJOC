@@ -25,14 +25,7 @@ enum class WarmStartStrategy {
     RelaxedSubProblem
 };
 
-enum class RelaxedCutStrategy {
-    Aggregate,
-    MultiCut
-};
-
-constexpr WarmStartStrategy kWarmStartStrategy = WarmStartStrategy::RelaxedSubProblem;
-constexpr bool kPruneByUb = false;
-constexpr RelaxedCutStrategy kRelaxedCutStrategy = RelaxedCutStrategy::Aggregate;
+constexpr WarmStartStrategy kWarmStartStrategy = WarmStartStrategy::ZeroLowerBound;
 
 const char* WarmStartStrategyName()
 {
@@ -141,26 +134,13 @@ Status IntegerLShaped::Initialize()
     InitializeBendersMasterModel(*model, masterVars, masterConstrs, zVars, theta, true);
     model->set(GRB_DoubleParam_MIPGap, 0.0);
     const auto dataInitEnd = Tools::Clock::now();
-    std::cout << "Integer L-shaped data/master initialization elapsed_ms="
+    std::cout << "Natural ILS data/master initialization elapsed_ms="
               << Tools::ElapsedMs(dataInitStart, dataInitEnd) << std::endl;
 
     subProblems.clear();
     const int scenarioCount = subProblemStrategy->ScenarioCount(*problemData);
     if (scenarioCount <= 0) {
-        throw std::runtime_error("Integer L-shaped requires at least one scenario sub-problem.");
-    }
-
-    relaxedThetaVars.clear();
-    if constexpr (kRelaxedCutStrategy == RelaxedCutStrategy::MultiCut) {
-        relaxedThetaVars.reserve(static_cast<size_t>(scenarioCount));
-        GRBLinExpr relaxedThetaSum = 0.0;
-        for (int scenarioIndex = 0; scenarioIndex < scenarioCount; ++scenarioIndex) {
-            GRBVar scenarioTheta = model->addVar(0.0, GRB_INFINITY, 0.0, GRB_CONTINUOUS,
-                "theta_relaxed_scenario_" + std::to_string(scenarioIndex));
-            relaxedThetaVars.push_back(scenarioTheta);
-            relaxedThetaSum += scenarioTheta;
-        }
-        model->addConstr(relaxedThetaSum <= theta, "theta_relaxed_sum");
+        throw std::runtime_error("Natural ILS requires at least one scenario sub-problem.");
     }
 
     const auto subProblemsInitStart = Tools::Clock::now();
@@ -180,7 +160,7 @@ Status IntegerLShaped::Initialize()
         subProblems.push_back(std::move(sub));
     }
     const auto subProblemsInitEnd = Tools::Clock::now();
-    std::cout << "Integer L-shaped sub-problems initialization elapsed_ms="
+    std::cout << "Natural ILS sub-problems initialization elapsed_ms="
               << Tools::ElapsedMs(subProblemsInitStart, subProblemsInitEnd) << std::endl;
 
     model->update();
@@ -282,7 +262,7 @@ Status IntegerLShaped::EvaluateSubProblems(const std::vector<double>& zValues, b
     std::vector<IntegerLShapedCutInfo>* scenarioCutInfos)
 {
     if (subProblems.empty()) {
-        std::cerr << "Integer L-shaped sub-problems are not initialized" << std::endl;
+        std::cerr << "Natural ILS sub-problems are not initialized" << std::endl;
         return ERROR;
     }
 
@@ -317,7 +297,7 @@ Status IntegerLShaped::EvaluateSubProblems(const std::vector<double>& zValues, b
             result = future.get();
         }
         catch (const std::exception& e) {
-            std::cerr << "Integer L-shaped sub-problem failed: " << e.what() << std::endl;
+            std::cerr << "Natural ILS sub-problem failed: " << e.what() << std::endl;
             return ERROR;
         }
 
@@ -335,7 +315,7 @@ Status IntegerLShaped::EvaluateSubProblems(const std::vector<double>& zValues, b
 
         if (!result.cutInfo.isOptimalityCut) {
             if (scenarioSubObjs != nullptr && scenarioCutInfos == nullptr) {
-                throw std::runtime_error("Integer L-shaped scenario lower bounds require optimal sub-problem results");
+                throw std::runtime_error("Natural ILS scenario lower bounds require optimal sub-problem results");
             }
             cutInfo = result.cutInfo;
             subObj = result.subObj;
@@ -343,7 +323,7 @@ Status IntegerLShaped::EvaluateSubProblems(const std::vector<double>& zValues, b
         }
 
         if (result.cutInfo.yCoeffs.size() != zValues.size()) {
-            std::cerr << "Integer L-shaped cut size mismatch" << std::endl;
+            std::cerr << "Natural ILS cut size mismatch" << std::endl;
             return ERROR;
         }
 
@@ -402,7 +382,7 @@ Status IntegerLShaped::Solve()
     if (warmStartStatus != OK) {
         return warmStartStatus;
     }
-    std::cout << "Integer L-shaped warm start strategy=" << WarmStartStrategyName()
+    std::cout << "Natural ILS warm start strategy=" << WarmStartStrategyName()
               << ", elapsed_ms=" << Tools::ElapsedMs(algorithmStart, Tools::Clock::now()) << std::endl;
 
     model->addConstr(theta >= globalLowerBound, "theta_global_lb");
@@ -411,7 +391,7 @@ Status IntegerLShaped::Solve()
     for (int iter = 0; iter < maxIters; ++iter) {
         const double elapsedSec = Tools::ElapsedMs(algorithmStart, Tools::Clock::now()) / 1000.0;
         if (elapsedSec >= solverConfig.timeLimit) {
-            std::cout << "Integer L-shaped reached time limit: " << solverConfig.timeLimit << "s"
+            std::cout << "Natural ILS reached time limit: " << solverConfig.timeLimit << "s"
                       << ", elapsed_ms=" << Tools::ElapsedMs(algorithmStart, Tools::Clock::now()) << std::endl;
             return ERROR;
         }
@@ -423,7 +403,7 @@ Status IntegerLShaped::Solve()
         int masterStatus = model->get(GRB_IntAttr_Status);
         if (!(masterStatus == GRB_OPTIMAL ||
               (masterStatus == GRB_TIME_LIMIT && model->get(GRB_IntAttr_SolCount) > 0))) {
-            std::cerr << "Integer L-shaped master problem not solved, status: " << masterStatus << std::endl;
+            std::cerr << "Natural ILS master problem not solved, status: " << masterStatus << std::endl;
             Debug::OutputModel(model);
             return ERROR;
         }
@@ -434,88 +414,6 @@ Status IntegerLShaped::Solve()
         const double thetaValue = masterSolution.thetaValue;
         bestLowerBound = std::max(bestLowerBound, masterSolution.objectiveValue);
 
-        double relaxedQValue = 0.0;
-        IntegerLShapedCutInfo continuousCutInfo;
-        std::vector<double> scenarioRelaxedQValues;
-        std::vector<IntegerLShapedCutInfo> scenarioContinuousCutInfos;
-        const auto relaxedStart = Tools::Clock::now();
-        Status relaxedStatus = ERROR;
-        if constexpr (kRelaxedCutStrategy == RelaxedCutStrategy::MultiCut) {
-            relaxedStatus = EvaluateSubProblems(zValues, true, continuousCutInfo, relaxedQValue,
-                &scenarioRelaxedQValues, &scenarioContinuousCutInfos);
-        } else {
-            relaxedStatus = EvaluateSubProblems(zValues, true, continuousCutInfo, relaxedQValue);
-        }
-        const auto relaxedEnd = Tools::Clock::now();
-        const long long relaxedMs = Tools::ElapsedMs(relaxedStart, relaxedEnd);
-        if (relaxedStatus != OK) {
-            std::cerr << "Relaxed sub-problem failed in iteration " << iter << std::endl;
-            return ERROR;
-        }
-
-        if (!continuousCutInfo.isOptimalityCut) {
-            AddFeasibilityCut(*model, continuousCutInfo, zVars,
-                "integer_l_shaped_relaxed_feasibility_" + std::to_string(iter));
-            std::cout << "Integer L-shaped iter " << iter << ", feasibility cut from relaxation";
-            if (std::isfinite(bestUpperBound)) {
-                const double denom = std::max(1.0, std::fabs(bestUpperBound));
-                std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound
-                          << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
-            }
-            model->update();
-            const auto iterEnd = Tools::Clock::now();
-            std::cout << ", master_ms=" << masterMs
-                      << ", relaxed_ms=" << relaxedMs
-                      << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
-            continue;
-        }
-
-        if (std::isfinite(relaxedQValue)) {
-            bool relaxedCutViolated = false;
-            if constexpr (kRelaxedCutStrategy == RelaxedCutStrategy::MultiCut) {
-                if (scenarioRelaxedQValues.size() != relaxedThetaVars.size() ||
-                    scenarioContinuousCutInfos.size() != relaxedThetaVars.size()) {
-                    throw std::runtime_error("Integer L-shaped relaxed multi-cut size mismatch");
-                }
-                for (size_t scenarioIdx = 0; scenarioIdx < scenarioContinuousCutInfos.size(); ++scenarioIdx) {
-                    const double thetaScenarioValue = relaxedThetaVars[scenarioIdx].get(GRB_DoubleAttr_X);
-                    if (thetaScenarioValue + tolerance >= scenarioRelaxedQValues[scenarioIdx]) {
-                        continue;
-                    }
-
-                    const CutEval cutContinuous = BuildContinuousCut(scenarioContinuousCutInfos[scenarioIdx],
-                        zValues, iter, static_cast<int>(scenarioIdx));
-                    model->addConstr(cutContinuous.expr <= relaxedThetaVars[scenarioIdx], cutContinuous.name);
-                    relaxedCutViolated = true;
-                }
-            } else if (thetaValue + tolerance < relaxedQValue) {
-                const CutEval cutContinuous = BuildContinuousCut(continuousCutInfo, zValues, iter);
-                model->addConstr(cutContinuous.expr <= theta, cutContinuous.name);
-                relaxedCutViolated = true;
-            }
-
-            const double relaxedObj = fixedCost + relaxedQValue;
-            const bool canImproveUb = relaxedObj + tolerance < bestUpperBound;
-            const bool solveInteger = !relaxedCutViolated || (kPruneByUb && canImproveUb);
-
-            if (relaxedCutViolated && !solveInteger) {
-                std::cout << "Integer L-shaped iter " << iter << ", theta=" << thetaValue << ", Q_lp(z)=" << relaxedQValue;
-                if (std::isfinite(bestUpperBound)) {
-                    const double denom = std::max(1.0, std::fabs(bestUpperBound));
-                    std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound
-                            << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
-                }
-
-                model->update();
-                const auto iterEnd = Tools::Clock::now();
-                std::cout << ", cut from relaxation"
-                          << ", master_ms=" << masterMs
-                          << ", relaxed_ms=" << relaxedMs
-                          << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
-                continue;
-            }
-        }
-
         double aggregatedQValue = 0.0;
         IntegerLShapedCutInfo integerCutInfo;
         const auto integerStart = Tools::Clock::now();
@@ -523,14 +421,14 @@ Status IntegerLShaped::Solve()
         const auto integerEnd = Tools::Clock::now();
         const long long integerMs = Tools::ElapsedMs(integerStart, integerEnd);
         if (secondStageStatus != OK) {
-            std::cerr << "Integer L-shaped second-stage evaluation failed in iteration " << iter << std::endl;
+            std::cerr << "Natural ILS second-stage evaluation failed in iteration " << iter << std::endl;
             return ERROR;
         }
 
         if (!integerCutInfo.isOptimalityCut) {
             AddFeasibilityCut(*model, integerCutInfo, zVars, "integer_l_shaped_feasibility_" + std::to_string(iter));
 
-            std::cout << "Integer L-shaped iter " << iter << ", feasibility cut";
+            std::cout << "Natural ILS iter " << iter << ", feasibility cut";
             if (std::isfinite(bestUpperBound)) {
                 std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound;
                 const double denom = std::max(1.0, std::fabs(bestUpperBound));
@@ -540,7 +438,7 @@ Status IntegerLShaped::Solve()
             model->update();
             const auto iterEnd = Tools::Clock::now();
             std::cout << ", master_ms=" << masterMs
-                      << ", relaxed_ms=" << relaxedMs
+
                       << ", integer_ms=" << integerMs
                       << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
             continue;
@@ -553,7 +451,7 @@ Status IntegerLShaped::Solve()
 
         double delta = std::max(0.0, aggregatedQValue - globalLowerBound);
 
-        std::cout << "Integer L-shaped iter " << iter << ", theta=" << thetaValue << ", Q(z)=" << aggregatedQValue;
+        std::cout << "Natural ILS iter " << iter << ", theta=" << thetaValue << ", Q(z)=" << aggregatedQValue;
         if (std::isfinite(bestUpperBound)) {
             std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound;
             double denom = std::max(1.0, std::fabs(bestUpperBound));
@@ -565,13 +463,13 @@ Status IntegerLShaped::Solve()
         if (relGap <= solverConfig.mipGap) {
             const auto iterEnd = Tools::Clock::now();
             std::cout << ", master_ms=" << masterMs
-                      << ", relaxed_ms=" << relaxedMs
+
                       << ", integer_ms=" << integerMs
                       << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
             PrintBestSolution();
-            std::cout << "Integer L-shaped converged." << std::endl;
+            std::cout << "Natural ILS converged." << std::endl;
             const auto solveEnd = Tools::Clock::now();
-            std::cout << "Integer L-shaped final elapsed time: " << Tools::ElapsedMs(solveStart, solveEnd) << " ms" << std::endl;
+            std::cout << "Natural ILS final elapsed time: " << Tools::ElapsedMs(solveStart, solveEnd) << " ms" << std::endl;
             return OK;
         }
 
@@ -581,13 +479,13 @@ Status IntegerLShaped::Solve()
         model->update();
         const auto iterEnd = Tools::Clock::now();
         std::cout << ", master_ms=" << masterMs
-                  << ", relaxed_ms=" << relaxedMs
+
                   << ", integer_ms=" << integerMs
                   << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
     }
 
     const auto solveEnd = Tools::Clock::now();
-    std::cout << "Integer L-shaped reached max iterations: " << maxIters
+    std::cout << "Natural ILS reached max iterations: " << maxIters
               << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, solveEnd) << std::endl;
     return ERROR;
 }
