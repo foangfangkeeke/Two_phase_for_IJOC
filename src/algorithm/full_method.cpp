@@ -100,6 +100,11 @@ Status LShapeRelaxedStation::Initialize()
     const auto phase1End = Tools::Clock::now();
     phase1ElapsedMs_ = Tools::ElapsedMs(fullAlgorithmStart_, phase1End);
     std::cout << "Phase 1 elapsed time: " << phase1ElapsedMs_ << " ms" << std::endl;
+    if (phase1ElapsedMs_ / 1000.0 >= solverConfig.timeLimit) {
+        std::cout << "Two-phase reached time limit after Phase 1; skip Phase 2 initialization." << std::endl;
+        std::cout << "Total elapsed time (Phase 1 + Phase 2): " << phase1ElapsedMs_ << " ms" << std::endl;
+        return ERROR;
+    }
 
     // Capture Phase 1 state before phase1 goes out of scope
     phase1ZValues = phase1.GetIncumbentZValues();

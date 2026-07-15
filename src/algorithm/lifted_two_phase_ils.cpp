@@ -116,6 +116,11 @@ Status LiftedTwoPhaseILS::Initialize()
     const auto phase1End = Tools::Clock::now();
     phase1ElapsedMs = Tools::ElapsedMs(fullAlgorithmStart, phase1End);
     std::cout << "Phase 1 elapsed time: " << phase1ElapsedMs << " ms" << std::endl;
+    if (phase1ElapsedMs / 1000.0 >= solverConfig.timeLimit) {
+        std::cout << "Two-phase reached time limit after Phase 1; skip Phase 2 initialization." << std::endl;
+        std::cout << "Total elapsed time (Phase 1 + Phase 2): " << phase1ElapsedMs << " ms" << std::endl;
+        return ERROR;
+    }
 
     // Capture Phase 1 state
     env = phase1.ReleaseEnv();
