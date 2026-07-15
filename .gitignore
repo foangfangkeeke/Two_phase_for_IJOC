@@ -1,6 +1,6 @@
-out/build/
-out/Release/
-out/Debug/
+/out
+/build
+.claude/
 logs/
 gurobi_log.txt
 *.ilp
@@ -8,4 +8,3 @@ gurobi_log.txt
 debug_model.lp
 debug.log
 data/*_data/
-.*

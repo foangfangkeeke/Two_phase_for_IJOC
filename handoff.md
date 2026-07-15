@@ -137,23 +137,15 @@ Requires: Windows 11, MSVC 2022, CMake ≥ 3.20, Gurobi 12.0+. Output: `out/buil
 
 ## 7. Experiment execution plan
 
-### 7.1 Phase A: full-method ceiling（7200s）
+### 7.1 Stage 1: quick screening（600s）
 
-`full` @ 7200s on `tower_small` → `tower_medium` → `tower_5` → `tower_10` → `tower_20`. Stop when convergence fails. Largest converging case = main table upper bound.
+All five algorithms @ 600s on all instances（`tower_small` → `tower_medium` → `tower_5` → `tower_10` → `tower_20`）. 2-3 runs each. Goal: find break point where solver/natural-ils fail but `full` still works.
 
-### 7.2 Phase B: 600s scan
+### 7.2 Stage 2: main table（7200s unified）
 
-All five algorithms @ 600s on all viable instances. 2-3 runs each. Goal: find break point where solver/natural-ils fail but `full` still works.
+All five algorithms @ 7200s on instances around the break point, ≥3 runs per cell. Report mean ± std or min/median/max. The five-algorithm ladder itself is the ablation.
 
-### 7.3 Phase C: 7200s main table
-
-3-4 instances around break point. All algorithms @ 7200s, ≥3 runs per cell. Report mean ± std or min/median/max.
-
-### 7.4 Ablation table
-
-`natural-ils` → `lifted-ils` → `lifted-two-phase` → `full` on `tower_5` @ 7200s.
-
-### 7.5 Per-run output fields
+### 7.3 Per-run output fields
 
 UB, LB, gap, wall-clock time, iteration count, Phase 1 time, Phase 2 time, LP cut count, feasibility cut count, optimality cut count, incumbent status（found/none）, termination status（converged/timeout/error）.
 
@@ -191,9 +183,9 @@ Paper states: "All methods are given access to the same hardware. The solver use
 
 ### Model consistency
 
-- [ ] Verify `WIRELESS_CHARGING_NO_PLUGIN` vs actual plug-in modeling.
-- [ ] Compare objective terms between `wireless.cpp` and `wireless_reform.cpp`.
-- [ ] Compare battery cost scaling, plug-in constraints, wireless constraints, SoC.
+- [x] Verify `WIRELESS_CHARGING_NO_PLUGIN` vs actual plug-in modeling.
+- [x] Compare objective terms between `wireless.cpp` and `wireless_reform.cpp`.
+- [x] Compare battery cost scaling, plug-in constraints, wireless constraints, SoC.
 
 ### Algorithm contributions
 
