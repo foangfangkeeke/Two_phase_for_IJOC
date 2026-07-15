@@ -295,7 +295,7 @@ Transportation Research Part B, INFORMS Journal on Computing, or Transportation 
 - Phase 1 求解 route-level relaxation，其可行域包含 Phase 2 MIP 可行域，因此 `Q^R_ω(w,z_ω) ≤ Q_ω(w,z_ω)`，提供 valid LB，但不证明 MIP feasibility。
 - Strengthened feasibility cut validity：monotonicity 保证被 infeasible 方案支配的配置（不新增设施、不升级电池）仍不可行。
 - Strengthened optimality cut validity：`L_ω` 是对 master 所有可行 `(w, z_ω)` 都有效的 scenario-wide global lower bound。对被 feasible 方案支配的配置，`Q_ω ≥ Q_ω(x*)`；indicator 仅在新增设施/升级电池方向取正，由 monotonicity 这些方向不增加运营成本，因此 `θ_ω ≥ Q_ω(x*) - δ_ω · indicator` 对一切 master 可行解成立。
-- Finite convergence：假设 master 精确求解、Phase 2 精确验证且所有 cut 有效，master 含有限个 binary facility 和 battery 配置。Phase-2-infeasible 配置被 feasibility cut 排除；Phase-2-feasible 配置若 θ_ω 被低估则被 optimality cut 修正，避免同一配置以同一低估 θ_ω 重复出现。因此算法在有限步内精确收敛。计算实现中 master 和 outer loop 按给定容差求解（Benders master MIPGap = 0.01%，outer-loop gap = 0.01%），算法在指定全局最优性容差处有限终止，而不声称精确最优。
+- Finite convergence：假设 master 精确求解、Phase 2 精确验证且所有 cut 有效，master 含有限个 binary facility 和 battery 配置。Phase-2-infeasible 配置被 feasibility cut 排除；Phase-2-feasible 配置若 θ_ω 被低估则被 optimality cut 修正，避免同一配置以同一低估 θ_ω 重复出现。因此算法在有限步内精确收敛。计算实现中 master 精确求解（MIPGap = 0），outer loop 按 `solverConfig.mipGap` 容差终止，而不声称精确最优。
 
 ## 9. References
 

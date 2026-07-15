@@ -118,16 +118,17 @@ UB, LB, global gap, total wall-clock time, master solve time, Phase 1 time, Phas
 All algorithms use Gurobi 12.0 default settings except MIPGap, TimeLimit, and method-specific thread allocation under a common hardware budget.
 
 MIPGap settings:
-- **Stage 1 (600s screening)**: all Gurobi MIPGap = 0（EF Solver, Benders master, Phase 2 subproblem）。
-- **Stage 2 (7200s main table)**: EF Solver MIPGap = 0.01%, Benders master MIPGap = 0.01%, Phase 2 subproblem MIPGap = 0.
+- **Stage 1 (600s screening)**: all Gurobi MIPGap = 0.
+- **Stage 2 (7200s main table)**: EF Solver MIPGap = 0.01%, Benders master MIPGap = 0, Phase 2 subproblem MIPGap = 0.
+- Benders master MIPGap is always 0. This guarantees `ObjBound = master最优值`, so the outer-loop LB is not distorted by master imprecision. The master is a relaxation and its optimal value is a valid global LB.
 - Phase 1 operational relaxation is an LP and does not use MIPGap.
-- Outer-loop global convergence tolerance = 0.01%. Gap is computed as `(UB − LB) / max{1, |UB|}`. A numerical gap is reported only when a finite incumbent exists (`UB < ∞`); otherwise report `—` or `undefined`.
+- Outer-loop global convergence tolerance = `solverConfig.mipGap` (0% for Stage 1, 0.01% for Stage 2). Gap is computed as `(UB − LB) / max{1, |UB|}`. A numerical gap is reported only when a finite incumbent exists (`UB < ∞`); otherwise report `—` or `undefined`.
 - Outer-loop lower bound is obtained from the Benders master `ObjBound`, not from the master incumbent objective value.
 
 TimeLimit settings:
 - All methods use the same wall-clock time limit.
 - For the EF Solver, TimeLimit is set directly on the Gurobi model.
-- For decomposition methods, the outer loop tracks elapsed wall-clock time and dynamically sets the remaining time on each Gurobi call (master and subproblems).
+- For decomposition methods, the outer loop tracks elapsed wall-clock time at each iteration and exits when the limit is reached.
 
 The extensive-form solver uses Gurobi internal parallelism. Decomposition-based methods use one Gurobi thread per subproblem and cap the number of concurrent subproblem evaluations at the same hardware budget. If the machine budget is N physical cores, at most N subproblems should be evaluated concurrently.
 
@@ -178,10 +179,9 @@ Paper states: "All methods are given access to the same hardware. The solver use
 - [ ] `tower_10` config.
 - [ ] Standardized per-run output.
 - [ ] ≥3 runs per cell with spread reporting.
-- [ ] Stage 2 config: switch master MIPGap to 0.01%, use `ObjBound` for outer-loop LB in natural-ils/lifted-ils/lifted-two-phase (`full` already uses `ObjBound`).
+- [x] Benders master MIPGap fixed at 0; outer-loop LB via `ObjBound`; outer-loop convergence tolerance via `solverConfig.mipGap`.
 
 ## 9. Immediate priorities
 
-1. Stage 2 config: master MIPGap = 0.01%, `ObjBound` LB for remaining Benders variants.
-2. Generate `tower_10` scenario config.
-3. Run experiment plan Stage 1 & Stage 2.
+1. Generate `tower_10` scenario config.
+2. Run experiment plan Stage 1 & Stage 2.

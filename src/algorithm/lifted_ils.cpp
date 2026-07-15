@@ -153,6 +153,7 @@ Status LiftedILS::Initialize()
         sub->env->start();
         sub->model = std::make_unique<GRBModel>(*sub->env);
         sub->model->set(GRB_IntParam_OutputFlag, 0);
+        sub->model->set(GRB_DoubleParam_MIPGap, 0.0);
         sub->model->set(GRB_IntParam_Presolve, solverConfig.presolve);
         sub->model->set(GRB_IntParam_Method, solverConfig.method);
         sub->model->set(GRB_IntParam_Threads, solverConfig.threads);
@@ -294,7 +295,7 @@ Status LiftedILS::Solve()
         const std::vector<double>& zValues = masterSolution.values;
         const double fixedCost = masterSolution.firstStageValue;
         const double thetaValue = masterSolution.thetaValue;
-        bestLowerBound = std::max(bestLowerBound, masterSolution.objectiveValue);
+        bestLowerBound = std::max(bestLowerBound, model->get(GRB_DoubleAttr_ObjBound));
 
         double aggregatedQValue = 0.0;
         LShapeCutInfo aggregateCutInfo;
