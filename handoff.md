@@ -178,14 +178,10 @@ Paper states: "All methods are given access to the same hardware. The solver use
 - [ ] `tower_10` config.
 - [ ] Standardized per-run output.
 - [ ] ≥3 runs per cell with spread reporting.
-- [ ] Phase 2 sub MIPGap = 0 set on all Benders variants.
-- [ ] Benders master MIPGap set to 0.01%.
-- [ ] Master `ObjBound` used as outer-loop LB.
-- [ ] Outer-loop convergence test implemented (0.01% tolerance, formula `(UB−LB)/max{1,|UB|}`).
-- [ ] Outer-loop wall-clock TimeLimit tracking implemented for decomposition methods.
+- [ ] Stage 2 config: switch master MIPGap to 0.01%, use `ObjBound` for outer-loop LB in natural-ils/lifted-ils/lifted-two-phase (`full` already uses `ObjBound`).
 
 ## 9. Immediate priorities
 
-1. Complete outer-loop TimeLimit and convergence-gap control (Phase 2 sub MIPGap = 0, master ObjBound as LB, 0.01% outer-loop test).
+1. Stage 2 config: master MIPGap = 0.01%, `ObjBound` LB for remaining Benders variants.
 2. Generate `tower_10` scenario config.
 3. Run experiment plan Stage 1 & Stage 2.
