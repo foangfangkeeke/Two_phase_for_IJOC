@@ -1,11 +1,13 @@
 #include "lifted_two_phase_ils.hpp"
 #include "lshape_monotonicity_cut.hpp"
+#include "lshape_relaxed.hpp"
 #include "wireless_reform.hpp"
 #include "tools.hpp"
 
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <future>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -74,6 +76,7 @@ SubProblemEvalResult EvaluateStationGroupSubproblem(const ProblemData& problemDa
 struct LiftedTwoPhaseILS::StationSubProblemState {
     int stationGroupId = 0;
     int scenarioIndex = 0;
+    StationGroupInfo sgInfo;
     std::unique_ptr<ISubProblem_LShape> strategy;
     std::unique_ptr<GRBEnv> env;
     std::unique_ptr<GRBModel> model;
@@ -96,61 +99,82 @@ LiftedTwoPhaseILS::~LiftedTwoPhaseILS() = default;
 
 Status LiftedTwoPhaseILS::Initialize()
 {
-    env = std::make_unique<GRBEnv>(true);
-    env->set(GRB_IntParam_OutputFlag, 0);
-    env->set("LogFile", "gurobi_log.txt");
-    env->start();
-    model = std::make_shared<GRBModel>(*env);
-    model->set(GRB_IntParam_OutputFlag, 0);
+    if (initialized) return OK;
 
-    if (problemType != WIRELESS_CAPACITY_REFORM) {
-        throw std::invalid_argument("Lifted two-phase ILS requires WIRELESS_CAPACITY_REFORM problem type");
+    fullAlgorithmStart = Tools::Clock::now();
+
+    // ── Phase 1: operational relaxation ──
+    LShapeRelaxed phase1(problemType, dataFolder, maxIters, tolerance);
+    phase1.SetSolverConfig(solverConfig);
+    phase1.SetQuiet(true);
+
+    Status s = phase1.Initialize();
+    if (s != OK) { std::cerr << "Phase 1 init failed" << std::endl; return s; }
+
+    s = phase1.Solve();
+    if (s != OK) { std::cerr << "Phase 1 solve failed" << std::endl; return s; }
+    const auto phase1End = Tools::Clock::now();
+    phase1ElapsedMs = Tools::ElapsedMs(fullAlgorithmStart, phase1End);
+    std::cout << "Phase 1 elapsed time: " << phase1ElapsedMs << " ms" << std::endl;
+
+    // Capture Phase 1 state
+    env = phase1.ReleaseEnv();
+    model = phase1.GetModel();
+    problemDataOwned = phase1.ReleaseProblemData();
+    problemData = problemDataOwned.get();
+    zVars = phase1.GetZVars();
+    theta = model->getVarByName("theta");
+
+    if (!model || !problemData) {
+        std::cerr << "Phase 1 did not produce a valid model" << std::endl;
+        return ERROR;
     }
 
-    auto it = kStrategyMap.find(problemType);
-    if (it == kStrategyMap.end()) {
-        throw std::invalid_argument("Unsupported problem type for Lifted two-phase ILS");
+    bestLowerBound = phase1.GetBestLowerBound();
+    bestUpperBound = std::numeric_limits<double>::infinity();
+
+    std::cout << std::endl << "-- Phase 2: MIP verification (reusing Phase 1 master + all cuts) --" << std::endl;
+
+    // ── Build station-group sub-problems ──
+    const auto& stationGroups = problemData->getData<std::vector<StationGroupInfo>>(
+        "wireless_station_groups");
+
+    if (stationGroups.empty()) {
+        std::cerr << "No station groups found" << std::endl;
+        return ERROR;
     }
 
-    dataIniter = std::get<0>(it->second)(dataFolder);
-    problemData = std::make_unique<ProblemData>();
-    const auto dataInitStart = Tools::Clock::now();
-    dataIniter->DataInit(*problemData);
-    const std::vector<ProblemDataConstr> masterConstrs = dataIniter->ConstrInit(*problemData);
-    const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
-    InitializeBendersMasterModel(*model, masterVars, masterConstrs, zVars, theta, true);
-    model->set(GRB_DoubleParam_MIPGap, 0.0);
-    model->set(GRB_IntParam_Presolve, solverConfig.presolve);
-    model->set(GRB_IntParam_Method, solverConfig.method);
-    model->set(GRB_IntParam_Threads, solverConfig.threads);
-
-    const auto& stationGroups = problemData->getData<std::vector<StationGroupInfo>>("wireless_station_groups");
     groupThetaVars.clear();
     groupThetaVars.reserve(stationGroups.size());
-    GRBLinExpr thetaSum = 0.0;
-    for (size_t sgIdx = 0; sgIdx < stationGroups.size(); ++sgIdx) {
-        GRBVar t = model->addVar(0.0, GRB_INFINITY, 0.0, GRB_CONTINUOUS,
-            "theta_sg" + std::to_string(sgIdx));
-        groupThetaVars.push_back(t);
-        thetaSum += t;
+    GRBLinExpr groupThetaSum = 0.0;
+    for (size_t idx = 0; idx < stationGroups.size(); ++idx) {
+        GRBVar gTheta = model->addVar(0.0, GRB_INFINITY, 0.0, GRB_CONTINUOUS,
+            "group_theta_p2_" + std::to_string(idx));
+        groupThetaVars.push_back(gTheta);
+        groupThetaSum += gTheta;
     }
-    model->addConstr(thetaSum <= theta, "theta_multi_sum");
+    model->addConstr(groupThetaSum <= theta, "theta_group_sum_p2");
 
-    const auto dataInitEnd = Tools::Clock::now();
-    std::cout << "Lifted two-phase ILS data/master initialization elapsed_ms="
-              << Tools::ElapsedMs(dataInitStart, dataInitEnd) << std::endl;
-
-    const auto subProblemsInitStart = Tools::Clock::now();
     subProblems.clear();
+    subProblems.reserve(stationGroups.size());
 
-    for (size_t sgIdx = 0; sgIdx < stationGroups.size(); ++sgIdx) {
-        const StationGroupInfo& sgInfo = stationGroups[sgIdx];
+    phase2Start = Tools::Clock::now();
+
+    for (size_t idx = 0; idx < stationGroups.size(); ++idx) {
+        std::cout << "Phase 2 init sub-problem " << idx << "/" << stationGroups.size()
+                  << " sc=" << stationGroups[idx].scenarioIndex
+                  << " routes=" << stationGroups[idx].routeIds.size()
+                  << " EBs=" << stationGroups[idx].ebIndices.size() << std::endl;
 
         auto sub = std::make_unique<StationSubProblemState>();
-        sub->stationGroupId = sgInfo.stationGroupId;
-        sub->scenarioIndex = sgInfo.scenarioIndex;
-        sub->strategy = std::get<1>(it->second)();
-        static_cast<WirelessStationGroupSubProblem*>(sub->strategy.get())->SetStationGroupInfo(sgInfo);
+        sub->scenarioIndex = stationGroups[idx].scenarioIndex;
+        sub->sgInfo = stationGroups[idx];
+        sub->strategy = std::make_unique<WirelessStationGroupSubProblem>();
+        static_cast<WirelessStationGroupSubProblem*>(sub->strategy.get())
+            ->SetStationGroupInfo(stationGroups[idx]);
+        static_cast<WirelessStationGroupSubProblem*>(sub->strategy.get())
+            ->SetRelaxChargerCapacity(false);
+
         sub->env = std::make_unique<GRBEnv>(true);
         sub->env->set(GRB_IntParam_OutputFlag, 0);
         sub->env->start();
@@ -161,13 +185,35 @@ Status LiftedTwoPhaseILS::Initialize()
         sub->model->set(GRB_IntParam_Method, solverConfig.method);
         sub->model->set(GRB_IntParam_Threads, solverConfig.threads);
         sub->context.Clear();
-        sub->strategy->InitSubProblem(*problemData, static_cast<int>(sgIdx), *sub->model, sub->context);
         subProblems.push_back(std::move(sub));
     }
 
-    const auto subProblemsInitEnd = Tools::Clock::now();
-    std::cout << "Lifted two-phase ILS operational sub-problems init count=" << subProblems.size()
-              << " elapsed_ms=" << Tools::ElapsedMs(subProblemsInitStart, subProblemsInitEnd) << std::endl;
+    // Parallel init
+    {
+        std::vector<std::future<void>> initFutures;
+        initFutures.reserve(subProblems.size());
+        const ProblemData* pd = problemData;
+        for (size_t idx = 0; idx < subProblems.size(); ++idx) {
+            initFutures.push_back(std::async(std::launch::async,
+                [pd, idx, sub = subProblems[idx].get()]() {
+                    sub->strategy->InitSubProblem(*pd, static_cast<int>(idx),
+                        *sub->model, sub->context);
+                }));
+        }
+        for (size_t idx = 0; idx < initFutures.size(); ++idx) {
+            try { initFutures[idx].get(); }
+            catch (const std::exception& e) {
+                std::cerr << "Phase 2 sub-problem init failed " << idx << ": " << e.what() << std::endl;
+                return ERROR;
+            }
+            std::cout << "  done, cols=" << subProblems[idx]->model->get(GRB_IntAttr_NumVars)
+                      << " rows=" << subProblems[idx]->model->get(GRB_IntAttr_NumConstrs) << std::endl;
+        }
+    }
+
+    const auto phase2InitEnd = Tools::Clock::now();
+    std::cout << "Phase 2 init elapsed_ms=" << Tools::ElapsedMs(phase2Start, phase2InitEnd)
+              << " subProblems=" << subProblems.size() << std::endl;
 
     model->update();
     initialized = true;
@@ -205,7 +251,7 @@ Status LiftedTwoPhaseILS::EvaluateSubProblems(const std::vector<double>& zValues
     groupSubObjs.assign(subProblems.size(), 0.0);
     groupCutInfos.assign(subProblems.size(), LShapeCutInfo{});
 
-    const ProblemData* problemDataPtr = problemData.get();
+    const ProblemData* problemDataPtr = problemData;
     for (size_t idx = 0; idx < subProblems.size(); ++idx) {
         auto& sub = subProblems[idx];
         SubProblemEvalResult result = EvaluateStationGroupSubproblem(*problemDataPtr,
@@ -260,7 +306,9 @@ void LiftedTwoPhaseILS::PrintBestSolution() const
     std::cout << "Active master variables:" << std::endl;
     for (size_t idx = 0; idx < zVars.size(); ++idx) {
         if (incumbentZValues[idx] > 0.5) {
-            std::cout << "  " << zVars[idx].get(GRB_StringAttr_VarName) << std::endl;
+            const std::string name = zVars[idx].get(GRB_StringAttr_VarName);
+            if (name.rfind("w_", 0) != 0) continue;
+            std::cout << "  " << name << std::endl;
         }
     }
     std::cout << "Q(z): " << incumbentSecondStageValue << std::endl;
@@ -268,19 +316,20 @@ void LiftedTwoPhaseILS::PrintBestSolution() const
 
 Status LiftedTwoPhaseILS::Solve()
 {
-    algorithmStart = Tools::Clock::now();
-    const auto solveStart = algorithmStart;
-
-    Status warmStartStatus = ApplyWarmStart();
-    if (warmStartStatus != OK) return warmStartStatus;
-
     model->addConstr(theta >= globalLowerBound, "theta_global_lb");
     model->update();
 
+    // ── Phase 2: MIP verification with classic cuts ──
     for (int iter = 0; iter < maxIters; ++iter) {
-        const double elapsedSec = Tools::ElapsedMs(algorithmStart, Tools::Clock::now()) / 1000.0;
+        const double elapsedSec = Tools::ElapsedMs(fullAlgorithmStart, Tools::Clock::now()) / 1000.0;
         if (elapsedSec >= solverConfig.timeLimit) {
-            std::cout << "Lifted two-phase ILS reached time limit: " << solverConfig.timeLimit << "s" << std::endl;
+            std::cout << "Phase 2 reached time limit: " << solverConfig.timeLimit << "s" << std::endl;
+            {
+                const long long phase2Ms = Tools::ElapsedMs(phase2Start, Tools::Clock::now());
+                std::cout << "Phase 2 elapsed time: " << phase2Ms << " ms" << std::endl;
+                std::cout << "Total elapsed time (Phase 1 + Phase 2): "
+                          << (phase1ElapsedMs + phase2Ms) << " ms" << std::endl;
+            }
             return ERROR;
         }
 
@@ -291,7 +340,7 @@ Status LiftedTwoPhaseILS::Solve()
         int masterStatus = model->get(GRB_IntAttr_Status);
         if (!(masterStatus == GRB_OPTIMAL ||
               (masterStatus == GRB_TIME_LIMIT && model->get(GRB_IntAttr_SolCount) > 0))) {
-            std::cerr << "Lifted two-phase ILS master problem not solved, status: " << masterStatus << std::endl;
+            std::cerr << "Phase 2 master not solved, status: " << masterStatus << std::endl;
             return ERROR;
         }
 
@@ -301,66 +350,14 @@ Status LiftedTwoPhaseILS::Solve()
         const double thetaValue = masterSolution.thetaValue;
         bestLowerBound = std::max(bestLowerBound, model->get(GRB_DoubleAttr_ObjBound));
 
-        double relaxedQValue = 0.0;
-        LShapeCutInfo relaxedCutInfo;
-        std::vector<double> relaxedGroupQValues;
-        std::vector<LShapeCutInfo> relaxedGroupCutInfos;
-        const auto relaxedStart = Tools::Clock::now();
-        Status relaxedStatus = EvaluateSubProblems(zValues, relaxedCutInfo, relaxedQValue,
-            relaxedGroupQValues, relaxedGroupCutInfos, true);
-        const auto relaxedEnd = Tools::Clock::now();
-        const long long relaxedMs = Tools::ElapsedMs(relaxedStart, relaxedEnd);
-        if (relaxedStatus != OK) return ERROR;
-
-        bool relaxationAnyInfeasible = false;
-        int relaxationFeasCount = 0;
-        int relaxationOptCount = 0;
-        std::set<std::string> addedRelaxationFeasCuts;
-        for (size_t idx = 0; idx < relaxedGroupCutInfos.size(); ++idx) {
-            if (!relaxedGroupCutInfos[idx].isOptimalityCut) {
-                relaxationAnyInfeasible = true;
-                const std::string sig = MakeFeasibilityCutSignature(relaxedGroupCutInfos[idx]);
-                if (addedRelaxationFeasCuts.insert(sig).second) {
-                    AddFeasibilityCut(*model, relaxedGroupCutInfos[idx], zVars,
-                        "lifted_two_phase_relaxed_feasibility_" + std::to_string(iter) + "_sub_" + std::to_string(idx));
-                    ++relaxationFeasCount;
-                }
-            } else if (groupThetaVars[idx].get(GRB_DoubleAttr_X) + tolerance < relaxedGroupQValues[idx]) {
-                const CutEval cutContinuous = BuildContinuousCut(
-                    relaxedGroupCutInfos[idx], zValues, iter, static_cast<int>(idx));
-                model->addConstr(cutContinuous.expr <= groupThetaVars[idx], cutContinuous.name);
-                ++relaxationOptCount;
-            }
-        }
-
-        if (relaxationAnyInfeasible) {
-            std::cout << "Lifted two-phase ILS iter " << iter
-                      << ", feasibility cut from relaxation x" << relaxationFeasCount;
-            if (std::isfinite(bestUpperBound)) {
-                const double denom = std::max(1.0, std::fabs(bestUpperBound));
-                std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound
-                          << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
-            }
-            model->update();
-            std::cout << ", master_ms=" << masterMs << ", relaxed_ms=" << relaxedMs
-                      << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, Tools::Clock::now()) << std::endl;
-            continue;
-        }
-        if (relaxationOptCount > 0) {
-            model->update();
-        }
-
         double aggregatedQValue = 0.0;
         LShapeCutInfo aggregateCutInfo;
         std::vector<double> groupQValues;
         std::vector<LShapeCutInfo> groupCutInfos;
-        const auto integerStart = Tools::Clock::now();
         Status secondStageStatus = EvaluateSubProblems(zValues, aggregateCutInfo, aggregatedQValue,
             groupQValues, groupCutInfos, false);
-        const auto integerEnd = Tools::Clock::now();
-        const long long integerMs = Tools::ElapsedMs(integerStart, integerEnd);
         if (secondStageStatus != OK) {
-            std::cerr << "Lifted two-phase ILS second-stage evaluation failed in iteration " << iter << std::endl;
+            std::cerr << "Phase 2 sub-problem evaluation failed iter " << iter << std::endl;
             return ERROR;
         }
 
@@ -370,25 +367,24 @@ Status LiftedTwoPhaseILS::Solve()
         for (size_t idx = 0; idx < groupCutInfos.size(); ++idx) {
             if (groupCutInfos[idx].isOptimalityCut) continue;
             mipAnyInfeasible = true;
-            const std::string cutSignature = MakeFeasibilityCutSignature(groupCutInfos[idx]);
-            if (addedMIPFeasibilityCuts.insert(cutSignature).second) {
+            const std::string cs = MakeFeasibilityCutSignature(groupCutInfos[idx]);
+            if (addedMIPFeasibilityCuts.insert(cs).second) {
                 AddFeasibilityCut(*model, groupCutInfos[idx], zVars,
-                    "lifted_two_phase_mip_feasibility_" + std::to_string(iter) + "_sub_" + std::to_string(idx));
+                    "p2_feas_" + std::to_string(iter) + "_" + std::to_string(idx));
                 ++mipFeasCount;
             }
         }
 
         if (mipAnyInfeasible) {
-            std::cout << "Lifted two-phase ILS iter " << iter << ", feasibility cut x" << mipFeasCount;
+            std::cout << "Phase 2 iter " << iter << ", feasibility cut x" << mipFeasCount;
             if (std::isfinite(bestUpperBound)) {
                 const double denom = std::max(1.0, std::fabs(bestUpperBound));
                 std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound
                           << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
             }
             model->update();
-            std::cout << ", master_ms=" << masterMs << ", relaxed_ms=" << relaxedMs
-                      << ", integer_ms=" << integerMs
-                      << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, Tools::Clock::now()) << std::endl;
+            std::cout << ", master_ms=" << masterMs
+                      << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start, Tools::Clock::now()) << std::endl;
             continue;
         }
 
@@ -397,8 +393,8 @@ Status LiftedTwoPhaseILS::Solve()
             UpdateIncumbent(zValues, aggregatedQValue);
         }
 
-        std::cout << "Lifted two-phase ILS iter " << iter
-                  << ", theta=" << thetaValue << ", Q(z)=" << aggregatedQValue;
+        std::cout << "Phase 2 iter " << iter << ", theta=" << thetaValue
+                  << ", Q(z)=" << aggregatedQValue;
         if (std::isfinite(bestUpperBound)) {
             const double denom = std::max(1.0, std::fabs(bestUpperBound));
             std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound
@@ -409,17 +405,20 @@ Status LiftedTwoPhaseILS::Solve()
         const double relGap = (bestUpperBound - bestLowerBound) / gapDenom;
         if (relGap <= solverConfig.mipGap) {
             const auto iterEnd = Tools::Clock::now();
-            std::cout << ", master_ms=" << masterMs << ", relaxed_ms=" << relaxedMs
-                      << ", integer_ms=" << integerMs
-                      << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
+            std::cout << ", master_ms=" << masterMs
+                      << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start, iterEnd) << std::endl;
             PrintBestSolution();
-            const auto solveEnd = Tools::Clock::now();
-            std::cout << "Lifted two-phase ILS converged." << std::endl;
-            std::cout << "Lifted two-phase ILS final elapsed time: "
-                      << Tools::ElapsedMs(solveStart, solveEnd) << " ms" << std::endl;
+            {
+                const long long phase2Ms = Tools::ElapsedMs(phase2Start, Tools::Clock::now());
+                std::cout << "Phase 2 converged." << std::endl;
+                std::cout << "Phase 2 final elapsed time: " << phase2Ms << " ms" << std::endl;
+                std::cout << "Total elapsed time (Phase 1 + Phase 2): "
+                          << (phase1ElapsedMs + phase2Ms) << " ms" << std::endl;
+            }
             return OK;
         }
 
+        // Classic LP dual continuous optimality cuts (vs. strengthened in full)
         for (size_t idx = 0; idx < groupCutInfos.size(); ++idx) {
             if (!groupCutInfos[idx].isOptimalityCut) continue;
             const CutEval cutDual = BuildContinuousCut(groupCutInfos[idx], zValues, iter, static_cast<int>(idx));
@@ -427,13 +426,17 @@ Status LiftedTwoPhaseILS::Solve()
         }
 
         model->update();
-        const auto iterEnd = Tools::Clock::now();
-        std::cout << ", master_ms=" << masterMs << ", relaxed_ms=" << relaxedMs
-                  << ", integer_ms=" << integerMs
-                  << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
+        std::cout << ", master_ms=" << masterMs
+                  << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start, Tools::Clock::now()) << std::endl;
     }
 
     PrintBestSolution();
-    std::cout << "Lifted two-phase ILS reached max iterations: " << maxIters << std::endl;
+    {
+        const long long phase2Ms = Tools::ElapsedMs(phase2Start, Tools::Clock::now());
+        std::cout << "Phase 2 reached max iterations: " << maxIters << std::endl;
+        std::cout << "Phase 2 elapsed time: " << phase2Ms << " ms" << std::endl;
+        std::cout << "Total elapsed time (Phase 1 + Phase 2): "
+                  << (phase1ElapsedMs + phase2Ms) << " ms" << std::endl;
+    }
     return ERROR;
 }

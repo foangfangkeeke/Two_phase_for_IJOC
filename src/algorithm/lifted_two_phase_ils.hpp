@@ -44,17 +44,21 @@ private:
 
     std::unique_ptr<GRBEnv> env;
     std::shared_ptr<GRBModel> model;
-    std::unique_ptr<ProblemData> problemData;
+    std::unique_ptr<ProblemData> problemDataOwned;
+    ProblemData* problemData = nullptr;
     std::unique_ptr<IDataInit_LShape> dataIniter;
     std::vector<std::unique_ptr<StationSubProblemState>> subProblems;
     std::vector<GRBVar> zVars;
     GRBVar theta;
     std::vector<GRBVar> groupThetaVars;
 
+    long long phase1ElapsedMs = 0;
+    std::chrono::steady_clock::time_point fullAlgorithmStart;
+    std::chrono::steady_clock::time_point phase2Start;
+
     double globalLowerBound;
     double bestUpperBound;
     double bestLowerBound;
     std::vector<double> incumbentZValues;
     double incumbentSecondStageValue;
-    std::chrono::steady_clock::time_point algorithmStart;
 };

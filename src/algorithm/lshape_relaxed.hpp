@@ -16,6 +16,8 @@ public:
     Status Solve() override;
     ~LShapeRelaxed() override;
 
+    void SetQuiet(bool quiet) { quiet_ = quiet; }
+
     // Expose Phase 1 results and internals for Phase 2 reuse
     const std::vector<double>& GetIncumbentZValues() const { return incumbentZValues; }
     double GetBestUpperBound() const { return bestUpperBound; }
@@ -61,6 +63,7 @@ private:
     std::vector<std::vector<GRBVar>> routeThetaVars;
     GRBVar theta;
 
+    bool quiet_ = false;
     double globalLowerBound;
     double bestUpperBound;
     double bestLowerBound;

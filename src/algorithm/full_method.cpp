@@ -90,6 +90,7 @@ Status LShapeRelaxedStation::Initialize()
     // ── Phase 1: operational relaxation ──
     LShapeRelaxed phase1(problemType, dataFolder, maxIters, tolerance);
     phase1.SetSolverConfig(solverConfig);
+    phase1.SetQuiet(true);
 
     Status s = phase1.Initialize();
     if (s != OK) { std::cerr << "Phase 1 init failed" << std::endl; return s; }
@@ -122,6 +123,8 @@ Status LShapeRelaxedStation::Initialize()
     std::cout << std::endl << "── Phase 2: MIP verification (reusing Phase 1 master + all cuts) ──" << std::endl;
 
     // ── Build station-group sub-problems ──
+    phase2Start_ = Tools::Clock::now();
+
     const auto& stationGroups = problemData_->getData<std::vector<StationGroupInfo>>(
         "wireless_station_groups");
 
@@ -144,8 +147,6 @@ Status LShapeRelaxedStation::Initialize()
 
     subProblems_.clear();
     subProblems_.reserve(stationGroups.size());
-
-    const auto phase2InitStart = Tools::Clock::now();
 
     // ── Pass 1 (serial): Create GRBEnv + GRBModel (license init not thread-safe) ──
     for (size_t idx = 0; idx < stationGroups.size(); ++idx) {
@@ -204,7 +205,7 @@ Status LShapeRelaxedStation::Initialize()
 
     std::cout << "Phase 2 station-group sub-problems count=" << subProblems_.size()
               << ", master constraints=" << model_->get(GRB_IntAttr_NumConstrs)
-              << ", init_elapsed_ms=" << Tools::ElapsedMs(phase2InitStart, phase2InitEnd) << std::endl;
+              << ", init_elapsed_ms=" << Tools::ElapsedMs(phase2Start_, phase2InitEnd) << std::endl;
 
     initialized = true;
     return OK;
@@ -216,9 +217,6 @@ Status LShapeRelaxedStation::Solve()
         std::cerr << "Phase 2 not initialized" << std::endl;
         return ERROR;
     }
-
-    algorithmStart_ = Tools::Clock::now();
-    const auto solveStart = algorithmStart_;
 
     // Apply MIP start from Phase 1 solution
     for (size_t i = 0; i < zVars_.size(); ++i)
@@ -234,15 +232,13 @@ Status LShapeRelaxedStation::Solve()
         "wireless_route_facility_var_names");
 
     for (int iter = 0; iter < maxIters; ++iter) {
-        const double elapsedSec = Tools::ElapsedMs(algorithmStart_, Tools::Clock::now()) / 1000.0;
+        const double elapsedSec = Tools::ElapsedMs(fullAlgorithmStart_, Tools::Clock::now()) / 1000.0;
         if (elapsedSec >= solverConfig.timeLimit) {
             std::cout << "Phase 2 reached time limit: " << solverConfig.timeLimit << "s" << std::endl;
-            const auto solveEnd = Tools::Clock::now();
-            const long long phase2Ms = Tools::ElapsedMs(solveStart, solveEnd);
-            const long long totalMs = Tools::ElapsedMs(fullAlgorithmStart_, solveEnd);
-            std::cout << "Two-phase total elapsed time: " << totalMs
-                      << " ms (phase1=" << phase1ElapsedMs_
-                      << " ms, phase2=" << phase2Ms << " ms)" << std::endl;
+            phase2ElapsedMs_ = Tools::ElapsedMs(phase2Start_, Tools::Clock::now());
+            std::cout << "Phase 2 elapsed time: " << phase2ElapsedMs_ << " ms" << std::endl;
+            std::cout << "Total elapsed time (Phase 1 + Phase 2): "
+                      << (phase1ElapsedMs_ + phase2ElapsedMs_) << " ms" << std::endl;
             return ERROR;
         }
 
@@ -347,7 +343,7 @@ Status LShapeRelaxedStation::Solve()
                 const auto iterEnd = Tools::Clock::now();
                 std::cout << ", master_ms=" << masterMs
                           << ", eval_ms=" << Tools::ElapsedMs(masterEnd, iterEnd)
-                          << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
+                          << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start_, iterEnd) << std::endl;
                 continue;
             }
             if (optCount > 0) model_->update();
@@ -426,7 +422,7 @@ Status LShapeRelaxedStation::Solve()
             const auto iterEnd = Tools::Clock::now();
             std::cout << ", master_ms=" << masterMs
                       << ", mip_eval_ms=" << Tools::ElapsedMs(masterEnd, iterEnd)
-                      << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
+                      << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start_, iterEnd) << std::endl;
             continue;
         }
 
@@ -481,23 +477,24 @@ Status LShapeRelaxedStation::Solve()
             const auto iterEnd = Tools::Clock::now();
             std::cout << ", master_ms=" << masterMs
                       << ", mip_eval_ms=" << Tools::ElapsedMs(masterEnd, iterEnd)
-                      << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
+                      << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start_, iterEnd) << std::endl;
             std::cout << "Phase 2 converged." << std::endl;
             std::cout << "UB: " << bestUpperBound_ << ", LB: " << bestLowerBound_ << std::endl;
             if (!incumbentZValues_.empty()) {
                 std::cout << "Active master variables:" << std::endl;
-                for (size_t i = 0; i < zVars_.size(); ++i)
-                    if (incumbentZValues_[i] > 0.5)
-                        std::cout << zVars_[i].get(GRB_StringAttr_VarName) << std::endl;
+                for (size_t i = 0; i < zVars_.size(); ++i) {
+                    if (incumbentZValues_[i] > 0.5) {
+                        const std::string name = zVars_[i].get(GRB_StringAttr_VarName);
+                        if (name.rfind("w_", 0) != 0) continue;
+                        std::cout << name << std::endl;
+                    }
+                }
                 std::cout << "Q(z): " << incumbentQ_ << std::endl;
             }
-            const auto solveEnd = Tools::Clock::now();
-            const long long phase2Ms = Tools::ElapsedMs(solveStart, solveEnd);
-            const long long totalMs = Tools::ElapsedMs(fullAlgorithmStart_, solveEnd);
-            std::cout << "Phase 2 final elapsed time: " << phase2Ms << " ms" << std::endl;
-            std::cout << "Two-phase total elapsed time: " << totalMs
-                      << " ms (phase1=" << phase1ElapsedMs_
-                      << " ms, phase2=" << phase2Ms << " ms)" << std::endl;
+            phase2ElapsedMs_ = Tools::ElapsedMs(phase2Start_, Tools::Clock::now());
+            std::cout << "Phase 2 final elapsed time: " << phase2ElapsedMs_ << " ms" << std::endl;
+            std::cout << "Total elapsed time (Phase 1 + Phase 2): "
+                      << (phase1ElapsedMs_ + phase2ElapsedMs_) << " ms" << std::endl;
             return OK;
             }
         }  // iter > 0
@@ -505,17 +502,15 @@ Status LShapeRelaxedStation::Solve()
         const auto iterEnd = Tools::Clock::now();
         std::cout << ", master_ms=" << masterMs
                   << ", mip_eval_ms=" << Tools::ElapsedMs(masterEnd, iterEnd)
-                  << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
+                  << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start_, iterEnd) << std::endl;
     }
 
     std::cout << "UB: " << bestUpperBound_ << ", LB: " << bestLowerBound_ << std::endl;
     std::cout << "Phase 2 reached max iterations: " << maxIters << std::endl;
-    const auto solveEnd = Tools::Clock::now();
-    const long long phase2Ms = Tools::ElapsedMs(solveStart, solveEnd);
-    const long long totalMs = Tools::ElapsedMs(fullAlgorithmStart_, solveEnd);
-    std::cout << "Two-phase total elapsed time: " << totalMs
-              << " ms (phase1=" << phase1ElapsedMs_
-              << " ms, phase2=" << phase2Ms << " ms)" << std::endl;
+    phase2ElapsedMs_ = Tools::ElapsedMs(phase2Start_, Tools::Clock::now());
+    std::cout << "Phase 2 elapsed time: " << phase2ElapsedMs_ << " ms" << std::endl;
+    std::cout << "Total elapsed time (Phase 1 + Phase 2): "
+              << (phase1ElapsedMs_ + phase2ElapsedMs_) << " ms" << std::endl;
     return ERROR;
 }
 

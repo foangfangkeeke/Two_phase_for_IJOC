@@ -426,12 +426,11 @@ Status LShapeRelaxed::Solve()
                 const double denom = std::max(1.0, std::fabs(bestUpperBound));
                 std::cout << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
             }
-
-            model->update();
-            const auto iterEnd = Tools::Clock::now();
             std::cout << ", master_ms=" << masterMs
                       << ", integer_ms=" << integerMs
-                      << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
+                      << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, Tools::Clock::now()) << std::endl;
+
+            model->update();
             continue;
         }
 
@@ -450,14 +449,15 @@ Status LShapeRelaxed::Solve()
         const double gapDenom = std::max(1.0, std::fabs(bestUpperBound));
         const double relGap = (bestUpperBound - bestLowerBound) / gapDenom;
         if (relGap <= solverConfig.mipGap) {
-            const auto iterEnd = Tools::Clock::now();
             std::cout << ", master_ms=" << masterMs
                       << ", integer_ms=" << integerMs
-                      << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
-            PrintBestSolution();
-            std::cout << "Relaxed Route converged." << std::endl;
-            const auto solveEnd = Tools::Clock::now();
-            std::cout << "Relaxed Route final elapsed time: " << Tools::ElapsedMs(solveStart, solveEnd) << " ms" << std::endl;
+                      << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, Tools::Clock::now()) << std::endl;
+            if (!quiet_) {
+                PrintBestSolution();
+                std::cout << "Relaxed Route converged." << std::endl;
+                const auto solveEnd = Tools::Clock::now();
+                std::cout << "Relaxed Route final elapsed time: " << Tools::ElapsedMs(solveStart, solveEnd) << " ms" << std::endl;
+            }
             return OK;
         }
 
@@ -469,15 +469,19 @@ Status LShapeRelaxed::Solve()
         }
 
         model->update();
-        const auto iterEnd = Tools::Clock::now();
-        std::cout << ", master_ms=" << masterMs
-                  << ", integer_ms=" << integerMs
-                  << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
+        {
+            const auto iterEnd = Tools::Clock::now();
+            std::cout << ", master_ms=" << masterMs
+                      << ", integer_ms=" << integerMs
+                      << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
+        }
     }
 
-    const auto solveEnd = Tools::Clock::now();
-    std::cout << "Relaxed Route reached max iterations: " << maxIters
-              << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, solveEnd) << std::endl;
+    {
+        const auto solveEnd = Tools::Clock::now();
+        std::cout << "Relaxed Route reached max iterations: " << maxIters
+                  << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, solveEnd) << std::endl;
+    }
     return ERROR;
 }
 
@@ -495,7 +499,7 @@ void LShapeRelaxed::UpdateIncumbent(const std::vector<double>& zValues, double s
 
 void LShapeRelaxed::PrintBestSolution() const
 {
-    if (incumbentZValues.size() != zVars.size()) {
+    if (incumbentZValues.size() != zVars.size() || quiet_) {
         return;
     }
 
@@ -504,7 +508,9 @@ void LShapeRelaxed::PrintBestSolution() const
         if (incumbentZValues[idx] <= 0.5) {
             continue;
         }
-        std::cout << zVars[idx].get(GRB_StringAttr_VarName) << std::endl;
+        const std::string name = zVars[idx].get(GRB_StringAttr_VarName);
+        if (name.rfind("w_", 0) != 0) continue;
+        std::cout << name << std::endl;
     }
     std::cout << "Q(z): " << incumbentSecondStageValue << std::endl;
     std::cout << "UB: " << bestUpperBound << ", LB: " << bestLowerBound << std::endl;

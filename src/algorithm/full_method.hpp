@@ -53,7 +53,8 @@ private:
     double bestLowerBound_ = -std::numeric_limits<double>::infinity();
     std::vector<double> incumbentZValues_;
     double incumbentQ_ = 0.0;
-    std::chrono::steady_clock::time_point algorithmStart_;
     std::chrono::steady_clock::time_point fullAlgorithmStart_;
     long long phase1ElapsedMs_ = 0;
+    long long phase2ElapsedMs_ = 0;
+    std::chrono::steady_clock::time_point phase2Start_;
 };
