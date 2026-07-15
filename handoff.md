@@ -10,7 +10,7 @@ Wireless charging facility deployment and adaptive battery configuration under s
 2. `natural-ils` — natural ILS: `w` in master, `z_ω` + `y_ω` in subproblem（naive, no LP pruning）.
 3. `lifted-ils` — lifted reformulation, single-phase MIP, classic cuts.
 4. `lifted-two-phase` — lifted + two-phase (LP→MIP), classic cuts.
-5. `full` — lifted + two-phase + strengthened feasibility and optimality cuts（optimality pending in the current implementation）.
+5. `full` — lifted + two-phase + strengthened feasibility and optimality cuts.
 
 ## 2. Final intended algorithm ladder
 
@@ -24,7 +24,7 @@ Wireless charging facility deployment and adaptive battery configuration under s
 
 ## 3. Target code architecture
 
-Below is the target state. See §4 for the delta from current code.
+Below is the intended code architecture; implementation progress is tracked in §8.
 
 ### 3.1 Algorithm files (`src/algorithm/`)
 
@@ -47,67 +47,29 @@ Below is the target state. See §4 for the delta from current code.
 | `WIRELESS_CHARGING_NO_PLUGIN` | `wireless.cpp` | Full plug-in capacity + scheduling binaries. Enum name misleading; model contains plug-in constraints. |
 | `WIRELESS_CAPACITY_REFORM` | `wireless_reform.cpp` | Same physical model, different data initialization. `reform` is a decomposition device, not a separate problem type. |
 
-Both model the same system with capacity constraints and scheduling binaries. Consistency must be verified before reporting ablation results.
+Both model the same physical system with capacity constraints and scheduling binaries (verified).
 
 ### 3.3 Target key behaviors
 
 - Solver timeout with no incumbent prints `no incumbent found`, not `no feasible solution`.
-- Phase 1 and Phase 2 elapsed times reported separately; Phase 2 LB uses Gurobi `ObjBound`.
-- Each scenario → one operational subproblem（no station-group decomposition）.
-- Natural ILS is a naive baseline: no LP-relaxation pruning, no relaxed warm start.
+- Phase 1 and Phase 2 elapsed times reported separately.
+- Target: each scenario → one operational subproblem（no station-group decomposition）.
+- Target: Natural ILS is a naive baseline — no LP-relaxation pruning, no relaxed warm start.
 - Solver uses Gurobi internal parallelism. Benders variants: one Gurobi thread per subproblem, concurrent subproblem evaluations capped at available hardware cores. If the machine budget is N physical cores, at most N subproblems are evaluated concurrently.
 
-## 4. Current implementation status
+## 4. Implementation notes
 
-### 4.1 Implemented
+### 4.1 `WIRELESS_CHARGING_NO_PLUGIN` enum
 
-- [x] Five algorithm CLI names exposed in `main.cpp`.
-- [x] `lifted-ils`, `lifted-two-phase` as self-contained implementations.
-- [x] `LShapeStation` shared engine removed.
-- [x] `full` as independent file.
-- [x] Strengthened feasibility cut via `BuildStationGroupStrengthenedNoGoodCut`.
-- [x] `no incumbent found` output for solver timeout.
-- [x] Phase 1/Phase 2 timing reporting.
-- [x] Old `sg-*` CLI names removed.
+Enum name misleading — the model contains plug-in capacity constraints. Both `wireless.cpp` and `wireless_reform.cpp` model the same physical system (verified).
 
-### 4.2 Partially implemented
+### 4.2 Solver thread policy
 
-- [ ] Station-group decomposition still present in `lifted_ils`, `lifted_two_phase_ils`, `lshape_relaxed_station`（should be removed）.
-- [ ] Natural-ILS still has LP-relaxation pruning and relaxed warm start（should be removed to make it a naive baseline）.
-- [ ] Legacy file names remain: `barp_s_integer_l_shaped` → `natural_ils`, `lshape_relaxed_station` → `full_method`, `lshape_station_cut` → `lshape_monotonicity_cut`.
+All methods share the same hardware budget. Solver uses Gurobi internal parallelism. Benders variants: Threads=1 per subproblem, `std::async` concurrency capped at available cores.
 
-### 4.3 Not yet implemented
+## 5. Build and run instructions
 
-- [ ] Monotonicity-strengthened optimality cut（reuses same indicator as feasibility cut）.
-- [ ] Standardized log output across all five algorithms.
-- [ ] `tower_10` scenario config.
-- [ ] `PROJECT_SUMMARY.md` committed.
-
-## 5. Known inconsistencies and risks
-
-### 5.1 `WIRELESS_CHARGING_NO_PLUGIN` consistency
-
-Enum name misleading. Must verify `wireless.cpp` and `wireless_reform.cpp` model the same physical system: plug-in constraints, wireless facility constraints, battery/SoC constraints, battery cost scaling, scenario data, objective components.
-
-### 5.2 Natural-ILS purity
-
-`barp_s_integer_l_shaped.cpp` has LP-relaxation pruning (`kPruneByUb`) and relaxed warm start. These make it not a naive baseline. Ablation comparison natural-ils → lifted-two-phase mixes two differences: (a) decomposition structure, (b) LP acceleration strategy. Remove or disable before ablation runs.
-
-### 5.3 Station-group removal
-
-Code still uses `stationGroups`/`groupThetaVars`/`StationGroupInfo`. Paper formulation is per-scenario. Remove these structures from `lifted_ils.cpp`, `lifted_two_phase_ils.cpp`, and `lshape_relaxed_station.cpp`; rename `BuildStationGroupStrengthenedNoGoodCut` and related utilities to scenario-level monotonicity-cut terminology.
-
-### 5.4 Strengthened optimality cut
-
-Same monotonicity indicator as feasibility cut. Feasibility: `indicator ≥ 1`. Optimality: `θ ≥ Q* − δ · indicator`. Currently only feasibility version implemented.
-
-### 5.5 Solver thread policy
-
-All methods use same hardware budget. Solver uses Gurobi internal parallelism. Benders variants: Threads=1 per subproblem, `std::async` concurrency capped at available cores.
-
-## 6. Build and run instructions
-
-### 6.1 Build
+### 5.1 Build
 
 ```bat
 cmd.exe /d /s /c "call .\run.bat <nul"
@@ -115,55 +77,70 @@ cmd.exe /d /s /c "call .\run.bat <nul"
 
 Requires: Windows 11, MSVC 2022, CMake ≥ 3.20, Gurobi 12.0+. Output: `out/build/x64/Release/wireless.exe`.
 
-### 6.2 CLI commands
+### 5.2 CLI commands
 
 ```bash
-# Full method
-./wireless.exe --pb wireless_reform --alg full --data tower
+# Baseline — original formulation (wireless.cpp)
+./wireless.exe --pb wireless --alg solver --data tower
+./wireless.exe --pb wireless --alg l2 --data tower          # natural-ils (legacy CLI name)
 
-# Ablation
-./wireless.exe --pb wireless_reform --alg solver --data tower
-./wireless.exe --pb wireless_reform --alg natural-ils --data tower
+# Reformulated methods (wireless_reform.cpp)
 ./wireless.exe --pb wireless_reform --alg lifted-ils --data tower
 ./wireless.exe --pb wireless_reform --alg lifted-two-phase --data tower
+./wireless.exe --pb wireless_reform --alg full --data tower
 ```
 
-### 6.3 Config files
+> **TODO**: under `--pb wireless`, rename `--alg l2` → `--alg natural-ils`. Under `--pb wireless_reform`, remove `solver` and `natural-ils` (both currently dispatch to `wireless.cpp` internally, inconsistent with the `wireless_reform` label). The five-algorithm experiment should run `solver` and `natural-ils` via `--pb wireless`, and `lifted-ils`/`lifted-two-phase`/`full` via `--pb wireless_reform`.
 
-- `solverCfg.txt` — Gurobi default settings except MIPGap, TimeLimit, and thread policy. Thread policy: solver uses Gurobi internal parallelism; Benders variants use one thread per subproblem, with concurrent subproblem evaluations capped by the hardware-core budget（see §8）.
+### 5.3 Config files
+
+- `solverCfg.txt` — Gurobi default settings except MIPGap, TimeLimit, and thread policy. Thread policy: solver uses Gurobi internal parallelism; Benders variants use one thread per subproblem, with concurrent subproblem evaluations capped by the hardware-core budget（see §7）.
 - `data/{type}_data/globalCfg.txt` — operational and charger parameters.
 - `data/{type}_data/scenarioCfg.txt` — scenario list and probabilities.
 - `data/{type}_data/{scenario}/scenarioMiscCfg.txt` — routes, EBs, timetables.
 
-## 7. Experiment execution plan
+## 6. Experiment execution plan
 
-### 7.1 Stage 1: quick screening（600s）
+### 6.1 Stage 1: quick screening（600s）
 
 All five algorithms @ 600s on all instances（`tower_small` → `tower_medium` → `tower_5` → `tower_10` → `tower_20`）. 2-3 runs each. Goal: find break point where solver/natural-ils fail but `full` still works.
 
-### 7.2 Stage 2: main table（7200s unified）
+### 6.2 Stage 2: main table（7200s unified）
 
 All five algorithms @ 7200s on instances around the break point, ≥3 runs per cell. Report mean ± std or min/median/max. The five-algorithm ladder itself is the ablation.
 
-### 7.3 Per-run output fields
+### 6.3 Per-run output fields
 
-UB, LB, gap, wall-clock time, iteration count, Phase 1 time, Phase 2 time, LP cut count, feasibility cut count, optimality cut count, incumbent status（found/none）, termination status（converged/timeout/error）.
+UB, LB, global gap, total wall-clock time, master solve time, Phase 1 time, Phase 2 time, iteration count, LP cut count, feasibility cut count, optimality cut count, incumbent status（found/none）, model-level termination status, outer-loop termination status（converged/timeout/error）.
 
-## 8. Solver parameter policy
+## 7. Solver parameter policy
 
-All algorithms use Gurobi 12.0 default settings except MIPGap, TimeLimit, and method-specific thread allocation under a common hardware budget. All methods use the same wall-clock time limit, MIPGap, and total hardware budget.
+All algorithms use Gurobi 12.0 default settings except MIPGap, TimeLimit, and method-specific thread allocation under a common hardware budget.
+
+MIPGap settings:
+- **Stage 1 (600s screening)**: all Gurobi MIPGap = 0（EF Solver, Benders master, Phase 2 subproblem）。
+- **Stage 2 (7200s main table)**: EF Solver MIPGap = 0.01%, Benders master MIPGap = 0.01%, Phase 2 subproblem MIPGap = 0.
+- Phase 1 operational relaxation is an LP and does not use MIPGap.
+- Outer-loop global convergence tolerance = 0.01%. Gap is computed as `(UB − LB) / max{1, |UB|}`. A numerical gap is reported only when a finite incumbent exists (`UB < ∞`); otherwise report `—` or `undefined`.
+- Outer-loop lower bound is obtained from the Benders master `ObjBound`, not from the master incumbent objective value.
+
+TimeLimit settings:
+- All methods use the same wall-clock time limit.
+- For the EF Solver, TimeLimit is set directly on the Gurobi model.
+- For decomposition methods, the outer loop tracks elapsed wall-clock time and dynamically sets the remaining time on each Gurobi call (master and subproblems).
 
 The extensive-form solver uses Gurobi internal parallelism. Decomposition-based methods use one Gurobi thread per subproblem and cap the number of concurrent subproblem evaluations at the same hardware budget. If the machine budget is N physical cores, at most N subproblems should be evaluated concurrently.
 
 Paper states: "All methods are given access to the same hardware. The solver uses Gurobi's internal parallelism. Benders variants use one thread per subproblem and exploit parallelism through concurrent subproblem evaluation, capped at the available core count."
 
-## 9. Checklist
+## 8. Checklist
 
 ### Public path cleanup
 
 - [x] Five algorithm names exposed in `main.cpp`.
 - [x] Old `sg-*` labels replaced.
-- [ ] Decide legacy `wireless --alg l2` fate.
+- [ ] Rename `--alg l2` → `--alg natural-ils` under `--pb wireless`.
+- [ ] Remove `solver` and `natural-ils` from `--pb wireless_reform` (both dispatch to `wireless.cpp` internally; baseline methods should live under `--pb wireless`).
 
 ### File split / code organization
 
@@ -197,16 +174,22 @@ Paper states: "All methods are given access to the same hardware. The solver use
 
 ### Experiment readiness
 
-- [ ] Phase A/B/C execution.
-- [ ] Ablation table.
+- [ ] Stage 1 & Stage 2 execution.
 - [ ] `tower_10` config.
 - [ ] Standardized per-run output.
 - [ ] ≥3 runs per cell with spread reporting.
+- [ ] Phase 2 sub MIPGap = 0 set on all Benders variants.
+- [ ] Benders master MIPGap set to 0.01%.
+- [ ] Master `ObjBound` used as outer-loop LB.
+- [ ] Outer-loop convergence test implemented (0.01% tolerance, formula `(UB−LB)/max{1,|UB|}`).
+- [ ] Outer-loop wall-clock TimeLimit tracking implemented for decomposition methods.
 
-## 10. Immediate priorities
+## 9. Immediate priorities
 
-1. Remove LP-pruning from `natural-ils` — restores naive baseline.
-2. Remove station-group decomposition — unify to per-scenario subproblems.
-3. Rename legacy files.
-4. Implement monotonicity-strengthened optimality cut — so that `full` matches its target definition（strengthened feasibility and optimality cuts）.
-5. Run experiment plan Phases A→B→C.
+1. Rename legacy files (`barp_s_integer_l_shaped` → `natural_ils`, `lshape_relaxed_station` → `full_method`, `lshape_station_cut` → `lshape_monotonicity_cut`).
+2. Remove LP-relaxation pruning from `natural-ils` — restores naive baseline.
+3. Remove station-group decomposition — unify to per-scenario subproblems.
+4. Implement monotonicity-strengthened optimality cut — so that `full` matches its target definition (strengthened feasibility and optimality cuts).
+5. Complete outer-loop TimeLimit and convergence-gap control (Phase 2 sub MIPGap = 0, master ObjBound as LB, 0.01% outer-loop test).
+6. Generate `tower_10` scenario config.
+7. Run experiment plan Stage 1 & Stage 2.

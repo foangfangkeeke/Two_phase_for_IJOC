@@ -30,6 +30,8 @@ Operational stage:
     charging schedules are optimized given the facility layout and battery configuration.
 ```
 
+Although battery configuration and charging operation are physically distinct decisions, no additional uncertainty is revealed between them. Both are conditioned on the same realized service-plan scenario and therefore belong to the second-stage recourse. The model is thus a two-stage stochastic program: first-stage facility location, second-stage battery configuration and charging operation.
+
 电池容量不会每天变动；它随中期服务计划调整，而非随每日排班波动。
 
 ### 2.2 Decision hierarchy
@@ -106,7 +108,7 @@ s.t.
      x_{eb,t,time} ∈ {0,1}
 ```
 
-Phase 1 求解 route-level relaxation（简化 plug-in/快充容量竞争），提供 valid lower bound，不证明 MIP feasibility。
+Phase 1 求解 route-level relaxation：relax the cross-route plug-in/fast-charger capacity coupling（将共享容量约束松弛为 route-specific），retain route-local energy、charging、and battery constraints。提供 valid lower bound，不证明 MIP feasibility。
 
 ## 4. Methodology
 
@@ -122,7 +124,7 @@ Phase 1 求解 route-level relaxation（简化 plug-in/快充容量竞争），�
 SP_ω(w) = min_{z_ω,y_ω} C^bat_ω(z_ω) + C^op_ω(y_ω)
 ```
 
-Master 仅含 `w` + `θ_ω`，子问题联合优化 `z_ω` + `y_ω`。子问题含 battery integers + scheduling binaries → MILP。正式消融实验中，Natural ILS baseline 必须与 proposed method 求解等价 formulation（相同数据、目标、约束和成本缩放），两者只允许在分解结构和割生成策略上存在差异。在 `wireless.cpp` 与 `wireless_reform.cpp` 的模型一致性核验完成前，该等价性应视为实验前置条件，而不是已经验证的结论。
+Master 仅含 `w` + `θ_ω`，子问题联合优化 `z_ω` + `y_ω`。子问题含 battery integers + scheduling binaries → MILP。正式消融实验中，Natural ILS baseline 与 proposed method 求解等价 formulation（相同数据、目标、约束和成本缩放，已验证）。两者只允许在分解结构和割生成策略上存在差异。
 
 ### 4.3 Lifted reformulation
 
@@ -146,13 +148,13 @@ s.t. Σ_cap z_{ω,r,cap} = 1    ∀ω,r
 
 ### 4.5 Two-phase method
 
-Lift `z_ω` 后，Phase 1 求解 route-level operational relaxation（简化 plug-in 容量竞争），用 LP dual optimality + Farkas cuts 快速推下界。Phase 2 继承 Phase 1 的 master、cuts 和 warm start，恢复 occupancy integrality 进行 per-scenario MIP verification，添加 feasibility/optimality cuts。Two-phase 是 sequential，不是循环切换。
+Lift `z_ω` 后，Phase 1 求解 route-level operational relaxation（relax cross-route plug-in capacity coupling to route-specific capacity），用 LP dual optimality + Farkas cuts 快速推下界。Phase 2 继承 Phase 1 的 master、cuts 和 warm start，恢复 occupancy integrality 进行 per-scenario MIP verification，添加 feasibility/optimality cuts。Two-phase 是 sequential，不是循环切换。
 
 Lifted reformulation 是 two-phase 的 enabling condition：未 lift 时 Phase 1 仍需面对 battery integers（MILP 子问题或 fractional battery relaxation）。
 
 ### 4.6 Strengthened cuts
 
-**Implemented**: monotonicity-based strengthened feasibility cut。条件：`weightPerEnergy=0`（电池容量不影响能耗），opening more facilities / larger batteries only expand the feasible region。
+Monotonicity-based strengthened feasibility cut。条件：`weightPerEnergy=0`（电池容量不影响能耗），opening more facilities / larger batteries only expand the feasible region。
 
 Strengthened no-good cut（MIP infeasible）：
 ```
@@ -160,30 +162,36 @@ Strengthened no-good cut（MIP infeasible）：
 ```
 Indicator 只在打开当前未开的设施或升级电池容量时取正。被当前 infeasible 方案支配的组合（不新增设施、不升级电池）仍不可行，因此继续被该 cut 排除。
 
-**Planned**: monotonicity-strengthened optimality cut。同一 indicator，形式为 `θ_ω ≥ Q_ω(x*) - δ_ω · indicator`。当前实现为 classic Hamming-distance integer optimality cut。
+Monotonicity-strengthened optimality cut，使用与 feasibility cut 相同的 direction-selective indicator。形式为 `θ_ω ≥ Q_ω(x*) - δ_ω · indicator`，其中 `δ_ω = Q_ω(x*) - L_ω`，`L_ω` 是对 master 所有可行 `(w, z_ω)` 都有效的 scenario-wide global lower bound。Indicator 包含当前解中未建设的设施（`w_j^* = 0`）和高于当前所选容量的电池选项（`cap > cap^*_{ω,r}`）。当不新增设施且不升级电池时 indicator = 0，cut 保持 `θ_ω ≥ Q_ω(x*)`；仅在当前关闭的设施被打开或选择更大电池容量时 indicator 取正，从而放松 RHS。由 monotonicity，这些变化不会增加最优运营 recourse cost `Q_ω`（注意是运营成本，不含电池投资成本）。
 
 ### Benders cuts summary
 
-**Implemented — Phase 1 LP dual optimality cut**（route-level relaxation）：
+**Phase 1 LP dual optimality cut**（route-level relaxation）：
 ```
 θ_ω ≥ Σ_j π_{ω,j} · w_j + Σ_{r,cap} λ_{ω,r,cap} · z_{ω,r,cap} + constant_ω
 ```
 
-**Implemented — Phase 1 LP Farkas feasibility cut**：relaxation infeasible → original MIP infeasible（单向）。排除连 relaxation 都不可行的 master 解，不等价于 MIP feasibility verification。
+**Phase 1 LP Farkas feasibility cut**：relaxation infeasible → original MIP infeasible（单向）。排除连 relaxation 都不可行的 master 解，不等价于 MIP feasibility verification。
 
-**Implemented — Phase 2 strengthened no-good cut**（MIP infeasible）：
+**Phase 2 classic feasibility cut**（used by `lifted-ils` and `lifted-two-phase`）：
+```
+Σ_{j: w*_j=0} w_j + Σ_{r,cap: z*_{ω,r,cap}=0} z_{ω,r,cap} ≥ 1
+```
+
+**Phase 2 classic integer optimality cut**（used by `lifted-ils` and `lifted-two-phase`）：classic Hamming-distance form（所有变量统一 δ，不区分 facility/battery 方向）。
+
+**Phase 2 monotonicity-strengthened feasibility cut**（used by `full`）：
 ```
 Σ_{j: w*_j=0} w_j + Σ_{r, cap>cap*_{ω,r}} z_{ω,r,cap} ≥ 1
 ```
+Indicator 仅在未开设施和更大电池方向取正；被当前 infeasible 方案支配的组合仍不可行，因此继续被排除。
 
-**Implemented — Phase 2 integer optimality cut**: classic Hamming-distance form（所有变量统一 δ，不区分 facility/battery 方向）。
-
-**Planned（not yet implemented）— Phase 2 monotonicity-strengthened optimality cut**：
+**Phase 2 monotonicity-strengthened optimality cut**（used by `full`）：
 ```
 θ_ω ≥ Q_ω(x*) - δ_ω · [Σ_{j: w_j^*=0} w_j + Σ_{r} Σ_{cap>cap^*_{ω,r}} z_{ω,r,cap}]
 δ_ω = Q_ω(x*) - L_ω
 ```
-与 strengthened feasibility cut 使用同一 monotonicity indicator。差异化 δ，仅在新增设施/升级电池方向放松 RHS。
+与 strengthened feasibility cut 使用同一 monotonicity indicator。Indicator 在未建设施和更大电池方向取正，当前配置方向取零，仅在可能改善运营成本的方向上放松 RHS。
 
 ## 5. Contribution summary
 
@@ -191,9 +199,10 @@ Indicator 只在打开当前未开的设施或升级电池容量时取正。被�
 |---|-------------|---------------|
 | 1 | Lifted reformulation | Decomposes joint battery+charging MIP into lifted battery decision + conditional operational subproblem |
 | 2 | Reformulation-enabled two-phase framework | Phase 1 LP-relaxed operational response, Phase 2 MIP verification |
-| 3 | Monotonicity-based strengthened feasibility and optimality cuts（feasibility implemented; optimality pending implementation） | Keep cuts tight for dominated fewer-facility/lower-capacity solutions and relax them only when facilities are added or battery capacities are increased |
+| 3a | Monotonicity-strengthened feasibility cut | Excludes all solutions dominated by the current infeasible configuration — those with no additional facilities and no larger battery capacities remain infeasible |
+| 3b | Monotonicity-strengthened optimality cut | Maintains the Q* lower bound for all dominated feasible configurations; relaxes RHS only in the direction of opened facilities or larger battery capacities |
 
-三项构成 **reformulation-enabled partial integer L-shaped method**：一部分 scenario-dependent recourse lift 到 master，其余留在子问题，two-phase 求解，strengthened cuts 加速。
+上述三类贡献共同构成 **reformulation-enabled partial integer L-shaped method**：一部分 scenario-dependent recourse lift 到 master，其余留在子问题，two-phase 求解，strengthened cuts 加速。
 
 ## 6. Experimental and ablation design
 
@@ -205,7 +214,7 @@ Indicator 只在打开当前未开的设施或升级电池容量时取正。被�
 | `natural-ils` | Natural ILS: `w` in master, `z_ω` + `y_ω` in subproblem（naive, no LP pruning） |
 | `lifted-ils` | Lifted reformulation, single-phase MIP, classic cuts |
 | `lifted-two-phase` | Lifted + two-phase (LP→MIP), classic cuts |
-| `full` | Lifted + two-phase + strengthened feasibility and optimality cuts（current implementation: feasibility implemented; optimality pending） |
+| `full` | Lifted + two-phase + strengthened feasibility and optimality cuts |
 
 ### 6.2 Ablation logic
 
@@ -215,20 +224,18 @@ Indicator 只在打开当前未开的设施或升级电池容量时取正。被�
 | lifted-ils → lifted-two-phase | Effect of two-phase structure |
 | lifted-two-phase → full | Combined effect of monotonicity-strengthened feasibility and optimality cuts |
 
-The final `lifted-two-phase → full` comparison evaluates the two strengthened cut types as one contribution package. Until the strengthened optimality cut is implemented, any interim comparison isolates only the strengthened feasibility cut.
+The `lifted-two-phase → full` comparison evaluates the combined effect of the monotonicity-strengthened feasibility and optimality cuts.
 
 Natural ILS is a naive baseline（no LP pruning, no relaxed warm start）to keep the comparison clean.
 
 ### 6.3 Main comparison and scalability
 
-- Phase A: `full` @ 7200s to find the ceiling instance.
-- Phase B: all five algorithms @ 600s scan to find the break point.
-- Phase C: main table @ 7200s on 3-4 instances around the break point, ≥3 runs per cell.
-- Ablation table: tower_5 @ 7200s.
+- Stage 1: all five algorithms @ 600s screening on all instances to find the break point. 2–3 runs each.
+- Stage 2: all five algorithms @ 7200s on 3–4 instances around the break point, ≥3 runs per cell. The five-algorithm comparison is the ablation.
 
 ### 6.4 Required output metrics
 
-Per-run: UB, LB, gap, wall-clock time, iterations, Phase 1 time, Phase 2 time, LP cut count, feasibility cut count, optimality cut count, incumbent status, termination status.
+Per-run: UB, LB, global gap, total wall-clock time, master solve time, Phase 1 time, Phase 2 time, iteration count, LP cut count, feasibility cut count, optimality cut count, incumbent status, model-level termination status, outer-loop termination status.
 
 ## 7. Paper-writing guidance
 
@@ -236,11 +243,11 @@ Per-run: UB, LB, gap, wall-clock time, iterations, Phase 1 time, Phase 2 time, L
 
 **Situation**: 公交电气化需要建设无线充电设施 + 配置电池。设施是长期战略投资（跨场景 here-and-now），电池是场景适应性决策。评估方案需解典型日充电调度。→ 二阶段适应性规划。
 
-**Complication**: Natural ILS 子问题含 battery integers + scheduling binaries → MILP。Classical LP dual cuts 不能直接表示 mixed-integer recourse，generic integer cuts 的信息量有限。当前开发测试表明，在 600s 筛查时限下，Solver 和 Natural ILS 从 `tower_5` 开始已出现明显的可扩展性困难；正式结论仍需基于统一时限实验。
+**Complication**: Natural ILS 子问题含 battery integers + scheduling binaries → MILP。Classical LP dual cuts 不能直接表示 mixed-integer recourse，generic integer cuts 的信息量有限。随着场景数量和问题规模增长，extensive-form MILP 和 natural ILS 面临日益严重的计算困难——前者包含完整的场景展开 formulation，后者反复求解 mixed-integer recourse 子问题且依赖信息量相对有限的 generic integer cuts。
 
 **Question**: 如何高效求解子问题为 MILP 的适应性设施选址问题？
 
-**Answer**: Reformulation（lift z_ω）→ Two-phase（Phase 1 LP push LB, Phase 2 MIP verify）→ Strengthened cuts（monotonicity-based feasibility and optimality cuts; optimality pending implementation）。
+**Answer**: Reformulation（lift z_ω）→ Two-phase（Phase 1 LP push LB, Phase 2 MIP verify）→ Strengthened cuts（monotonicity-based feasibility and optimality cuts）。
 
 ### 7.2 Scenario definition wording
 
@@ -284,35 +291,13 @@ Transportation Research Part B, INFORMS Journal on Computing, or Transportation 
 ### Key theoretical propositions
 
 - Reformulated model 与 extensive-form MILP 的 exact equivalence。
-- Lifted reformulation is necessary for clean LP-first strategy（未 lift 时必须松弛 battery binaries 或面对 MILP 子问题）。
-- Phase 1 relaxation 提供 valid LB，不证明 MIP feasibility。
-- Strengthened feasibility cut validity：monotonicity 保证被 infeasible 方案支配的仍 infeasible。
-- Strengthened optimality cut validity（planned）：被 feasible 方案支配的 cost ≥ Q*；新增设施/升级电池方向放松 RHS。
+- Lifted reformulation enables clean LP-first decomposition（未 lift 时 Phase 1 必须松弛 battery binaries 或面对 MILP 子问题）。
+- Phase 1 求解 route-level relaxation，其可行域包含 Phase 2 MIP 可行域，因此 `Q^R_ω(w,z_ω) ≤ Q_ω(w,z_ω)`，提供 valid LB，但不证明 MIP feasibility。
+- Strengthened feasibility cut validity：monotonicity 保证被 infeasible 方案支配的配置（不新增设施、不升级电池）仍不可行。
+- Strengthened optimality cut validity：`L_ω` 是对 master 所有可行 `(w, z_ω)` 都有效的 scenario-wide global lower bound。对被 feasible 方案支配的配置，`Q_ω ≥ Q_ω(x*)`；indicator 仅在新增设施/升级电池方向取正，由 monotonicity 这些方向不增加运营成本，因此 `θ_ω ≥ Q_ω(x*) - δ_ω · indicator` 对一切 master 可行解成立。
+- Finite convergence：假设 master 精确求解、Phase 2 精确验证且所有 cut 有效，master 含有限个 binary facility 和 battery 配置。Phase-2-infeasible 配置被 feasibility cut 排除；Phase-2-feasible 配置若 θ_ω 被低估则被 optimality cut 修正，避免同一配置以同一低估 θ_ω 重复出现。因此算法在有限步内精确收敛。计算实现中 master 和 outer loop 按给定容差求解（Benders master MIPGap = 0.01%，outer-loop gap = 0.01%），算法在指定全局最优性容差处有限终止，而不声称精确最优。
 
 ## 9. References
 
 - Laporte, G., & Louveaux, F. V. (1993). The integer L-shaped method for stochastic integer programs with complete recourse. *Operations Research Letters*, 13(3), 133–142.
 - [Add reference on partial Benders decomposition / partial decomposition]
-
----
-
-## Historical development results (not final paper results)
-
-当前表混合时间口径（baseline 600s, proposed run-to-convergence），不作为最终实验表。正式论文统一 7200s。
-
-| Dataset | Algorithm | UB | LB | Gap% | Iters | Time | Status |
-|---------|-----------|----|----|------|-------|------|--------|
-| tower_small (2) | Solver | 9572.05 | 9572.05 | 0 | 1720 nodes | 259.3s | converged |
-| | ILS | 9572.05 | 9571.39 | 0.0069 | 115 | 224.9s | converged |
-| | Ours | 9572.05 | 9572.05 | 0 | Ph1:6 Ph2:1 | 1.6s | converged |
-| tower_medium (2) | Solver | 16203.06 | 15959.49 | 1.50 | 1313 nodes | 600.8s | timeout |
-| | ILS | 16155.53 | 16031.30 | 0.77 | 164 | 601.7s | timeout |
-| | Ours | 16155.53 | 16155.53 | 0 | Ph1:6 Ph2:1 | 2.5s | converged |
-| tower_5 (5) | Solver | inf | 346.78 | — | — | 601.1s | no incumbent |
-| | ILS | — | 52725.20 | — | 11 | 601.3s | no incumbent |
-| | Ours | 54374.34 | 54372.57 | 0.0032 | Ph1:12 Ph2:2 | 52.8s | converged |
-| tower_20 (20) | Solver | — | — | — | — | — | N/A |
-| | ILS | — | — | — | — | — | N/A |
-| | Ours | 54439.04 | 54436.83 | 0.0041 | Ph1:12 Ph2:3 | 1838.1s | converged |
-
-Key observations: under the recorded development settings, Solver and Natural ILS did not obtain an incumbent on `tower_5` within 600s; the `tower_20` baseline results were not available. The proposed method converged on all recorded instances, including `tower_20` in about 30 minutes, but the mixed time limits mean these results are not a fair final comparison.
