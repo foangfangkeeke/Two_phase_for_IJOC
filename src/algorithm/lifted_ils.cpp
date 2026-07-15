@@ -256,7 +256,9 @@ void LiftedILS::PrintBestSolution() const
     std::cout << "Active master variables:" << std::endl;
     for (size_t idx = 0; idx < zVars.size(); ++idx) {
         if (incumbentZValues[idx] > 0.5) {
-            std::cout << "  " << zVars[idx].get(GRB_StringAttr_VarName) << std::endl;
+            const std::string name = zVars[idx].get(GRB_StringAttr_VarName);
+            if (name.rfind("w_", 0) != 0) continue;
+            std::cout << "  " << name << std::endl;
         }
     }
     std::cout << "Q(z): " << incumbentSecondStageValue << std::endl;

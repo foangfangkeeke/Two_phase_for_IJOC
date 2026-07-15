@@ -8,6 +8,10 @@
 #include "tools.hpp"
 #include "using_solver.hpp"
 
+#include <chrono>
+#include <ctime>
+#include <filesystem>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -17,6 +21,21 @@
 #endif
 
 using namespace std;
+
+namespace {
+
+class ScopedStreamRedirect {
+public:
+    ScopedStreamRedirect(ostream& stream, streambuf* replacement)
+        : stream_(stream), original_(stream.rdbuf(replacement)) {}
+    ~ScopedStreamRedirect() { stream_.rdbuf(original_); }
+
+private:
+    ostream& stream_;
+    streambuf* original_;
+};
+
+} // namespace
 
 int main(int argc, char* argv[])
 {
@@ -44,6 +63,26 @@ int main(int argc, char* argv[])
     const string algLower = Tools::ToLower(alg);
     const string pbLower = Tools::ToLower(pb);
     const string dataFolder = dataType + "_data";
+
+    // ── Log file setup ──
+    const filesystem::path logDir = filesystem::path("logs") / dataType;
+    filesystem::create_directories(logDir);
+    const auto now = chrono::system_clock::now();
+    const time_t tt = chrono::system_clock::to_time_t(now);
+    tm tmBuf;
+    localtime_s(&tmBuf, &tt);
+    char ts[64];
+    strftime(ts, sizeof(ts), "%Y-%m-%d_%H-%M-%S", &tmBuf);
+    const filesystem::path logPath =
+        logDir / (alg + "_" + pb + "_" + ts + ".log");
+
+    filebuf logBuf;
+    logBuf.open(logPath, ios::out);
+    cout << "Log file: " << logPath.string() << endl;
+    ScopedStreamRedirect coutRedirect(cout, &logBuf);
+    ScopedStreamRedirect cerrRedirect(cerr, &logBuf);
+
+    // ... (algorithm dispatch below; logBuf must stay alive)
 
     if (pbLower == "wireless") {
         MILPSolver solver;

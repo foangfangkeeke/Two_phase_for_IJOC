@@ -513,7 +513,9 @@ void IntegerLShaped::PrintBestSolution() const
         if (incumbentZValues[idx] <= 0.5) {
             continue;
         }
-        std::cout << zVars[idx].get(GRB_StringAttr_VarName) << std::endl;
+        const std::string name = zVars[idx].get(GRB_StringAttr_VarName);
+        if (name.rfind("w_", 0) != 0) continue;
+        std::cout << name << std::endl;
     }
     std::cout << "Q(z): " << incumbentSecondStageValue << std::endl;
     std::cout << "UB: " << bestUpperBound << ", LB: " << bestLowerBound << std::endl;
