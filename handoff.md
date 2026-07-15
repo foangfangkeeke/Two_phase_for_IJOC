@@ -170,7 +170,7 @@ Paper states: "All methods are given access to the same hardware. The solver use
 - [x] Two-phase structure implemented.
 - [x] Strengthened feasibility cut implemented.
 - [x] Remove LP-relaxation pruning from natural-ILS.
-- [ ] Implement monotonicity-strengthened optimality cut.
+- [x] Implement monotonicity-strengthened optimality cut.
 
 ### Experiment readiness
 
@@ -186,7 +186,6 @@ Paper states: "All methods are given access to the same hardware. The solver use
 
 ## 9. Immediate priorities
 
-1. Implement monotonicity-strengthened optimality cut — so that `full` matches its target definition (strengthened feasibility and optimality cuts).
-2. Complete outer-loop TimeLimit and convergence-gap control (Phase 2 sub MIPGap = 0, master ObjBound as LB, 0.01% outer-loop test).
-3. Generate `tower_10` scenario config.
-4. Run experiment plan Stage 1 & Stage 2.
+1. Complete outer-loop TimeLimit and convergence-gap control (Phase 2 sub MIPGap = 0, master ObjBound as LB, 0.01% outer-loop test).
+2. Generate `tower_10` scenario config.
+3. Run experiment plan Stage 1 & Stage 2.

@@ -84,6 +84,51 @@ inline BendersCutInfo BuildStationGroupStrengthenedNoGoodCut(
     return cut;
 }
 
+// --- Monotonicity-strengthened optimality cut ---
+// Same indicator as the feasibility cut.
+// theta >= Q* - delta * indicator, where delta = Q* - L.
+inline BendersCutInfo BuildMonotonicityStrengthenedOptimalityCut(
+    const std::vector<ProblemDataVar>& masterVars,
+    const std::vector<double>& zValues, int scenarioIndex,
+    const std::vector<int>& scenarioRouteIds,
+    const std::vector<std::string>& scenarioFacilityVarNames,
+    double subObj, double lowerBound)
+{
+    std::unordered_set<std::string> facilitySet(
+        scenarioFacilityVarNames.begin(), scenarioFacilityVarNames.end());
+    std::unordered_map<int, int> selectedCapacityByRoute;
+    for (size_t idx = 0; idx < masterVars.size(); ++idx) {
+        int vs, vr, cap;
+        if (TryParseCapacityVar(masterVars[idx].name, vs, vr, cap)
+            && vs == scenarioIndex && zValues[idx] > 0.5)
+            selectedCapacityByRoute[vr] = cap;
+    }
+    double delta = std::max(0.0, subObj - lowerBound);
+    BendersCutInfo cut;
+    cut.isOptimalityCut = true; cut.sense = '>'; cut.rhs = 0.0;
+    cut.constant = subObj;
+    cut.yCoeffs.assign(zValues.size(), 0.0);
+    for (size_t idx = 0; idx < masterVars.size(); ++idx) {
+        const std::string& name = masterVars[idx].name;
+        if (IsFacilityMasterVar(name)) {
+            if (facilitySet.count(name) > 0 && zValues[idx] <= 0.5)
+                cut.yCoeffs[idx] = -delta;
+            continue;
+        }
+        int vs, vr, cap;
+        if (TryParseCapacityVar(name, vs, vr, cap) && vs == scenarioIndex) {
+            bool inScenario = false;
+            for (int rid : scenarioRouteIds)
+                if (rid == vr) { inScenario = true; break; }
+            if (!inScenario) continue;
+            auto it = selectedCapacityByRoute.find(vr);
+            if (it != selectedCapacityByRoute.end() && cap > it->second)
+                cut.yCoeffs[idx] = -delta;
+        }
+    }
+    return cut;
+}
+
 // --- Cut signature for deduplication ---
 inline std::string MakeFeasibilityCutSignature(const BendersCutInfo& cutInfo)
 {

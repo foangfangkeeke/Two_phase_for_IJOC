@@ -368,6 +368,7 @@ Status LShapeRelaxedStation::Solve()
         double aggregatedQValue = 0.0;
         bool spAnyInfeasible = false;
         std::vector<BendersCutInfo> mipCutInfos(subProblems_.size());
+        std::vector<double> mipSubObjs(subProblems_.size(), 0.0);
         for (size_t idx = 0; idx < mipFutures.size(); ++idx) {
             SubProblemEvalResult result;
             try { result = mipFutures[idx].get(); }
@@ -378,6 +379,7 @@ Status LShapeRelaxedStation::Solve()
             if (result.status != OK) return result.status;
 
             mipCutInfos[idx] = result.cutInfo;
+            mipSubObjs[idx] = result.subObj;
             if (result.cutInfo.isOptimalityCut)
                 aggregatedQValue += result.subObj;
             else
@@ -444,15 +446,29 @@ Status LShapeRelaxedStation::Solve()
                       << ", gap=" << (bestUpperBound_ - bestLowerBound_) / denom * 100.0 << "%";
         }
 
-        // Add MIP integer optimality cuts to the corresponding Phase 2 theta variables.
-        // These tighten the LB on the NEXT master re-solve.
+        // Add MIP optimality cuts: monotonicity-strengthened for each feasible group.
+        const auto& stationGroups = problemData_->getData<std::vector<StationGroupInfo>>(
+            "wireless_station_groups");
+        const auto& facilityVarNames = problemData_->getData<
+            std::vector<std::vector<std::vector<std::string>>>>("wireless_route_facility_var_names");
         for (size_t idx = 0; idx < mipCutInfos.size(); ++idx) {
             if (!mipCutInfos[idx].isOptimalityCut) continue;
+            const auto& sgInfo = stationGroups[idx];
+            int scIdx = sgInfo.scenarioIndex;
+            std::vector<std::string> sgFacNames;
+            for (int rid : sgInfo.routeIds) {
+                const auto& rn = facilityVarNames.at(static_cast<size_t>(scIdx))
+                    .at(static_cast<size_t>(rid));
+                sgFacNames.insert(sgFacNames.end(), rn.begin(), rn.end());
+            }
+            const BendersCutInfo optCut = BuildMonotonicityStrengthenedOptimalityCut(
+                masterVars, zValues, scIdx, sgInfo.routeIds, sgFacNames,
+                mipSubObjs[idx], globalLowerBound_);
             GRBLinExpr cutExpr;
             double lhsAtCurrent;
-            BuildContinuousCutExpr(mipCutInfos[idx], zVars_, cutExpr, lhsAtCurrent, zValues);
+            BuildContinuousCutExpr(optCut, zVars_, cutExpr, lhsAtCurrent, zValues);
             model_->addConstr(cutExpr <= groupThetaVars_[idx],
-                "p2_mip_opt_" + std::to_string(iter) + "_" + std::to_string(idx));
+                "p2_mip_sopt_" + std::to_string(iter) + "_" + std::to_string(idx));
         }
         model_->update();
 
