@@ -114,7 +114,7 @@ private:
 
 class WirelessNoPlugInIntegerLShaped : public IntegerLShaped {
 public:
-    explicit WirelessNoPlugInIntegerLShaped(std::string dataFolder = "test_data", int maxIters = 500, double tol = 1e-6)
+    explicit WirelessNoPlugInIntegerLShaped(std::string dataFolder = "test_data", int maxIters = 2147483647, double tol = 1e-6)
         : IntegerLShaped(WIRELESS_CHARGING_NO_PLUGIN, dataFolder, maxIters, tol) {}
 };
 
