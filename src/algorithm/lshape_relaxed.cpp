@@ -365,7 +365,6 @@ Status LShapeRelaxed::Solve()
         if (!(masterStatus == GRB_OPTIMAL ||
               (masterStatus == GRB_TIME_LIMIT && model->get(GRB_IntAttr_SolCount) > 0))) {
             std::cerr << "Relaxed Route master problem not solved, status: " << masterStatus << std::endl;
-            Debug::OutputModel(model);
             return ERROR;
         }
 

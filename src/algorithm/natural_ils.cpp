@@ -19,25 +19,6 @@ namespace {
 using DataInitFactory = std::function<std::unique_ptr<IDataInitializationStrategy_IntegerLShaped>(const std::string&)>;
 using SubFactory = std::function<std::unique_ptr<ISubProblemStrategy_IntegerLShaped>()>;
 
-enum class WarmStartStrategy {
-    ZeroLowerBound,
-    IntegerSubProblem,
-    RelaxedSubProblem
-};
-
-constexpr WarmStartStrategy kWarmStartStrategy = WarmStartStrategy::ZeroLowerBound;
-
-const char* WarmStartStrategyName()
-{
-    if constexpr (kWarmStartStrategy == WarmStartStrategy::ZeroLowerBound) {
-        return "zero lower bound";
-    }
-    if constexpr (kWarmStartStrategy == WarmStartStrategy::IntegerSubProblem) {
-        return "integer subproblem";
-    }
-    return "relaxed subproblem";
-}
-
 struct SubProblemEvalResult {
     Status status = ERROR;
     IntegerLShapedCutInfo cutInfo;
@@ -340,30 +321,8 @@ Status IntegerLShaped::EvaluateSubProblems(const std::vector<double>& zValues, b
 Status IntegerLShaped::ApplyWarmStart()
 {
     double warmL = 0.0;
-    std::vector<double> scenarioLs;
-    std::vector<double> warmZ;
+    std::vector<double> scenarioLs(subProblems.size(), 0.0);
     bestUpperBound = 1e9;
-
-    if constexpr (kWarmStartStrategy == WarmStartStrategy::ZeroLowerBound) {
-        scenarioLs.assign(subProblems.size(), 0.0);
-    } else {
-        warmZ = dataIniter->BuildWarmStartMasterValues(*problemData);
-        IntegerLShapedCutInfo warmCutInfo;
-
-        const bool relaxedWarmStart = kWarmStartStrategy == WarmStartStrategy::RelaxedSubProblem;
-        Status warmStatus = EvaluateSubProblems(warmZ, relaxedWarmStart,
-            warmCutInfo, warmL, &scenarioLs);
-        if (warmStatus != OK) {
-            return warmStatus;
-        }
-
-        if constexpr (kWarmStartStrategy == WarmStartStrategy::IntegerSubProblem) {
-            const bool warmMasterFeasible = dataIniter->IsWarmStartMasterFeasible(*problemData, warmZ, tolerance);
-            if (warmMasterFeasible) {
-                UpdateIncumbent(warmZ, warmL);
-            }
-        }
-    }
 
     globalLowerBound = warmL;
     for (size_t idx = 0; idx < subProblems.size(); ++idx) {
@@ -382,7 +341,7 @@ Status IntegerLShaped::Solve()
     if (warmStartStatus != OK) {
         return warmStartStatus;
     }
-    std::cout << "Natural ILS warm start strategy=" << WarmStartStrategyName()
+    std::cout << "Natural ILS warm start strategy=zero lower bound"
               << ", elapsed_ms=" << Tools::ElapsedMs(algorithmStart, Tools::Clock::now()) << std::endl;
 
     model->addConstr(theta >= globalLowerBound, "theta_global_lb");
@@ -404,7 +363,6 @@ Status IntegerLShaped::Solve()
         if (!(masterStatus == GRB_OPTIMAL ||
               (masterStatus == GRB_TIME_LIMIT && model->get(GRB_IntAttr_SolCount) > 0))) {
             std::cerr << "Natural ILS master problem not solved, status: " << masterStatus << std::endl;
-            Debug::OutputModel(model);
             return ERROR;
         }
 
