@@ -82,7 +82,7 @@ Requires: Windows 11, MSVC 2022, CMake ≥ 3.20, Gurobi 12.0+. Output: `out/buil
 ```bash
 # Baseline — original formulation (wireless.cpp)
 ./wireless.exe --pb wireless --alg solver --data tower
-./wireless.exe --pb wireless --alg l2 --data tower          # natural-ils (legacy CLI name)
+./wireless.exe --pb wireless --alg natural-ils --data tower
 
 # Reformulated methods (wireless_reform.cpp)
 ./wireless.exe --pb wireless_reform --alg lifted-ils --data tower
@@ -90,7 +90,7 @@ Requires: Windows 11, MSVC 2022, CMake ≥ 3.20, Gurobi 12.0+. Output: `out/buil
 ./wireless.exe --pb wireless_reform --alg full --data tower
 ```
 
-> **TODO**: under `--pb wireless`, rename `--alg l2` → `--alg natural-ils`. Under `--pb wireless_reform`, remove `solver` and `natural-ils` (both currently dispatch to `wireless.cpp` internally, inconsistent with the `wireless_reform` label). The five-algorithm experiment should run `solver` and `natural-ils` via `--pb wireless`, and `lifted-ils`/`lifted-two-phase`/`full` via `--pb wireless_reform`.
+> Baseline methods (`solver`, `natural-ils`) run under `--pb wireless`. Reformulated methods (`lifted-ils`, `lifted-two-phase`, `full`) run under `--pb wireless_reform`.
 
 ### 5.3 Config files
 
@@ -139,8 +139,8 @@ Paper states: "All methods are given access to the same hardware. The solver use
 
 - [x] Five algorithm names exposed in `main.cpp`.
 - [x] Old `sg-*` labels replaced.
-- [ ] Rename `--alg l2` → `--alg natural-ils` under `--pb wireless`.
-- [ ] Remove `solver` and `natural-ils` from `--pb wireless_reform` (both dispatch to `wireless.cpp` internally; baseline methods should live under `--pb wireless`).
+- [x] Rename `--alg l2` → `--alg natural-ils` under `--pb wireless`.
+- [x] Remove `solver` and `natural-ils` from `--pb wireless_reform`.
 
 ### File split / code organization
 

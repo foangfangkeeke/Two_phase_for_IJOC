@@ -51,10 +51,11 @@ int main(int argc, char* argv[])
 
         if (algLower == "solver") {
             solver.SetAlgorithm(std::make_unique<UsingSolver>(WIRELESS_CHARGING_NO_PLUGIN, dataFolder));
-        } else if (algLower == "l2") {
+        } else if (algLower == "natural-ils") {
             solver.SetAlgorithm(std::make_unique<WirelessNoPlugInIntegerLShaped>(dataFolder));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;
+            cout << "valid wireless algorithms: solver, natural-ils" << endl;
             return 1;
         }
 
@@ -70,14 +71,7 @@ int main(int argc, char* argv[])
         MILPSolver solver;
         solver.SetSolverConfig(LoadSolverConfig());
 
-        if (algLower == "solver") {
-            // Direct EF-MILP baseline. The lifted reformulation is a decomposition
-            // device, so the direct solver remains the original extensive form.
-            solver.SetAlgorithm(std::make_unique<UsingSolver>(WIRELESS_CHARGING_NO_PLUGIN, dataFolder));
-        } else if (algLower == "natural-ils") {
-            // Natural ILS baseline before lifting scenario battery variables.
-            solver.SetAlgorithm(std::make_unique<WirelessNoPlugInIntegerLShaped>(dataFolder));
-        } else if (algLower == "lifted-ils") {
+        if (algLower == "lifted-ils") {
             solver.SetAlgorithm(std::make_unique<LiftedILS>(
                 WIRELESS_CAPACITY_REFORM, dataFolder, 5000));
         } else if (algLower == "lifted-two-phase") {
@@ -88,7 +82,7 @@ int main(int argc, char* argv[])
                 WIRELESS_CAPACITY_REFORM, dataFolder, 5000));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;
-            cout << "valid wireless_reform algorithms: solver, natural-ils, lifted-ils, lifted-two-phase, full" << endl;
+            cout << "valid wireless_reform algorithms: lifted-ils, lifted-two-phase, full" << endl;
             return 1;
         }
 
