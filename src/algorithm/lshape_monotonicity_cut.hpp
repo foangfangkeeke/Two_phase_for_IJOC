@@ -25,20 +25,20 @@ inline bool TryParseCapacityVar(const std::string& name, int& scenarioIndex, int
     return true;
 }
 
-// --- Station-group strengthened no-good cut ---
-// Scope: station-group facility union (vs per-route in Paper1).
-// Σ_{j: w_j=0, w_j in stationGroupFacilities} w_j + Σ_{r in stationGroup, cap > selected} z_{r,cap} >= 1
-inline BendersCutInfo BuildStationGroupStrengthenedNoGoodCut(
+// --- Scenario-subproblem strengthened no-good cut ---
+// Scope: scenario-subproblem facility union (vs per-route in Paper1).
+// Σ_{j: w_j=0, w_j in scenarioSubproblemFacilities} w_j + Σ_{r in scenarioSubproblem, cap > selected} z_{r,cap} >= 1
+inline BendersCutInfo BuildScenarioStrengthenedNoGoodCut(
     const std::vector<ProblemDataVar>& masterVars,
     const std::vector<double>& zValues,
     int scenarioIndex,
-    const std::vector<int>& stationGroupRouteIds,
-    const std::vector<std::string>& stationGroupFacilityVarNames)
+    const std::vector<int>& scenarioSubproblemRouteIds,
+    const std::vector<std::string>& scenarioSubproblemFacilityVarNames)
 {
     std::unordered_set<std::string> facilitySet(
-        stationGroupFacilityVarNames.begin(), stationGroupFacilityVarNames.end());
+        scenarioSubproblemFacilityVarNames.begin(), scenarioSubproblemFacilityVarNames.end());
 
-    // Find selected capacity for each route in this station group
+    // Find selected capacity for each route in this scenario subproblem
     std::unordered_map<int, int> selectedCapacityByRoute;  // routeId -> selected capacity
     for (size_t idx = 0; idx < masterVars.size(); ++idx) {
         int vs, vr, cap;
@@ -58,7 +58,7 @@ inline BendersCutInfo BuildStationGroupStrengthenedNoGoodCut(
     for (size_t idx = 0; idx < masterVars.size(); ++idx) {
         const std::string& name = masterVars[idx].name;
         if (IsFacilityMasterVar(name)) {
-            // Facility unopened AND relevant to this station group -> can open it
+            // Facility unopened AND relevant to this scenario subproblem -> can open it
             if (facilitySet.count(name) > 0 && zValues[idx] <= 0.5) {
                 cut.yCoeffs[idx] = 1.0;
             }
@@ -67,12 +67,12 @@ inline BendersCutInfo BuildStationGroupStrengthenedNoGoodCut(
 
         int vs, vr, cap;
         if (TryParseCapacityVar(name, vs, vr, cap) && vs == scenarioIndex) {
-            // Check if this route is in the station group
-            bool inGroup = false;
-            for (int rid : stationGroupRouteIds) {
-                if (rid == vr) { inGroup = true; break; }
+            // Check if this route is in the scenario subproblem
+            bool inSubproblem = false;
+            for (int rid : scenarioSubproblemRouteIds) {
+                if (rid == vr) { inSubproblem = true; break; }
             }
-            if (!inGroup) continue;
+            if (!inSubproblem) continue;
 
             auto it = selectedCapacityByRoute.find(vr);
             if (it != selectedCapacityByRoute.end() && cap > it->second) {

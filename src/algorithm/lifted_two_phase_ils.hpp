@@ -30,7 +30,7 @@ private:
 
     Status EvaluateSubProblems(const std::vector<double>& zValues,
         LShapeCutInfo& cutInfo, double& subObj,
-        std::vector<double>& groupSubObjs, std::vector<LShapeCutInfo>& groupCutInfos,
+        std::vector<double>& scenarioSubObjs, std::vector<LShapeCutInfo>& scenarioCutInfos,
         bool relaxed);
 
     Status ApplyWarmStart();
@@ -50,7 +50,7 @@ private:
     std::vector<std::unique_ptr<StationSubProblemState>> subProblems;
     std::vector<GRBVar> zVars;
     GRBVar theta;
-    std::vector<GRBVar> groupThetaVars;
+    std::vector<GRBVar> scenarioThetaVars;
 
     long long phase1ElapsedMs = 0;
     std::chrono::steady_clock::time_point fullAlgorithmStart;

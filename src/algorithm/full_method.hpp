@@ -8,13 +8,13 @@
 #include <string>
 #include <vector>
 
-struct StationGroupInfo;
+struct ScenarioSubproblemInfo;
 
 /// Two-phase Benders algorithm:
 ///   Phase 1: operational relaxation with per-route LP sub-problems.
 ///   Phase 2: Reuses Phase 1 master model (with accumulated cuts),
-///            replaces sub-problems with station-group MIPs (full charger capacity),
-///            continues Benders iterations with one theta variable per station group.
+///            replaces sub-problems with scenario MIPs (full charger capacity),
+///            continues Benders iterations with one theta variable per scenario subproblem.
 class LShapeRelaxedStation : public IMILPAlgorithmStrategy {
 public:
     LShapeRelaxedStation(ProblemType problemType, std::string dataFolder = "test_data",
@@ -40,11 +40,11 @@ private:
     std::unique_ptr<ProblemData> problemDataOwned_;
     std::shared_ptr<GRBModel> model_;
     std::vector<GRBVar> zVars_;
-    std::vector<GRBVar> groupThetaVars_;  // one theta per Phase 2 station group
+    std::vector<GRBVar> scenarioThetaVars_;  // one theta per Phase 2 scenario subproblem
     GRBVar theta_;
     ProblemData* problemData_ = nullptr;
 
-    // Phase 2: station-group sub-problems
+    // Phase 2: scenario subproblems
     std::vector<std::unique_ptr<StationSubProblemState>> subProblems_;
 
     // Benders state

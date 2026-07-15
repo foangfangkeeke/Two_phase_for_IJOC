@@ -36,7 +36,7 @@ struct SubProblemEvalResult {
     double subObj = 0.0;
 };
 
-SubProblemEvalResult EvaluateStationGroup(const ProblemData& problemData,
+SubProblemEvalResult EvaluateScenarioSubproblem(const ProblemData& problemData,
     ISubProblem_LShape& strategy, GRBModel& subModel,
     LShapeSubProblemContext& context, const std::vector<double>& zValues,
     bool relaxed)
@@ -68,7 +68,7 @@ void BuildContinuousCutExpr(const BendersCutInfo& cutInfo, const std::vector<GRB
 
 struct LShapeRelaxedStation::StationSubProblemState {
     int scenarioIndex = 0;
-    StationGroupInfo sgInfo;
+    ScenarioSubproblemInfo scenarioInfo;
     std::unique_ptr<ISubProblem_LShape> strategy;
     std::unique_ptr<GRBEnv> env;
     std::unique_ptr<GRBModel> model;
@@ -127,46 +127,46 @@ Status LShapeRelaxedStation::Initialize()
 
     std::cout << std::endl << "── Phase 2: MIP verification (reusing Phase 1 master + all cuts) ──" << std::endl;
 
-    // ── Build station-group sub-problems ──
+    // ── Build scenario subproblems ──
     phase2Start_ = Tools::Clock::now();
 
-    const auto& stationGroups = problemData_->getData<std::vector<StationGroupInfo>>(
-        "wireless_station_groups");
+    const auto& scenarioSubproblems = problemData_->getData<std::vector<ScenarioSubproblemInfo>>(
+        "wireless_scenario_subproblems");
 
-    if (stationGroups.empty()) {
-        std::cerr << "No station groups found" << std::endl;
+    if (scenarioSubproblems.empty()) {
+        std::cerr << "No scenario subproblems found" << std::endl;
         return ERROR;
     }
 
-    // Add one Phase 2 theta variable per station group.
-    groupThetaVars_.clear();
-    groupThetaVars_.reserve(stationGroups.size());
-    GRBLinExpr groupThetaSum = 0.0;
-    for (size_t idx = 0; idx < stationGroups.size(); ++idx) {
+    // Add one Phase 2 theta variable per scenario subproblem.
+    scenarioThetaVars_.clear();
+    scenarioThetaVars_.reserve(scenarioSubproblems.size());
+    GRBLinExpr scenarioThetaSum = 0.0;
+    for (size_t idx = 0; idx < scenarioSubproblems.size(); ++idx) {
         GRBVar gTheta = model_->addVar(0.0, GRB_INFINITY, 0.0, GRB_CONTINUOUS,
-            "group_theta_p2_" + std::to_string(idx));
-        groupThetaVars_.push_back(gTheta);
-        groupThetaSum += gTheta;
+            "scenario_theta_p2_" + std::to_string(idx));
+        scenarioThetaVars_.push_back(gTheta);
+        scenarioThetaSum += gTheta;
     }
-    model_->addConstr(groupThetaSum <= theta_, "theta_group_sum_p2");
+    model_->addConstr(scenarioThetaSum <= theta_, "theta_scenario_sum_p2");
 
     subProblems_.clear();
-    subProblems_.reserve(stationGroups.size());
+    subProblems_.reserve(scenarioSubproblems.size());
 
     // ── Pass 1 (serial): Create GRBEnv + GRBModel (license init not thread-safe) ──
-    for (size_t idx = 0; idx < stationGroups.size(); ++idx) {
-        std::cout << "Phase 2 init sub-problem " << idx << "/" << stationGroups.size()
-                  << " sc=" << stationGroups[idx].scenarioIndex
-                  << " routes=" << stationGroups[idx].routeIds.size()
-                  << " EBs=" << stationGroups[idx].ebIndices.size() << std::endl;
+    for (size_t idx = 0; idx < scenarioSubproblems.size(); ++idx) {
+        std::cout << "Phase 2 init sub-problem " << idx << "/" << scenarioSubproblems.size()
+                  << " sc=" << scenarioSubproblems[idx].scenarioIndex
+                  << " routes=" << scenarioSubproblems[idx].routeIds.size()
+                  << " EBs=" << scenarioSubproblems[idx].ebIndices.size() << std::endl;
 
         auto sub = std::make_unique<StationSubProblemState>();
-        sub->scenarioIndex = stationGroups[idx].scenarioIndex;
-        sub->sgInfo = stationGroups[idx];
-        sub->strategy = std::make_unique<WirelessStationGroupSubProblem>();
-        static_cast<WirelessStationGroupSubProblem*>(sub->strategy.get())
-            ->SetStationGroupInfo(stationGroups[idx]);
-        static_cast<WirelessStationGroupSubProblem*>(sub->strategy.get())
+        sub->scenarioIndex = scenarioSubproblems[idx].scenarioIndex;
+        sub->scenarioInfo = scenarioSubproblems[idx];
+        sub->strategy = std::make_unique<WirelessScenarioSubProblem>();
+        static_cast<WirelessScenarioSubProblem*>(sub->strategy.get())
+            ->SetScenarioSubproblemInfo(scenarioSubproblems[idx]);
+        static_cast<WirelessScenarioSubProblem*>(sub->strategy.get())
             ->SetRelaxChargerCapacity(false);
 
         sub->env = std::make_unique<GRBEnv>(true);
@@ -208,7 +208,7 @@ Status LShapeRelaxedStation::Initialize()
 
     const auto phase2InitEnd = Tools::Clock::now();
 
-    std::cout << "Phase 2 station-group sub-problems count=" << subProblems_.size()
+    std::cout << "Phase 2 scenario subproblems count=" << subProblems_.size()
               << ", master constraints=" << model_->get(GRB_IntAttr_NumConstrs)
               << ", init_elapsed_ms=" << Tools::ElapsedMs(phase2Start_, phase2InitEnd) << std::endl;
 
@@ -230,8 +230,8 @@ Status LShapeRelaxedStation::Solve()
 
     std::cout << "Phase 2 MIP start applied, starting Benders..." << std::endl;
 
-    const auto& stationGroups = problemData_->getData<std::vector<StationGroupInfo>>(
-        "wireless_station_groups");
+    const auto& scenarioSubproblems = problemData_->getData<std::vector<ScenarioSubproblemInfo>>(
+        "wireless_scenario_subproblems");
     const auto& masterVars = problemData_->getData<std::vector<ProblemDataVar>>("masterVars");
     const auto& facilityVarNames = problemData_->getData<std::vector<std::vector<std::vector<std::string>>>>(
         "wireless_route_facility_var_names");
@@ -270,7 +270,7 @@ Status LShapeRelaxedStation::Solve()
         const double masterBound = model_->get(GRB_DoubleAttr_ObjBound);
         bestLowerBound_ = std::max(bestLowerBound_, masterBound);
 
-        // ── RSP: LP relaxation of station-group sub-problems ──
+        // ── RSP: LP relaxation of scenario subproblems ──
         bool rspAnyInfeasible = false;
         {
             // Evaluate LP relaxation for lower-bounding before MIP verification.
@@ -280,7 +280,7 @@ Status LShapeRelaxedStation::Solve()
             for (auto& sub : subProblems_) {
                 futures.push_back(std::async(std::launch::async,
                     [pd, &zValues, sub = sub.get()] {
-                        return EvaluateStationGroup(*pd, *sub->strategy, *sub->model,
+                        return EvaluateScenarioSubproblem(*pd, *sub->strategy, *sub->model,
                             sub->context, zValues, true); // relaxed = LP relaxation
                     }));
             }
@@ -299,7 +299,7 @@ Status LShapeRelaxedStation::Solve()
                 if (result.status != OK) return result.status;
 
                 if (!result.cutInfo.isOptimalityCut) {
-                    // Infeasible LP relaxation → feasibility cut + strengthened no-good
+                    // Infeasible LP relaxation �?feasibility cut + strengthened no-good
                     rspAnyInfeasible = true;
                     const std::string sig = MakeFeasibilityCutSignature(result.cutInfo);
                     if (addedFeasCuts.insert(sig).second) {
@@ -307,17 +307,17 @@ Status LShapeRelaxedStation::Solve()
                             "p2_feas_" + std::to_string(iter) + "_" + std::to_string(idx));
                         ++feasCount;
                     }
-                    // Strengthened no-good cut for the current station-group scope.
-                    const auto& sgInfo = stationGroups[idx];
-                    std::vector<std::string> sgFacNames;
-                    int scIdx = sgInfo.scenarioIndex;
-                    for (int rid : sgInfo.routeIds) {
+                    // Strengthened no-good cut for the current scenario-subproblem scope.
+                    const auto& scenarioInfo = scenarioSubproblems[idx];
+                    std::vector<std::string> scenarioFacilityNames;
+                    int scIdx = scenarioInfo.scenarioIndex;
+                    for (int rid : scenarioInfo.routeIds) {
                         const auto& rn = facilityVarNames.at(static_cast<size_t>(scIdx))
                             .at(static_cast<size_t>(rid));
-                        sgFacNames.insert(sgFacNames.end(), rn.begin(), rn.end());
+                        scenarioFacilityNames.insert(scenarioFacilityNames.end(), rn.begin(), rn.end());
                     }
-                    const BendersCutInfo noGood = BuildStationGroupStrengthenedNoGoodCut(
-                        masterVars, zValues, scIdx, sgInfo.routeIds, sgFacNames);
+                    const BendersCutInfo noGood = BuildScenarioStrengthenedNoGoodCut(
+                        masterVars, zValues, scIdx, scenarioInfo.routeIds, scenarioFacilityNames);
                     const std::string ngSig = MakeFeasibilityCutSignature(noGood);
                     if (addedFeasCuts.insert(ngSig).second) {
                         AddFeasibilityCut(*model_, noGood, zVars_,
@@ -325,12 +325,12 @@ Status LShapeRelaxedStation::Solve()
                         ++feasCount;
                     }
                 } else {
-                    // Feasible LP → optimality cut on groupThetaVar
-                    if (groupThetaVars_[idx].get(GRB_DoubleAttr_X) + tolerance < result.subObj) {
+                    // Feasible LP �?optimality cut on scenarioThetaVar
+                    if (scenarioThetaVars_[idx].get(GRB_DoubleAttr_X) + tolerance < result.subObj) {
                         GRBLinExpr cutExpr;
                         double lhsAtCurrent;
                         BuildContinuousCutExpr(result.cutInfo, zVars_, cutExpr, lhsAtCurrent, zValues);
-                        model_->addConstr(cutExpr <= groupThetaVars_[idx],
+                        model_->addConstr(cutExpr <= scenarioThetaVars_[idx],
                             "p2_opt_" + std::to_string(iter) + "_" + std::to_string(idx));
                         ++optCount;
                     }
@@ -361,7 +361,7 @@ Status LShapeRelaxedStation::Solve()
         for (auto& sub : subProblems_) {
             mipFutures.push_back(std::async(std::launch::async,
                 [pd, &zValues, sub = sub.get()] {
-                    return EvaluateStationGroup(*pd, *sub->strategy, *sub->model,
+                    return EvaluateScenarioSubproblem(*pd, *sub->strategy, *sub->model,
                         sub->context, zValues, false); // full MIP
                 }));
         }
@@ -399,17 +399,17 @@ Status LShapeRelaxedStation::Solve()
                         "p2_mip_feas_" + std::to_string(iter) + "_" + std::to_string(idx));
                     ++feasCount;
                 }
-                // Strengthened no-good cut for the current station-group scope.
-                const auto& sgInfo = stationGroups[idx];
-                std::vector<std::string> sgFacNames;
-                int scIdx = sgInfo.scenarioIndex;
-                for (int rid : sgInfo.routeIds) {
+                // Strengthened no-good cut for the current scenario-subproblem scope.
+                const auto& scenarioInfo = scenarioSubproblems[idx];
+                std::vector<std::string> scenarioFacilityNames;
+                int scIdx = scenarioInfo.scenarioIndex;
+                for (int rid : scenarioInfo.routeIds) {
                     const auto& rn = facilityVarNames.at(static_cast<size_t>(scIdx))
                         .at(static_cast<size_t>(rid));
-                    sgFacNames.insert(sgFacNames.end(), rn.begin(), rn.end());
+                    scenarioFacilityNames.insert(scenarioFacilityNames.end(), rn.begin(), rn.end());
                 }
-                const BendersCutInfo noGood = BuildStationGroupStrengthenedNoGoodCut(
-                    masterVars, zValues, scIdx, sgInfo.routeIds, sgFacNames);
+                const BendersCutInfo noGood = BuildScenarioStrengthenedNoGoodCut(
+                    masterVars, zValues, scIdx, scenarioInfo.routeIds, scenarioFacilityNames);
                 const std::string ngSig = MakeFeasibilityCutSignature(noGood);
                 if (addedFeasCuts.insert(ngSig).second) {
                     AddFeasibilityCut(*model_, noGood, zVars_,
@@ -447,33 +447,33 @@ Status LShapeRelaxedStation::Solve()
                       << ", gap=" << (bestUpperBound_ - bestLowerBound_) / denom * 100.0 << "%";
         }
 
-        // Add MIP optimality cuts: monotonicity-strengthened for each feasible group.
-        const auto& stationGroups = problemData_->getData<std::vector<StationGroupInfo>>(
-            "wireless_station_groups");
+        // Add MIP optimality cuts: monotonicity-strengthened for each feasible scenario subproblem.
+        const auto& scenarioSubproblems = problemData_->getData<std::vector<ScenarioSubproblemInfo>>(
+            "wireless_scenario_subproblems");
         const auto& facilityVarNames = problemData_->getData<
             std::vector<std::vector<std::vector<std::string>>>>("wireless_route_facility_var_names");
         for (size_t idx = 0; idx < mipCutInfos.size(); ++idx) {
             if (!mipCutInfos[idx].isOptimalityCut) continue;
-            const auto& sgInfo = stationGroups[idx];
-            int scIdx = sgInfo.scenarioIndex;
-            std::vector<std::string> sgFacNames;
-            for (int rid : sgInfo.routeIds) {
+            const auto& scenarioInfo = scenarioSubproblems[idx];
+            int scIdx = scenarioInfo.scenarioIndex;
+            std::vector<std::string> scenarioFacilityNames;
+            for (int rid : scenarioInfo.routeIds) {
                 const auto& rn = facilityVarNames.at(static_cast<size_t>(scIdx))
                     .at(static_cast<size_t>(rid));
-                sgFacNames.insert(sgFacNames.end(), rn.begin(), rn.end());
+                scenarioFacilityNames.insert(scenarioFacilityNames.end(), rn.begin(), rn.end());
             }
             const BendersCutInfo optCut = BuildMonotonicityStrengthenedOptimalityCut(
-                masterVars, zValues, scIdx, sgInfo.routeIds, sgFacNames,
+                masterVars, zValues, scIdx, scenarioInfo.routeIds, scenarioFacilityNames,
                 mipSubObjs[idx], globalLowerBound_);
             GRBLinExpr cutExpr;
             double lhsAtCurrent;
             BuildContinuousCutExpr(optCut, zVars_, cutExpr, lhsAtCurrent, zValues);
-            model_->addConstr(cutExpr <= groupThetaVars_[idx],
+            model_->addConstr(cutExpr <= scenarioThetaVars_[idx],
                 "p2_mip_sopt_" + std::to_string(iter) + "_" + std::to_string(idx));
         }
         model_->update();
 
-        // Convergence check — skip on iter 0 since MIP cuts haven't been
+        // Convergence check �?skip on iter 0 since MIP cuts haven't been
         // re-optimized yet (LB from Phase 1 cuts may be deceptively tight).
         if (iter > 0) {
             double gapDenom = std::max(1.0, std::fabs(bestUpperBound_));

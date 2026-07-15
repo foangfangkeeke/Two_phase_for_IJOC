@@ -12,11 +12,11 @@ struct BatteryRhsConstr {
     double constant;
 };
 
-// Per-station-group subproblem info
-struct StationGroupInfo {
-    int stationGroupId;           // charger station ID
+// Per-scenario operational subproblem info
+struct ScenarioSubproblemInfo {
+    int scenarioSubproblemId;
     int scenarioIndex;
-    std::vector<int> routeIds;    // routes that visit this station
+    std::vector<int> routeIds;    // routes included in this scenario subproblem
     std::vector<int> ebIndices;   // all EBs belonging to those routes
 };
 
@@ -33,9 +33,9 @@ private:
     std::string dataFolder;
 };
 
-class WirelessStationGroupSubProblem : public ISubProblem_LShape {
+class WirelessScenarioSubProblem : public ISubProblem_LShape {
 public:
-    void SetStationGroupInfo(const StationGroupInfo& info) { sgInfo = info; }
+    void SetScenarioSubproblemInfo(const ScenarioSubproblemInfo& info) { scenarioInfo = info; }
     void SetRelaxChargerCapacity(bool relax) { relaxChargerCapacity = relax; }
 
     int ScenarioCount(const ProblemData& problemData) const override;
@@ -58,7 +58,7 @@ private:
     Status SolveRelaxedModel(const ProblemData& problemData, const std::vector<double>& zValues,
         LShapeCutInfo& cutInfo, double& subObj);
 
-    StationGroupInfo sgInfo;
+    ScenarioSubproblemInfo scenarioInfo;
     bool lowerBoundReady = false;
     double qLowerBound = 0.0;
     bool lowerBoundCutAdded = false;
@@ -70,6 +70,6 @@ private:
     std::vector<GRBConstr> relaxedFacilityConstrs;
     std::vector<BatteryRhsConstr> relaxedBatteryConstrs;
 
-    // [scenarioIdx][routeId] â†’ [(capacity, masterVarIndex), ...]  flat array, no hashing
+    // [scenarioIdx][routeId] â†?[(capacity, masterVarIndex), ...]  flat array, no hashing
     std::vector<std::vector<std::vector<std::pair<int, size_t>>>> capacityVarIdx;
 };

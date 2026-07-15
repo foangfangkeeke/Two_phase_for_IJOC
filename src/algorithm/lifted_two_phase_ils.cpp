@@ -53,11 +53,11 @@ const std::map<ProblemType, std::tuple<DataInitFactory, SubFactory>> kStrategyMa
             [](const std::string& dataFolder) {
                 return std::make_unique<WirelessReformDataInit>(dataFolder);
             },
-            []() { return std::make_unique<WirelessStationGroupSubProblem>(); })
+            []() { return std::make_unique<WirelessScenarioSubProblem>(); })
     }
 };
 
-SubProblemEvalResult EvaluateStationGroupSubproblem(const ProblemData& problemData,
+SubProblemEvalResult EvaluateScenarioSubproblem(const ProblemData& problemData,
     ISubProblem_LShape& strategy, GRBModel& subModel,
     LShapeSubProblemContext& context, const std::vector<double>& zValues, bool relaxed)
 {
@@ -74,9 +74,9 @@ SubProblemEvalResult EvaluateStationGroupSubproblem(const ProblemData& problemDa
 } // namespace
 
 struct LiftedTwoPhaseILS::StationSubProblemState {
-    int stationGroupId = 0;
+    int scenarioSubproblemId = 0;
     int scenarioIndex = 0;
-    StationGroupInfo sgInfo;
+    ScenarioSubproblemInfo scenarioInfo;
     std::unique_ptr<ISubProblem_LShape> strategy;
     std::unique_ptr<GRBEnv> env;
     std::unique_ptr<GRBModel> model;
@@ -140,44 +140,44 @@ Status LiftedTwoPhaseILS::Initialize()
 
     std::cout << std::endl << "-- Phase 2: MIP verification (reusing Phase 1 master + all cuts) --" << std::endl;
 
-    // ── Build station-group sub-problems ──
-    const auto& stationGroups = problemData->getData<std::vector<StationGroupInfo>>(
-        "wireless_station_groups");
+    // ── Build scenario subproblems ──
+    const auto& scenarioSubproblems = problemData->getData<std::vector<ScenarioSubproblemInfo>>(
+        "wireless_scenario_subproblems");
 
-    if (stationGroups.empty()) {
-        std::cerr << "No station groups found" << std::endl;
+    if (scenarioSubproblems.empty()) {
+        std::cerr << "No scenario subproblems found" << std::endl;
         return ERROR;
     }
 
-    groupThetaVars.clear();
-    groupThetaVars.reserve(stationGroups.size());
-    GRBLinExpr groupThetaSum = 0.0;
-    for (size_t idx = 0; idx < stationGroups.size(); ++idx) {
+    scenarioThetaVars.clear();
+    scenarioThetaVars.reserve(scenarioSubproblems.size());
+    GRBLinExpr scenarioThetaSum = 0.0;
+    for (size_t idx = 0; idx < scenarioSubproblems.size(); ++idx) {
         GRBVar gTheta = model->addVar(0.0, GRB_INFINITY, 0.0, GRB_CONTINUOUS,
-            "group_theta_p2_" + std::to_string(idx));
-        groupThetaVars.push_back(gTheta);
-        groupThetaSum += gTheta;
+            "scenario_theta_p2_" + std::to_string(idx));
+        scenarioThetaVars.push_back(gTheta);
+        scenarioThetaSum += gTheta;
     }
-    model->addConstr(groupThetaSum <= theta, "theta_group_sum_p2");
+    model->addConstr(scenarioThetaSum <= theta, "theta_scenario_sum_p2");
 
     subProblems.clear();
-    subProblems.reserve(stationGroups.size());
+    subProblems.reserve(scenarioSubproblems.size());
 
     phase2Start = Tools::Clock::now();
 
-    for (size_t idx = 0; idx < stationGroups.size(); ++idx) {
-        std::cout << "Phase 2 init sub-problem " << idx << "/" << stationGroups.size()
-                  << " sc=" << stationGroups[idx].scenarioIndex
-                  << " routes=" << stationGroups[idx].routeIds.size()
-                  << " EBs=" << stationGroups[idx].ebIndices.size() << std::endl;
+    for (size_t idx = 0; idx < scenarioSubproblems.size(); ++idx) {
+        std::cout << "Phase 2 init sub-problem " << idx << "/" << scenarioSubproblems.size()
+                  << " sc=" << scenarioSubproblems[idx].scenarioIndex
+                  << " routes=" << scenarioSubproblems[idx].routeIds.size()
+                  << " EBs=" << scenarioSubproblems[idx].ebIndices.size() << std::endl;
 
         auto sub = std::make_unique<StationSubProblemState>();
-        sub->scenarioIndex = stationGroups[idx].scenarioIndex;
-        sub->sgInfo = stationGroups[idx];
-        sub->strategy = std::make_unique<WirelessStationGroupSubProblem>();
-        static_cast<WirelessStationGroupSubProblem*>(sub->strategy.get())
-            ->SetStationGroupInfo(stationGroups[idx]);
-        static_cast<WirelessStationGroupSubProblem*>(sub->strategy.get())
+        sub->scenarioIndex = scenarioSubproblems[idx].scenarioIndex;
+        sub->scenarioInfo = scenarioSubproblems[idx];
+        sub->strategy = std::make_unique<WirelessScenarioSubProblem>();
+        static_cast<WirelessScenarioSubProblem*>(sub->strategy.get())
+            ->SetScenarioSubproblemInfo(scenarioSubproblems[idx]);
+        static_cast<WirelessScenarioSubProblem*>(sub->strategy.get())
             ->SetRelaxChargerCapacity(false);
 
         sub->env = std::make_unique<GRBEnv>(true);
@@ -238,7 +238,7 @@ LiftedTwoPhaseILS::CutEval LiftedTwoPhaseILS::BuildContinuousCut(const LShapeCut
 
 Status LiftedTwoPhaseILS::EvaluateSubProblems(const std::vector<double>& zValues,
     LShapeCutInfo& cutInfo, double& subObj,
-    std::vector<double>& groupSubObjs, std::vector<LShapeCutInfo>& groupCutInfos,
+    std::vector<double>& scenarioSubObjs, std::vector<LShapeCutInfo>& scenarioCutInfos,
     bool relaxed)
 {
     if (subProblems.empty()) {
@@ -253,19 +253,19 @@ Status LiftedTwoPhaseILS::EvaluateSubProblems(const std::vector<double>& zValues
     cutInfo.yCoeffs.assign(zValues.size(), 0.0);
     cutInfo.constant = 0.0;
     subObj = 0.0;
-    groupSubObjs.assign(subProblems.size(), 0.0);
-    groupCutInfos.assign(subProblems.size(), LShapeCutInfo{});
+    scenarioSubObjs.assign(subProblems.size(), 0.0);
+    scenarioCutInfos.assign(subProblems.size(), LShapeCutInfo{});
 
     const ProblemData* problemDataPtr = problemData;
     for (size_t idx = 0; idx < subProblems.size(); ++idx) {
         auto& sub = subProblems[idx];
-        SubProblemEvalResult result = EvaluateStationGroupSubproblem(*problemDataPtr,
+        SubProblemEvalResult result = EvaluateScenarioSubproblem(*problemDataPtr,
             *sub->strategy, *sub->model, sub->context, zValues, relaxed);
 
         if (result.status != OK) return result.status;
 
-        groupSubObjs[idx] = result.subObj;
-        groupCutInfos[idx] = result.cutInfo;
+        scenarioSubObjs[idx] = result.subObj;
+        scenarioCutInfos[idx] = result.cutInfo;
 
         if (!result.cutInfo.isOptimalityCut) {
             if (cutInfo.isOptimalityCut) cutInfo = result.cutInfo;
@@ -357,10 +357,10 @@ Status LiftedTwoPhaseILS::Solve()
 
         double aggregatedQValue = 0.0;
         LShapeCutInfo aggregateCutInfo;
-        std::vector<double> groupQValues;
-        std::vector<LShapeCutInfo> groupCutInfos;
+        std::vector<double> scenarioQValues;
+        std::vector<LShapeCutInfo> scenarioCutInfos;
         Status secondStageStatus = EvaluateSubProblems(zValues, aggregateCutInfo, aggregatedQValue,
-            groupQValues, groupCutInfos, false);
+            scenarioQValues, scenarioCutInfos, false);
         if (secondStageStatus != OK) {
             std::cerr << "Phase 2 sub-problem evaluation failed iter " << iter << std::endl;
             return ERROR;
@@ -369,12 +369,12 @@ Status LiftedTwoPhaseILS::Solve()
         int mipFeasCount = 0;
         bool mipAnyInfeasible = false;
         std::set<std::string> addedMIPFeasibilityCuts;
-        for (size_t idx = 0; idx < groupCutInfos.size(); ++idx) {
-            if (groupCutInfos[idx].isOptimalityCut) continue;
+        for (size_t idx = 0; idx < scenarioCutInfos.size(); ++idx) {
+            if (scenarioCutInfos[idx].isOptimalityCut) continue;
             mipAnyInfeasible = true;
-            const std::string cs = MakeFeasibilityCutSignature(groupCutInfos[idx]);
+            const std::string cs = MakeFeasibilityCutSignature(scenarioCutInfos[idx]);
             if (addedMIPFeasibilityCuts.insert(cs).second) {
-                AddFeasibilityCut(*model, groupCutInfos[idx], zVars,
+                AddFeasibilityCut(*model, scenarioCutInfos[idx], zVars,
                     "p2_feas_" + std::to_string(iter) + "_" + std::to_string(idx));
                 ++mipFeasCount;
             }
@@ -424,10 +424,10 @@ Status LiftedTwoPhaseILS::Solve()
         }
 
         // Classic LP dual continuous optimality cuts (vs. strengthened in full)
-        for (size_t idx = 0; idx < groupCutInfos.size(); ++idx) {
-            if (!groupCutInfos[idx].isOptimalityCut) continue;
-            const CutEval cutDual = BuildContinuousCut(groupCutInfos[idx], zValues, iter, static_cast<int>(idx));
-            model->addConstr(cutDual.expr <= groupThetaVars[idx], cutDual.name);
+        for (size_t idx = 0; idx < scenarioCutInfos.size(); ++idx) {
+            if (!scenarioCutInfos[idx].isOptimalityCut) continue;
+            const CutEval cutDual = BuildContinuousCut(scenarioCutInfos[idx], zValues, iter, static_cast<int>(idx));
+            model->addConstr(cutDual.expr <= scenarioThetaVars[idx], cutDual.name);
         }
 
         model->update();

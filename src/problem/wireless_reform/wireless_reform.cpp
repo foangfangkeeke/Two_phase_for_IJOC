@@ -27,7 +27,7 @@ using linkTimeType = unordered_map<int, unordered_map<int, double>>;
 using stationTimeType = vector<vector<int>>;
 using stringCfgType = vector<vector<string>>;
 
-// Build flat array index: capIdx[scenario][routeId] â†’ [(capacity, masterVarIndex), ...]
+// Build flat array index: capIdx[scenario][routeId] â†?[(capacity, masterVarIndex), ...]
 // Replaces O(masterVars) string scanning with direct [scenario][routeId] array lookup.
 static auto BuildCapacityVarIndex(const vector<ProblemDataVar>& masterVars)
     -> vector<vector<vector<pair<int, size_t>>>>
@@ -682,7 +682,7 @@ static void PrintWirelessScenarioSummary(const vector<WirelessScenarioConfig>& s
 }
 
 // Energy budget per (scenario, route): for the EB with the most trips, compute
-//   totalC  = fixed energy consumed (kWh) â€” start + inter-station + end
+//   totalC  = fixed energy consumed (kWh) â€?start + inter-station + end
 //   fastChargeFree = max charge from always-available fast chargers (kWh)
 //   facCharges[f] = (facilityVarName, max charge kWh) for each wireless facility visited
 //
@@ -832,7 +832,7 @@ static void InitWirelessMasterData(ProblemData& data, const string& dataFolder, 
         BuildRouteFacilityVarNames(dataFolder, scenarios, masterVars));
     data.addData("wireless_model_data_cache", modelDataCache);
 
-    // --- Paper2: Build station-group info ---
+    // --- Paper2: Build scenario-subproblem info ---
     // Build routeâ†’chargerStation assignment: first chargerPhys station on each route
     vector<vector<int>> routeChargerStation(scenarios.size());
     for (size_t scIdx = 0; scIdx < scenarios.size(); ++scIdx) {
@@ -862,21 +862,21 @@ static void InitWirelessMasterData(ProblemData& data, const string& dataFolder, 
     }
     data.addData("wireless_route_charger_station", routeChargerStation);
 
-    // Build per-scenario groups: each scenario = one subproblem
-    vector<StationGroupInfo> stationGroups;
+    // Build per-scenario subproblems: each scenario = one operational subproblem
+    vector<ScenarioSubproblemInfo> scenarioSubproblems;
     for (size_t scIdx = 0; scIdx < scenarios.size(); ++scIdx) {
         const auto& scenarioData = modelDataCache[scIdx];
         const auto& schedCfg = scenarioData.GetSchedulingCfg();
-        StationGroupInfo info;
-        info.stationGroupId = 0;
+        ScenarioSubproblemInfo info;
+        info.scenarioSubproblemId = static_cast<int>(scIdx);
         info.scenarioIndex = static_cast<int>(scIdx);
         for (int routeId = 0; routeId < schedCfg.numRoutes; ++routeId)
             info.routeIds.push_back(routeId);
         for (int ebIdx = 0; ebIdx < schedCfg.numEB; ++ebIdx)
             info.ebIndices.push_back(ebIdx);
-        stationGroups.push_back(info);
+        scenarioSubproblems.push_back(info);
     }
-    data.addData("wireless_station_groups", stationGroups);
+    data.addData("wireless_scenario_subproblems", scenarioSubproblems);
 
     // Valid inequality: facility-aware energy budget from worst-EB on each route
     // Only active for per-station mode where the routeâ†’charger station binding is known.
@@ -1054,7 +1054,7 @@ static bool BuildWirelessOperationalSubproblem(const string& dataRootFolder, con
 
     size_t numEB = schedulingCfg.numEB;
 
-    // Filter EBs: only include those belonging to this station group (if specified)
+    // Filter EBs: only include those belonging to this scenario subproblem (if specified)
     vector<int> ebIndices;
     if (activeEbIndices != nullptr) {
         ebIndices = *activeEbIndices;
@@ -1215,7 +1215,7 @@ static bool BuildWirelessOperationalSubproblem(const string& dataRootFolder, con
 
     // Battery cost is in the master problem, not in sub-problem objective.
 
-    // energy range â€” battery capacity (routeE) passed via RHS constraints
+    // energy range â€?battery capacity (routeE) passed via RHS constraints
     const double socMax = operationCfg.socMax;
     const double socMin = operationCfg.socMin;
     for (int ebIdx : ebIndices) {
@@ -1231,16 +1231,16 @@ static bool BuildWirelessOperationalSubproblem(const string& dataRootFolder, con
                 GRBVar arrE = energyArr_bns[ebIdx][tripIdx][stationIdx];
                 GRBVar depE = energyDep_bns[ebIdx][tripIdx][stationIdx];
 
-                // arrE >= routeE * socMin  â†’  arrE >= 0, RHS = socMin * routeE
+                // arrE >= routeE * socMin  â†? arrE >= 0, RHS = socMin * routeE
                 batteryRhsOut.push_back({model.addConstr(arrE >= 0.0,
                     MakeWirelessBatteryRhsConstrName(routeId, batteryRhsSerial++)), routeId, socMin, 0.0});
-                // arrE <= routeE * socMax  â†’  arrE <= 0, RHS = socMax * routeE
+                // arrE <= routeE * socMax  â†? arrE <= 0, RHS = socMax * routeE
                 batteryRhsOut.push_back({model.addConstr(arrE <= 0.0,
                     MakeWirelessBatteryRhsConstrName(routeId, batteryRhsSerial++)), routeId, socMax, 0.0});
-                // depE >= routeE * socMin  â†’  depE >= 0, RHS = socMin * routeE
+                // depE >= routeE * socMin  â†? depE >= 0, RHS = socMin * routeE
                 batteryRhsOut.push_back({model.addConstr(depE >= 0.0,
                     MakeWirelessBatteryRhsConstrName(routeId, batteryRhsSerial++)), routeId, socMin, 0.0});
-                // depE <= routeE * socMax  â†’  depE <= 0, RHS = socMax * routeE
+                // depE <= routeE * socMax  â†? depE <= 0, RHS = socMax * routeE
                 batteryRhsOut.push_back({model.addConstr(depE <= 0.0,
                     MakeWirelessBatteryRhsConstrName(routeId, batteryRhsSerial++)), routeId, socMax, 0.0});
             }
@@ -1426,7 +1426,7 @@ static bool BuildWirelessOperationalSubproblem(const string& dataRootFolder, con
         }
     }
 
-    // energy of the first and the last trips â€” battery capacity via RHS
+    // energy of the first and the last trips â€?battery capacity via RHS
     for (int ebIdx : ebIndices) {
         int eb = schedulingCfg.EBs[ebIdx];
         const int routeId = schedulingCfg.routeIdByEBs.at(static_cast<size_t>(ebIdx));
@@ -1483,7 +1483,7 @@ static bool BuildWirelessOperationalSubproblem(const string& dataRootFolder, con
         }
     }
 
-    // inter station energy connection â€” battery capacity via RHS
+    // inter station energy connection â€?battery capacity via RHS
     for (int ebIdx : ebIndices) {
         int eb = schedulingCfg.EBs[ebIdx];
         const int routeId = schedulingCfg.routeIdByEBs.at(static_cast<size_t>(ebIdx));
@@ -1522,7 +1522,7 @@ static bool BuildWirelessOperationalSubproblem(const string& dataRootFolder, con
         }
     }
 
-    // overnight charging â€” battery capacity via RHS
+    // overnight charging â€?battery capacity via RHS
     for (int ebIdx : ebIndices) {
         int eb = schedulingCfg.EBs[ebIdx];
         const int routeId = schedulingCfg.routeIdByEBs.at(static_cast<size_t>(ebIdx));
@@ -1640,31 +1640,31 @@ bool WirelessReformDataInit::IsWarmStartMasterFeasible(const ProblemData& data,
     return true;
 }
 
-int WirelessStationGroupSubProblem::ScenarioCount(const ProblemData& problemData) const
+int WirelessScenarioSubProblem::ScenarioCount(const ProblemData& problemData) const
 {
-    return static_cast<int>(problemData.getData<std::vector<StationGroupInfo>>("wireless_station_groups").size());
+    return static_cast<int>(problemData.getData<std::vector<ScenarioSubproblemInfo>>("wireless_scenario_subproblems").size());
 }
 
-void WirelessStationGroupSubProblem::InitSubProblem(const ProblemData& problemData, int subProblemIndex,
+void WirelessScenarioSubProblem::InitSubProblem(const ProblemData& problemData, int subProblemIndex,
     GRBModel& subModel, LShapeSubProblemContext& context)
 {
-    const auto& stationGroups = problemData.getData<std::vector<StationGroupInfo>>("wireless_station_groups");
-    const size_t sgIdx = static_cast<size_t>(subProblemIndex);
-    if (sgIdx >= stationGroups.size()) {
-        throw std::runtime_error("Station group index out of range.");
+    const auto& scenarioSubproblems = problemData.getData<std::vector<ScenarioSubproblemInfo>>("wireless_scenario_subproblems");
+    const size_t subIdx = static_cast<size_t>(subProblemIndex);
+    if (subIdx >= scenarioSubproblems.size()) {
+        throw std::runtime_error("Scenario subproblem index out of range.");
     }
-    this->sgInfo = stationGroups[sgIdx];
+    this->scenarioInfo = scenarioSubproblems[subIdx];
 
     const auto& dataRootFolder = problemData.getData<std::string>("wireless_data_root_folder");
     const auto& scenarios = problemData.getData<std::vector<WirelessScenarioConfig>>("wireless_scenarios");
     const auto& masterVars = problemData.getData<std::vector<ProblemDataVar>>("masterVars");
 
     const auto& modelDataCache = problemData.getData<vector<ModelData>>("wireless_model_data_cache");
-    const ModelData* cachedData = (static_cast<size_t>(this->sgInfo.scenarioIndex) < modelDataCache.size())
-        ? &modelDataCache[static_cast<size_t>(this->sgInfo.scenarioIndex)] : nullptr;
+    const ModelData* cachedData = (static_cast<size_t>(this->scenarioInfo.scenarioIndex) < modelDataCache.size())
+        ? &modelDataCache[static_cast<size_t>(this->scenarioInfo.scenarioIndex)] : nullptr;
     bool built = BuildWirelessChargingLShapedSubProblem(dataRootFolder, scenarios,
-        static_cast<size_t>(this->sgInfo.scenarioIndex), masterVars, subModel, context,
-        batteryRhsConstrs, routeIdByEB, &sgInfo.ebIndices, nullptr,
+        static_cast<size_t>(this->scenarioInfo.scenarioIndex), masterVars, subModel, context,
+        batteryRhsConstrs, routeIdByEB, &scenarioInfo.ebIndices, nullptr,
         this->relaxChargerCapacity, cachedData);
     if (!built) {
         throw std::runtime_error("Failed to build wireless charging L-shaped sub-problem.");
@@ -1674,7 +1674,7 @@ void WirelessStationGroupSubProblem::InitSubProblem(const ProblemData& problemDa
     qLowerBound = 0.0;
     lowerBoundCutAdded = false;
 
-    // Build flat array index for capacity master vars (one-time: [scenario][routeId] â†’ varIdx)
+    // Build flat array index for capacity master vars (one-time: [scenario][routeId] â†?varIdx)
     if (capacityVarIdx.empty()) {
         capacityVarIdx = BuildCapacityVarIndex(masterVars);
     }
@@ -1703,7 +1703,7 @@ static void CollectWirelessFacilityRhsConstrs(GRBModel& model, vector<GRBConstr>
     delete[] constrs;
 }
 
-void WirelessStationGroupSubProblem::InitRelaxedSubProblem(
+void WirelessScenarioSubProblem::InitRelaxedSubProblem(
     const ProblemData& problemData, GRBModel& subModel)
 {
     (void)problemData;
@@ -1729,7 +1729,7 @@ void WirelessStationGroupSubProblem::InitRelaxedSubProblem(
     relaxedModel->update();
 }
 
-Status WirelessStationGroupSubProblem::SolveRelaxedModel(
+Status WirelessScenarioSubProblem::SolveRelaxedModel(
     const ProblemData& problemData, const std::vector<double>& zValues,
     LShapeCutInfo& cutInfo, double& subObj)
 {
@@ -1750,7 +1750,7 @@ Status WirelessStationGroupSubProblem::SolveRelaxedModel(
 
         // Update battery RHS
         vector<double> routeE = ComputeRouteEPerRoute(zValues,
-            static_cast<size_t>(sgInfo.scenarioIndex), numRoutes,
+            static_cast<size_t>(scenarioInfo.scenarioIndex), numRoutes,
             capacityVarIdx);
         UpdateBatteryRhsConstrs(relaxedBatteryConstrs, routeE);
 
@@ -1780,7 +1780,7 @@ Status WirelessStationGroupSubProblem::SolveRelaxedModel(
 
             // Battery duals
             ExtractBatteryRhsDuals(relaxedBatteryConstrs, zValues,
-                static_cast<size_t>(sgInfo.scenarioIndex), cutInfo,
+                static_cast<size_t>(scenarioInfo.scenarioIndex), cutInfo,
                 capacityVarIdx);
 
             return OK;
@@ -1808,7 +1808,7 @@ Status WirelessStationGroupSubProblem::SolveRelaxedModel(
                     }
 
                     ExtractBatteryRhsFarkasDuals(relaxedBatteryConstrs, zValues,
-                        static_cast<size_t>(sgInfo.scenarioIndex), cutInfo,
+                        static_cast<size_t>(scenarioInfo.scenarioIndex), cutInfo,
                         capacityVarIdx);
                     subObj = GRB_INFINITY;
                     gotFarkas = true;
@@ -1825,9 +1825,9 @@ Status WirelessStationGroupSubProblem::SolveRelaxedModel(
                     }
                 }
 
-                // Battery capacity vars: only for routes in this station group, this scenario
-                const size_t sgScIdx = static_cast<size_t>(sgInfo.scenarioIndex);
-                for (int rid : sgInfo.routeIds) {
+                // Battery capacity vars: only for routes in this scenario subproblem, this scenario
+                const size_t scenarioSubproblemScIdx = static_cast<size_t>(scenarioInfo.scenarioIndex);
+                for (int rid : scenarioInfo.routeIds) {
                     for (size_t j = 0; j < masterVars.size(); ++j) {
                         const string& name = masterVars[j].name;
                         if (name.rfind("sc", 0) != 0) continue;
@@ -1836,7 +1836,7 @@ Status WirelessStationGroupSubProblem::SolveRelaxedModel(
                         size_t capPos = name.find("_cap", ePos + 4);
                         if (capPos == string::npos) continue;
                         int varSc = stoi(name.substr(2, ePos - 2));
-                        if (static_cast<size_t>(varSc) != sgScIdx) continue;
+                        if (static_cast<size_t>(varSc) != scenarioSubproblemScIdx) continue;
                         int varRid = stoi(name.substr(ePos + 4, capPos - (ePos + 4)));
                         if (varRid == rid) {
                             relevantSet.insert(j);
@@ -1874,14 +1874,14 @@ Status WirelessStationGroupSubProblem::SolveRelaxedModel(
     }
 }
 
-void WirelessStationGroupSubProblem::SetLowerBound(double lowerBound)
+void WirelessScenarioSubProblem::SetLowerBound(double lowerBound)
 {
     qLowerBound = lowerBound;
     lowerBoundReady = true;
     lowerBoundCutAdded = false;
 }
 
-void WirelessStationGroupSubProblem::UpdateSubProblem(const ProblemData& problemData, GRBModel& subModel,
+void WirelessScenarioSubProblem::UpdateSubProblem(const ProblemData& problemData, GRBModel& subModel,
     LShapeSubProblemContext& context, const std::vector<double>& zValues)
 {
     const auto& masterVars = problemData.getData<std::vector<ProblemDataVar>>("masterVars");
@@ -1895,14 +1895,14 @@ void WirelessStationGroupSubProblem::UpdateSubProblem(const ProblemData& problem
 
     // Compute routeE per route from zValues and update battery RHS constraints
     vector<double> routeE = ComputeRouteEPerRoute(zValues,
-        static_cast<size_t>(sgInfo.scenarioIndex), numRoutes,
+        static_cast<size_t>(scenarioInfo.scenarioIndex), numRoutes,
         capacityVarIdx);
     UpdateBatteryRhsConstrs(batteryRhsConstrs, routeE);
 
     subModel.update();
 }
 
-Status WirelessStationGroupSubProblem::SolveSubProblem(const ProblemData& problemData, GRBModel& subModel,
+Status WirelessScenarioSubProblem::SolveSubProblem(const ProblemData& problemData, GRBModel& subModel,
     LShapeSubProblemContext& context, const std::vector<double>& zValues,
     LShapeCutInfo& cutInfo, double& subObj)
 {
@@ -1930,7 +1930,7 @@ Status WirelessStationGroupSubProblem::SolveSubProblem(const ProblemData& proble
     }
 
     if (status == GRB_INFEASIBLE || status == GRB_INF_OR_UNBD || status == GRB_UNBOUNDED) {
-        // Sub-problem is LP â€” get Farkas duals (Method=1 gives infeasibility cert)
+        // Sub-problem is LP â€?get Farkas duals (Method=1 gives infeasibility cert)
         const auto& masterVars = problemData.getData<std::vector<ProblemDataVar>>("masterVars");
         try {
             const double farkasProof = subModel.get(GRB_DoubleAttr_FarkasProof);
@@ -1954,7 +1954,7 @@ Status WirelessStationGroupSubProblem::SolveSubProblem(const ProblemData& proble
 
                 // Battery Farkas duals
                 ExtractBatteryRhsFarkasDuals(batteryRhsConstrs, zValues,
-                    static_cast<size_t>(sgInfo.scenarioIndex), cutInfo,
+                    static_cast<size_t>(scenarioInfo.scenarioIndex), cutInfo,
                     capacityVarIdx);
 
                 subObj = GRB_INFINITY;
@@ -1973,7 +1973,7 @@ Status WirelessStationGroupSubProblem::SolveSubProblem(const ProblemData& proble
     return ERROR;
 }
 
-Status WirelessStationGroupSubProblem::SolveRelaxedSubProblem(const ProblemData& problemData, GRBModel& subModel,
+Status WirelessScenarioSubProblem::SolveRelaxedSubProblem(const ProblemData& problemData, GRBModel& subModel,
     LShapeSubProblemContext& context, const std::vector<double>& zValues,
     LShapeCutInfo& cutInfo, double& subObj)
 {
@@ -1982,10 +1982,10 @@ Status WirelessStationGroupSubProblem::SolveRelaxedSubProblem(const ProblemData&
     return SolveRelaxedModel(problemData, zValues, cutInfo, subObj);
 }
 
-std::unique_ptr<ISubProblem_LShape> WirelessStationGroupSubProblem::Clone() const
+std::unique_ptr<ISubProblem_LShape> WirelessScenarioSubProblem::Clone() const
 {
-    auto c = std::make_unique<WirelessStationGroupSubProblem>();
-    c->sgInfo = sgInfo;
+    auto c = std::make_unique<WirelessScenarioSubProblem>();
+    c->scenarioInfo = scenarioInfo;
     c->lowerBoundReady = lowerBoundReady;
     c->qLowerBound = qLowerBound;
     c->lowerBoundCutAdded = lowerBoundCutAdded;
