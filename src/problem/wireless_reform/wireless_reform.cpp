@@ -862,89 +862,21 @@ static void InitWirelessMasterData(ProblemData& data, const string& dataFolder, 
     }
     data.addData("wireless_route_charger_station", routeChargerStation);
 
-    // Build station groups
+    // Build per-scenario groups: each scenario = one subproblem
     vector<StationGroupInfo> stationGroups;
     for (size_t scIdx = 0; scIdx < scenarios.size(); ++scIdx) {
         const auto& scenarioData = modelDataCache[scIdx];
         const auto& schedCfg = scenarioData.GetSchedulingCfg();
-        const auto& netCfg = scenarioData.GetNetworkCfg();
-
-        if (perStationMode) {
-            // Per-station mode: each chargerPhys station = one group
-            for (int station : netCfg.chargerPhys) {
-                StationGroupInfo info;
-                info.stationGroupId = station;
-                info.scenarioIndex = static_cast<int>(scIdx);
-                for (int routeId = 0; routeId < schedCfg.numRoutes; ++routeId) {
-                    if (routeChargerStation[scIdx][static_cast<size_t>(routeId)] == station)
-                        info.routeIds.push_back(routeId);
-                }
-                if (info.routeIds.empty()) continue;
-                for (int ebIdx = 0; ebIdx < schedCfg.numEB; ++ebIdx) {
-                    int routeId = schedCfg.routeIdByEBs.at(static_cast<size_t>(ebIdx));
-                    for (int r : info.routeIds) {
-                        if (r == routeId) { info.ebIndices.push_back(ebIdx); break; }
-                    }
-                }
-                stationGroups.push_back(info);
-            }
-        } else {
-            // Union-find: merge stations that share routes
-            unordered_map<int, unordered_set<int>> stationRoutes;
-            for (int ebIdx = 0; ebIdx < schedCfg.numEB; ++ebIdx) {
-                int routeId = schedCfg.routeIdByEBs.at(static_cast<size_t>(ebIdx));
-                for (int tripIdx = 0; tripIdx < schedCfg.tripEBs[ebIdx].size(); ++tripIdx) {
-                    int trip = schedCfg.tripEBs[ebIdx][tripIdx];
-                    for (int sIdx = 0; sIdx < schedCfg.stationTrips[trip].size(); ++sIdx) {
-                        int station = schedCfg.stationTrips[trip][sIdx];
-                        if (netCfg.chargerPhys.count(station))
-                            stationRoutes[station].insert(routeId);
-                    }
-                }
-            }
-            vector<int> stationList;
-            for (const auto& [station, _] : stationRoutes) stationList.push_back(station);
-            sort(stationList.begin(), stationList.end());
-            unordered_map<int, int> parent;
-            for (int s : stationList) parent[s] = s;
-            function<int(int)> find = [&](int x) -> int {
-                if (parent[x] != x) parent[x] = find(parent[x]);
-                return parent[x];
-            };
-            auto unite = [&](int a, int b) {
-                int ra = find(a), rb = find(b);
-                if (ra != rb) parent[ra] = rb;
-            };
-            unordered_map<int, unordered_set<int>> stationToRoutes;
-            for (const auto& [station, routes] : stationRoutes) stationToRoutes[station] = routes;
-            for (size_t i = 0; i < stationList.size(); ++i) {
-                for (size_t j = i + 1; j < stationList.size(); ++j) {
-                    int sa = stationList[i], sb = stationList[j];
-                    for (int r : stationToRoutes[sa]) {
-                        if (stationToRoutes[sb].count(r)) { unite(sa, sb); break; }
-                    }
-                }
-            }
-            unordered_map<int, unordered_set<int>> componentRoutes;
-            for (int s : stationList) {
-                int root = find(s);
-                for (int r : stationToRoutes[s]) componentRoutes[root].insert(r);
-            }
-            for (const auto& [root, routes] : componentRoutes) {
-                StationGroupInfo info;
-                info.stationGroupId = root;
-                info.scenarioIndex = static_cast<int>(scIdx);
-                info.routeIds.assign(routes.begin(), routes.end());
-                for (int ebIdx = 0; ebIdx < schedCfg.numEB; ++ebIdx) {
-                    int routeId = schedCfg.routeIdByEBs.at(static_cast<size_t>(ebIdx));
-                    if (routes.count(routeId)) info.ebIndices.push_back(ebIdx);
-                }
-                stationGroups.push_back(info);
-            }
-        }
+        StationGroupInfo info;
+        info.stationGroupId = 0;
+        info.scenarioIndex = static_cast<int>(scIdx);
+        for (int routeId = 0; routeId < schedCfg.numRoutes; ++routeId)
+            info.routeIds.push_back(routeId);
+        for (int ebIdx = 0; ebIdx < schedCfg.numEB; ++ebIdx)
+            info.ebIndices.push_back(ebIdx);
+        stationGroups.push_back(info);
     }
     data.addData("wireless_station_groups", stationGroups);
-    data.addData("wireless_per_station_mode", perStationMode);
 
     // Valid inequality: facility-aware energy budget from worst-EB on each route
     // Only active for per-station mode where the route→charger station binding is known.
@@ -1726,22 +1658,13 @@ void WirelessStationGroupSubProblem::InitSubProblem(const ProblemData& problemDa
     const auto& dataRootFolder = problemData.getData<std::string>("wireless_data_root_folder");
     const auto& scenarios = problemData.getData<std::vector<WirelessScenarioConfig>>("wireless_scenarios");
     const auto& masterVars = problemData.getData<std::vector<ProblemDataVar>>("masterVars");
-    bool perStation = false;
-    try { perStation = problemData.getData<bool>("wireless_per_station_mode"); } catch (...) {}
-    const vector<int>* routeCharger = nullptr;
-    if (perStation) {
-        try {
-            routeCharger = &problemData.getData<std::vector<std::vector<int>>>("wireless_route_charger_station")
-                .at(static_cast<size_t>(this->sgInfo.scenarioIndex));
-        } catch (...) {}
-    }
 
     const auto& modelDataCache = problemData.getData<vector<ModelData>>("wireless_model_data_cache");
     const ModelData* cachedData = (static_cast<size_t>(this->sgInfo.scenarioIndex) < modelDataCache.size())
         ? &modelDataCache[static_cast<size_t>(this->sgInfo.scenarioIndex)] : nullptr;
     bool built = BuildWirelessChargingLShapedSubProblem(dataRootFolder, scenarios,
         static_cast<size_t>(this->sgInfo.scenarioIndex), masterVars, subModel, context,
-        batteryRhsConstrs, routeIdByEB, &sgInfo.ebIndices, routeCharger,
+        batteryRhsConstrs, routeIdByEB, &sgInfo.ebIndices, nullptr,
         this->relaxChargerCapacity, cachedData);
     if (!built) {
         throw std::runtime_error("Failed to build wireless charging L-shaped sub-problem.");
