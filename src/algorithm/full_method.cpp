@@ -64,6 +64,14 @@ void BuildContinuousCutExpr(const BendersCutInfo& cutInfo, const std::vector<GRB
         lhsAtCurrent += cutInfo.yCoeffs[j] * zCurrent[j];
 }
 
+bool MeetsOuterGap(double bestUpperBound, double bestLowerBound, const SolverConfig& solverConfig)
+{
+    if (!std::isfinite(bestUpperBound)) return false;
+    const double gapDenom = std::max(1.0, std::fabs(bestUpperBound));
+    const double relGap = (bestUpperBound - bestLowerBound) / gapDenom;
+    return relGap <= solverConfig.mipGap;
+}
+
 } // namespace
 
 struct LShapeRelaxedStation::StationSubProblemState {
@@ -348,6 +356,15 @@ Status LShapeRelaxedStation::Solve()
                 std::cout << ", master_ms=" << masterMs
                           << ", eval_ms=" << Tools::ElapsedMs(masterEnd, iterEnd)
                           << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start_, iterEnd) << std::endl;
+                if (MeetsOuterGap(bestUpperBound_, bestLowerBound_, solverConfig)) {
+                    std::cout << "Phase 2 converged." << std::endl;
+                    std::cout << "UB: " << bestUpperBound_ << ", LB: " << bestLowerBound_ << std::endl;
+                    phase2ElapsedMs_ = Tools::ElapsedMs(phase2Start_, Tools::Clock::now());
+                    std::cout << "Phase 2 final elapsed time: " << phase2ElapsedMs_ << " ms" << std::endl;
+                    std::cout << "Total elapsed time (Phase 1 + Phase 2): "
+                              << (phase1ElapsedMs_ + phase2ElapsedMs_) << " ms" << std::endl;
+                    return OK;
+                }
                 continue;
             }
             if (optCount > 0) model_->update();
@@ -427,6 +444,15 @@ Status LShapeRelaxedStation::Solve()
             std::cout << ", master_ms=" << masterMs
                       << ", mip_eval_ms=" << Tools::ElapsedMs(masterEnd, iterEnd)
                       << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start_, iterEnd) << std::endl;
+            if (MeetsOuterGap(bestUpperBound_, bestLowerBound_, solverConfig)) {
+                std::cout << "Phase 2 converged." << std::endl;
+                std::cout << "UB: " << bestUpperBound_ << ", LB: " << bestLowerBound_ << std::endl;
+                phase2ElapsedMs_ = Tools::ElapsedMs(phase2Start_, Tools::Clock::now());
+                std::cout << "Phase 2 final elapsed time: " << phase2ElapsedMs_ << " ms" << std::endl;
+                std::cout << "Total elapsed time (Phase 1 + Phase 2): "
+                          << (phase1ElapsedMs_ + phase2ElapsedMs_) << " ms" << std::endl;
+                return OK;
+            }
             continue;
         }
 
@@ -472,12 +498,7 @@ Status LShapeRelaxedStation::Solve()
         }
         model_->update();
 
-        // Convergence check â€?skip on iter 0 since MIP cuts haven't been
-        // re-optimized yet (LB from Phase 1 cuts may be deceptively tight).
-        if (iter > 0) {
-            double gapDenom = std::max(1.0, std::fabs(bestUpperBound_));
-            double relGap = (bestUpperBound_ - bestLowerBound_) / gapDenom;
-            if (relGap <= solverConfig.mipGap) {
+        if (MeetsOuterGap(bestUpperBound_, bestLowerBound_, solverConfig)) {
             const auto iterEnd = Tools::Clock::now();
             std::cout << ", master_ms=" << masterMs
                       << ", mip_eval_ms=" << Tools::ElapsedMs(masterEnd, iterEnd)
@@ -500,8 +521,7 @@ Status LShapeRelaxedStation::Solve()
             std::cout << "Total elapsed time (Phase 1 + Phase 2): "
                       << (phase1ElapsedMs_ + phase2ElapsedMs_) << " ms" << std::endl;
             return OK;
-            }
-        }  // iter > 0
+        }
 
         const auto iterEnd = Tools::Clock::now();
         std::cout << ", master_ms=" << masterMs
