@@ -49,6 +49,11 @@ Status UsingSolver::Solve()
     int solveStatus = model->get(GRB_IntAttr_Status);
     const auto solveEnd = Tools::Clock::now();
     if (solveStatus == GRB_OPTIMAL || (solveStatus == GRB_TIME_LIMIT && model->get(GRB_IntAttr_SolCount) > 0)) {
+        if (solveStatus == GRB_OPTIMAL) {
+            std::cout << "Solver status: OPTIMAL" << std::endl;
+        } else {
+            std::cout << "Solver status: TIME_LIMIT_WITH_INCUMBENT" << std::endl;
+        }
         double ub = model->get(GRB_DoubleAttr_ObjVal);
         double lb = model->get(GRB_DoubleAttr_ObjBound);
         std::cout << "UB: " << ub << ", LB: " << lb << std::endl;
@@ -57,6 +62,7 @@ Status UsingSolver::Solve()
     }
 
     double lb = model->get(GRB_DoubleAttr_ObjBound);
+    std::cout << "Solver status: NO_INCUMBENT_OR_ERROR" << std::endl;
     std::cout << "UB: inf, LB: " << lb << " (no incumbent found)" << std::endl;
     std::cerr << "Not solved to optimality, status: " << solveStatus << std::endl;
     return ERROR;
