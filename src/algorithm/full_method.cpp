@@ -99,6 +99,7 @@ Status LShapeRelaxedStation::Initialize()
     LShapeRelaxed phase1(problemType, dataFolder, maxIters, tolerance);
     phase1.SetSolverConfig(solverConfig);
     phase1.SetQuiet(true);
+    phase1.SetUseStrengthenedCuts(true);
 
     Status s = phase1.Initialize();
     if (s != OK) { std::cerr << "Phase 1 init failed" << std::endl; return s; }

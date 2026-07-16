@@ -17,6 +17,7 @@ public:
     ~LShapeRelaxed() override;
 
     void SetQuiet(bool quiet) { quiet_ = quiet; }
+    void SetUseStrengthenedCuts(bool enabled) { useStrengthenedCuts_ = enabled; }
 
     // Expose Phase 1 results and internals for Phase 2 reuse
     const std::vector<double>& GetIncumbentZValues() const { return incumbentZValues; }
@@ -64,6 +65,7 @@ private:
     GRBVar theta;
 
     bool quiet_ = false;
+    bool useStrengthenedCuts_ = false;
     double globalLowerBound;
     double bestUpperBound;
     double bestLowerBound;

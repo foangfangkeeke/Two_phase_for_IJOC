@@ -143,6 +143,57 @@ LShapeCutInfo BuildRouteStrengthenedNoGoodCut(
 
     return cut;
 }
+
+LShapeCutInfo BuildRouteMonotonicityStrengthenedOptimalityCut(
+    const std::vector<ProblemDataVar>& masterVars, const std::vector<double>& zValues,
+    int scenarioIndex, int routeId, const std::vector<std::string>& routeFacilityVarNames,
+    double subObj, double lowerBound)
+{
+    std::unordered_set<std::string> routeFacilityVarNameSet(
+        routeFacilityVarNames.begin(), routeFacilityVarNames.end());
+
+    int selectedCapacity = -1;
+    for (size_t idx = 0; idx < masterVars.size(); ++idx) {
+        int varScenario = -1;
+        int varRoute = -1;
+        int capacity = -1;
+        if (TryParseCapacityVar(masterVars[idx].name, varScenario, varRoute, capacity)
+            && varScenario == scenarioIndex && varRoute == routeId && zValues[idx] > 0.5) {
+            selectedCapacity = capacity;
+            break;
+        }
+    }
+
+    const double delta = std::max(0.0, subObj - lowerBound);
+    LShapeCutInfo cut;
+    cut.isOptimalityCut = true;
+    cut.sense = '>';
+    cut.rhs = 0.0;
+    cut.constant = subObj;
+    cut.yCoeffs.assign(zValues.size(), 0.0);
+
+    for (size_t idx = 0; idx < masterVars.size(); ++idx) {
+        const std::string& name = masterVars[idx].name;
+        if (IsFacilityMasterVar(name)) {
+            if (routeFacilityVarNameSet.count(name) > 0 && zValues[idx] <= 0.5) {
+                cut.yCoeffs[idx] = -delta;
+            }
+            continue;
+        }
+
+        int varScenario = -1;
+        int varRoute = -1;
+        int capacity = -1;
+        if (TryParseCapacityVar(name, varScenario, varRoute, capacity)
+            && varScenario == scenarioIndex && varRoute == routeId
+            && selectedCapacity >= 0 && capacity > selectedCapacity) {
+            cut.yCoeffs[idx] = -delta;
+        }
+    }
+
+    return cut;
+}
+
 } // namespace
 
 struct LShapeRelaxed::RouteSubProblemState {
@@ -406,17 +457,19 @@ Status LShapeRelaxed::Solve()
                     ++feasCount;
                 }
 
-                const int scenarioIndex = subProblems[idx]->scenarioIndex;
-                const int routeId = subProblems[idx]->routeId;
-                const LShapeCutInfo noGoodCut = BuildRouteStrengthenedNoGoodCut(
-                    masterVars, zValues, scenarioIndex, routeId,
-                    routeFacilityVarNames.at(static_cast<size_t>(scenarioIndex)).at(static_cast<size_t>(routeId)));
-                const std::string noGoodSignature = MakeFeasibilityCutSignature(noGoodCut);
-                if (addedFeasibilityCuts.insert(noGoodSignature).second) {
-                    AddFeasibilityCut(*model, noGoodCut, zVars,
-                        "relaxed_route_strengthened_nogood_" + std::to_string(iter)
-                        + "_sub_" + std::to_string(idx));
-                    ++feasCount;
+                if (useStrengthenedCuts_) {
+                    const int scenarioIndex = subProblems[idx]->scenarioIndex;
+                    const int routeId = subProblems[idx]->routeId;
+                    const LShapeCutInfo noGoodCut = BuildRouteStrengthenedNoGoodCut(
+                        masterVars, zValues, scenarioIndex, routeId,
+                        routeFacilityVarNames.at(static_cast<size_t>(scenarioIndex)).at(static_cast<size_t>(routeId)));
+                    const std::string noGoodSignature = MakeFeasibilityCutSignature(noGoodCut);
+                    if (addedFeasibilityCuts.insert(noGoodSignature).second) {
+                        AddFeasibilityCut(*model, noGoodCut, zVars,
+                            "relaxed_route_strengthened_nogood_" + std::to_string(iter)
+                            + "_sub_" + std::to_string(idx));
+                        ++feasCount;
+                    }
                 }
             }
 
@@ -461,11 +514,24 @@ Status LShapeRelaxed::Solve()
             return OK;
         }
 
+        const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
+        const auto& routeFacilityVarNames = problemData->getData<std::vector<std::vector<std::vector<std::string>>>>(
+            "wireless_route_facility_var_names");
         for (size_t idx = 0; idx < routeCutInfos.size(); ++idx) {
             const CutEval cutDual = BuildContinuousCut(routeCutInfos[idx], zValues, iter, static_cast<int>(idx));
             const int scenarioIndex = subProblems[idx]->scenarioIndex;
             const int routeId = subProblems[idx]->routeId;
             model->addConstr(cutDual.expr <= routeThetaVars[scenarioIndex][routeId], cutDual.name);
+            if (useStrengthenedCuts_) {
+                const LShapeCutInfo strengthenedCut = BuildRouteMonotonicityStrengthenedOptimalityCut(
+                    masterVars, zValues, scenarioIndex, routeId,
+                    routeFacilityVarNames.at(static_cast<size_t>(scenarioIndex)).at(static_cast<size_t>(routeId)),
+                    routeQValues[idx], globalLowerBound);
+                const CutEval strengthenedCutEval = BuildContinuousCut(
+                    strengthenedCut, zValues, iter, static_cast<int>(idx));
+                model->addConstr(strengthenedCutEval.expr <= routeThetaVars[scenarioIndex][routeId],
+                    strengthenedCutEval.name + "_strengthened");
+            }
         }
 
         model->update();
