@@ -101,13 +101,35 @@ Requires: Windows 11, MSVC 2022, CMake ≥ 3.20, Gurobi 12.0+. Output: `out/buil
 
 ## 6. Experiment execution plan
 
-### 6.1 Stage 1: quick screening（600s）
+### 6.1 Table 1: network-scale ablation
 
-All five algorithms @ 600s on all instances（`tower_small` → `tower_medium` → `tower_5` → `tower_10` → `tower_20`）. 2-3 runs each. Goal: find break point where solver/natural-ils fail but `full` still works.
+Run all five algorithms on the three-scenario network-scale ladder:
 
-### 6.2 Stage 2: main table（7200s unified）
+| Instance | Solver | Natural ILS | Lifted ILS | Lifted Two-phase | Full |
+|----------|--------|-------------|------------|------------------|------|
+| `tower_small` | run | run | run | run | run |
+| `tower_medium` | run | - | - | run | run |
+| `tower` | run | - | - | run | run |
 
-All five algorithms @ 7200s on instances around the break point, ≥3 runs per cell. Report mean ± std or min/median/max. The five-algorithm ladder itself is the ablation.
+`-` means not run because the method failed to close the gap on a smaller instance within the time limit. Current script still executes only the methods that remain useful for later stages according to its stop rules.
+
+### 6.2 Table 2: scenario-scale scalability
+
+Scenario-scale runs use the full Tower network and start from `tower_5`; the 3-scenario `tower` row is reused from Table 1.
+
+| # Scenarios | Extensive-form Solver | Lifted Two-phase ILS | Full Method |
+|------------:|-----------------------|----------------------|-------------|
+| 3 | see Table 1 | see Table 1 | see Table 1 |
+| 5 | run if Table 1 tower completed | run if Table 1 tower completed | run if Table 1 tower completed |
+| 10 | run if previous scenario setting completed | run if previous scenario setting completed | run if previous scenario setting completed |
+| 20 | run if previous scenario setting completed | run if previous scenario setting completed | run if previous scenario setting completed |
+| 40 | run if previous scenario setting completed | run if previous scenario setting completed | run if previous scenario setting completed |
+
+Notes:
+- `experiment.sh` starts Experiment 2 from `tower_5`, not `tower`, to avoid rerunning the Table 1 `tower` case.
+- An algorithm enters Experiment 2 only if it completed `tower` in Experiment 1.
+- The extensive-form solver may use a memory-conservative configuration for scenario-scale runs when the default configuration runs out of memory.
+- The 40-scenario full-method run may use the large-case configuration; fill the final status after completion.
 
 ### 6.3 Per-run output fields
 

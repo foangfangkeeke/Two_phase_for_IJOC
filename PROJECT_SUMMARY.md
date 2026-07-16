@@ -230,8 +230,39 @@ Natural ILS is a naive baseline（no LP pruning, no relaxed warm start）to keep
 
 ### 6.3 Main comparison and scalability
 
-- Stage 1: all five algorithms @ 600s screening on all instances to find the break point. 2–3 runs each.
-- Stage 2: all five algorithms @ 7200s on 3–4 instances around the break point, ≥3 runs per cell. The five-algorithm comparison is the ablation.
+The computational section should use two two-dimensional tables.
+
+**Table 1. Network-scale ablation under three service-plan scenarios**
+
+| Instance | Solver | Natural ILS | Lifted ILS | Lifted Two-phase | Full |
+|----------|--------|-------------|------------|------------------|------|
+| `tower_small` | 5.37s | TL, 63.15% | TL, 52.60% | 0.44s | 0.36s |
+| `tower_medium` | 967.18s | - | - | 6.04s | 5.02s |
+| `tower` | OOM, 4.18% | - | - | 66.48s | 58.13s |
+
+Notes:
+- The table reports wall-clock time for converged runs. For non-converged runs, the final global gap is reported.
+- `-` indicates not run because the method failed to close the gap on a smaller instance within the time limit.
+- `TL` indicates time limit with a finite incumbent.
+- `OOM` indicates Gurobi error 10001 (out of memory) with a finite incumbent; the reported gap is based on the final incumbent and bound.
+- The `tower` row uses the corrected full-method log after the Phase-2 outer-gap check fix.
+
+**Table 2. Scenario-scale scalability on the full Tower network**
+
+| # Scenarios | Extensive-form Solver | Lifted Two-phase ILS | Full Method |
+|------------:|-----------------------|----------------------|-------------|
+| 3 | see Table 1 | see Table 1 | see Table 1 |
+| 5 |  |  |  |
+| 10 |  |  |  |
+| 20 |  |  |  |
+| 40 |  |  |  |
+
+Notes:
+- The 3-scenario row reuses the full-network results from Table 1.
+- For scenario-scale experiments, the extensive-form solver may use a memory-conservative configuration when the default configuration runs out of memory. The same wall-clock limit and hardware budget are retained.
+- The 40-scenario full-method run may use the large-case configuration. The final status and performance should be filled after the run completes.
+- A blank cell indicates that the run has not yet been completed.
+- Reported entries use the format `time` for converged runs and `status, gap` for non-converged runs with a finite incumbent.
 
 ### 6.4 Required output metrics
 
