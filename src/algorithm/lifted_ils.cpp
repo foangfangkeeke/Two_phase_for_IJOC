@@ -1,5 +1,6 @@
 #include "lifted_ils.hpp"
 #include "lshape_monotonicity_cut.hpp"
+#include "parallel_utils.hpp"
 #include "wireless_reform.hpp"
 #include "tools.hpp"
 
@@ -119,7 +120,7 @@ Status LiftedILS::Initialize()
     model->set(GRB_DoubleParam_MIPGap, 0.0);
     model->set(GRB_IntParam_Presolve, solverConfig.presolve);
     model->set(GRB_IntParam_Method, solverConfig.method);
-    model->set(GRB_IntParam_Threads, solverConfig.threads);
+    model->set(GRB_IntParam_Threads, ParallelConfig::MasterThreads(solverConfig));
 
     const auto& scenarioSubproblems = problemData->getData<std::vector<ScenarioSubproblemInfo>>("wireless_scenario_subproblems");
     scenarioThetaVars.clear();
@@ -156,7 +157,7 @@ Status LiftedILS::Initialize()
         sub->model->set(GRB_DoubleParam_MIPGap, 0.0);
         sub->model->set(GRB_IntParam_Presolve, solverConfig.presolve);
         sub->model->set(GRB_IntParam_Method, solverConfig.method);
-        sub->model->set(GRB_IntParam_Threads, solverConfig.threads);
+        sub->model->set(GRB_IntParam_Threads, ParallelConfig::SubProblemThreads());
         sub->context.Clear();
         sub->strategy->InitSubProblem(*problemData, static_cast<int>(subIdx), *sub->model, sub->context);
         subProblems.push_back(std::move(sub));
@@ -202,11 +203,23 @@ Status LiftedILS::EvaluateSubProblems(const std::vector<double>& zValues,
     scenarioCutInfos.assign(subProblems.size(), LShapeCutInfo{});
 
     const ProblemData* problemDataPtr = problemData.get();
-    for (size_t idx = 0; idx < subProblems.size(); ++idx) {
-        auto& sub = subProblems[idx];
-        SubProblemEvalResult result = EvaluateScenarioSubproblem(*problemDataPtr,
-            *sub->strategy, *sub->model, sub->context, zValues);
+    std::vector<SubProblemEvalResult> results;
+    try {
+        results = RunBoundedIndexedTasks(subProblems.size(),
+            ParallelConfig::MaxSubProblemConcurrency(solverConfig),
+            [problemDataPtr, &zValues, this](size_t idx) {
+                auto& sub = subProblems[idx];
+                return EvaluateScenarioSubproblem(*problemDataPtr,
+                    *sub->strategy, *sub->model, sub->context, zValues);
+            });
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Lifted ILS operational sub-problem failed: " << e.what() << std::endl;
+        return ERROR;
+    }
 
+    for (size_t idx = 0; idx < results.size(); ++idx) {
+        const SubProblemEvalResult& result = results[idx];
         if (result.status != OK) return result.status;
 
         scenarioSubObjs[idx] = result.subObj;

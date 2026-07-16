@@ -1,12 +1,12 @@
 #include "full_method.hpp"
 #include "lshape_relaxed.hpp"
 #include "lshape_monotonicity_cut.hpp"
+#include "parallel_utils.hpp"
 #include "wireless_reform.hpp"
 #include "tools.hpp"
 
 #include <algorithm>
 #include <cmath>
-#include <future>
 #include <iostream>
 #include <limits>
 #include <set>
@@ -177,30 +177,29 @@ Status LShapeRelaxedStation::Initialize()
         sub->model->set(GRB_DoubleParam_MIPGap, 0.0);
         sub->model->set(GRB_IntParam_Presolve, solverConfig.presolve);
         sub->model->set(GRB_IntParam_Method, solverConfig.method);
-        sub->model->set(GRB_IntParam_Threads, solverConfig.threads);
+        sub->model->set(GRB_IntParam_Threads, ParallelConfig::SubProblemThreads());
         sub->context.Clear();
         subProblems_.push_back(std::move(sub));
     }
 
     // ── Pass 2 (parallel): InitSubProblem on independent models ──
     {
-        std::vector<std::future<void>> initFutures;
-        initFutures.reserve(subProblems_.size());
         const ProblemData* pd = problemData_;
-        for (size_t idx = 0; idx < subProblems_.size(); ++idx) {
-            initFutures.push_back(std::async(std::launch::async,
-                [pd, idx, sub = subProblems_[idx].get()]() {
+        try {
+            RunBoundedIndexedTasks(subProblems_.size(),
+                ParallelConfig::MaxSubProblemConcurrency(solverConfig),
+                [pd, this](size_t idx) {
+                    auto* sub = subProblems_[idx].get();
                     sub->strategy->InitSubProblem(*pd, static_cast<int>(idx),
                         *sub->model, sub->context);
-                }));
+                    return OK;
+                });
         }
-        for (size_t idx = 0; idx < initFutures.size(); ++idx) {
-            try {
-                initFutures[idx].get();
-            } catch (const std::exception& e) {
-                std::cerr << "Phase 2 sub-problem init failed for " << idx << ": " << e.what() << std::endl;
-                return ERROR;
-            }
+        catch (const std::exception& e) {
+            std::cerr << "Phase 2 sub-problem init failed: " << e.what() << std::endl;
+            return ERROR;
+        }
+        for (size_t idx = 0; idx < subProblems_.size(); ++idx) {
             std::cout << "  done, cols=" << subProblems_[idx]->model->get(GRB_IntAttr_NumVars)
                       << " rows=" << subProblems_[idx]->model->get(GRB_IntAttr_NumConstrs) << std::endl;
         }
@@ -274,28 +273,28 @@ Status LShapeRelaxedStation::Solve()
         bool rspAnyInfeasible = false;
         {
             // Evaluate LP relaxation for lower-bounding before MIP verification.
-            std::vector<std::future<SubProblemEvalResult>> futures;
-            futures.reserve(subProblems_.size());
             const ProblemData* pd = problemData_;
-            for (auto& sub : subProblems_) {
-                futures.push_back(std::async(std::launch::async,
-                    [pd, &zValues, sub = sub.get()] {
+            std::vector<SubProblemEvalResult> results;
+            try {
+                results = RunBoundedIndexedTasks(subProblems_.size(),
+                    ParallelConfig::MaxSubProblemConcurrency(solverConfig),
+                    [pd, &zValues, this](size_t idx) {
+                        auto* sub = subProblems_[idx].get();
                         return EvaluateScenarioSubproblem(*pd, *sub->strategy, *sub->model,
                             sub->context, zValues, true); // relaxed = LP relaxation
-                    }));
+                    });
+            }
+            catch (const std::exception& e) {
+                std::cerr << "Phase 2 sub-problem failed: " << e.what() << std::endl;
+                return ERROR;
             }
 
             int feasCount = 0;
             int optCount = 0;
             std::set<std::string> addedFeasCuts;
 
-            for (size_t idx = 0; idx < futures.size(); ++idx) {
-                SubProblemEvalResult result;
-                try { result = futures[idx].get(); }
-                catch (const std::exception& e) {
-                    std::cerr << "Phase 2 sub-problem failed: " << e.what() << std::endl;
-                    return ERROR;
-                }
+            for (size_t idx = 0; idx < results.size(); ++idx) {
+                const SubProblemEvalResult& result = results[idx];
                 if (result.status != OK) return result.status;
 
                 if (!result.cutInfo.isOptimalityCut) {
@@ -355,28 +354,28 @@ Status LShapeRelaxedStation::Solve()
         }
 
         // ── SP: Full MIP sub-problems (for incumbent update + integer optimality cuts) ──
-        std::vector<std::future<SubProblemEvalResult>> mipFutures;
-        mipFutures.reserve(subProblems_.size());
         const ProblemData* pd = problemData_;
-        for (auto& sub : subProblems_) {
-            mipFutures.push_back(std::async(std::launch::async,
-                [pd, &zValues, sub = sub.get()] {
+        std::vector<SubProblemEvalResult> mipResults;
+        try {
+            mipResults = RunBoundedIndexedTasks(subProblems_.size(),
+                ParallelConfig::MaxSubProblemConcurrency(solverConfig),
+                [pd, &zValues, this](size_t idx) {
+                    auto* sub = subProblems_[idx].get();
                     return EvaluateScenarioSubproblem(*pd, *sub->strategy, *sub->model,
                         sub->context, zValues, false); // full MIP
-                }));
+                });
+        }
+        catch (const std::exception& e) {
+            std::cerr << "Phase 2 MIP sub-problem failed: " << e.what() << std::endl;
+            return ERROR;
         }
 
         double aggregatedQValue = 0.0;
         bool spAnyInfeasible = false;
         std::vector<BendersCutInfo> mipCutInfos(subProblems_.size());
         std::vector<double> mipSubObjs(subProblems_.size(), 0.0);
-        for (size_t idx = 0; idx < mipFutures.size(); ++idx) {
-            SubProblemEvalResult result;
-            try { result = mipFutures[idx].get(); }
-            catch (const std::exception& e) {
-                std::cerr << "Phase 2 MIP sub-problem failed: " << e.what() << std::endl;
-                return ERROR;
-            }
+        for (size_t idx = 0; idx < mipResults.size(); ++idx) {
+            const SubProblemEvalResult& result = mipResults[idx];
             if (result.status != OK) return result.status;
 
             mipCutInfos[idx] = result.cutInfo;

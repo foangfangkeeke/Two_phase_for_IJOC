@@ -1,11 +1,11 @@
 #include "natural_ils.hpp"
 
 #include "wireless.hpp"
+#include "parallel_utils.hpp"
 #include "tools.hpp"
 
 #include <algorithm>
 #include <cmath>
-#include <future>
 #include <functional>
 #include <iostream>
 #include <limits>
@@ -114,6 +114,7 @@ Status IntegerLShaped::Initialize()
     const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
     InitializeBendersMasterModel(*model, masterVars, masterConstrs, zVars, theta, true);
     model->set(GRB_DoubleParam_MIPGap, 0.0);
+    model->set(GRB_IntParam_Threads, ParallelConfig::MasterThreads(solverConfig));
     const auto dataInitEnd = Tools::Clock::now();
     std::cout << "Natural ILS data/master initialization elapsed_ms="
               << Tools::ElapsedMs(dataInitStart, dataInitEnd) << std::endl;
@@ -136,6 +137,7 @@ Status IntegerLShaped::Initialize()
         sub->model = std::make_unique<GRBModel>(*sub->env);
         sub->model->set(GRB_IntParam_OutputFlag, 0);
         sub->model->set(GRB_DoubleParam_MIPGap, 0.0);
+        sub->model->set(GRB_IntParam_Threads, ParallelConfig::SubProblemThreads());
         sub->context.Clear();
         sub->strategy->InitSubProblem(*problemData, scenarioIndex, *sub->model, sub->context);
         subProblems.push_back(std::move(sub));
@@ -247,14 +249,20 @@ Status IntegerLShaped::EvaluateSubProblems(const std::vector<double>& zValues, b
         return ERROR;
     }
 
-    std::vector<std::future<SubProblemEvalResult>> futures;
-    futures.reserve(subProblems.size());
     const ProblemData* problemDataPtr = problemData.get();
-    for (auto& sub : subProblems) {
-        futures.push_back(std::async(std::launch::async, [problemDataPtr, &zValues, relaxed, sub = sub.get()] {
+    std::vector<SubProblemEvalResult> results;
+    try {
+        results = RunBoundedIndexedTasks(subProblems.size(),
+            ParallelConfig::MaxSubProblemConcurrency(solverConfig),
+            [problemDataPtr, &zValues, relaxed, this](size_t idx) {
+                auto* sub = subProblems[idx].get();
             return EvaluateScenarioSubproblem(*problemDataPtr, *sub->strategy, *sub->model,
                 sub->context, zValues, relaxed);
-        }));
+            });
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Natural ILS sub-problem failed: " << e.what() << std::endl;
+        return ERROR;
     }
 
     cutInfo = IntegerLShapedCutInfo{};
@@ -271,17 +279,8 @@ Status IntegerLShaped::EvaluateSubProblems(const std::vector<double>& zValues, b
         scenarioCutInfos->assign(subProblems.size(), IntegerLShapedCutInfo{});
     }
 
-    size_t scenarioResultIdx = 0;
-    for (auto& future : futures) {
-        SubProblemEvalResult result;
-        try {
-            result = future.get();
-        }
-        catch (const std::exception& e) {
-            std::cerr << "Natural ILS sub-problem failed: " << e.what() << std::endl;
-            return ERROR;
-        }
-
+    for (size_t scenarioResultIdx = 0; scenarioResultIdx < results.size(); ++scenarioResultIdx) {
+        const SubProblemEvalResult& result = results[scenarioResultIdx];
         if (result.status != OK) {
             return result.status;
         }
@@ -292,8 +291,6 @@ Status IntegerLShaped::EvaluateSubProblems(const std::vector<double>& zValues, b
         if (scenarioCutInfos != nullptr) {
             (*scenarioCutInfos)[scenarioResultIdx] = result.cutInfo;
         }
-        ++scenarioResultIdx;
-
         if (!result.cutInfo.isOptimalityCut) {
             if (scenarioSubObjs != nullptr && scenarioCutInfos == nullptr) {
                 throw std::runtime_error("Natural ILS scenario lower bounds require optimal sub-problem results");

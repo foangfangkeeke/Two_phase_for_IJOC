@@ -1,12 +1,12 @@
 #include "lshape_relaxed.hpp"
 
+#include "parallel_utils.hpp"
 #include "wireless_reform.hpp"
 #include "wireless_reform_route.hpp"
 #include "tools.hpp"
 
 #include <algorithm>
 #include <cmath>
-#include <future>
 #include <iomanip>
 #include <iostream>
 #include <limits>
@@ -182,6 +182,7 @@ Status LShapeRelaxed::Initialize()
     const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
     InitializeBendersMasterModel(*model, masterVars, masterConstrs, zVars, theta, true);
     model->set(GRB_DoubleParam_MIPGap, 0.0);
+    model->set(GRB_IntParam_Threads, ParallelConfig::MasterThreads(solverConfig));
     const auto dataInitEnd = Tools::Clock::now();
     std::cout << "Relaxed Route data/master initialization elapsed_ms="
               << Tools::ElapsedMs(dataInitStart, dataInitEnd) << std::endl;
@@ -236,6 +237,7 @@ Status LShapeRelaxed::Initialize()
             sub->model = std::make_unique<GRBModel>(*sub->env);
             sub->model->set(GRB_IntParam_OutputFlag, 0);
             sub->model->set(GRB_DoubleParam_MIPGap, 0.0);
+            sub->model->set(GRB_IntParam_Threads, ParallelConfig::SubProblemThreads());
             sub->context.Clear();
             sub->strategy->InitSubProblem(*problemData, scenarioIndex, *sub->model, sub->context);
             subProblems.push_back(std::move(sub));
@@ -286,25 +288,24 @@ Status LShapeRelaxed::EvaluateSubProblems(const std::vector<double>& zValues,
     routeSubObjs.assign(subProblems.size(), 0.0);
     routeCutInfos.assign(subProblems.size(), LShapeCutInfo{});
 
-    std::vector<std::future<SubProblemEvalResult>> futures;
-    futures.reserve(subProblems.size());
     const ProblemData* problemDataPtr = problemData.get();
-    for (auto& sub : subProblems) {
-        futures.push_back(std::async(std::launch::async, [problemDataPtr, &zValues, sub = sub.get()] {
+    std::vector<SubProblemEvalResult> results;
+    try {
+        results = RunBoundedIndexedTasks(subProblems.size(),
+            ParallelConfig::MaxSubProblemConcurrency(solverConfig),
+            [problemDataPtr, &zValues, this](size_t idx) {
+                auto* sub = subProblems[idx].get();
             return EvaluateRouteSubproblem(*problemDataPtr, *sub->strategy, *sub->model,
                 sub->context, zValues);
-        }));
+            });
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Relaxed Route sub-problem failed: " << e.what() << std::endl;
+        return ERROR;
     }
 
-    for (size_t idx = 0; idx < futures.size(); ++idx) {
-        SubProblemEvalResult result;
-        try {
-            result = futures[idx].get();
-        } catch (const std::exception& e) {
-            std::cerr << "Relaxed Route sub-problem failed: " << e.what() << std::endl;
-            return ERROR;
-        }
-
+    for (size_t idx = 0; idx < results.size(); ++idx) {
+        const SubProblemEvalResult& result = results[idx];
         if (result.status != OK) return result.status;
 
         routeSubObjs[idx] = result.subObj;

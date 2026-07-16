@@ -1,13 +1,13 @@
 #include "lifted_two_phase_ils.hpp"
 #include "lshape_monotonicity_cut.hpp"
 #include "lshape_relaxed.hpp"
+#include "parallel_utils.hpp"
 #include "wireless_reform.hpp"
 #include "tools.hpp"
 
 #include <algorithm>
 #include <cmath>
 #include <functional>
-#include <future>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -188,29 +188,29 @@ Status LiftedTwoPhaseILS::Initialize()
         sub->model->set(GRB_DoubleParam_MIPGap, 0.0);
         sub->model->set(GRB_IntParam_Presolve, solverConfig.presolve);
         sub->model->set(GRB_IntParam_Method, solverConfig.method);
-        sub->model->set(GRB_IntParam_Threads, solverConfig.threads);
+        sub->model->set(GRB_IntParam_Threads, ParallelConfig::SubProblemThreads());
         sub->context.Clear();
         subProblems.push_back(std::move(sub));
     }
 
-    // Parallel init
+    // Bounded parallel init
     {
-        std::vector<std::future<void>> initFutures;
-        initFutures.reserve(subProblems.size());
         const ProblemData* pd = problemData;
-        for (size_t idx = 0; idx < subProblems.size(); ++idx) {
-            initFutures.push_back(std::async(std::launch::async,
-                [pd, idx, sub = subProblems[idx].get()]() {
+        try {
+            RunBoundedIndexedTasks(subProblems.size(),
+                ParallelConfig::MaxSubProblemConcurrency(solverConfig),
+                [pd, this](size_t idx) {
+                    auto* sub = subProblems[idx].get();
                     sub->strategy->InitSubProblem(*pd, static_cast<int>(idx),
                         *sub->model, sub->context);
-                }));
+                    return OK;
+                });
         }
-        for (size_t idx = 0; idx < initFutures.size(); ++idx) {
-            try { initFutures[idx].get(); }
-            catch (const std::exception& e) {
-                std::cerr << "Phase 2 sub-problem init failed " << idx << ": " << e.what() << std::endl;
-                return ERROR;
-            }
+        catch (const std::exception& e) {
+            std::cerr << "Phase 2 sub-problem init failed: " << e.what() << std::endl;
+            return ERROR;
+        }
+        for (size_t idx = 0; idx < subProblems.size(); ++idx) {
             std::cout << "  done, cols=" << subProblems[idx]->model->get(GRB_IntAttr_NumVars)
                       << " rows=" << subProblems[idx]->model->get(GRB_IntAttr_NumConstrs) << std::endl;
         }
@@ -257,11 +257,23 @@ Status LiftedTwoPhaseILS::EvaluateSubProblems(const std::vector<double>& zValues
     scenarioCutInfos.assign(subProblems.size(), LShapeCutInfo{});
 
     const ProblemData* problemDataPtr = problemData;
-    for (size_t idx = 0; idx < subProblems.size(); ++idx) {
-        auto& sub = subProblems[idx];
-        SubProblemEvalResult result = EvaluateScenarioSubproblem(*problemDataPtr,
-            *sub->strategy, *sub->model, sub->context, zValues, relaxed);
+    std::vector<SubProblemEvalResult> results;
+    try {
+        results = RunBoundedIndexedTasks(subProblems.size(),
+            ParallelConfig::MaxSubProblemConcurrency(solverConfig),
+            [problemDataPtr, &zValues, relaxed, this](size_t idx) {
+                auto& sub = subProblems[idx];
+                return EvaluateScenarioSubproblem(*problemDataPtr,
+                    *sub->strategy, *sub->model, sub->context, zValues, relaxed);
+            });
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Lifted two-phase ILS operational sub-problem failed: " << e.what() << std::endl;
+        return ERROR;
+    }
 
+    for (size_t idx = 0; idx < results.size(); ++idx) {
+        const SubProblemEvalResult& result = results[idx];
         if (result.status != OK) return result.status;
 
         scenarioSubObjs[idx] = result.subObj;
