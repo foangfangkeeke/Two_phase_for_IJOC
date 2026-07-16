@@ -9,14 +9,17 @@
 #include "using_solver.hpp"
 
 #include <chrono>
+#include <cstdio>
 #include <ctime>
 #include <filesystem>
-#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #ifdef _WIN32
+#include <fcntl.h>
+#include <io.h>
 #include <windows.h>
 #endif
 
@@ -24,16 +27,34 @@ using namespace std;
 
 namespace {
 
-class ScopedStreamRedirect {
-public:
-    ScopedStreamRedirect(ostream& stream, streambuf* replacement)
-        : stream_(stream), original_(stream.rdbuf(replacement)) {}
-    ~ScopedStreamRedirect() { stream_.rdbuf(original_); }
+void RedirectProcessOutputToLog(const filesystem::path& logPath)
+{
+#ifdef _WIN32
+    const std::string path = logPath.string();
+    HANDLE logHandle = CreateFileA(path.c_str(), GENERIC_WRITE, FILE_SHARE_READ,
+        nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (logHandle == INVALID_HANDLE_VALUE) {
+        throw std::runtime_error("Cannot open log file for writing: " + path);
+    }
 
-private:
-    ostream& stream_;
-    streambuf* original_;
-};
+    const int fd = _open_osfhandle(reinterpret_cast<intptr_t>(logHandle), _O_TEXT);
+    if (fd == -1) {
+        CloseHandle(logHandle);
+        throw std::runtime_error("Cannot attach log file handle: " + path);
+    }
+
+    if (_dup2(fd, _fileno(stdout)) != 0 || _dup2(fd, _fileno(stderr)) != 0) {
+        _close(fd);
+        throw std::runtime_error("Cannot redirect stdout/stderr to log file: " + path);
+    }
+    _close(fd);
+#else
+    freopen(logPath.string().c_str(), "w", stdout);
+    freopen(logPath.string().c_str(), "a", stderr);
+#endif
+    cout.clear();
+    cerr.clear();
+}
 
 } // namespace
 
@@ -76,13 +97,11 @@ int main(int argc, char* argv[])
     const filesystem::path logPath =
         logDir / (alg + "_" + pb + "_" + ts + ".log");
 
-    filebuf logBuf;
-    logBuf.open(logPath, ios::out);
     cout << "Log file: " << logPath.string() << endl;
-    ScopedStreamRedirect coutRedirect(cout, &logBuf);
-    ScopedStreamRedirect cerrRedirect(cerr, &logBuf);
+    fflush(stdout);
+    RedirectProcessOutputToLog(logPath);
 
-    // ... (algorithm dispatch below; logBuf must stay alive)
+    // ... (algorithm dispatch below; stdout/stderr are redirected to the log file)
 
     if (pbLower == "wireless") {
         MILPSolver solver;
