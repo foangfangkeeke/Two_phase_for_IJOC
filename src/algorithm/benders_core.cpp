@@ -1,5 +1,6 @@
 #include "benders_decomposition.hpp"
 
+#include <cmath>
 #include <stdexcept>
 
 void InitializeBendersMasterModel(GRBModel& model, const std::vector<ProblemDataVar>& masterVarData,
@@ -46,7 +47,12 @@ BendersMasterSolution GetBendersMasterSolution(GRBModel& model, const std::vecto
     solution.values.assign(masterVars.size(), 0.0);
 
     for (size_t idx = 0; idx < masterVars.size(); ++idx) {
-        solution.values[idx] = masterVars[idx].get(GRB_DoubleAttr_X);
+        double value = masterVars[idx].get(GRB_DoubleAttr_X);
+        const char varType = masterVars[idx].get(GRB_CharAttr_VType);
+        if (varType == GRB_BINARY || varType == GRB_INTEGER) {
+            value = std::round(value);
+        }
+        solution.values[idx] = value;
         solution.firstStageValue += masterVars[idx].get(GRB_DoubleAttr_Obj) * solution.values[idx];
     }
 

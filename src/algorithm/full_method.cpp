@@ -271,7 +271,7 @@ Status LShapeRelaxedStation::Solve()
         double fixedCost = 0.0;
         std::vector<double> zValues(zVars_.size());
         for (size_t i = 0; i < zVars_.size(); ++i) {
-            zValues[i] = zVars_[i].get(GRB_DoubleAttr_X);
+            zValues[i] = std::round(zVars_[i].get(GRB_DoubleAttr_X));
             fixedCost += zVars_[i].get(GRB_DoubleAttr_Obj) * zValues[i];
         }
         const double thetaValue = theta_.get(GRB_DoubleAttr_X);
