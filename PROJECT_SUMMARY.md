@@ -77,13 +77,15 @@ base 需求水平
 
 ### 3.2 Objective and cost scale
 
-```
-min Σ facility_cost × w
-  + Σ_{ω} p_ω × [Σ_r Σ_cap n_{ω,r} × c^bat_cap × z_{ω,r,cap}
-                + Q_ω(w, z_ω)]
+```text
+min sum_j c^fac_j * w_j
+  + sum_omega p_omega * [sum_r sum_cap n_{omega,r} * c^bat_day * cap * z_{omega,r,cap}
+                         + Q_omega(w, z_omega)]
 ```
 
-目标最小化 charging-infrastructure, battery-configuration, and charging-operation cost。`n_{ω,r}` 是场景 ω 下路线 r 的车辆数，`Q_ω(w,z_ω)` 是代表性运营日的日间充电 + 夜间充电成本。论文中应将所有成本统一到规划期总成本尺度（基础设施和电池按规划年限折算，运营成本按代表性日成本 × 规划期运营天数折算）。车辆购置成本作为场景外生常数 `Σ_ω p_ω C^bus_ω` 在 post-processing 加回，不影响优化器。
+The objective is evaluated on a representative operating day and all monetary parameters use USD. Facility costs are daily-equivalent costs: plug-in and static wireless chargers use USD/day, dynamic wireless chargers use USD/km/day, and inverter cost uses USD/kW/day. Battery capacity cost uses USD/kWh/day in the master problem. The current data set uses the external benchmark battery purchase price of 108 USD/kWh amortized over the 2-year battery life used by Wang et al. (2024): 108 / (2 * 365) = 0.14795 USD/kWh/day, rounded to 0.148. Day and night charging prices are 0.1922 and 0.1233 USD/kWh.
+
+`n_{omega,r}` is the number of vehicles on route r under scenario omega, and `Q_omega(w,z_omega)` is the representative-day charging-operation cost. Bus purchase cost remains an exogenous scenario constant and can be added in post-processing if needed; it does not affect optimization decisions.
 
 ### 3.3 Core constraints
 

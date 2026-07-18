@@ -204,9 +204,9 @@ static vector<WirelessScenarioConfig> LoadWirelessScenarioConfigs(const string& 
 } // namespace
 
 struct OperationCfg {
-    double priceOfPowerDay; // CNY per kW
-    double priceOfPowerNight; // CNY per kW
-    double priceOfUnitBat; // CNY per kW.h
+    double priceOfPowerDay; // USD per kWh
+    double priceOfPowerNight; // USD per kWh
+    double priceOfUnitBat; // USD per kWh per representative day
     double socMax;
     double socMin;
     double capacityMin;
@@ -224,8 +224,8 @@ struct ChargerCfg {
     int num;
     vector<double> chargeRate; // kW per minute;
     vector<double> chargeEfficiency;
-    vector<double> priceOfUnitCharger; // unit price of facility construction
-    double priceOfInverterPerkW; // unit price of inverter (CNY/kW)
+    vector<double> priceOfUnitCharger; // daily facility cost: plug-in/static USD/day, dynamic USD/km/day
+    double priceOfInverterPerkW; // USD per kW per representative day
 };
 
 struct SchedulingCfg {
@@ -365,7 +365,7 @@ private:
             for (int i = 0; i < chargerCfg.num; i++) {
                 chargerCfg.chargeRate.push_back(stod(chargerCfgRate[i]));
                 chargerCfg.chargeEfficiency.push_back(stod(chargerCfgEfficiency[i]));
-                chargerCfg.priceOfUnitCharger.push_back(stoi(chargerCfgInt[i]));
+                chargerCfg.priceOfUnitCharger.push_back(stod(chargerCfgInt[i]));
             }
             chargerCfg.priceOfInverterPerkW = stod(chargerCfgInt[chargerCfg.num]);
 

@@ -67,6 +67,12 @@ Enum name misleading — the model contains plug-in capacity constraints. Both `
 
 All methods share the same hardware budget. Solver uses Gurobi internal parallelism. Benders variants: Threads=1 per subproblem, `std::async` concurrency capped at available cores.
 
+### 4.3 Cost unit policy
+
+Current data and objectives use a representative-day USD scale. `priceOfPowerDay` and `priceOfPowerNight` are USD/kWh. `priceOfUnitBat` is USD/kWh/day; the current value is `0.148`, computed from `108 USD/kWh` over the 2-year battery life used by Wang et al. (2024). Facility parameters are daily-equivalent costs: plug-in/static chargers are USD/day, dynamic wireless chargers are USD/km/day, and inverter cost is USD/kW/day.
+
+Battery weight is intentionally not migrated from the external health-evaluation project. Keep `weightPerEnergy=0` unless the model is explicitly changed to include battery-weight-dependent energy consumption.
+
 ## 5. Build and run instructions
 
 ### 5.1 Build

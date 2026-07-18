@@ -251,7 +251,7 @@ private:
             for (int i = 0; i < chargerCfg.num; i++) {
                 chargerCfg.chargeRate.push_back(stod(chargerCfgRate[i]));
                 chargerCfg.chargeEfficiency.push_back(stod(chargerCfgEfficiency[i]));
-                chargerCfg.priceOfUnitCharger.push_back(stoi(chargerCfgInt[i]));
+                chargerCfg.priceOfUnitCharger.push_back(stod(chargerCfgInt[i]));
             }
             chargerCfg.priceOfInverterPerkW = stod(chargerCfgInt[chargerCfg.num]);
         }

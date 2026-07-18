@@ -242,7 +242,7 @@ private:
             for (int i = 0; i < chargerCfg.num; i++) {
                 chargerCfg.chargeRate.push_back(std::stod(chargerCfgRate[i]));
                 chargerCfg.chargeEfficiency.push_back(std::stod(chargerCfgEfficiency[i]));
-                chargerCfg.priceOfUnitCharger.push_back(std::stoi(chargerCfgInt[i]));
+                chargerCfg.priceOfUnitCharger.push_back(std::stod(chargerCfgInt[i]));
             }
             chargerCfg.priceOfInverterPerkW = std::stod(chargerCfgInt[chargerCfg.num]);
 
