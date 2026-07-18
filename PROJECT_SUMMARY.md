@@ -260,7 +260,6 @@ Notes:
 Notes:
 - The 3-scenario row reuses the full-network results from Table 1.
 - For scenario-scale experiments, the extensive-form solver may use a memory-conservative configuration when the default configuration runs out of memory. The same wall-clock limit and hardware budget are retained.
-- The 40-scenario full-method run may use the large-case configuration. The final status and performance should be filled after the run completes.
 - A blank cell indicates that the run has not yet been completed.
 - Reported entries use the format `time` for converged runs and `status, gap` for non-converged runs with a finite incumbent.
 

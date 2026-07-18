@@ -75,6 +75,12 @@ All methods share the same hardware budget. Solver uses Gurobi internal parallel
 cmd.exe /d /s /c "call .\run.bat <nul"
 ```
 
+Codex/agent builds should not invoke `run.bat` by default. Use the validated direct Ninja build command instead:
+
+```powershell
+cmd.exe /d /s /c "`"C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Auxiliary\Build\vcvars64.bat`" && cd /d C:\faq_work\Papers\Two_phase_wireless_charging_and_integer_lshape && cmake.exe -S . -B out/build/x64-ninja -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe && cmake.exe --build out/build/x64-ninja --config Release"
+```
+
 Requires: Windows 11, MSVC 2022, CMake ≥ 3.20, Gurobi 12.0+. Output: `out/build/x64/Release/wireless.exe`.
 
 ### 5.2 CLI commands
@@ -129,7 +135,6 @@ Notes:
 - `experiment.sh` starts Experiment 2 from `tower_5`, not `tower`, to avoid rerunning the Table 1 `tower` case.
 - An algorithm enters Experiment 2 only if it completed `tower` in Experiment 1.
 - The extensive-form solver may use a memory-conservative configuration for scenario-scale runs when the default configuration runs out of memory.
-- The 40-scenario full-method run may use the large-case configuration; fill the final status after completion.
 
 ### 6.3 Per-run output fields
 
@@ -203,7 +208,36 @@ Paper states: "All methods are given access to the same hardware. The solver use
 - [ ] ≥3 runs per cell with spread reporting.
 - [x] Benders master MIPGap fixed at 0; outer-loop LB via `ObjBound`; outer-loop convergence tolerance via `solverConfig.mipGap`.
 
-## 9. Immediate priorities
+## 9. Full-method implementation notes
 
-1. Generate `tower_10` scenario config.
-2. Run experiment plan Stage 1 & Stage 2.
+### 9.1 Effective implementation optimization
+
+The only optimization currently supported by clean evidence and suitable for the main exact algorithm is Phase 1 route-subproblem initialization parallelization.
+
+- Previous Phase 1 route SP initialization was serial inside `LShapeRelaxed::Initialize()`.
+- The useful change is to create each `GRBEnv` / `GRBModel` serially, then run `InitSubProblem()` with bounded parallelism.
+- Clean `tower_20` evidence: route SP initialization dropped from roughly `34-36s` to `5-6s` for 560 route subproblems.
+- Total runtime still has substantial master/SP solve variance, but the initialization improvement itself is real and does not change the mathematical algorithm.
+
+### 9.2 Decisions for the exact algorithm
+
+- Do not use partial SP evaluation in Phase 2. It becomes a delayed/incomplete separation heuristic, requires extra tuning and final full verification, and is harder to justify as the main exact algorithm.
+- Do not use nonzero MIPGap for Phase 2 SP MIPs. Exact SP separation is required for cut validity, UB evaluation, and clean convergence logic.
+- Do not force aggressive presolve as a default optimization. Experiments did not show stable speedup, and LP/Farkas-related paths make the policy harder to explain.
+- Do not prioritize MIP starts for Phase 2 SPs. A previous-round SP solution is feasible only for the previous `z`; after the master changes `z`, Gurobi may need to repair or discard the start, so expected benefit is uncertain.
+- Do not overlap Phase 2 master optimization with scenario-SP initialization as a main-line change. It may hide some init time, but it can also slow the master by competing for CPU, memory bandwidth, and Gurobi resources.
+
+### 9.3 RSP role
+
+Keep RSP as an algorithmic step. Its main role is not only speed: it handles the feasible-region gap between Phase 1 and Phase 2. Phase 1 uses a relaxed/aggregated representation, so a Phase 1 master solution may be infeasible for Phase 2 scenario MIPs. RSP can detect infeasibility before expensive SP MIP solves and generate feasibility cuts.
+
+Current checked logs mostly show RSP producing optimality cuts (`status=0`, `isOptCut=1`) rather than infeasibility cuts. This means the robustness role is not visible on the current data set, but it should remain in the algorithm and be explained briefly in the paper-stage narrative.
+
+### 9.4 Known issues and handling
+
+- Large `tower_40` scenario MIPs: earlier runs were dominated by scenarios with large route/global demand increases, which created very large row/column counts. The handling is to keep generated benchmark scenarios local and moderate rather than using global or half-global positive-demand cases.
+- Phase 1 checkpoint validity: checkpoint files are data-specific. After regenerating `data/tower_40_data`, old files under `debug/full_phase1/tower_40_data` must not be reused.
+- Phase 2 checkpoint debugging: keep `phase1.Initialize()` and only replace the slow `phase1.Solve()` path when debugging Phase 2. Directly skipping all Phase 1 initialization requires rebuilding too much Gurobi/model state by hand.
+- Negative reported gap: if `LB > UB` appears, first check whether master `z` values are rounded before subproblem evaluation, whether LB was updated after new cuts while UB still comes from an older incumbent, and whether master/subproblem MIPGap settings are inconsistent with the intended exact solve.
+
+No additional code-change TODO is carried from this debug pass. The remaining work is experiment execution according to the plan in Section 6.
