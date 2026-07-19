@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
             solver.SetAlgorithm(std::make_unique<LiftedTwoPhaseILS>(
                 WIRELESS_CAPACITY_REFORM, dataFolder, 5000));
         } else if (algLower == "full") {
-            solver.SetAlgorithm(std::make_unique<LShapeRelaxedStation>(
+            solver.SetAlgorithm(std::make_unique<FullMethod>(
                 WIRELESS_CAPACITY_REFORM, dataFolder, 5000));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;

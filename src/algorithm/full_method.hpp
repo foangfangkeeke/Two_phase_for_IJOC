@@ -15,16 +15,16 @@ struct ScenarioSubproblemInfo;
 ///   Phase 2: Reuses Phase 1 master model (with accumulated cuts),
 ///            replaces sub-problems with scenario MIPs (full charger capacity),
 ///            continues Benders iterations with one theta variable per scenario subproblem.
-class LShapeRelaxedStation : public IMILPAlgorithmStrategy {
+class FullMethod : public IMILPAlgorithmStrategy {
 public:
-    LShapeRelaxedStation(ProblemType problemType, std::string dataFolder = "test_data",
+    FullMethod(ProblemType problemType, std::string dataFolder = "test_data",
         int maxIters = 500, double tol = 1e-6);
     Status Initialize() override;
     Status Solve() override;
-    ~LShapeRelaxedStation() override;
+    ~FullMethod() override;
 
 private:
-    struct StationSubProblemState;
+    struct ScenarioSubProblemState;
 
     ProblemType problemType;
     std::string dataFolder;
@@ -45,7 +45,7 @@ private:
     ProblemData* problemData_ = nullptr;
 
     // Phase 2: scenario subproblems
-    std::vector<std::unique_ptr<StationSubProblemState>> subProblems_;
+    std::vector<std::unique_ptr<ScenarioSubProblemState>> subProblems_;
 
     // Benders state
     double globalLowerBound_ = 0.0;

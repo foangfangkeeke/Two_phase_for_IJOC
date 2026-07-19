@@ -74,7 +74,7 @@ bool MeetsOuterGap(double bestUpperBound, double bestLowerBound, const SolverCon
 
 } // namespace
 
-struct LShapeRelaxedStation::StationSubProblemState {
+struct FullMethod::ScenarioSubProblemState {
     int scenarioIndex = 0;
     ScenarioSubproblemInfo scenarioInfo;
     std::unique_ptr<ISubProblem_LShape> strategy;
@@ -83,13 +83,13 @@ struct LShapeRelaxedStation::StationSubProblemState {
     LShapeSubProblemContext context;
 };
 
-LShapeRelaxedStation::LShapeRelaxedStation(ProblemType problemType,
+FullMethod::FullMethod(ProblemType problemType,
     std::string dataFolder, int maxIters, double tol)
     : problemType(problemType), dataFolder(std::move(dataFolder)),
       maxIters(maxIters), tolerance(tol)
 {}
 
-Status LShapeRelaxedStation::Initialize()
+Status FullMethod::Initialize()
 {
     if (initialized) return OK;
 
@@ -169,7 +169,7 @@ Status LShapeRelaxedStation::Initialize()
                   << " routes=" << scenarioSubproblems[idx].routeIds.size()
                   << " EBs=" << scenarioSubproblems[idx].ebIndices.size() << std::endl;
 
-        auto sub = std::make_unique<StationSubProblemState>();
+        auto sub = std::make_unique<ScenarioSubProblemState>();
         sub->scenarioIndex = scenarioSubproblems[idx].scenarioIndex;
         sub->scenarioInfo = scenarioSubproblems[idx];
         sub->strategy = std::make_unique<WirelessScenarioSubProblem>();
@@ -224,7 +224,7 @@ Status LShapeRelaxedStation::Initialize()
     return OK;
 }
 
-Status LShapeRelaxedStation::Solve()
+Status FullMethod::Solve()
 {
     if (!initialized || !model_) {
         std::cerr << "Phase 2 not initialized" << std::endl;
@@ -307,7 +307,7 @@ Status LShapeRelaxedStation::Solve()
                 if (result.status != OK) return result.status;
 
                 if (!result.cutInfo.isOptimalityCut) {
-                    // Infeasible LP relaxation â†?feasibility cut + strengthened no-good
+                    // Infeasible LP relaxation ï¿½?feasibility cut + strengthened no-good
                     rspAnyInfeasible = true;
                     const std::string sig = MakeFeasibilityCutSignature(result.cutInfo);
                     if (addedFeasCuts.insert(sig).second) {
@@ -333,7 +333,7 @@ Status LShapeRelaxedStation::Solve()
                         ++feasCount;
                     }
                 } else {
-                    // Feasible LP â†?optimality cut on scenarioThetaVar
+                    // Feasible LP ï¿½?optimality cut on scenarioThetaVar
                     if (scenarioThetaVars_[idx].get(GRB_DoubleAttr_X) + tolerance < result.subObj) {
                         GRBLinExpr cutExpr;
                         double lhsAtCurrent;
@@ -539,4 +539,4 @@ Status LShapeRelaxedStation::Solve()
     return ERROR;
 }
 
-LShapeRelaxedStation::~LShapeRelaxedStation() = default;
+FullMethod::~FullMethod() = default;

@@ -17,7 +17,7 @@ public:
     ~LiftedILS() override;
 
 private:
-    struct StationSubProblemState;
+    struct ScenarioSubProblemState;
 
     struct CutEval {
         GRBLinExpr expr = 0.0;
@@ -45,7 +45,7 @@ private:
     std::shared_ptr<GRBModel> model;
     std::unique_ptr<ProblemData> problemData;
     std::unique_ptr<IDataInit_LShape> dataIniter;
-    std::vector<std::unique_ptr<StationSubProblemState>> subProblems;
+    std::vector<std::unique_ptr<ScenarioSubProblemState>> subProblems;
     std::vector<GRBVar> zVars;
     GRBVar theta;
     std::vector<GRBVar> scenarioThetaVars;

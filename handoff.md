@@ -190,7 +190,7 @@ Paper states: "All methods are given access to the same hardware. The solver use
 - [x] `no incumbent found` output.
 - [x] Phase 1/Phase 2 timing.
 - [~] Standardize log output across all five algorithms. (won't do — full is the final algorithm; ablation baselines are for comparison only)
-- [ ] Remove station-group terminology from code comments and logs.
+- [x] Remove station-group terminology from code comments and logs (class names: `LShapeRelaxedStation` → `FullMethod`, `StationSubProblemState` → `ScenarioSubProblemState`).
 
 ### Model consistency
 
@@ -246,4 +246,4 @@ Current checked logs mostly show RSP producing optimality cuts (`status=0`, `isO
 - Phase 2 checkpoint debugging: keep `phase1.Initialize()` and only replace the slow `phase1.Solve()` path when debugging Phase 2. Directly skipping all Phase 1 initialization requires rebuilding too much Gurobi/model state by hand.
 - Negative reported gap: if `LB > UB` appears, first check whether master `z` values are rounded before subproblem evaluation, whether LB was updated after new cuts while UB still comes from an older incumbent, and whether master/subproblem MIPGap settings are inconsistent with the intended exact solve.
 
-Experiment execution complete. Results: [experiment_results_2026-07-19.md](experiment_results_2026-07-19.md). Remaining work: station-group terminology cleanup (P1) and paper writing (P0).
+Experiment execution complete. Results: [experiment_results_2026-07-19.md](experiment_results_2026-07-19.md). Station-group terminology cleanup complete. Remaining work: paper writing (P0).

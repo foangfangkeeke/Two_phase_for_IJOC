@@ -17,7 +17,7 @@ public:
     ~LiftedTwoPhaseILS() override;
 
 private:
-    struct StationSubProblemState;
+    struct ScenarioSubProblemState;
 
     struct CutEval {
         GRBLinExpr expr = 0.0;
@@ -47,7 +47,7 @@ private:
     std::unique_ptr<ProblemData> problemDataOwned;
     ProblemData* problemData = nullptr;
     std::unique_ptr<IDataInit_LShape> dataIniter;
-    std::vector<std::unique_ptr<StationSubProblemState>> subProblems;
+    std::vector<std::unique_ptr<ScenarioSubProblemState>> subProblems;
     std::vector<GRBVar> zVars;
     GRBVar theta;
     std::vector<GRBVar> scenarioThetaVars;

@@ -69,7 +69,7 @@ SubProblemEvalResult EvaluateScenarioSubproblem(const ProblemData& problemData,
 
 } // namespace
 
-struct LiftedILS::StationSubProblemState {
+struct LiftedILS::ScenarioSubProblemState {
     int scenarioSubproblemId = 0;
     int scenarioIndex = 0;
     std::unique_ptr<ISubProblem_LShape> strategy;
@@ -144,7 +144,7 @@ Status LiftedILS::Initialize()
     for (size_t subIdx = 0; subIdx < scenarioSubproblems.size(); ++subIdx) {
         const ScenarioSubproblemInfo& scenarioInfo = scenarioSubproblems[subIdx];
 
-        auto sub = std::make_unique<StationSubProblemState>();
+        auto sub = std::make_unique<ScenarioSubProblemState>();
         sub->scenarioSubproblemId = scenarioInfo.scenarioSubproblemId;
         sub->scenarioIndex = scenarioInfo.scenarioIndex;
         sub->strategy = std::get<1>(it->second)();

@@ -73,7 +73,7 @@ SubProblemEvalResult EvaluateScenarioSubproblem(const ProblemData& problemData,
 
 } // namespace
 
-struct LiftedTwoPhaseILS::StationSubProblemState {
+struct LiftedTwoPhaseILS::ScenarioSubProblemState {
     int scenarioSubproblemId = 0;
     int scenarioIndex = 0;
     ScenarioSubproblemInfo scenarioInfo;
@@ -171,7 +171,7 @@ Status LiftedTwoPhaseILS::Initialize()
                   << " routes=" << scenarioSubproblems[idx].routeIds.size()
                   << " EBs=" << scenarioSubproblems[idx].ebIndices.size() << std::endl;
 
-        auto sub = std::make_unique<StationSubProblemState>();
+        auto sub = std::make_unique<ScenarioSubProblemState>();
         sub->scenarioIndex = scenarioSubproblems[idx].scenarioIndex;
         sub->scenarioInfo = scenarioSubproblems[idx];
         sub->strategy = std::make_unique<WirelessScenarioSubProblem>();
