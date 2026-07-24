@@ -1,4 +1,4 @@
-# Handoff
+﻿# Handoff
 
 For the full paper-facing methodology narrative and mathematical formulation, see [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md).
 
@@ -87,19 +87,19 @@ Codex/agent builds should not invoke `run.bat` by default. Use the validated dir
 cmd.exe /d /s /c "`"C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Auxiliary\Build\vcvars64.bat`" && cd /d C:\faq_work\Papers\Two_phase_wireless_charging_and_integer_lshape && cmake.exe -S . -B out/build/x64-ninja -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=cl.exe -DCMAKE_CXX_COMPILER=cl.exe && cmake.exe --build out/build/x64-ninja --config Release"
 ```
 
-Requires: Windows 11, MSVC 2022, CMake ≥ 3.20, Gurobi 12.0+. Output: `out/build/x64/Release/wireless.exe`.
+Requires: Windows 11, MSVC 2022, CMake ≥ 3.20, Gurobi 12.0+. Output: `out/wireless.exe`.
 
 ### 5.2 CLI commands
 
 ```bash
 # Baseline — original formulation (wireless.cpp)
-./wireless.exe --pb wireless --alg solver --data tower
-./wireless.exe --pb wireless --alg natural-ils --data tower
+./out/wireless.exe --pb wireless --alg solver --data tower
+./out/wireless.exe --pb wireless --alg natural-ils --data tower
 
 # Reformulated methods (wireless_reform.cpp)
-./wireless.exe --pb wireless_reform --alg lifted-ils --data tower
-./wireless.exe --pb wireless_reform --alg lifted-two-phase --data tower
-./wireless.exe --pb wireless_reform --alg full --data tower
+./out/wireless.exe --pb wireless_reform --alg lifted-ils --data tower
+./out/wireless.exe --pb wireless_reform --alg lifted-two-phase --data tower
+./out/wireless.exe --pb wireless_reform --alg full --data tower
 ```
 
 > Baseline methods (`solver`, `natural-ils`) run under `--pb wireless`. Reformulated methods (`lifted-ils`, `lifted-two-phase`, `full`) run under `--pb wireless_reform`.
@@ -140,7 +140,7 @@ Scenario-scale runs use the full Tower network and start from `tower_5`; the 3-s
 Notes:
 - `experiment.sh` starts Experiment 2 from `tower_5`, not `tower`, to avoid rerunning the Table 1 `tower` case.
 - An algorithm enters Experiment 2 only if it completed `tower` in Experiment 1.
-- The extensive-form solver may use a memory-conservative configuration for scenario-scale runs when the default configuration runs out of memory.
+- The extensive-form solver is not rerun with a special memory-conservative configuration in the final comparison; omitted scenario-scale cells follow the script's stop rule after smaller-scale failure/OOM.
 
 ### 6.3 Per-run output fields
 

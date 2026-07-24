@@ -1,4 +1,4 @@
-# Project Summary: Wireless Charging Facility Deployment and Adaptive Battery Configuration
+﻿# Project Summary: Wireless Charging Facility Deployment and Adaptive Battery Configuration
 
 For implementation status, CLI commands, and experiment execution details, see [handoff.md](handoff.md).
 
@@ -323,4 +323,4 @@ Target journal: **Transportation Research Part B (TRB)**. Experiment matrix comp
 ## 9. References
 
 - Laporte, G., & Louveaux, F. V. (1993). The integer L-shaped method for stochastic integer programs with complete recourse. *Operations Research Letters*, 13(3), 133–142.
-- [Add reference on partial Benders decomposition / partial decomposition]
+- Writing-stage literature task: add the closest reference stream on partial Benders decomposition / partial decomposition and clearly distinguish the present lifted two-phase integer L-shaped design.
