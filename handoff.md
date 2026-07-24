@@ -183,13 +183,13 @@ Paper states: "All methods are given access to the same hardware. The solver use
 - [x] `full` independent.
 - [x] Remove station-group decomposition from all Benders variants.
 - [x] Rename: `barp_s_integer_l_shaped` → `natural_ils`, `lshape_relaxed_station` → `full_method`, `lshape_station_cut` → `lshape_monotonicity_cut`.
-- [ ] Shared utilities limited to genuinely identical behavior.
+- [~] Shared utilities limited to genuinely identical behavior. (won't do — full is the final algorithm; ablation algorithms are reference-only)
 
 ### Terminology and output cleanup
 
 - [x] `no incumbent found` output.
 - [x] Phase 1/Phase 2 timing.
-- [ ] Standardize log output across all five algorithms.
+- [~] Standardize log output across all five algorithms. (won't do — full is the final algorithm; ablation baselines are for comparison only)
 - [ ] Remove station-group terminology from code comments and logs.
 
 ### Model consistency
@@ -208,10 +208,10 @@ Paper states: "All methods are given access to the same hardware. The solver use
 
 ### Experiment readiness
 
-- [ ] Stage 1 & Stage 2 execution.
-- [ ] `tower_10` config.
-- [ ] Standardized per-run output.
-- [ ] ≥3 runs per cell with spread reporting.
+- [~] Stage 1 (600s screening) — abandoned; Stage 2 (7200s main table) — completed.
+- [x] `tower_10` config.
+- [x] Standardized per-run output (full produces all required fields; ablation baselines output subset).
+- [~] ≥3 runs per cell with spread reporting. (won't do — current single-run results are treated as final)
 - [x] Benders master MIPGap fixed at 0; outer-loop LB via `ObjBound`; outer-loop convergence tolerance via `solverConfig.mipGap`.
 
 ## 9. Full-method implementation notes
@@ -246,4 +246,4 @@ Current checked logs mostly show RSP producing optimality cuts (`status=0`, `isO
 - Phase 2 checkpoint debugging: keep `phase1.Initialize()` and only replace the slow `phase1.Solve()` path when debugging Phase 2. Directly skipping all Phase 1 initialization requires rebuilding too much Gurobi/model state by hand.
 - Negative reported gap: if `LB > UB` appears, first check whether master `z` values are rounded before subproblem evaluation, whether LB was updated after new cuts while UB still comes from an older incumbent, and whether master/subproblem MIPGap settings are inconsistent with the intended exact solve.
 
-No additional code-change TODO is carried from this debug pass. The remaining work is experiment execution according to the plan in Section 6.
+Experiment execution complete. Results: [experiment_results_2026-07-19.md](experiment_results_2026-07-19.md). Remaining work: station-group terminology cleanup (P1) and paper writing (P0).

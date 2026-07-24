@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-EXE="./out/Release/wireless.exe"
+EXE="./out/wireless.exe"
 
 # algorithm config: name,problem_type
 ALGS=(

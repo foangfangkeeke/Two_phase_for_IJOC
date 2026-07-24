@@ -232,38 +232,29 @@ Natural ILS is a naive baseline（no LP pruning, no relaxed warm start）to keep
 
 ### 6.3 Main comparison and scalability
 
-The computational section should use two two-dimensional tables.
+The computational section uses two tables. ✓ = converged within mipGap (0.01%) tolerance. TL = 7200s time limit reached with a finite incumbent. OOM = Gurobi error 10001 (out of memory). — = not run (method failed at smaller instance scale).
 
 **Table 1. Network-scale ablation under three service-plan scenarios**
 
-| Instance | Solver | Natural ILS | Lifted ILS | Lifted Two-phase | Full |
-|----------|--------|-------------|------------|------------------|------|
-| `tower_small` | 5.37s | TL, 63.15% | TL, 52.60% | 0.44s | 0.36s |
-| `tower_medium` | 967.18s | - | - | 6.04s | 5.02s |
-| `tower` | OOM, 4.18% | - | - | 66.48s | 58.13s |
+| Instance | Solver | Natural ILS | Lifted ILS | Lifted Two-Phase | Full |
+|----------|:------:|:-----------:|:----------:|:----------------:|:----:|
+| `tower_small` | ✓ 4.0s | TL, 98.3% | TL, 80.0% | ✓ 0.3s | ✓ 0.4s |
+| `tower_medium` | TL, 0.28% | — | — | ✓ 26.2s | ✓ 21.6s |
+| `tower` | OOM, 0.27% | — | — | TL, 0.60% | ✓ 45.4s |
 
-Notes:
-- The table reports wall-clock time for converged runs. For non-converged runs, the final global gap is reported.
-- `-` indicates not run because the method failed to close the gap on a smaller instance within the time limit.
-- `TL` indicates time limit with a finite incumbent.
-- `OOM` indicates Gurobi error 10001 (out of memory) with a finite incumbent; the reported gap is based on the final incumbent and bound.
-- The `tower` row uses the corrected full-method log after the Phase-2 outer-gap check fix.
+Full raw data per run: see [experiment_results_2026-07-19.md](experiment_results_2026-07-19.md).
 
 **Table 2. Scenario-scale scalability on the full Tower network**
 
-| # Scenarios | Extensive-form Solver | Lifted Two-phase ILS | Full Method |
-|------------:|-----------------------|----------------------|-------------|
-| 3 | see Table 1 | see Table 1 | see Table 1 |
-| 5 |  |  |  |
-| 10 |  |  |  |
-| 20 |  |  |  |
-| 40 |  |  |  |
+| # Scenarios | Solver | Lifted Two-Phase | Full |
+|------------:|:------:|:----------------:|:----:|
+| 3 | OOM, 0.27% | TL, 0.60% | ✓ 45.4s |
+| 5 | — | — | ✓ 52.8s |
+| 10 | — | — | ✓ 126.6s |
+| 20 | — | — | ✓ 356.3s |
+| 40 | — | — | ✓ 1702.1s |
 
-Notes:
-- The 3-scenario row reuses the full-network results from Table 1.
-- For scenario-scale experiments, the extensive-form solver may use a memory-conservative configuration when the default configuration runs out of memory. The same wall-clock limit and hardware budget are retained.
-- A blank cell indicates that the run has not yet been completed.
-- Reported entries use the format `time` for converged runs and `status, gap` for non-converged runs with a finite incumbent.
+Full raw data per run: see [experiment_results_2026-07-19.md](experiment_results_2026-07-19.md).
 
 ### 6.4 Required output metrics
 
@@ -318,7 +309,7 @@ Plug-in/快充是既有外生补能机会，不是 master 中的选址或扩容�
 
 ## 8. Target journals and next paper tasks
 
-Transportation Research Part B, INFORMS Journal on Computing, or Transportation Science。先补齐实验矩阵，再请专家判断。
+Target journal: **Transportation Research Part B (TRB)**. Experiment matrix complete; results in [experiment_results_2026-07-19.md](experiment_results_2026-07-19.md).
 
 ### Key theoretical propositions
 
