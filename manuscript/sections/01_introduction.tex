@@ -1,0 +1,30 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Electrifying bus fleets requires coordinated decisions on charging infrastructure, battery capacity, and daily charging operations.
+Wireless charging technologies expand the set of feasible charging opportunities by allowing buses to charge at selected stops or road links during regular service.
+This creates a planning trade-off: more in-route wireless charging can reduce battery requirements and residual plug-in fast-charging needs, but installing such infrastructure is costly and must be robust to future service plans.
+
+The planning difficulty is amplified by service-plan uncertainty.
+Transit agencies may adjust routes, timetables, and duty assignments over a medium-term planning horizon, while embedded wireless facilities are shared physical investments that cannot be changed after the scenario is realized.
+Thus, a first-stage wireless charging layout must support multiple possible representative operating days.
+
+Wireless infrastructure also changes downstream operational coupling.
+After a service-plan scenario is realized, the operator chooses route-level battery capacities and charging schedules.
+SWC and DWC opportunities affect how much energy can be obtained during service, which in turn changes battery sizing and the residual demand for existing plug-in fast chargers.
+Because plug-in fast chargers are limited shared operational resources, residual fast-charging demand couples otherwise route-level recourse decisions.
+
+These features lead to a two-stage stochastic mixed-integer planning problem.
+The first stage selects shared wireless charging facilities, and the second stage contains scenario-dependent battery and charging-operation decisions.
+The recourse problem has discrete battery choices, operational charging decisions, and shared plug-in fast-charger capacity constraints, making the deterministic equivalent and a direct integer L-shaped decomposition computationally challenging.
+
+This paper develops an exact reformulation-enabled integer L-shaped method for this problem class.
+The three algorithmic contributions are nested rather than independent.
+First, we introduce an exact structure-exposing lifted reformulation that places scenario-dependent battery configuration variables in the master while preserving their scenario-adaptive role.
+Second, we use the lifted structure to build a nested scenario--route relaxation--verification decomposition: Phase 1 relaxes shared plug-in fast-charger capacity coupling and operational integrality to obtain route-level LP lower bounds, and Phase 2 restores the exact scenario-level mixed-integer operational recourse.
+Third, we derive joint-resource direction-selective monotonicity cuts that exploit the partial order induced by wireless facility additions and battery-capacity upgrades.
+The dependency chain is lifting, route-decomposable relaxation, exposed joint-resource order, and strengthened cuts.
+
+The computational study uses Tower-derived electric-bus planning instances as a realistic test bed for the algorithm.
+The experiments first give a compact planning interpretation, then evaluate the algorithm through network-scale ablation, scenario-count scalability, and capacity-coupling stress tests.
+The evidence is intended to show which components are necessary for scalability and how the method behaves when the Phase 1 relaxation becomes more or less aligned with the exact Phase 2 feasible region.

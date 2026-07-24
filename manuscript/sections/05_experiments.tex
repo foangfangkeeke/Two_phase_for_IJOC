@@ -1,0 +1,261 @@
+\section{Computational Results}
+\label{sec:experiments}
+
+% Section role:
+% Define the Tower-derived instance families, give one compact planning interpretation, and validate the algorithmic contribution through ablation and scalability tests.
+
+This section evaluates the proposed reformulation and solution method on Tower-derived wireless charging planning instances.
+The experiments use the bus network as a realistic source of shared stops, shared links, and route-level service plans, while the main purpose of the section is to validate algorithmic performance.
+
+\subsection{Experimental design and instance families}
+\label{subsec:experimental-setup}
+
+% Paragraph plan:
+% 1. Introduce the Tower-derived network as a realistic computational test bed.
+% 2. Define the scenario concept once.
+% 3. Define all main instance families and explain how each family maps to a later experiment.
+% 4. Summarize preprocessing and parameterization.
+% 5. Define the compared methods and solver protocol.
+
+The test instances are derived from the Tower Transit bus network in Singapore's Jurong area.
+The resulting data set provides a realistic spatial structure with shared stops, shared road links, and multiple routes that may use the same wireless charging infrastructure.
+We use these instances as a computational test bed rather than as a public benchmark.
+
+Each scenario represents an alternative medium-term service plan for the same physical network, not random same-day scheduling noise.
+Scenario-dependent data include the operated routes, bus duties, timetables, energy requirements, and charging opportunities induced by the corresponding service plan.
+The first-stage wireless charging facilities are shared across all scenarios, whereas battery and charging-operation decisions adapt after the service plan is realized.
+
+We use a compact instance code of the form \texttt{N-k}, where \texttt{N} indicates the network scale and $k$ indicates the number of service-plan scenarios.
+Specifically, \texttt{S}, \texttt{M}, \texttt{B}, and \texttt{L} denote the small, medium, base, and large Tower-derived networks, respectively.
+The capacity-coupling experiment appends \texttt{C}q to the base 10-scenario instance, where $q$ indexes the number of existing plug-in fast chargers.
+The network-scale family fixes the scenario count at three and varies the physical network scale.
+The scenario-count family fixes the base network and varies the number of service-plan scenarios.
+Motivated by the relaxation-verification structure in Section~\ref{subsec:two-phase-framework}, the capacity-coupling family varies plug-in fast-charger capacity on \texttt{B-10} to change how strongly residual fast-charging demand couples route-level recourse decisions.
+Table~\ref{tab:instance-families} summarizes the resulting instance families and their experimental roles.
+
+Travel times are computed from link distances using a nominal operating speed of 30 km/h and then rounded to the one-minute scheduling grid.\footnote{The one-minute lower bound avoids zero-duration movements on short links and absorbs acceleration, deceleration, signal delay, and station-approach time.}
+The remaining parameters specify battery costs, charging rates, charging efficiencies, electricity prices, facility costs, and state-of-charge limits.
+Table~\ref{tab:parameter-settings} reports the main parameter values used in the computational experiments.
+
+The benchmark ladder consists of five methods: the extensive-form solver, natural ILS, lifted ILS, lifted two-phase, and the full method.
+The extensive-form solver directly optimizes the deterministic equivalent.
+Natural ILS applies the classical integer L-shaped decomposition induced by the original two-stage model.
+Lifted ILS uses the lifted master representation without the two-phase relaxation.
+Lifted two-phase adds the Phase 1 lower-bounding and Phase 2 verification structure.
+The full method further adds the monotonicity-based strengthened cuts.
+
+% TODO: Add exact solver version, CPU, memory, thread count, time limit, and optimality tolerance.
+% TODO: Add compact size statistics for each instance family after the final data extraction.
+% TODO: Add exact statistics for \texttt{L-3}.
+% TODO: Add exact statistics for \texttt{B-10-C1} through \texttt{B-10-C5}.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.88\linewidth]{figures/study_case.png}
+    \caption{Spatial layout of the base Tower-derived network in the Jurong area.}
+    \label{fig:case-study-map}
+\end{figure}
+
+% TODO: Check why the high-frequency scenario has fewer buses than the base scenario in the current generated data.
+\begin{table}[htbp]
+\centering
+\small
+\caption{Main instance families and experimental use}
+\label{tab:instance-families}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lllll@{}}
+\toprule
+\textbf{Instance family} & \textbf{Data source or variant} & \textbf{Varied dimension} & \textbf{Primary use} & \textbf{Compared methods} \\
+\midrule
+\texttt{S-3}, \texttt{M-3}, \texttt{B-3}, \texttt{L-3} & \texttt{tower\_small}, \texttt{tower\_medium}, \texttt{tower}, \texttt{large} & Network scale, with three scenarios fixed & Network-scale ablation & Extensive form, natural ILS, lifted ILS, lifted two-phase, full method \\
+\texttt{B-}k, $k\in\{3,5,10,20,40\}$ & \texttt{tower}, \texttt{tower\_5}, \texttt{tower\_10}, \texttt{tower\_20}, \texttt{tower\_40} & Scenario count, with base network fixed & Scenario-count scalability & Extensive form, lifted two-phase, full method \\
+\texttt{B-10-C}q, $q\in\{1,2,3,4,5\}$ & Capacity variants of \texttt{tower\_10} & Existing plug-in fast-charger units, with base network and 10 scenarios fixed & Relaxation-gap stress test & Lifted two-phase, full method \\
+\bottomrule
+\multicolumn{5}{@{}l}{\footnotesize \texttt{B-3} is the representative base instance used for solution interpretation; larger $q$ indicates more existing plug-in fast-charger units.} \\
+\end{tabular}
+}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Parameter settings for the computational experiments}
+\label{tab:parameter-settings}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.16\linewidth}>{\raggedright\arraybackslash}p{0.30\linewidth}>{\raggedright\arraybackslash}p{0.18\linewidth}>{\raggedright\arraybackslash}p{0.28\linewidth}@{}}
+\toprule
+\textbf{Parameter} & \textbf{Description} & \textbf{Value} & \textbf{Source} \\
+\midrule
+\multicolumn{4}{@{}l}{\textit{Battery and state of charge}} \\
+$c^{\mathrm{bat}}$ & Daily-equivalent battery capacity cost & 0.148 USD/kWh/day & BloombergNEF price amortized over Wang et al. battery life \citep{bloombergnef_lithium-ion_2025,wang_reliable_2024} \\
+$\mathcal{K}_r$ & Candidate route-level battery options & 10-kWh increments within instance bounds & Case-data preprocessing \\
+$\underline{\rho},\overline{\rho}$ & Minimum and maximum state-of-charge fractions & 0.2, 0.8 & Wireless bus planning literature \citep{li_planning_2024} \\
+\addlinespace
+\multicolumn{4}{@{}l}{\textit{Charging operation}} \\
+$r^{\mathrm{F}}$ & Plug-in fast-charging rate & 2.5 kWh/min & \citet{najafi_integrated_2025} \\
+$r^{\mathrm{SWC}}$ & Stationary wireless charging rate & 1.0 kWh/min & \citet{wang_reliable_2024} \\
+$r^{\mathrm{DWC}}$ & Dynamic wireless charging rate & 1.0 kWh/min & \citet{wang_reliable_2024} \\
+$\eta^{\mathrm{F}}$ & Plug-in fast-charging efficiency & 0.90 & \citet{li_planning_2024} \\
+$\eta^{\mathrm{SWC}}$ & Stationary wireless charging efficiency & 0.85 & \citet{sun_optimizing_2024} \\
+$\eta^{\mathrm{DWC}}$ & Dynamic wireless charging efficiency & 0.80 & \citet{sun_optimizing_2024} \\
+$a_s$ & Existing plug-in charger units at each fast-charging location & 4 chargers & Case-study assumption \\
+\addlinespace
+\multicolumn{4}{@{}l}{\textit{Infrastructure and electricity cost}} \\
+$T^{\mathrm{fac}}$ & Facility amortization horizon & 30 years & \citet{wang_reliable_2024} \\
+$c^{\mathrm{fac}}_j$, $j\in\mathcal{J}^{\mathrm{SWC}}$ & Daily-equivalent cost of an SWC facility & 2.16 USD/day & \citet{wang_reliable_2024} \\
+$c^{\mathrm{fac}}_j$, $j\in\mathcal{J}^{\mathrm{DWC}}$ & Daily-equivalent cost of a DWC link of length $d_j$ km & $9d_j+0.90$ USD/day & \citet{wang_reliable_2024} \\
+$c^{\mathrm{day}}$ & Daytime electricity price & 0.1922 USD/kWh & Singapore tariff data \citep{singstat_electricity_2026} \\
+$c^{\mathrm{night}}$ & Nighttime electricity price & 0.1233 USD/kWh & Singapore tariff data \citep{singstat_electricity_2026} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\subsection{Solution characteristics on the base Tower instance}
+\label{subsec:solution-characteristics}
+
+% Paragraph plan:
+% 1. Present a compact solution-summary table for the representative full-method solution.
+% 2. Use selected stations or links to show shared infrastructure placement.
+% 3. State the planning take-away before moving to algorithmic performance.
+% TODO: Extract the representative solution table for \texttt{B-3}.
+% TODO: Identify several selected stops or links and record route-sharing counts.
+
+This subsection will use \texttt{B-3} as the representative planning solution.
+
+The solution-summary table will report selected SWC facilities, selected DWC links, cost components, objective value, and battery-capacity summaries.
+
+Representative selected stops or links will show that the model places wireless infrastructure on shared parts of the bus network.
+
+The planning interpretation is that the model recommends a network-level wireless charging layout under service-plan uncertainty rather than a single-day charging schedule.
+
+% Solution-summary and representative-facility tables to add after extracting the planning solution.
+
+\subsection{Network-scale algorithmic ablation}
+\label{subsec:network-scale-results}
+
+% Paragraph plan:
+% 1. Present the network-scale ablation table and define the five methods.
+% 2. State the main finding that only the full method completes the largest Tower instance.
+% 3. Use lifted two-phase versus full method to explain the mechanism.
+% 4. Add phase-level evidence if the phase breakdown cannot be explained cleanly in text.
+% TODO: Rerun the network-scale ablation under the final instance names and final algorithm settings.
+% TODO: Remove or rewrite framework-style subsection summary sentences in the final manuscript draft.
+
+The network-scale ablation compares five methods on \texttt{S-3}, \texttt{M-3}, \texttt{B-3}, and \texttt{L-3}.
+
+The largest reported instances are intended to show where direct optimization and simpler decomposition variants stop being computationally effective.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Network-scale ablation under three service-plan scenarios}
+\label{tab:network-ablation}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}llllll@{}}
+\toprule
+\textbf{Instance} & \textbf{Extensive form} & \textbf{Natural ILS} & \textbf{Lifted ILS} & \textbf{Lifted two-phase} & \textbf{Full method} \\
+\midrule
+\texttt{S-3} & Conv., 4.0s & TL, 98.3\% & TL, 80.0\% & Conv., 0.3s & Conv., 0.4s \\
+\texttt{M-3} & TL, 0.28\% & skipped & skipped & Conv., 26.2s & Conv., 21.6s \\
+\texttt{B-3} & OOM, 0.27\% & skipped & skipped & TL, 0.60\% & Conv., 45.4s \\
+\texttt{L-3} & TODO & skipped & skipped & TODO & TODO \\
+\bottomrule
+\multicolumn{6}{@{}l}{\footnotesize Conv. = converged within the $0.01\%$ tolerance; TL = 7200s time limit with incumbent;} \\
+\multicolumn{6}{@{}l}{\footnotesize OOM = Gurobi memory error 10001. Reported percentages are final relative gaps. Prior-run values are placeholders to be rerun.} \\
+\end{tabular}
+}
+\end{table}
+
+The mechanism contrast is that lifted two-phase still generates many weak verification cycles on \texttt{B-3}, whereas the strengthened full method converges quickly with only a few Phase 2 iterations.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Mechanism contrast on \texttt{B-3}}
+\label{tab:mechanism-contrast}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Method} & \textbf{Status} & \textbf{Gap (\%)} & \textbf{Time (s)} & \textbf{Iterations} \\
+\midrule
+Lifted two-phase & TL & 0.595 & 7211.8 & 548 \\
+Full method & Conv. & 0.010 & 45.4 & 9/3 \\
+\bottomrule
+\multicolumn{5}{@{}l}{\footnotesize Full-method iterations are reported as Phase 1/Phase 2 iterations.} \\
+\end{tabular}
+\end{table}
+
+The phase-level evidence supports the interpretation that the full method controls both first-stage bound improvement and second-stage mixed-integer verification.
+
+\subsection{Scenario-count scalability}
+\label{subsec:scenario-scale-results}
+
+% Paragraph plan:
+% 1. Use the scenario-count family defined in Section~\ref{subsec:experimental-setup}.
+% 2. Compare the extensive-form solver, lifted two-phase, and full method.
+% 3. Explain how scenario count affects total time, phase time, and iteration counts.
+% TODO: Rerun scenario-count scalability for the extensive-form solver, lifted two-phase, and full method under final settings.
+
+This subsection uses the \texttt{B-}k family, with $k\in\{3,5,10,20,40\}$, to test scenario-count scalability on the base Tower-derived network.
+The comparison is limited to the extensive-form solver, lifted two-phase, and full method because the simpler ILS variants already fail in the network-scale ablation.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Scenario-count scalability on the base Tower-derived network}
+\label{tab:scenario-scalability}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}llllrr@{}}
+\toprule
+\textbf{Instance} & \textbf{Extensive form} & \textbf{Lifted two-phase} & \textbf{Full method} & \textbf{Phase 1/2 (s)} & \textbf{Iters P1/P2} \\
+\midrule
+\texttt{B-3}  & OOM, 0.27\% & TL, 0.60\% & Conv., 45.4s & 29.7/15.7     & 9/3 \\
+\texttt{B-5}  & TODO & TODO & Conv., 52.8s & 36.3/16.5     & 6/3 \\
+\texttt{B-10} & TODO & TODO & Conv., 126.6s & 68.1/58.5     & 3/4 \\
+\texttt{B-20} & TODO & TODO & Conv., 356.3s & 145.6/210.7   & 9/4 \\
+\texttt{B-40} & TODO & TODO & Conv., 1702.1s & 447.3/1254.8  & 12/2 \\
+\bottomrule
+\multicolumn{6}{@{}l}{\footnotesize All entries are placeholders from prior runs and should be rerun under the final settings.} \\
+\end{tabular}
+}
+\end{table}
+
+The main diagnostic is how total time, Phase 1 time, Phase 2 time, and iteration counts change as more scenario-specific recourse problems are added to the same first-stage infrastructure plan.
+
+\subsection{Capacity-coupling and relaxation-gap experiment}
+\label{subsec:capacity-coupling-results}
+
+% Paragraph plan:
+% 1. Use the capacity-level stress-test family defined in Section~\ref{subsec:experimental-setup}.
+% 2. Explain how tighter charger capacity changes the gap between Phase 1 and Phase 2.
+% 3. Compare lifted two-phase and full method because they differ mainly in monotonicity strengthening.
+% TODO: Add results for \texttt{C1} through \texttt{C5}, all based on \texttt{B-10}.
+
+This subsection uses \texttt{B-10-C1} through \texttt{B-10-C5} to test the effect of shared plug-in fast-charger capacity on the relaxation-verification structure.
+Within this subsection, we denote these five variants by \texttt{C1}--\texttt{C5}; all five are built from \texttt{B-10}, and only the number of existing plug-in fast chargers is varied.
+This changes how residual fast-charging demand, after accounting for wireless charging opportunities and battery choices, couples the route-level recourse problems.
+The experiment is designed around the Phase 1 relaxation in Proposition~\ref{prop:phase-one-lb}, which removes shared plug-in fast-charger capacity coupling to obtain route-level LP subproblems.
+When capacity is tight, the Phase 1 relaxation is expected to be less aligned with Phase 2; when capacity is loose, the two feasible regions should be closer.
+The comparison is restricted to lifted two-phase and the full method because both use the same lifted reformulation, Phase 1 relaxation, and exact Phase 2 verification; the main difference is the monotonicity strengthening.
+The main computational question is how the relaxation gap and Phase 2 verification burden change with capacity, and whether monotonicity strengthening remains effective as capacity coupling becomes tighter.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Capacity-coupling and relaxation-gap stress test on \texttt{B-10}}
+\label{tab:capacity-coupling}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}llllrrrr@{}}
+\toprule
+\textbf{Instance} & \textbf{Lifted two-phase} & \textbf{Full method} & \textbf{Initial P2 gap} & \textbf{P1 time} & \textbf{P2 master time} & \textbf{Exact subproblem time} & \textbf{P1/P2 cuts} \\
+\midrule
+\texttt{C1} & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+\texttt{C2} & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+\texttt{C3} & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+\texttt{C4} & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+\texttt{C5} & TODO & TODO & TODO & TODO & TODO & TODO & TODO \\
+\bottomrule
+\multicolumn{8}{@{}l}{\footnotesize All entries are placeholders for the final capacity-coupling experiment.} \\
+\end{tabular}
+}
+\end{table}

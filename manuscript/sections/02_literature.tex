@@ -1,0 +1,47 @@
+\section{Literature Review}
+\label{sec:literature}
+
+This section reviews two streams of literature that are closest to this paper: electric-bus charging infrastructure planning and decomposition methods for stochastic mixed-integer planning.
+The first stream explains the application objects in our model: wireless charging facilities, battery choices, representative-day charging schedules, and shared plug-in fast chargers.
+The second stream explains the methodological background: stochastic facility location with scenario-dependent recourse and exact decomposition methods for mixed-integer recourse.
+The purpose is to identify the modeling and algorithmic structure that motivates our formulation and solution method, not to claim that either stream is inadequate in isolation.
+
+\subsection{Electric-bus charging infrastructure planning}
+\label{subsec:lit-wireless-bus}
+
+% TODO: Add verified citations for SWC/DWC planning, electric-bus battery sizing, plug-in charging scheduling, and route-level energy management.
+
+Electric-bus charging planning studies typically coordinate charging infrastructure, battery capacity, charging schedules, and service feasibility.
+Depot and plug-in fast-charging models emphasize limited charger availability and schedule feasibility, whereas wireless charging adds charging opportunities at stops or along roadway links.
+For our setting, this stream motivates the coexistence of wireless facilities and existing plug-in fast chargers, but the detailed real-time dispatch or charging-control layer is outside the scope of the paper.
+
+Wireless charging infrastructure planning differs from conventional plug-in charger placement because installing stationary wireless charging at stops or dynamic wireless charging along links changes the energy available during route execution.
+These in-route charging opportunities affect the battery capacity required by each route and the residual plug-in fast-charging demand after the wireless deployment plan is fixed.
+Thus, the application side of our model is not only where to deploy wireless facilities, but how those strategic facilities alter route-level tactical recourse under future service plans.
+
+The closest transportation studies provide useful modeling ingredients, but they usually focus on deterministic planning, operational scheduling, or a fixed set of service conditions.
+Our paper uses this stream to define the application logic: a transit agency makes strategic wireless-facility decisions before service-plan uncertainty is realized, and then adapts battery and representative-day charging decisions after each scenario is observed.
+
+\subsection{Stochastic mixed-integer planning and decomposition methods}
+\label{subsec:lit-stochastic-decomposition}
+
+% TODO: Add verified citations for stochastic facility location and stochastic network design.
+% TODO: Add verified citations for integer L-shaped methods and mixed-integer recourse.
+% TODO: Add verified citations for partial Benders or lifted master reformulations.
+% TODO: Add verified citations for relaxation-based recourse switching and Benders subproblem decomposition.
+% TODO: Add verified citations for logic-based, combinatorial, and monotonicity-based Benders cuts.
+
+Facility location and network design studies provide the basic structure for shared strategic infrastructure decisions over a network.
+Stochastic versions extend this structure by letting demand, service plans, or operating conditions vary across scenarios, which leads to here-and-now facility decisions and scenario-dependent recourse.
+This is the methodological abstraction of our wireless charging planning problem.
+
+When second-stage recourse contains integer decisions and shared resource constraints, the deterministic equivalent can become large and computationally weak.
+Benders decomposition, integer L-shaped methods, and logic-based Benders methods separate first-stage decisions from recourse evaluation and generate cuts that approximate or enforce scenario value functions.
+These methods provide the baseline algorithmic language for the paper.
+
+Prior decomposition work also contains several ideas that are related to our method, including keeping selected recourse structure in the master, switching between relaxed and exact recourse evaluations, decomposing subproblems internally, and using logic-based or monotonicity-based cuts.
+We therefore position the contribution at the intersection of these ideas rather than claiming that any one broad idea is new.
+The specific structure here is scenario-adaptive battery lifting, selective relaxation of shared plug-in fast-charger capacity coupling, exact route-additive LP decomposition, and joint facility--battery directional cuts.
+
+In this sense, the paper connects the application stream to the stochastic facility-location stream through a shared-resource mixed-integer recourse structure.
+The literature review does not claim that either stream is incomplete on its own; it identifies the intersection where a tailored exact decomposition method is useful.

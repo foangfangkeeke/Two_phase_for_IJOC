@@ -14,8 +14,8 @@ It is a planning file, not final manuscript text.
 
 - Section 1, `Introduction`: motivate shared wireless charging deployment under service-plan uncertainty, state the optimization difficulty, and list algorithmic contributions.
 - Section 2, `Literature Review`: position the work through two streams: electric-bus charging infrastructure planning and facility location under uncertainty with decomposition methods.
-- Section 3, `Problem Description and Formulation`: define the original two-stage stochastic extensive-form MILP only.
-- Section 4, `Reformulation and Solution Method`: develop the natural baseline, lifted reformulation, two-phase relaxation-verification method, monotonicity-based cuts, and convergence.
+- Section 3, `Problem Formulation and Natural Decomposition`: define the original two-stage stochastic extensive-form MILP, the natural integer L-shaped decomposition, and the main limitation of that natural baseline.
+- Section 4, `Reformulation-Enabled Integer L-Shaped Method`: develop the paper's method contributions: lifted reformulation, route-decomposable relaxation-verification, monotonicity-based strengthened cuts, and convergence.
 - Section 5, `Computational Results`: define the common Tower-derived test bed, show one compact planning interpretation, and validate algorithmic performance through ablation, scenario scaling, and relaxation-gap stress tests.
 - Section 6, `Conclusion`: summarize the model, method, computational evidence, limitations, and extensions.
 
@@ -24,8 +24,8 @@ It is a planning file, not final manuscript text.
 - The introduction should use wireless bus charging as the motivating application, then move quickly through this chain: SWC/DWC deployment affects in-route charging opportunities, these opportunities affect battery sizing and residual plug-in fast-charging demand, and residual fast-charging demand creates shared plug-in fast-charger capacity coupling in the second-stage recourse.
 - The literature review should keep two streams aligned: the application-side charging-infrastructure planning stream, and the method-side stochastic facility-location/decomposition stream.
 - Do not use a literature comparison table by default; add one only if advisor feedback or target-journal positioning requires it.
-- Section 3 should translate the application into the two-stage extensive-form model and should not introduce algorithm variants beyond the direct-solver baseline.
-- Section 4 should carry the algorithmic contribution as a chain: lifted master exposes battery choices, Phase 1 relaxes shared plug-in fast-charger capacity coupling to generate route-level LP lower bounds, Phase 2 restores exact mixed-integer verification, and monotonicity-based cuts strengthen the full loop.
+- Section 3 should translate the application into the two-stage extensive-form model and introduce natural integer L-shaped decomposition as the classical decomposition induced by the information structure.
+- Section 4 should start from the paper's method contributions rather than from natural ILS: lifted master exposes scenario-adaptive battery choices, Phase 1 relaxes shared plug-in fast-charger capacity coupling and operational integrality to generate route-level LP lower bounds, Phase 2 restores exact mixed-integer verification, and monotonicity-based cuts strengthen both separation phases when valid for exact recourse.
 - Section 5 should use the application as a realistic computational test bed, not as a TRB-style standalone case-study narrative.
 - The conclusion should restate both sides of the story: the application motivates the shared-resource stochastic MIP, and the method is intended to generalize beyond the wireless bus case.
 
@@ -42,7 +42,7 @@ It is a planning file, not final manuscript text.
 
 ## Section 3 Reset Plan
 
-`3 Problem Description and Formulation`
+`3 Problem Formulation and Natural Decomposition`
 
 - Opening paragraphs
   - State the wireless charging planning story only to the extent needed for the model.
@@ -53,12 +53,17 @@ It is a planning file, not final manuscript text.
   - Define scenario-dependent battery variables `z_omega` and operational variables `y_omega`.
   - State that existing plug-in/fast chargers are exogenous operating resources.
   - Present the notation table.
-- `3.2 Extensive-form deterministic equivalent`
+- `3.2 Two-stage extensive-form formulation`
   - Present the objective.
   - Present battery-selection and battery-size constraints.
   - Present core operational feasibility constraints.
   - Present variable domains and close by identifying the extensive form as the direct-solver baseline.
-  - End with a short transition to the decomposition and reformulation methods in Section 4, without introducing natural ILS details.
+  - Identify the extensive form as the direct-solver baseline.
+- `3.3 Natural integer L-shaped baseline`
+  - Define the natural master with only first-stage facility variables and scenario recourse estimators.
+  - Define `Phi_omega(w)` as the natural recourse value that jointly optimizes scenario battery configuration and operations.
+  - State the limitation: the scenario subproblem still contains battery-selection integrality, operational integrality, and shared plug-in fast-charger capacity coupling.
+  - Transition to Section 4 as a reformulation-enabled improvement over this baseline.
 
 Open work:
 
@@ -68,24 +73,32 @@ Open work:
 
 ## Section 4 Reset Plan
 
-`4 Reformulation and Solution Method`
+`4 Reformulation-Enabled Integer L-Shaped Method`
 
-- `4.1 Natural integer L-shaped baseline`
-  - Define direct solver and natural ILS as baselines.
-  - Define `SP_omega(w)`.
-  - State the limitation: recourse still jointly contains battery-selection and operational-scheduling integrality.
-- `4.2 Lifted master reformulation`
+- Contribution 1: exact structure-exposing lifted reformulation.
+  - Lift scenario-dependent battery variables into the master without imposing cross-scenario nonanticipativity.
+  - The contribution is not generic variable movement; it isolates remaining operational recourse and exposes facility-battery resource structure.
+- Contribution 2: nested scenario-route relaxation-verification decomposition.
+  - Phase 1 relaxes shared plug-in fast-charger capacity coupling and operational integrality.
+  - The relaxed scenario recourse decomposes exactly into route-level LP subproblems.
+  - Route-level dual information is aggregated into scenario-level lower-bounding cuts valid for exact recourse because `Q^R_omega(w,z_omega) <= Q_omega(w,z_omega)`.
+  - Phase 2 restores the exact scenario-level operational MIP.
+- Contribution 3: joint-resource direction-selective monotonicity cuts.
+  - Use the partial order induced by adding wireless facilities and upgrading route batteries.
+  - Strengthened feasibility and optimality cuts cover dominated configurations.
+  - Do not claim monotonicity, logic cuts, or combinatorial cuts are new in general.
+- `4.1 Lifted master reformulation`
   - Lift scenario-dependent battery variables into the master without imposing nonanticipativity on them.
   - Define `Q_omega(w,z_omega)` and the lifted master.
   - State exact equivalence to the extensive form when operational value functions are represented exactly.
-- `4.3 Two-phase relaxation-verification framework`
+- `4.2 Two-phase relaxation-verification framework`
   - Narrative chain: exact operational recourse still couples routes through existing plug-in fast-charger capacity -> Phase 1 relaxes this coupling and operational integrality -> route-level LP subproblems provide valid lower bounds and LP-dual cuts -> Phase 2 restores exact mixed-integer operational verification -> a converged Phase 2 loop restores equivalence to the lifted/natural/extensive formulations.
-- `4.4 Monotonicity-based logic Benders cuts`
+- `4.3 Monotonicity-based strengthened cuts`
   - State monotone feasibility and operating-cost condition.
   - Define the direction-selective indicator.
   - State and prove strengthened feasibility and optimality cuts.
   - Explain that these cuts are the main distinction between lifted two-phase and the full method.
-- `4.5 Complete solution procedure`
+- `4.4 Complete solution procedure`
   - Present pseudocode.
   - State stopping rules.
   - State finite convergence under exact master and exact Phase 2 separation.
@@ -93,6 +106,7 @@ Open work:
 Open work:
 
 - Decide whether Phase 1 Farkas feasibility cuts are implemented and should be stated.
+- RSP is retained only as an optional experimental enhancement and will be reconsidered after the capacity-coupling experiments reveal whether exact subproblem evaluation becomes a computational bottleneck.
 - Move any long proof details to `appendices/appendix_proofs.tex`.
 - Keep implementation-tolerance language separate from exact convergence theory.
 
@@ -130,7 +144,8 @@ Open work:
   - Within Section 5.5, abbreviate these variants as `C1` through `C5` after stating that all are based on `B-10`.
   - Vary the number of existing plug-in fast chargers to change how binding the relaxed capacity-coupling constraints are.
   - Use this variation as an empirical stress test for the Phase 1--Phase 2 relaxation gap defined in the method section.
-  - Use the full method to test whether the algorithm remains effective as capacity coupling becomes tighter.
+  - Compare lifted two-phase and full method because both use the same lifted reformulation, Phase 1 relaxation, and exact Phase 2 verification; the main difference is monotonicity strengthening.
+  - Test whether strengthened cuts reduce Phase 2 verification burden as capacity coupling becomes tighter.
 
 Open work:
 
@@ -163,5 +178,5 @@ Open work:
 - [ ] Section 5.3: table notes for Conv., TL, OOM, gaps, and skipped-case logic.
 - [ ] Section 5.3: mechanism contrast between lifted two-phase and full method on `B-3`.
 - [ ] Section 5.4: scenario-count scalability table for direct solver, lifted two-phase, and full method where available.
-- [ ] Section 5.5: capacity-coupling table for `C1` through `C5`, all based on `B-10`.
+- [ ] Section 5.5: capacity-coupling table for lifted two-phase and full method on `C1` through `C5`, all based on `B-10`.
 - [ ] Appendix: reproducibility details and additional logs if the main text becomes crowded.

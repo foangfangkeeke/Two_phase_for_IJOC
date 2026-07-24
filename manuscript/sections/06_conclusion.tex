@@ -1,0 +1,19 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper studies a two-stage wireless charging facility-location problem for electric-bus systems under service-plan uncertainty.
+The model treats SWC and DWC deployment as strategic here-and-now decisions, while route-level battery selection and representative-day charging operations adapt after each service-plan scenario is realized.
+The resulting recourse structure captures how wireless charging opportunities affect battery requirements and residual demand for limited shared plug-in fast chargers.
+
+The main methodological contribution is an exact decomposition framework for this shared-resource mixed-integer recourse structure.
+The method uses an exact lifted reformulation that keeps scenario-dependent battery choices adaptive, a nested scenario--route relaxation--verification decomposition, and joint-resource direction-selective monotonicity cuts.
+Phase 1 route-level LP relaxations obtain valid lower bounds and cuts, Phase 2 restores exact mixed-integer operational verification, and the strengthened full method applies monotonicity cuts where they are valid for exact recourse.
+Under exact master and recourse separation, the complete procedure converges to an optimal solution of the original two-stage formulation.
+
+The computational study is designed to show how each algorithmic component contributes to scalability.
+The base planning instance illustrates the type of wireless facility layout and adaptive battery decisions produced by the model.
+The ablation, scenario-scaling, and capacity-coupling experiments then evaluate when the direct solver and simpler decomposition variants become insufficient and when the full method remains effective.
+
+Several limitations define natural extensions.
+The current experiments use constructed service-plan scenarios, treat plug-in fast-charging infrastructure as exogenous, and do not endogenize the feedback from battery weight to route-level energy consumption.
+Future work can develop richer scenario-generation models, jointly optimize wireless and plug-in charging expansion, incorporate operational uncertainty, and apply the lifted two-phase decomposition idea to other stochastic infrastructure-planning problems with shared-resource recourse.

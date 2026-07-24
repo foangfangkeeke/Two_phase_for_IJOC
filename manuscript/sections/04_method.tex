@@ -1,0 +1,268 @@
+\section{Reformulation-Enabled Integer L-Shaped Method}
+\label{sec:method}
+
+This section develops the proposed method, starting from the lifted reformulation rather than from the natural decomposition baseline.
+The method has three linked components: an exact structure-exposing lifted reformulation, a nested scenario--route relaxation--verification decomposition, and joint-resource direction-selective monotonicity cuts.
+The notation in this section separates master decisions from scenario operating evaluations.
+Let $\mathcal{Q}_\omega(w,z_\omega)$ denote the exact operational feasible set after the battery configuration is fixed, and let $Q_\omega(w,z_\omega)$ denote the corresponding exact operational recourse value.
+Let $\mathcal{Q}^R_\omega(w,z_\omega)$ and $Q^R_\omega(w,z_\omega)$ denote the Phase 1 relaxation.
+The variable $\theta_\omega$ is the master approximation of $Q_\omega(w,z_\omega)$, and $\mathcal{L}_\omega$ is the current set of valid lower-bounding cuts for scenario $\omega$.
+
+\subsection{Lifted master reformulation}
+\label{subsec:lifted-reformulation}
+
+The natural integer L-shaped formulation in Section~\ref{sec:model} keeps only the facility vector $w$ in the master and evaluates each scenario through the battery-and-operation recourse value $\Phi_\omega(w)$.
+The lifted reformulation moves the scenario-level battery variables $z_\omega$ into the master so that the master decides the facility layout and the battery configuration together.
+
+For fixed $(w,z_\omega)$, the exact operational recourse value is
+\begin{equation}
+    Q_\omega(w,z_\omega)
+    =
+    \min_{y_\omega}
+    \left\{
+    C^{\mathrm{op}}_\omega(y_\omega)
+    :
+    y_\omega \in \mathcal{Q}_\omega(w,z_\omega)
+    \right\}.
+    \label{eq:operational-recourse}
+\end{equation}
+The scenario value from Section~\ref{sec:model} can then be written as
+\begin{equation}
+    \Phi_\omega(w)
+    =
+    \min_{z_\omega}
+    \left\{
+    C^{\mathrm{bat}}_\omega(z_\omega)
+    +
+    Q_\omega(w,z_\omega)
+    :
+    z_\omega \in \mathcal{Z}_\omega
+    \right\}.
+    \label{eq:lifted-scenario-value}
+\end{equation}
+
+The lifted master is
+\begin{align}
+    \min_{w,z,\theta} \quad
+        & C^{\mathrm{fac}}(w)
+        + \sum_{\omega \in \Omega} p_\omega
+        \left[
+            C^{\mathrm{bat}}_\omega(z_\omega) + \theta_\omega
+        \right]
+        \label{eq:master-obj} \\
+    \mathrm{s.t.} \quad
+        & z_\omega \in \mathcal{Z}_\omega,
+        && \omega \in \Omega,
+        \label{eq:master-z-domain} \\
+        & \theta_\omega \geq \ell, && \omega \in \Omega,\ \ell \in \mathcal{L}_\omega,
+        \label{eq:benders-cuts} \\
+        & w_j \in \{0,1\},
+        && j \in \mathcal{J},
+        \label{eq:master-w-domain} \\
+        & z_{\omega r k} \in \{0,1\},
+        && \omega \in \Omega,\ r \in \mathcal{R}_\omega,\ k \in \mathcal{K}_r.
+        \label{eq:binary-decisions}
+\end{align}
+Here $\mathcal{Z}_\omega$ is the battery-choice feasible set from Section~\ref{sec:model}.
+
+\begin{proposition}[Exactness of the lifted master reformulation]
+\label{prop:equivalence}
+The lifted master reformulation is equivalent to the natural integer L-shaped formulation in Section~\ref{sec:model}.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+For any feasible solution of the natural formulation, the same $(w,z_\omega)$ pair is feasible in the lifted master, and the exact operational value $Q_\omega(w,z_\omega)$ is unchanged.
+Conversely, every feasible lifted solution induces the same $(w,z_\omega)$ configuration and the same objective value in the natural formulation because $z_\omega$ remains scenario dependent and has no cross-scenario nonanticipativity.
+\qedhere
+\end{proof}
+
+This reformulation only changes the layer at which $z_\omega$ is optimized.
+It does not impose cross-scenario nonanticipativity on $z_\omega$ and does not claim novelty from moving recourse variables in general.
+Its role is to isolate the remaining operational recourse and expose the facility--battery resource structure used by the Phase 1 decomposition and monotonicity cuts.
+
+\subsection{Two-phase lower bounding and exact verification}
+\label{subsec:two-phase-framework}
+
+Given $(w,z_\omega)$, the exact operational subproblem remains difficult because it still contains shared plug-in fast-charger capacity constraints and binary operational decisions.
+The two-phase scheme separates lower-bound generation from exact verification.
+
+\subsubsection{Phase 1: route-level LP relaxation}
+\label{subsec:phase-one}
+
+Phase 1 relaxes shared plug-in fast-charger capacity coupling and operational integrality in the exact operational subproblem.
+As a result, the remaining model decomposes by route and yields smaller LP subproblems whose dual solutions generate lower-bound cuts.
+The closer the Phase 1 relaxation is to the Phase 2 feasible region, the tighter these lower bounds can be.
+This Phase 1--Phase 2 gap is driven by how binding the relaxed constraints are; in the wireless charging application, the key relaxed coupling is the capacity of existing plug-in fast chargers that serve residual fast-charging demand after wireless charging opportunities and battery choices are fixed.
+
+\begin{proposition}[Phase 1 relaxation and decomposition]
+\label{prop:phase-one-lb}
+For any fixed master solution $(w,z_\omega)$, the Phase 1 relaxation satisfies
+\begin{equation}
+    Q^R_\omega(w,z_\omega) \leq Q_\omega(w,z_\omega).
+    \label{eq:phase-one-lb}
+\end{equation}
+Moreover, the Phase 1 relaxation decomposes exactly into independent route-level LP subproblems:
+\begin{equation}
+    Q^R_\omega(w,z_\omega)
+    =
+    \sum_{r \in \mathcal{R}_\omega} Q^R_{\omega r}(w,z_{\omega r}).
+    \label{eq:phase-one-decomposition}
+\end{equation}
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+Phase 1 removes constraints and integrality requirements from the exact operational subproblem, so its feasible region contains the exact feasible region and its minimization value is no larger.
+After the shared plug-in fast-charger capacity coupling is relaxed, the remaining route-specific constraints and objective terms separate by route, which gives the additive decomposition.
+\qedhere
+\end{proof}
+
+Any LP-dual lower-bounding cut generated from Phase 1 is therefore valid for the exact operational value.
+For a violated route-level LP relaxation, a representative cut can be written as
+\begin{equation}
+    \theta_\omega
+    \geq
+    \alpha_\omega
+    + \sum_{j \in \mathcal{J}} \pi_{\omega j} w_j
+    + \sum_{r \in \mathcal{R}_\omega}
+      \sum_{k \in \mathcal{K}_r}
+      \lambda_{\omega r k} z_{\omega r k},
+    \label{eq:phase-one-dual-cut}
+\end{equation}
+where the coefficients are obtained from the Phase 1 LP dual.
+
+\subsubsection{Phase 2: mixed-integer verification}
+\label{subsec:phase-two}
+
+Phase 2 restores the exact operational MIP for fixed $(w,z_\omega)$.
+It produces exact feasibility judgments, exact operational costs, and incumbent upper bounds:
+\begin{equation}
+    UB =
+    C^{\mathrm{fac}}(w)
+    + \sum_{\omega \in \Omega} p_\omega
+    \left[
+        C^{\mathrm{bat}}_\omega(z_\omega)
+        + Q_\omega(w,z_\omega)
+    \right].
+    \label{eq:upper-bound}
+\end{equation}
+Because Phase 2 evaluates the same exact operational subproblem that appears in the lifted formulation, it preserves the exactness of the model.
+
+\subsection{Monotonicity-based strengthened cuts}
+\label{subsec:strengthened-cuts}
+
+The full method strengthens both the relaxed and exact separation loops whenever the corresponding monotonicity-based cut is valid for the exact recourse function.
+The key structure is the joint partial order induced by wireless facility additions and route-level battery-capacity upgrades.
+
+\begin{assumption}[Monotone feasibility and operating cost]
+\label{ass:monotonicity}
+For a fixed service-plan scenario, opening additional wireless facilities or selecting weakly larger battery capacities cannot remove any operational schedule that was previously feasible.
+Moreover, these changes cannot increase the optimal operational recourse value $Q_\omega(w,z_\omega)$.
+\end{assumption}
+
+Assume that the battery options for each route are indexed in nondecreasing capacity order.
+Consider a Phase 2 solution $(w^*,z^*_\omega)$ for scenario $\omega$, and let $k^*_{\omega r}$ be the selected battery-capacity option for route $r$ in this solution.
+Define
+\begin{equation}
+    I_\omega(w,z_\omega;w^*,z^*_\omega)
+    =
+    \sum_{j: w^*_j=0} w_j
+    +
+    \sum_{r \in \mathcal{R}_\omega}
+    \sum_{k \in \mathcal{K}_r: k > k^*_{\omega r}}
+    z_{\omega r k}.
+    \label{eq:monotone-indicator}
+\end{equation}
+The indicator is zero when a candidate opens no additional facility and upgrades no route battery relative to $(w^*,z^*_\omega)$.
+
+\begin{proposition}[Strengthened feasibility cut]
+\label{prop:strengthened-feasibility}
+Suppose Assumption~\ref{ass:monotonicity} holds and the Phase 2 operational subproblem for scenario $\omega$ is infeasible at $(w^*,z^*_\omega)$.
+Then
+\begin{equation}
+    I_\omega(w,z_\omega;w^*,z^*_\omega) \geq 1
+    \label{eq:strengthened-feasibility-cut}
+\end{equation}
+is a valid feasibility cut.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+Any solution with zero indicator is dominated by the infeasible configuration and cannot restore feasibility by monotonicity.
+\qedhere
+\end{proof}
+
+\begin{proposition}[Strengthened optimality cut]
+\label{prop:strengthened-optimality}
+Suppose Assumption~\ref{ass:monotonicity} holds and the Phase 2 operational subproblem for scenario $\omega$ is feasible at $(w^*,z^*_\omega)$ with value $Q^*_\omega$.
+Let $L_\omega$ be any global lower bound satisfying $L_\omega \leq Q_\omega(w,z_\omega)$ for every master-feasible $(w,z_\omega)$, and define $\delta_\omega = Q^*_\omega - L_\omega \geq 0$.
+Then
+\begin{equation}
+    \theta_\omega
+    \geq
+    Q^*_\omega
+    -
+    \delta_\omega
+    I_\omega(w,z_\omega;w^*,z^*_\omega)
+    \label{eq:strengthened-optimality-cut}
+\end{equation}
+is a valid optimality cut.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+For zero indicator, monotonicity gives the bound $Q^*_\omega$.
+For positive indicator, the right-hand side relaxes to no more than the global lower bound $L_\omega$.
+\qedhere
+\end{proof}
+
+These cuts strengthen the lifted master without changing the underlying exact problem.
+They are not meant to claim that monotonicity or logic-based Benders cuts are new in general; the contribution is the direction-selective cut structure for the joint facility--battery order.
+
+\subsection{Complete solution procedure}
+\label{subsec:complete-procedure}
+
+Algorithm~\ref{alg:full-method} summarizes the full enhanced integer L-shaped method.
+
+\begin{algorithm}[htbp]
+\caption{Enhanced integer L-shaped method}
+\label{alg:full-method}
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output}
+\Input{Scenario data, candidate wireless facilities, candidate battery-capacity options, tolerance $\varepsilon$, time limit $T$}
+\Output{Facility layout $w$, scenario battery configurations $z$, incumbent upper bound, and final lower bound}
+
+\BlankLine
+Initialize the lifted master with battery-selection constraints and trivial recourse lower bounds\;
+\BlankLine
+\tcp{Phase 1: route-level LP lower-bounding separation}
+\Repeat{no violated Phase 1 cut is found or the time limit is reached}{
+    Solve the lifted master\;
+    Solve route-level LP relaxations for each scenario at the current $(w,z_\omega)$\;
+    Add LP-dual lower-bound cuts and relaxation feasibility cuts\;
+    Add monotonicity-based lower-bounding cuts that are valid for exact recourse\;
+}
+\BlankLine
+\tcp{Phase 2: exact mixed-integer verification}
+\Repeat{the incumbent gap is at most $\varepsilon$ or the time limit is reached}{
+    Solve the lifted master\;
+    Solve exact operational MIP subproblems for each scenario at the current $(w,z_\omega)$\;
+    Add monotonicity-based feasibility or optimality cuts when violated\;
+    Update the incumbent upper bound if all scenarios are feasible\;
+}
+\Return{Best incumbent and final lower bound}\;
+\end{algorithm}
+
+The implementation terminates when the incumbent gap reaches the prescribed tolerance or the time limit is reached.
+This stopping rule is distinct from the exact finite-convergence statement below.
+
+\begin{theorem}[Finite convergence]
+\label{thm:finite-convergence}
+Assume that the lifted master is solved exactly at each iteration, Phase 2 scenario subproblems are solved exactly, and all added feasibility and optimality cuts are valid.
+Then the exact Phase 2 separation loop terminates finitely with an optimal solution of the lifted reformulation and hence of the natural integer L-shaped formulation.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The lifted master has finitely many binary facility and battery configurations.
+Valid feasibility cuts exclude infeasible configurations.
+Valid optimality cuts correct feasible configurations whose exact recourse value is underestimated by the master.
+Thus the same unresolved configuration cannot recur indefinitely under exact separation, and Proposition~\ref{prop:equivalence} transfers convergence to the natural integer L-shaped formulation.
+\qedhere
+\end{proof}
