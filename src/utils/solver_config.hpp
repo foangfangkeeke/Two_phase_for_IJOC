@@ -6,7 +6,7 @@ struct SolverConfig {
     int presolve = -1;
     int mipFocus = 0;
     double heuristics = 0.05;
-    int threads = 14;
+    int threads = 12;
     int method = -1;
 };
 

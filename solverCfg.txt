@@ -1,7 +1,7 @@
 # Solver configuration
 mipGap=0.0001
 timeLimit=7200
-threads=14
+threads=12
 
 # Gurobi default
 presolve=-1

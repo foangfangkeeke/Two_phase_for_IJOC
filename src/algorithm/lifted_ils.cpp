@@ -120,7 +120,7 @@ Status LiftedILS::Initialize()
     model->set(GRB_DoubleParam_MIPGap, 0.0);
     model->set(GRB_IntParam_Presolve, solverConfig.presolve);
     model->set(GRB_IntParam_Method, solverConfig.method);
-    model->set(GRB_IntParam_Threads, ParallelConfig::MasterThreads(solverConfig));
+    model->set(GRB_IntParam_Threads, ParallelConfig::MasterThreads());
 
     const auto& scenarioSubproblems = problemData->getData<std::vector<ScenarioSubproblemInfo>>("wireless_scenario_subproblems");
     scenarioThetaVars.clear();
@@ -157,7 +157,7 @@ Status LiftedILS::Initialize()
         sub->model->set(GRB_DoubleParam_MIPGap, 0.0);
         sub->model->set(GRB_IntParam_Presolve, solverConfig.presolve);
         sub->model->set(GRB_IntParam_Method, solverConfig.method);
-        sub->model->set(GRB_IntParam_Threads, ParallelConfig::SubProblemThreads());
+        sub->model->set(GRB_IntParam_Threads, ParallelConfig::Phase2SubProblemThreads());
         sub->context.Clear();
         sub->strategy->InitSubProblem(*problemData, static_cast<int>(subIdx), *sub->model, sub->context);
         subProblems.push_back(std::move(sub));
@@ -206,7 +206,7 @@ Status LiftedILS::EvaluateSubProblems(const std::vector<double>& zValues,
     std::vector<SubProblemEvalResult> results;
     try {
         results = RunBoundedIndexedTasks(subProblems.size(),
-            ParallelConfig::MaxSubProblemConcurrency(solverConfig),
+            ParallelConfig::Phase2SubProblemConcurrency(),
             [problemDataPtr, &zValues, this](size_t idx) {
                 auto& sub = subProblems[idx];
                 return EvaluateScenarioSubproblem(*problemDataPtr,

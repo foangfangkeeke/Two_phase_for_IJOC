@@ -188,7 +188,7 @@ Status LiftedTwoPhaseILS::Initialize()
         sub->model->set(GRB_DoubleParam_MIPGap, 0.0);
         sub->model->set(GRB_IntParam_Presolve, solverConfig.presolve);
         sub->model->set(GRB_IntParam_Method, solverConfig.method);
-        sub->model->set(GRB_IntParam_Threads, ParallelConfig::SubProblemThreads());
+        sub->model->set(GRB_IntParam_Threads, ParallelConfig::Phase2SubProblemThreads());
         sub->context.Clear();
         subProblems.push_back(std::move(sub));
     }
@@ -198,7 +198,7 @@ Status LiftedTwoPhaseILS::Initialize()
         const ProblemData* pd = problemData;
         try {
             RunBoundedIndexedTasks(subProblems.size(),
-                ParallelConfig::MaxSubProblemConcurrency(solverConfig),
+                ParallelConfig::Phase2SubProblemConcurrency(),
                 [pd, this](size_t idx) {
                     auto* sub = subProblems[idx].get();
                     sub->strategy->InitSubProblem(*pd, static_cast<int>(idx),
@@ -260,7 +260,7 @@ Status LiftedTwoPhaseILS::EvaluateSubProblems(const std::vector<double>& zValues
     std::vector<SubProblemEvalResult> results;
     try {
         results = RunBoundedIndexedTasks(subProblems.size(),
-            ParallelConfig::MaxSubProblemConcurrency(solverConfig),
+            ParallelConfig::Phase2SubProblemConcurrency(),
             [problemDataPtr, &zValues, relaxed, this](size_t idx) {
                 auto& sub = subProblems[idx];
                 return EvaluateScenarioSubproblem(*problemDataPtr,

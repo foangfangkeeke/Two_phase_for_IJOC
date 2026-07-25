@@ -12,19 +12,41 @@
 
 namespace ParallelConfig {
 
-inline int MasterThreads(const SolverConfig& config)
+inline constexpr int kMasterThreads = 12;
+inline constexpr int kDirectSolverThreads = 12;
+inline constexpr int kPhase1SubProblemThreads = 1;
+inline constexpr size_t kPhase1SubProblemConcurrency = 12;
+inline constexpr int kPhase2SubProblemThreads = 3;
+inline constexpr size_t kPhase2SubProblemConcurrency = 4;
+
+inline int DirectSolverThreads()
 {
-    return std::max(1, config.threads);
+    return kDirectSolverThreads;
 }
 
-inline int SubProblemThreads()
+inline int MasterThreads()
 {
-    return 1;
+    return kMasterThreads;
 }
 
-inline size_t MaxSubProblemConcurrency(const SolverConfig& config)
+inline int Phase1SubProblemThreads()
 {
-    return static_cast<size_t>(std::max(1, config.threads));
+    return kPhase1SubProblemThreads;
+}
+
+inline size_t Phase1SubProblemConcurrency()
+{
+    return kPhase1SubProblemConcurrency;
+}
+
+inline int Phase2SubProblemThreads()
+{
+    return kPhase2SubProblemThreads;
+}
+
+inline size_t Phase2SubProblemConcurrency()
+{
+    return kPhase2SubProblemConcurrency;
 }
 
 } // namespace ParallelConfig

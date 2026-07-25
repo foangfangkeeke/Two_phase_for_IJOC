@@ -186,7 +186,7 @@ Status FullMethod::Initialize()
         sub->model->set(GRB_DoubleParam_MIPGap, 0.0);
         sub->model->set(GRB_IntParam_Presolve, solverConfig.presolve);
         sub->model->set(GRB_IntParam_Method, solverConfig.method);
-        sub->model->set(GRB_IntParam_Threads, ParallelConfig::SubProblemThreads());
+        sub->model->set(GRB_IntParam_Threads, ParallelConfig::Phase2SubProblemThreads());
         sub->context.Clear();
         subProblems_.push_back(std::move(sub));
     }
@@ -196,7 +196,7 @@ Status FullMethod::Initialize()
         const ProblemData* pd = problemData_;
         try {
             RunBoundedIndexedTasks(subProblems_.size(),
-                ParallelConfig::MaxSubProblemConcurrency(solverConfig),
+                ParallelConfig::Phase2SubProblemConcurrency(),
                 [pd, this](size_t idx) {
                     auto* sub = subProblems_[idx].get();
                     sub->strategy->InitSubProblem(*pd, static_cast<int>(idx),
@@ -286,7 +286,7 @@ Status FullMethod::Solve()
             std::vector<SubProblemEvalResult> results;
             try {
                 results = RunBoundedIndexedTasks(subProblems_.size(),
-                    ParallelConfig::MaxSubProblemConcurrency(solverConfig),
+                    ParallelConfig::Phase2SubProblemConcurrency(),
                     [pd, &zValues, this](size_t idx) {
                         auto* sub = subProblems_[idx].get();
                         return EvaluateScenarioSubproblem(*pd, *sub->strategy, *sub->model,
@@ -376,7 +376,7 @@ Status FullMethod::Solve()
         std::vector<SubProblemEvalResult> mipResults;
         try {
             mipResults = RunBoundedIndexedTasks(subProblems_.size(),
-                ParallelConfig::MaxSubProblemConcurrency(solverConfig),
+                ParallelConfig::Phase2SubProblemConcurrency(),
                 [pd, &zValues, this](size_t idx) {
                     auto* sub = subProblems_[idx].get();
                     return EvaluateScenarioSubproblem(*pd, *sub->strategy, *sub->model,

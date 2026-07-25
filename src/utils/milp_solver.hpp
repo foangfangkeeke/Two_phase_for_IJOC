@@ -2,6 +2,7 @@
 
 #include "basic_solver.hpp"
 #include "gurobi_c++.h"
+#include "parallel_utils.hpp"
 #include "solver_config.hpp"
 
 #include <memory>
@@ -25,7 +26,7 @@ protected:
         model.set(GRB_IntParam_Presolve, solverConfig.presolve);
         model.set(GRB_IntParam_MIPFocus, solverConfig.mipFocus);
         model.set(GRB_DoubleParam_Heuristics, solverConfig.heuristics);
-        model.set(GRB_IntParam_Threads, solverConfig.threads);
+        model.set(GRB_IntParam_Threads, ParallelConfig::DirectSolverThreads());
         model.set(GRB_IntParam_Method, solverConfig.method);
     }
 

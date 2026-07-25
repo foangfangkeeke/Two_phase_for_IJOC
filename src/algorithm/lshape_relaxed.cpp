@@ -233,7 +233,7 @@ Status LShapeRelaxed::Initialize()
     const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
     InitializeBendersMasterModel(*model, masterVars, masterConstrs, zVars, theta, true);
     model->set(GRB_DoubleParam_MIPGap, 0.0);
-    model->set(GRB_IntParam_Threads, ParallelConfig::MasterThreads(solverConfig));
+    model->set(GRB_IntParam_Threads, ParallelConfig::MasterThreads());
     const auto dataInitEnd = Tools::Clock::now();
     std::cout << "Relaxed Route data/master initialization elapsed_ms="
               << Tools::ElapsedMs(dataInitStart, dataInitEnd) << std::endl;
@@ -288,7 +288,7 @@ Status LShapeRelaxed::Initialize()
             sub->model = std::make_unique<GRBModel>(*sub->env);
             sub->model->set(GRB_IntParam_OutputFlag, 0);
             sub->model->set(GRB_DoubleParam_MIPGap, 0.0);
-            sub->model->set(GRB_IntParam_Threads, ParallelConfig::SubProblemThreads());
+            sub->model->set(GRB_IntParam_Threads, ParallelConfig::Phase1SubProblemThreads());
             sub->context.Clear();
             sub->strategy->InitSubProblem(*problemData, scenarioIndex, *sub->model, sub->context);
             subProblems.push_back(std::move(sub));
@@ -343,7 +343,7 @@ Status LShapeRelaxed::EvaluateSubProblems(const std::vector<double>& zValues,
     std::vector<SubProblemEvalResult> results;
     try {
         results = RunBoundedIndexedTasks(subProblems.size(),
-            ParallelConfig::MaxSubProblemConcurrency(solverConfig),
+            ParallelConfig::Phase1SubProblemConcurrency(),
             [problemDataPtr, &zValues, this](size_t idx) {
                 auto* sub = subProblems[idx].get();
             return EvaluateRouteSubproblem(*problemDataPtr, *sub->strategy, *sub->model,
