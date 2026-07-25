@@ -54,8 +54,8 @@ public:
     std::unique_ptr<ISubProblem_LShape> Clone() const override;
 
 private:
-    void InitRelaxedSubProblem(const ProblemData& problemData, GRBModel& subModel);
-    Status SolveRelaxedModel(const ProblemData& problemData, const std::vector<double>& zValues,
+    Status SolveRelaxedModel(const ProblemData& problemData, GRBModel& subModel,
+        const std::vector<double>& zValues,
         LShapeCutInfo& cutInfo, double& subObj);
 
     ScenarioSubproblemInfo scenarioInfo;
@@ -66,9 +66,6 @@ private:
     int numRoutes = 0;
     std::vector<BatteryRhsConstr> batteryRhsConstrs;
     std::vector<int> routeIdByEB;
-    std::unique_ptr<GRBModel> relaxedModel;
-    std::vector<GRBConstr> relaxedFacilityConstrs;
-    std::vector<BatteryRhsConstr> relaxedBatteryConstrs;
 
     // [scenarioIdx][routeId] â†?[(capacity, masterVarIndex), ...]  flat array, no hashing
     std::vector<std::vector<std::vector<std::pair<int, size_t>>>> capacityVarIdx;

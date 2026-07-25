@@ -1686,7 +1686,6 @@ void WirelessScenarioSubProblem::InitSubProblem(const ProblemData& problemData, 
     subModel.set(GRB_IntParam_Method, 1);
     subModel.update();
 
-    InitRelaxedSubProblem(problemData, subModel);
 }
 
 static void CollectWirelessFacilityRhsConstrs(GRBModel& model, vector<GRBConstr>& out)
@@ -1703,41 +1702,35 @@ static void CollectWirelessFacilityRhsConstrs(GRBModel& model, vector<GRBConstr>
     delete[] constrs;
 }
 
-void WirelessScenarioSubProblem::InitRelaxedSubProblem(
-    const ProblemData& problemData, GRBModel& subModel)
-{
-    (void)problemData;
-    relaxedModel = std::make_unique<GRBModel>(subModel.relax());
-    // Copy solver params from parent model (presolve/method/threads)
-    relaxedModel->set(GRB_IntParam_Presolve, subModel.get(GRB_IntParam_Presolve));
-    relaxedModel->set(GRB_IntParam_Method, subModel.get(GRB_IntParam_Method));
-    relaxedModel->set(GRB_IntParam_Threads, subModel.get(GRB_IntParam_Threads));
-    relaxedFacilityConstrs.clear();
-    CollectWirelessFacilityRhsConstrs(*relaxedModel, relaxedFacilityConstrs);
-
-    // Collect battery RHS constraints from relaxed model by matching names
-    relaxedBatteryConstrs.clear();
-    relaxedBatteryConstrs.reserve(batteryRhsConstrs.size());
-    for (const auto& brc : batteryRhsConstrs) {
-        BatteryRhsConstr relaxedBrc;
-        relaxedBrc.constr = relaxedModel->getConstrByName(brc.constr.get(GRB_StringAttr_ConstrName));
-        relaxedBrc.routeId = brc.routeId;
-        relaxedBrc.beta = brc.beta;
-        relaxedBrc.constant = brc.constant;
-        relaxedBatteryConstrs.push_back(relaxedBrc);
-    }
-    relaxedModel->update();
-}
-
 Status WirelessScenarioSubProblem::SolveRelaxedModel(
-    const ProblemData& problemData, const std::vector<double>& zValues,
+    const ProblemData& problemData, GRBModel& subModel, const std::vector<double>& zValues,
     LShapeCutInfo& cutInfo, double& subObj)
 {
     try {
         const auto& masterVars = problemData.getData<std::vector<ProblemDataVar>>("masterVars");
-        if (zValues.size() != masterVars.size() || !relaxedModel) {
-            std::cerr << "Relaxed model not initialized" << std::endl;
+        if (zValues.size() != masterVars.size()) {
+            std::cerr << "Wireless relaxed sub-problem master value size mismatch." << std::endl;
             return ERROR;
+        }
+
+        auto relaxedModel = std::make_unique<GRBModel>(subModel.relax());
+        relaxedModel->set(GRB_IntParam_Presolve, subModel.get(GRB_IntParam_Presolve));
+        relaxedModel->set(GRB_IntParam_Method, subModel.get(GRB_IntParam_Method));
+        relaxedModel->set(GRB_IntParam_Threads, subModel.get(GRB_IntParam_Threads));
+        relaxedModel->update();
+
+        std::vector<GRBConstr> relaxedFacilityConstrs;
+        CollectWirelessFacilityRhsConstrs(*relaxedModel, relaxedFacilityConstrs);
+
+        std::vector<BatteryRhsConstr> relaxedBatteryConstrs;
+        relaxedBatteryConstrs.reserve(batteryRhsConstrs.size());
+        for (const auto& brc : batteryRhsConstrs) {
+            BatteryRhsConstr relaxedBrc;
+            relaxedBrc.constr = relaxedModel->getConstrByName(brc.constr.get(GRB_StringAttr_ConstrName));
+            relaxedBrc.routeId = brc.routeId;
+            relaxedBrc.beta = brc.beta;
+            relaxedBrc.constant = brc.constant;
+            relaxedBatteryConstrs.push_back(relaxedBrc);
         }
 
         // Update facility RHS
@@ -1979,7 +1972,7 @@ Status WirelessScenarioSubProblem::SolveRelaxedSubProblem(const ProblemData& pro
 {
     (void)subModel;
     (void)context;
-    return SolveRelaxedModel(problemData, zValues, cutInfo, subObj);
+    return SolveRelaxedModel(problemData, subModel, zValues, cutInfo, subObj);
 }
 
 std::unique_ptr<ISubProblem_LShape> WirelessScenarioSubProblem::Clone() const
