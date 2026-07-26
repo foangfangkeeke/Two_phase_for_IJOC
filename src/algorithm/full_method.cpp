@@ -15,13 +15,22 @@
 #include <vector>
 
 namespace {
+constexpr double kSparseCoeffTol = 1e-12;
+
+bool IsRelevantCoeff(double coeff)
+{
+    return std::fabs(coeff) > kSparseCoeffTol;
+}
 
 void AddFeasibilityCut(GRBModel& model, const BendersCutInfo& cutInfo,
     const std::vector<GRBVar>& masterVars, const std::string& cutName)
 {
     GRBLinExpr cutExpr = cutInfo.constant;
-    for (size_t idx = 0; idx < masterVars.size(); ++idx)
-        cutExpr += cutInfo.yCoeffs[idx] * masterVars[idx];
+    for (size_t idx = 0; idx < masterVars.size(); ++idx) {
+        const double coeff = cutInfo.yCoeffs[idx];
+        if (IsRelevantCoeff(coeff))
+            cutExpr += coeff * masterVars[idx];
+    }
     if (cutInfo.sense == '>')
         model.addConstr(cutExpr >= cutInfo.rhs, cutName);
     else if (cutInfo.sense == '<')
@@ -57,11 +66,14 @@ void BuildContinuousCutExpr(const BendersCutInfo& cutInfo, const std::vector<GRB
     GRBLinExpr& cutExpr, double& lhsAtCurrent, const std::vector<double>& zCurrent)
 {
     cutExpr = cutInfo.constant;
-    for (size_t j = 0; j < masterVars.size(); ++j)
-        cutExpr += cutInfo.yCoeffs[j] * masterVars[j];
     lhsAtCurrent = cutInfo.constant;
-    for (size_t j = 0; j < masterVars.size(); ++j)
-        lhsAtCurrent += cutInfo.yCoeffs[j] * zCurrent[j];
+    for (size_t j = 0; j < masterVars.size(); ++j) {
+        const double coeff = cutInfo.yCoeffs[j];
+        if (!IsRelevantCoeff(coeff))
+            continue;
+        cutExpr += coeff * masterVars[j];
+        lhsAtCurrent += coeff * zCurrent[j];
+    }
 }
 
 bool MeetsOuterGap(double bestUpperBound, double bestLowerBound, const SolverConfig& solverConfig)

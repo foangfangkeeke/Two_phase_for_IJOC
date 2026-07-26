@@ -17,6 +17,12 @@
 #include <utility>
 
 namespace {
+constexpr double kSparseCoeffTol = 1e-12;
+
+bool IsRelevantCoeff(double coeff)
+{
+    return std::fabs(coeff) > kSparseCoeffTol;
+}
 
 using DataInitFactory = std::function<std::unique_ptr<IDataInit_LShape>(const std::string&)>;
 using SubFactory = std::function<std::unique_ptr<ISubProblem_LShape>()>;
@@ -32,7 +38,10 @@ void AddFeasibilityCut(GRBModel& model, const LShapeCutInfo& cutInfo,
 {
     GRBLinExpr cutExpr = cutInfo.constant;
     for (size_t idx = 0; idx < masterVars.size(); ++idx) {
-        cutExpr += cutInfo.yCoeffs[idx] * masterVars[idx];
+        const double coeff = cutInfo.yCoeffs[idx];
+        if (IsRelevantCoeff(coeff)) {
+            cutExpr += coeff * masterVars[idx];
+        }
     }
     if (cutInfo.sense == '>') {
         model.addConstr(cutExpr >= cutInfo.rhs, cutName);

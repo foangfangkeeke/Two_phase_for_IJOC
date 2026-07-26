@@ -18,6 +18,12 @@
 
 namespace {
 constexpr bool kMultiCut = true;
+constexpr double kSparseCoeffTol = 1e-12;
+
+bool IsRelevantCoeff(double coeff)
+{
+    return std::fabs(coeff) > kSparseCoeffTol;
+}
 
 const char* WarmStartStrategyName()
 {
@@ -46,7 +52,10 @@ void AddFeasibilityCut(GRBModel& model, const LShapeCutInfo& cutInfo,
 {
     GRBLinExpr cutExpr = cutInfo.constant;
     for (size_t idx = 0; idx < masterVars.size(); ++idx) {
-        cutExpr += cutInfo.yCoeffs[idx] * masterVars[idx];
+        const double coeff = cutInfo.yCoeffs[idx];
+        if (IsRelevantCoeff(coeff)) {
+            cutExpr += coeff * masterVars[idx];
+        }
     }
 
     if (cutInfo.sense == '>') {
