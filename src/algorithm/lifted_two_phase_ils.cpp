@@ -132,6 +132,7 @@ Status LiftedTwoPhaseILS::Initialize()
     }
 
     // Capture Phase 1 state
+    phase1ZValues = phase1.GetIncumbentZValues();
     env = phase1.ReleaseEnv();
     model = phase1.GetModel();
     problemDataOwned = phase1.ReleaseProblemData();
@@ -342,6 +343,12 @@ void LiftedTwoPhaseILS::PrintBestSolution() const
 
 Status LiftedTwoPhaseILS::Solve()
 {
+    for (size_t idx = 0; idx < zVars.size(); ++idx) {
+        zVars[idx].set(GRB_DoubleAttr_Start, phase1ZValues[idx]);
+    }
+    model->update();
+    std::cout << "Phase 2 MIP start applied, starting Benders..." << std::endl;
+
     model->addConstr(theta >= globalLowerBound, "theta_global_lb");
     model->update();
 

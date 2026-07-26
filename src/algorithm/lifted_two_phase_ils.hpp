@@ -51,6 +51,7 @@ private:
     std::vector<GRBVar> zVars;
     GRBVar theta;
     std::vector<GRBVar> scenarioThetaVars;
+    std::vector<double> phase1ZValues;
 
     long long phase1ElapsedMs = 0;
     std::chrono::steady_clock::time_point fullAlgorithmStart;
