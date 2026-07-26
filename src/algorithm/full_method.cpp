@@ -12,10 +12,12 @@
 #include <set>
 #include <stdexcept>
 #include <string>
+#include <tuple>
 #include <vector>
 
 namespace {
 constexpr double kSparseCoeffTol = 1e-12;
+constexpr double kCutKeyTol = 1e-9;
 
 bool IsRelevantCoeff(double coeff)
 {
@@ -37,6 +39,75 @@ void AddFeasibilityCut(GRBModel& model, const BendersCutInfo& cutInfo,
         model.addConstr(cutExpr <= cutInfo.rhs, cutName);
     else
         throw std::invalid_argument("Unsupported feasibility cut sense");
+}
+
+long long QuantizeCutValue(double value)
+{
+    return static_cast<long long>(std::llround(value / kCutKeyTol));
+}
+
+std::vector<int> ExtractBinaryCutTerms(const BendersCutInfo& cutInfo)
+{
+    std::vector<int> terms;
+    for (size_t idx = 0; idx < cutInfo.yCoeffs.size(); ++idx) {
+        if (IsRelevantCoeff(cutInfo.yCoeffs[idx])) {
+            terms.push_back(static_cast<int>(idx));
+        }
+    }
+    return terms;
+}
+
+double ExtractMonotoneDelta(const BendersCutInfo& cutInfo)
+{
+    for (double coeff : cutInfo.yCoeffs) {
+        if (IsRelevantCoeff(coeff)) {
+            return std::fabs(coeff);
+        }
+    }
+    return 0.0;
+}
+
+struct MonotoneFeasKey {
+    char sense = '>';
+    long long rhs = 0;
+    std::vector<int> terms;
+
+    bool operator<(const MonotoneFeasKey& other) const
+    {
+        return std::tie(sense, rhs, terms) < std::tie(other.sense, other.rhs, other.terms);
+    }
+};
+
+struct MonotoneOptKey {
+    int thetaScope = -1;
+    long long qValue = 0;
+    long long delta = 0;
+    std::vector<int> terms;
+
+    bool operator<(const MonotoneOptKey& other) const
+    {
+        return std::tie(thetaScope, qValue, delta, terms)
+            < std::tie(other.thetaScope, other.qValue, other.delta, other.terms);
+    }
+};
+
+MonotoneFeasKey BuildMonotoneFeasKey(const BendersCutInfo& cutInfo)
+{
+    return MonotoneFeasKey{
+        cutInfo.sense,
+        QuantizeCutValue(cutInfo.rhs),
+        ExtractBinaryCutTerms(cutInfo)
+    };
+}
+
+MonotoneOptKey BuildMonotoneOptKey(size_t thetaScope, const BendersCutInfo& cutInfo)
+{
+    return MonotoneOptKey{
+        static_cast<int>(thetaScope),
+        QuantizeCutValue(cutInfo.constant),
+        QuantizeCutValue(ExtractMonotoneDelta(cutInfo)),
+        ExtractBinaryCutTerms(cutInfo)
+    };
 }
 
 struct SubProblemEvalResult {
@@ -255,8 +326,12 @@ Status FullMethod::Solve()
     const auto& masterVars = problemData_->getData<std::vector<ProblemDataVar>>("masterVars");
     const auto& facilityVarNames = problemData_->getData<std::vector<std::vector<std::vector<std::string>>>>(
         "wireless_route_facility_var_names");
+    std::set<MonotoneFeasKey> monotoneFeasPool;
+    std::set<MonotoneOptKey> monotoneOptPool;
 
     for (int iter = 0; iter < maxIters; ++iter) {
+        int monotoneFeasDedupSkip = 0;
+        int monotoneOptDedupSkip = 0;
         const double elapsedSec = Tools::ElapsedMs(fullAlgorithmStart_, Tools::Clock::now()) / 1000.0;
         if (elapsedSec >= solverConfig.timeLimit) {
             std::cout << "Phase 2 reached time limit: " << solverConfig.timeLimit << "s" << std::endl;
@@ -312,7 +387,6 @@ Status FullMethod::Solve()
 
             int feasCount = 0;
             int optCount = 0;
-            std::set<std::string> addedFeasCuts;
 
             for (size_t idx = 0; idx < results.size(); ++idx) {
                 const SubProblemEvalResult& result = results[idx];
@@ -321,12 +395,9 @@ Status FullMethod::Solve()
                 if (!result.cutInfo.isOptimalityCut) {
                     // Infeasible LP relaxation �?feasibility cut + strengthened no-good
                     rspAnyInfeasible = true;
-                    const std::string sig = MakeFeasibilityCutSignature(result.cutInfo);
-                    if (addedFeasCuts.insert(sig).second) {
-                        AddFeasibilityCut(*model_, result.cutInfo, zVars_,
-                            "p2_feas_" + std::to_string(iter) + "_" + std::to_string(idx));
-                        ++feasCount;
-                    }
+                    AddFeasibilityCut(*model_, result.cutInfo, zVars_,
+                        "p2_feas_" + std::to_string(iter) + "_" + std::to_string(idx));
+                    ++feasCount;
                     // Strengthened no-good cut for the current scenario-subproblem scope.
                     const auto& scenarioInfo = scenarioSubproblems[idx];
                     std::vector<std::string> scenarioFacilityNames;
@@ -338,11 +409,13 @@ Status FullMethod::Solve()
                     }
                     const BendersCutInfo noGood = BuildScenarioStrengthenedNoGoodCut(
                         masterVars, zValues, scIdx, scenarioInfo.routeIds, scenarioFacilityNames);
-                    const std::string ngSig = MakeFeasibilityCutSignature(noGood);
-                    if (addedFeasCuts.insert(ngSig).second) {
+                    const MonotoneFeasKey noGoodKey = BuildMonotoneFeasKey(noGood);
+                    if (monotoneFeasPool.insert(noGoodKey).second) {
                         AddFeasibilityCut(*model_, noGood, zVars_,
                             "p2_nogood_" + std::to_string(iter) + "_" + std::to_string(idx));
                         ++feasCount;
+                    } else {
+                        ++monotoneFeasDedupSkip;
                     }
                 } else {
                     // Feasible LP �?optimality cut on scenarioThetaVar
@@ -359,6 +432,9 @@ Status FullMethod::Solve()
 
             if (rspAnyInfeasible) {
                 std::cout << "Phase 2 iter " << iter << ", feasibility cut x" << feasCount;
+                if (monotoneFeasDedupSkip > 0) {
+                    std::cout << ", monotone_feas_dedup_skip x" << monotoneFeasDedupSkip;
+                }
                 if (std::isfinite(bestUpperBound_)) {
                     double denom = std::max(1.0, std::fabs(bestUpperBound_));
                     std::cout << ", UB=" << bestUpperBound_ << ", LB=" << bestLowerBound_
@@ -419,15 +495,11 @@ Status FullMethod::Solve()
         if (spAnyInfeasible) {
             // MIP infeasible: add feasibility cut plus strengthened no-good cut.
             int feasCount = 0;
-            std::set<std::string> addedFeasCuts;
             for (size_t idx = 0; idx < mipCutInfos.size(); ++idx) {
                 if (mipCutInfos[idx].isOptimalityCut) continue;
-                const std::string sig = MakeFeasibilityCutSignature(mipCutInfos[idx]);
-                if (addedFeasCuts.insert(sig).second) {
-                    AddFeasibilityCut(*model_, mipCutInfos[idx], zVars_,
-                        "p2_mip_feas_" + std::to_string(iter) + "_" + std::to_string(idx));
-                    ++feasCount;
-                }
+                AddFeasibilityCut(*model_, mipCutInfos[idx], zVars_,
+                    "p2_mip_feas_" + std::to_string(iter) + "_" + std::to_string(idx));
+                ++feasCount;
                 // Strengthened no-good cut for the current scenario-subproblem scope.
                 const auto& scenarioInfo = scenarioSubproblems[idx];
                 std::vector<std::string> scenarioFacilityNames;
@@ -439,15 +511,20 @@ Status FullMethod::Solve()
                 }
                 const BendersCutInfo noGood = BuildScenarioStrengthenedNoGoodCut(
                     masterVars, zValues, scIdx, scenarioInfo.routeIds, scenarioFacilityNames);
-                const std::string ngSig = MakeFeasibilityCutSignature(noGood);
-                if (addedFeasCuts.insert(ngSig).second) {
+                const MonotoneFeasKey noGoodKey = BuildMonotoneFeasKey(noGood);
+                if (monotoneFeasPool.insert(noGoodKey).second) {
                     AddFeasibilityCut(*model_, noGood, zVars_,
                         "p2_mip_nogood_" + std::to_string(iter) + "_" + std::to_string(idx));
                     ++feasCount;
+                } else {
+                    ++monotoneFeasDedupSkip;
                 }
             }
             model_->update();
             std::cout << "Phase 2 iter " << iter << ", MIP infeasible, feasibility cut x" << feasCount;
+            if (monotoneFeasDedupSkip > 0) {
+                std::cout << ", monotone_feas_dedup_skip x" << monotoneFeasDedupSkip;
+            }
             if (std::isfinite(bestUpperBound_)) {
                 double denom = std::max(1.0, std::fabs(bestUpperBound_));
                 std::cout << ", UB=" << bestUpperBound_ << ", LB=" << bestLowerBound_
@@ -503,16 +580,24 @@ Status FullMethod::Solve()
             const BendersCutInfo optCut = BuildMonotonicityStrengthenedOptimalityCut(
                 masterVars, zValues, scIdx, scenarioInfo.routeIds, scenarioFacilityNames,
                 mipSubObjs[idx], globalLowerBound_);
-            GRBLinExpr cutExpr;
-            double lhsAtCurrent;
-            BuildContinuousCutExpr(optCut, zVars_, cutExpr, lhsAtCurrent, zValues);
-            model_->addConstr(cutExpr <= scenarioThetaVars_[idx],
-                "p2_mip_sopt_" + std::to_string(iter) + "_" + std::to_string(idx));
+            const MonotoneOptKey optKey = BuildMonotoneOptKey(idx, optCut);
+            if (monotoneOptPool.insert(optKey).second) {
+                GRBLinExpr cutExpr;
+                double lhsAtCurrent;
+                BuildContinuousCutExpr(optCut, zVars_, cutExpr, lhsAtCurrent, zValues);
+                model_->addConstr(cutExpr <= scenarioThetaVars_[idx],
+                    "p2_mip_sopt_" + std::to_string(iter) + "_" + std::to_string(idx));
+            } else {
+                ++monotoneOptDedupSkip;
+            }
         }
         model_->update();
 
         if (MeetsOuterGap(bestUpperBound_, bestLowerBound_, solverConfig)) {
             const auto iterEnd = Tools::Clock::now();
+            if (monotoneOptDedupSkip > 0) {
+                std::cout << ", monotone_opt_dedup_skip x" << monotoneOptDedupSkip;
+            }
             std::cout << ", master_ms=" << masterMs
                       << ", mip_eval_ms=" << Tools::ElapsedMs(masterEnd, iterEnd)
                       << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start_, iterEnd) << std::endl;
@@ -537,6 +622,9 @@ Status FullMethod::Solve()
         }
 
         const auto iterEnd = Tools::Clock::now();
+        if (monotoneOptDedupSkip > 0) {
+            std::cout << ", monotone_opt_dedup_skip x" << monotoneOptDedupSkip;
+        }
         std::cout << ", master_ms=" << masterMs
                   << ", mip_eval_ms=" << Tools::ElapsedMs(masterEnd, iterEnd)
                   << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start_, iterEnd) << std::endl;

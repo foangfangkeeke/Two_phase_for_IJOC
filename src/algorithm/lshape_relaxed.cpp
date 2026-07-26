@@ -13,12 +13,14 @@
 #include <set>
 #include <sstream>
 #include <stdexcept>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
 
 namespace {
 constexpr bool kMultiCut = true;
 constexpr double kSparseCoeffTol = 1e-12;
+constexpr double kCutKeyTol = 1e-9;
 
 bool IsRelevantCoeff(double coeff)
 {
@@ -71,15 +73,76 @@ void AddFeasibilityCut(GRBModel& model, const LShapeCutInfo& cutInfo,
     throw std::invalid_argument("Unsupported feasibility cut sense in relaxed route framework");
 }
 
-std::string MakeFeasibilityCutSignature(const LShapeCutInfo& cutInfo)
+long long QuantizeCutValue(double value)
 {
-    std::ostringstream out;
-    out << std::setprecision(17) << cutInfo.sense << '|' << cutInfo.rhs << '|'
-        << cutInfo.constant;
-    for (double coeff : cutInfo.yCoeffs) {
-        out << '|' << coeff;
+    return static_cast<long long>(std::llround(value / kCutKeyTol));
+}
+
+std::vector<int> ExtractBinaryCutTerms(const LShapeCutInfo& cutInfo)
+{
+    std::vector<int> terms;
+    for (size_t idx = 0; idx < cutInfo.yCoeffs.size(); ++idx) {
+        if (IsRelevantCoeff(cutInfo.yCoeffs[idx])) {
+            terms.push_back(static_cast<int>(idx));
+        }
     }
-    return out.str();
+    return terms;
+}
+
+double ExtractMonotoneDelta(const LShapeCutInfo& cutInfo)
+{
+    for (double coeff : cutInfo.yCoeffs) {
+        if (IsRelevantCoeff(coeff)) {
+            return std::fabs(coeff);
+        }
+    }
+    return 0.0;
+}
+
+struct MonotoneFeasKey {
+    char sense = '>';
+    long long rhs = 0;
+    std::vector<int> terms;
+
+    bool operator<(const MonotoneFeasKey& other) const
+    {
+        return std::tie(sense, rhs, terms) < std::tie(other.sense, other.rhs, other.terms);
+    }
+};
+
+struct MonotoneOptKey {
+    int scenarioIndex = -1;
+    int routeId = -1;
+    long long qValue = 0;
+    long long delta = 0;
+    std::vector<int> terms;
+
+    bool operator<(const MonotoneOptKey& other) const
+    {
+        return std::tie(scenarioIndex, routeId, qValue, delta, terms)
+            < std::tie(other.scenarioIndex, other.routeId, other.qValue, other.delta, other.terms);
+    }
+};
+
+MonotoneFeasKey BuildMonotoneFeasKey(const LShapeCutInfo& cutInfo)
+{
+    return MonotoneFeasKey{
+        cutInfo.sense,
+        QuantizeCutValue(cutInfo.rhs),
+        ExtractBinaryCutTerms(cutInfo)
+    };
+}
+
+MonotoneOptKey BuildMonotoneOptKey(
+    int scenarioIndex, int routeId, const LShapeCutInfo& cutInfo)
+{
+    return MonotoneOptKey{
+        scenarioIndex,
+        routeId,
+        QuantizeCutValue(cutInfo.constant),
+        QuantizeCutValue(ExtractMonotoneDelta(cutInfo)),
+        ExtractBinaryCutTerms(cutInfo)
+    };
 }
 
 bool IsFacilityMasterVar(const std::string& name)
@@ -410,7 +473,12 @@ Status LShapeRelaxed::Solve()
     model->addConstr(theta >= globalLowerBound, "theta_global_lb");
     model->update();
 
+    std::set<MonotoneFeasKey> monotoneFeasPool;
+    std::set<MonotoneOptKey> monotoneOptPool;
+
     for (int iter = 0; iter < maxIters; ++iter) {
+        int monotoneFeasDedupSkip = 0;
+        int monotoneOptDedupSkip = 0;
         const double elapsedSec = Tools::ElapsedMs(algorithmStart, Tools::Clock::now()) / 1000.0;
         if (elapsedSec >= solverConfig.timeLimit) {
             std::cout << "Relaxed Route reached time limit: " << solverConfig.timeLimit << "s"
@@ -451,7 +519,6 @@ Status LShapeRelaxed::Solve()
 
         if (!aggregateCutInfo.isOptimalityCut) {
             int feasCount = 0;
-            std::set<std::string> addedFeasibilityCuts;
             const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
             const auto& routeFacilityVarNames = problemData->getData<std::vector<std::vector<std::vector<std::string>>>>(
                 "wireless_route_facility_var_names");
@@ -459,12 +526,9 @@ Status LShapeRelaxed::Solve()
                 if (routeCutInfos[idx].isOptimalityCut) {
                     continue;
                 }
-                const std::string cutSignature = MakeFeasibilityCutSignature(routeCutInfos[idx]);
-                if (addedFeasibilityCuts.insert(cutSignature).second) {
-                    AddFeasibilityCut(*model, routeCutInfos[idx], zVars,
-                        "relaxed_route_feasibility_" + std::to_string(iter) + "_sub_" + std::to_string(idx));
-                    ++feasCount;
-                }
+                AddFeasibilityCut(*model, routeCutInfos[idx], zVars,
+                    "relaxed_route_feasibility_" + std::to_string(iter) + "_sub_" + std::to_string(idx));
+                ++feasCount;
 
                 if (useStrengthenedCuts_) {
                     const int scenarioIndex = subProblems[idx]->scenarioIndex;
@@ -472,17 +536,22 @@ Status LShapeRelaxed::Solve()
                     const LShapeCutInfo noGoodCut = BuildRouteStrengthenedNoGoodCut(
                         masterVars, zValues, scenarioIndex, routeId,
                         routeFacilityVarNames.at(static_cast<size_t>(scenarioIndex)).at(static_cast<size_t>(routeId)));
-                    const std::string noGoodSignature = MakeFeasibilityCutSignature(noGoodCut);
-                    if (addedFeasibilityCuts.insert(noGoodSignature).second) {
+                    const MonotoneFeasKey noGoodKey = BuildMonotoneFeasKey(noGoodCut);
+                    if (monotoneFeasPool.insert(noGoodKey).second) {
                         AddFeasibilityCut(*model, noGoodCut, zVars,
                             "relaxed_route_strengthened_nogood_" + std::to_string(iter)
                             + "_sub_" + std::to_string(idx));
                         ++feasCount;
+                    } else {
+                        ++monotoneFeasDedupSkip;
                     }
                 }
             }
 
             std::cout << "Relaxed Route iter " << iter << ", feasibility cut x" << feasCount;
+            if (monotoneFeasDedupSkip > 0) {
+                std::cout << ", monotone_feas_dedup_skip x" << monotoneFeasDedupSkip;
+            }
             if (std::isfinite(bestUpperBound)) {
                 std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound;
                 const double denom = std::max(1.0, std::fabs(bestUpperBound));
@@ -538,14 +607,23 @@ Status LShapeRelaxed::Solve()
                     routeQValues[idx], globalLowerBound);
                 const CutEval strengthenedCutEval = BuildContinuousCut(
                     strengthenedCut, zValues, iter, static_cast<int>(idx));
-                model->addConstr(strengthenedCutEval.expr <= routeThetaVars[scenarioIndex][routeId],
-                    strengthenedCutEval.name + "_strengthened");
+                const MonotoneOptKey strengthenedKey = BuildMonotoneOptKey(
+                    scenarioIndex, routeId, strengthenedCut);
+                if (monotoneOptPool.insert(strengthenedKey).second) {
+                    model->addConstr(strengthenedCutEval.expr <= routeThetaVars[scenarioIndex][routeId],
+                        strengthenedCutEval.name + "_strengthened");
+                } else {
+                    ++monotoneOptDedupSkip;
+                }
             }
         }
 
         model->update();
         {
             const auto iterEnd = Tools::Clock::now();
+            if (monotoneOptDedupSkip > 0) {
+                std::cout << ", monotone_opt_dedup_skip x" << monotoneOptDedupSkip;
+            }
             std::cout << ", master_ms=" << masterMs
                       << ", integer_ms=" << integerMs
                       << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
