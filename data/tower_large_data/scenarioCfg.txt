@@ -1,0 +1,6 @@
+# numScenarios
+3
+# scenario_folder,probability
+base,0.333333333333
+lo10pct,0.333333333333
+hi10pct,0.333333333333

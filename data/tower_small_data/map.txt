@@ -1,0 +1,49 @@
+Aft Bt Batok Stn/Blk 628,0
+BEF BLK 435A,1
+Blk 111,2
+Blk 132B,3
+Blk 215,4
+Blk 220A,5
+Blk 221B,6
+Blk 224A,7
+Blk 237A,8
+Blk 238,9
+Blk 240,10
+Blk 242,11
+Blk 306B,12
+Blk 321,13
+Blk 324,14
+Blk 324B,15
+Blk 331,16
+Blk 334,17
+Blk 347,18
+Blk 436A,19
+Blk 438A,20
+Blk 451A,21
+Blk 461C,22
+Blk 464A,23
+Blk 503,24
+Blk 510,25
+Blk 514,26
+Bt Batok Int,27
+Bt Batok Polyclinic,28
+Bt Gombak Stadium,29
+Bt Gombak Stn,30
+OPP BLK 435A,31
+Opp Blk 127,32
+Opp Blk 236A,33
+Opp Blk 347,34
+Opp Blk 437A,35
+Opp Blk 443D,36
+Opp Blk 451A,37
+Opp Blk 461C,38
+Opp Blk 628,39
+Opp Bt Gombak Stadium,40
+Opp Bt Gombak Stn,41
+Opp HomeTeamNS,42
+Regent Hts,43
+Ren Ci @ Bt Batok St 52,44
+St Anthony’s Pri Sch,45
+TENGAH CC,46
+Tengah CC,47
+Tengah Int,48
