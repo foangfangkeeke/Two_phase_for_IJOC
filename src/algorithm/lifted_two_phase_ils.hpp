@@ -10,7 +10,7 @@
 class LiftedTwoPhaseILS : public IMILPAlgorithmStrategy {
 public:
     LiftedTwoPhaseILS(ProblemType problemType, std::string dataFolder = "test_data",
-        int maxIters = 500, double tol = 1e-6);
+        int maxIters = 500, double tol = 1e-6, bool useRspCuts = true);
 
     Status Initialize() override;
     Status Solve() override;
@@ -41,6 +41,7 @@ private:
     std::string dataFolder;
     int maxIters;
     double tolerance;
+    bool useRspCuts;
 
     std::unique_ptr<GRBEnv> env;
     std::shared_ptr<GRBModel> model;

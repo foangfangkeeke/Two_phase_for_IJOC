@@ -18,6 +18,7 @@
 namespace {
 constexpr double kSparseCoeffTol = 1e-12;
 constexpr double kCutKeyTol = 1e-9;
+constexpr bool kEnablePhase2RSP = true;
 
 bool IsRelevantCoeff(double coeff)
 {
@@ -114,6 +115,8 @@ struct SubProblemEvalResult {
     Status status = ERROR;
     BendersCutInfo cutInfo;
     double subObj = 0.0;
+    int grbStatus = -1;
+    long long solveMs = 0;
 };
 
 SubProblemEvalResult EvaluateScenarioSubproblem(const ProblemData& problemData,
@@ -122,6 +125,7 @@ SubProblemEvalResult EvaluateScenarioSubproblem(const ProblemData& problemData,
     bool relaxed)
 {
     SubProblemEvalResult result;
+    const auto solveStart = Tools::Clock::now();
     strategy.UpdateSubProblem(problemData, subModel, context, zValues);
     if (relaxed)
         result.status = strategy.SolveRelaxedSubProblem(problemData, subModel, context,
@@ -129,6 +133,8 @@ SubProblemEvalResult EvaluateScenarioSubproblem(const ProblemData& problemData,
     else
         result.status = strategy.SolveSubProblem(problemData, subModel, context,
             zValues, result.cutInfo, result.subObj);
+    result.solveMs = Tools::ElapsedMs(solveStart, Tools::Clock::now());
+    result.grbStatus = subModel.get(GRB_IntAttr_Status);
     return result;
 }
 
@@ -167,9 +173,10 @@ struct FullMethod::ScenarioSubProblemState {
 };
 
 FullMethod::FullMethod(ProblemType problemType,
-    std::string dataFolder, int maxIters, double tol)
+    std::string dataFolder, int maxIters, double tol, bool usePhase1StrengthenedCuts)
     : problemType(problemType), dataFolder(std::move(dataFolder)),
-      maxIters(maxIters), tolerance(tol)
+      maxIters(maxIters), tolerance(tol),
+      usePhase1StrengthenedCuts(usePhase1StrengthenedCuts)
 {}
 
 Status FullMethod::Initialize()
@@ -182,7 +189,7 @@ Status FullMethod::Initialize()
     LShapeRelaxed phase1(problemType, dataFolder, maxIters, tolerance);
     phase1.SetSolverConfig(solverConfig);
     phase1.SetQuiet(true);
-    phase1.SetUseStrengthenedCuts(true);
+    phase1.SetUseStrengthenedCuts(usePhase1StrengthenedCuts);
 
     Status s = phase1.Initialize();
     if (s != OK) { std::cerr << "Phase 1 init failed" << std::endl; return s; }
@@ -367,7 +374,7 @@ Status FullMethod::Solve()
 
         // ── RSP: LP relaxation of scenario subproblems ──
         bool rspAnyInfeasible = false;
-        {
+        if (kEnablePhase2RSP) {
             // Evaluate LP relaxation for lower-bounding before MIP verification.
             const ProblemData* pd = problemData_;
             std::vector<SubProblemEvalResult> results;
@@ -376,8 +383,13 @@ Status FullMethod::Solve()
                     ParallelConfig::Phase2SubProblemConcurrency(),
                     [pd, &zValues, this](size_t idx) {
                         auto* sub = subProblems_[idx].get();
-                        return EvaluateScenarioSubproblem(*pd, *sub->strategy, *sub->model,
-                            sub->context, zValues, true); // relaxed = LP relaxation
+                        try {
+                            return EvaluateScenarioSubproblem(*pd, *sub->strategy, *sub->model,
+                                sub->context, zValues, true); // relaxed = LP relaxation
+                        } catch (const std::exception& e) {
+                            throw std::runtime_error("RSP idx=" + std::to_string(idx)
+                                + " failed: " + e.what());
+                        }
                     });
             }
             catch (const std::exception& e) {
@@ -457,6 +469,8 @@ Status FullMethod::Solve()
                 continue;
             }
             if (optCount > 0) model_->update();
+        } else {
+            std::cout << "Phase 2 iter " << iter << " RSP disabled, skip LP relaxation" << std::endl;
         }
 
         // ── SP: Full MIP sub-problems (for incumbent update + integer optimality cuts) ──
@@ -467,8 +481,13 @@ Status FullMethod::Solve()
                 ParallelConfig::Phase2SubProblemConcurrency(),
                 [pd, &zValues, this](size_t idx) {
                     auto* sub = subProblems_[idx].get();
-                    return EvaluateScenarioSubproblem(*pd, *sub->strategy, *sub->model,
-                        sub->context, zValues, false); // full MIP
+                    try {
+                        return EvaluateScenarioSubproblem(*pd, *sub->strategy, *sub->model,
+                            sub->context, zValues, false); // full MIP
+                    } catch (const std::exception& e) {
+                        throw std::runtime_error("SP idx=" + std::to_string(idx)
+                            + " failed: " + e.what());
+                    }
                 });
         }
         catch (const std::exception& e) {

@@ -93,11 +93,12 @@ struct LiftedTwoPhaseILS::ScenarioSubProblemState {
 };
 
 LiftedTwoPhaseILS::LiftedTwoPhaseILS(ProblemType problemType, std::string dataFolder,
-    int maxIters, double tol)
+    int maxIters, double tol, bool useRspCuts)
     : problemType(problemType),
       dataFolder(std::move(dataFolder)),
       maxIters(maxIters),
       tolerance(tol),
+      useRspCuts(useRspCuts),
       globalLowerBound(0.0),
       bestUpperBound(std::numeric_limits<double>::infinity()),
       bestLowerBound(-std::numeric_limits<double>::infinity()),
@@ -383,57 +384,61 @@ Status LiftedTwoPhaseILS::Solve()
         const double thetaValue = masterSolution.thetaValue;
         bestLowerBound = std::max(bestLowerBound, model->get(GRB_DoubleAttr_ObjBound));
 
-        double relaxedQValue = 0.0;
-        LShapeCutInfo relaxedAggregateCutInfo;
-        std::vector<double> relaxedScenarioQValues;
-        std::vector<LShapeCutInfo> relaxedScenarioCutInfos;
-        const auto rspStart = Tools::Clock::now();
-        Status relaxedStatus = EvaluateSubProblems(zValues, relaxedAggregateCutInfo, relaxedQValue,
-            relaxedScenarioQValues, relaxedScenarioCutInfos, true);
-        if (relaxedStatus != OK) {
-            std::cerr << "Phase 2 relaxed sub-problem evaluation failed iter " << iter << std::endl;
-            return ERROR;
-        }
+        if (useRspCuts) {
+            double relaxedQValue = 0.0;
+            LShapeCutInfo relaxedAggregateCutInfo;
+            std::vector<double> relaxedScenarioQValues;
+            std::vector<LShapeCutInfo> relaxedScenarioCutInfos;
+            const auto rspStart = Tools::Clock::now();
+            Status relaxedStatus = EvaluateSubProblems(zValues, relaxedAggregateCutInfo, relaxedQValue,
+                relaxedScenarioQValues, relaxedScenarioCutInfos, true);
+            if (relaxedStatus != OK) {
+                std::cerr << "Phase 2 relaxed sub-problem evaluation failed iter " << iter << std::endl;
+                return ERROR;
+            }
 
-        int rspFeasCount = 0;
-        int rspOptCount = 0;
-        bool rspAnyInfeasible = false;
-        std::set<std::string> addedRSPFeasibilityCuts;
-        for (size_t idx = 0; idx < relaxedScenarioCutInfos.size(); ++idx) {
-            if (!relaxedScenarioCutInfos[idx].isOptimalityCut) {
-                rspAnyInfeasible = true;
-                const std::string cs = MakeFeasibilityCutSignature(relaxedScenarioCutInfos[idx]);
-                if (addedRSPFeasibilityCuts.insert(cs).second) {
-                    AddFeasibilityCut(*model, relaxedScenarioCutInfos[idx], zVars,
-                        "p2_rsp_feas_" + std::to_string(iter) + "_" + std::to_string(idx));
-                    ++rspFeasCount;
+            int rspFeasCount = 0;
+            int rspOptCount = 0;
+            bool rspAnyInfeasible = false;
+            std::set<std::string> addedRSPFeasibilityCuts;
+            for (size_t idx = 0; idx < relaxedScenarioCutInfos.size(); ++idx) {
+                if (!relaxedScenarioCutInfos[idx].isOptimalityCut) {
+                    rspAnyInfeasible = true;
+                    const std::string cs = MakeFeasibilityCutSignature(relaxedScenarioCutInfos[idx]);
+                    if (addedRSPFeasibilityCuts.insert(cs).second) {
+                        AddFeasibilityCut(*model, relaxedScenarioCutInfos[idx], zVars,
+                            "p2_rsp_feas_" + std::to_string(iter) + "_" + std::to_string(idx));
+                        ++rspFeasCount;
+                    }
+                    continue;
                 }
+
+                if (scenarioThetaVars[idx].get(GRB_DoubleAttr_X) + tolerance < relaxedScenarioQValues[idx]) {
+                    const CutEval cutDual = BuildContinuousCut(
+                        relaxedScenarioCutInfos[idx], zValues, iter, static_cast<int>(idx));
+                    model->addConstr(cutDual.expr <= scenarioThetaVars[idx],
+                        "p2_rsp_opt_" + std::to_string(iter) + "_" + std::to_string(idx));
+                    ++rspOptCount;
+                }
+            }
+
+            if (rspAnyInfeasible) {
+                model->update();
+                std::cout << "Phase 2 iter " << iter << ", RSP feasibility cut x" << rspFeasCount;
+                if (std::isfinite(bestUpperBound)) {
+                    const double denom = std::max(1.0, std::fabs(bestUpperBound));
+                    std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound
+                              << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
+                }
+                std::cout << ", master_ms=" << masterMs
+                          << ", rsp_eval_ms=" << Tools::ElapsedMs(rspStart, Tools::Clock::now())
+                          << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start, Tools::Clock::now()) << std::endl;
                 continue;
             }
-
-            if (scenarioThetaVars[idx].get(GRB_DoubleAttr_X) + tolerance < relaxedScenarioQValues[idx]) {
-                const CutEval cutDual = BuildContinuousCut(
-                    relaxedScenarioCutInfos[idx], zValues, iter, static_cast<int>(idx));
-                model->addConstr(cutDual.expr <= scenarioThetaVars[idx],
-                    "p2_rsp_opt_" + std::to_string(iter) + "_" + std::to_string(idx));
-                ++rspOptCount;
-            }
+            if (rspOptCount > 0) model->update();
+        } else {
+            std::cout << "Phase 2 iter " << iter << " RSP disabled, skip LP relaxation" << std::endl;
         }
-
-        if (rspAnyInfeasible) {
-            model->update();
-            std::cout << "Phase 2 iter " << iter << ", RSP feasibility cut x" << rspFeasCount;
-            if (std::isfinite(bestUpperBound)) {
-                const double denom = std::max(1.0, std::fabs(bestUpperBound));
-                std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound
-                          << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
-            }
-            std::cout << ", master_ms=" << masterMs
-                      << ", rsp_eval_ms=" << Tools::ElapsedMs(rspStart, Tools::Clock::now())
-                      << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start, Tools::Clock::now()) << std::endl;
-            continue;
-        }
-        if (rspOptCount > 0) model->update();
 
         double aggregatedQValue = 0.0;
         LShapeCutInfo aggregateCutInfo;
