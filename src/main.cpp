@@ -132,6 +132,9 @@ int main(int argc, char* argv[])
         if (algLower == "lifted-ils") {
             solver.SetAlgorithm(std::make_unique<LiftedILS>(
                 WIRELESS_CAPACITY_REFORM, dataFolder, 5000));
+        } else if (algLower == "lifted-monotone") {
+            solver.SetAlgorithm(std::make_unique<LiftedILS>(
+                WIRELESS_CAPACITY_REFORM, dataFolder, 5000, 1e-6, true));
         } else if (algLower == "lifted-two-phase") {
             solver.SetAlgorithm(std::make_unique<LiftedTwoPhaseILS>(
                 WIRELESS_CAPACITY_REFORM, dataFolder, 5000));
@@ -140,7 +143,7 @@ int main(int argc, char* argv[])
                 WIRELESS_CAPACITY_REFORM, dataFolder, 5000));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;
-            cout << "valid wireless_reform algorithms: lifted-ils, lifted-two-phase, full" << endl;
+            cout << "valid wireless_reform algorithms: lifted-ils, lifted-monotone, lifted-two-phase, full" << endl;
             return 1;
         }
 

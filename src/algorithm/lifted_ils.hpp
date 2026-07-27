@@ -10,7 +10,7 @@
 class LiftedILS : public IMILPAlgorithmStrategy {
 public:
     LiftedILS(ProblemType problemType, std::string dataFolder = "test_data",
-        int maxIters = 500, double tol = 1e-6);
+        int maxIters = 500, double tol = 1e-6, bool useMonotoneCuts = false);
 
     Status Initialize() override;
     Status Solve() override;
@@ -40,6 +40,7 @@ private:
     std::string dataFolder;
     int maxIters;
     double tolerance;
+    bool useMonotoneCuts;
 
     std::unique_ptr<GRBEnv> env;
     std::shared_ptr<GRBModel> model;

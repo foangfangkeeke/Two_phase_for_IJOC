@@ -88,11 +88,12 @@ struct LiftedILS::ScenarioSubProblemState {
 };
 
 LiftedILS::LiftedILS(ProblemType problemType, std::string dataFolder,
-    int maxIters, double tol)
+    int maxIters, double tol, bool useMonotoneCuts)
     : problemType(problemType),
       dataFolder(std::move(dataFolder)),
       maxIters(maxIters),
       tolerance(tol),
+      useMonotoneCuts(useMonotoneCuts),
       globalLowerBound(0.0),
       bestUpperBound(std::numeric_limits<double>::infinity()),
       bestLowerBound(-std::numeric_limits<double>::infinity()),
@@ -144,7 +145,8 @@ Status LiftedILS::Initialize()
     model->addConstr(thetaSum <= theta, "theta_multi_sum");
 
     const auto dataInitEnd = Tools::Clock::now();
-    std::cout << "Lifted ILS data/master initialization elapsed_ms="
+    std::cout << (useMonotoneCuts ? "Lifted monotone ILS" : "Lifted ILS")
+              << " data/master initialization elapsed_ms="
               << Tools::ElapsedMs(dataInitStart, dataInitEnd) << std::endl;
 
     const auto subProblemsInitStart = Tools::Clock::now();
@@ -173,7 +175,8 @@ Status LiftedILS::Initialize()
     }
 
     const auto subProblemsInitEnd = Tools::Clock::now();
-    std::cout << "Lifted ILS operational sub-problems init count=" << subProblems.size()
+    std::cout << (useMonotoneCuts ? "Lifted monotone ILS" : "Lifted ILS")
+              << " operational sub-problems init count=" << subProblems.size()
               << " elapsed_ms=" << Tools::ElapsedMs(subProblemsInitStart, subProblemsInitEnd) << std::endl;
 
     model->update();
@@ -300,7 +303,8 @@ Status LiftedILS::Solve()
     for (int iter = 0; iter < maxIters; ++iter) {
         const double elapsedSec = Tools::ElapsedMs(algorithmStart, Tools::Clock::now()) / 1000.0;
         if (elapsedSec >= solverConfig.timeLimit) {
-            std::cout << "Lifted ILS reached time limit: " << solverConfig.timeLimit << "s" << std::endl;
+            std::cout << (useMonotoneCuts ? "Lifted monotone ILS" : "Lifted ILS")
+                      << " reached time limit: " << solverConfig.timeLimit << "s" << std::endl;
             return ERROR;
         }
 
@@ -311,7 +315,8 @@ Status LiftedILS::Solve()
         int masterStatus = model->get(GRB_IntAttr_Status);
         if (!(masterStatus == GRB_OPTIMAL ||
               (masterStatus == GRB_TIME_LIMIT && model->get(GRB_IntAttr_SolCount) > 0))) {
-            std::cerr << "Lifted ILS master problem not solved, status: " << masterStatus << std::endl;
+            std::cerr << (useMonotoneCuts ? "Lifted monotone ILS" : "Lifted ILS")
+                      << " master problem not solved, status: " << masterStatus << std::endl;
             return ERROR;
         }
 
@@ -338,6 +343,11 @@ Status LiftedILS::Solve()
         int feasCount = 0;
         bool mipAnyInfeasible = false;
         std::set<std::string> addedFeasibilityCuts;
+        const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
+        const auto& scenarioSubproblems = problemData->getData<std::vector<ScenarioSubproblemInfo>>(
+            "wireless_scenario_subproblems");
+        const auto& facilityVarNames = problemData->getData<
+            std::vector<std::vector<std::vector<std::string>>>>("wireless_route_facility_var_names");
         for (size_t idx = 0; idx < scenarioCutInfos.size(); ++idx) {
             if (scenarioCutInfos[idx].isOptimalityCut) continue;
             mipAnyInfeasible = true;
@@ -347,10 +357,30 @@ Status LiftedILS::Solve()
                     "lifted_ils_feasibility_" + std::to_string(iter) + "_sub_" + std::to_string(idx));
                 ++feasCount;
             }
+            if (useMonotoneCuts) {
+                const ScenarioSubproblemInfo& scenarioInfo = scenarioSubproblems[idx];
+                const int scIdx = scenarioInfo.scenarioIndex;
+                std::vector<std::string> scenarioFacilityNames;
+                for (int rid : scenarioInfo.routeIds) {
+                    const auto& routeFacilityNames = facilityVarNames.at(static_cast<size_t>(scIdx))
+                        .at(static_cast<size_t>(rid));
+                    scenarioFacilityNames.insert(scenarioFacilityNames.end(),
+                        routeFacilityNames.begin(), routeFacilityNames.end());
+                }
+                const BendersCutInfo noGood = BuildScenarioStrengthenedNoGoodCut(
+                    masterVars, zValues, scIdx, scenarioInfo.routeIds, scenarioFacilityNames);
+                const std::string noGoodSignature = MakeFeasibilityCutSignature(noGood);
+                if (addedFeasibilityCuts.insert(noGoodSignature).second) {
+                    AddFeasibilityCut(*model, noGood, zVars,
+                        "lifted_monotone_nogood_" + std::to_string(iter) + "_sub_" + std::to_string(idx));
+                    ++feasCount;
+                }
+            }
         }
 
         if (mipAnyInfeasible) {
-            std::cout << "Lifted ILS iter " << iter << ", feasibility cut x" << feasCount;
+            std::cout << (useMonotoneCuts ? "Lifted monotone ILS" : "Lifted ILS")
+                      << " iter " << iter << ", feasibility cut x" << feasCount;
             if (std::isfinite(bestUpperBound)) {
                 const double denom = std::max(1.0, std::fabs(bestUpperBound));
                 std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound
@@ -367,7 +397,8 @@ Status LiftedILS::Solve()
             UpdateIncumbent(zValues, aggregatedQValue);
         }
 
-        std::cout << "Lifted ILS iter " << iter
+        std::cout << (useMonotoneCuts ? "Lifted monotone ILS" : "Lifted ILS")
+                  << " iter " << iter
                   << ", theta=" << thetaValue << ", Q(z)=" << aggregatedQValue;
         if (std::isfinite(bestUpperBound)) {
             const double denom = std::max(1.0, std::fabs(bestUpperBound));
@@ -383,15 +414,32 @@ Status LiftedILS::Solve()
                       << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
             PrintBestSolution();
             const auto solveEnd = Tools::Clock::now();
-            std::cout << "Lifted ILS converged." << std::endl;
-            std::cout << "Lifted ILS final elapsed time: "
+            std::cout << (useMonotoneCuts ? "Lifted monotone ILS" : "Lifted ILS")
+                      << " converged." << std::endl;
+            std::cout << (useMonotoneCuts ? "Lifted monotone ILS" : "Lifted ILS")
+                      << " final elapsed time: "
                       << Tools::ElapsedMs(solveStart, solveEnd) << " ms" << std::endl;
             return OK;
         }
 
         for (size_t idx = 0; idx < scenarioCutInfos.size(); ++idx) {
             if (!scenarioCutInfos[idx].isOptimalityCut) continue;
-            const CutEval cutDual = BuildContinuousCut(scenarioCutInfos[idx], zValues, iter, static_cast<int>(idx));
+            LShapeCutInfo optCutInfo = scenarioCutInfos[idx];
+            if (useMonotoneCuts) {
+                const ScenarioSubproblemInfo& scenarioInfo = scenarioSubproblems[idx];
+                const int scIdx = scenarioInfo.scenarioIndex;
+                std::vector<std::string> scenarioFacilityNames;
+                for (int rid : scenarioInfo.routeIds) {
+                    const auto& routeFacilityNames = facilityVarNames.at(static_cast<size_t>(scIdx))
+                        .at(static_cast<size_t>(rid));
+                    scenarioFacilityNames.insert(scenarioFacilityNames.end(),
+                        routeFacilityNames.begin(), routeFacilityNames.end());
+                }
+                optCutInfo = BuildMonotonicityStrengthenedOptimalityCut(
+                    masterVars, zValues, scIdx, scenarioInfo.routeIds, scenarioFacilityNames,
+                    scenarioQValues[idx], globalLowerBound);
+            }
+            const CutEval cutDual = BuildContinuousCut(optCutInfo, zValues, iter, static_cast<int>(idx));
             model->addConstr(cutDual.expr <= scenarioThetaVars[idx], cutDual.name);
         }
 
@@ -402,6 +450,7 @@ Status LiftedILS::Solve()
     }
 
     PrintBestSolution();
-    std::cout << "Lifted ILS reached max iterations: " << maxIters << std::endl;
+    std::cout << (useMonotoneCuts ? "Lifted monotone ILS" : "Lifted ILS")
+              << " reached max iterations: " << maxIters << std::endl;
     return ERROR;
 }
