@@ -28,11 +28,13 @@ For each section, proceed in this order:
 - Target the manuscript toward Transportation Science or IJOC-style algorithm writing unless the user says otherwise.
 - Emphasize the algorithmic contribution: exact reformulation, decomposition logic, valid lower bounds, valid cuts, and convergence.
 - Keep baseline methods concise; do not turn standard baselines into major theoretical results.
+- Avoid defensive positioning prose. Do not write sentences whose main purpose is to say what a component is not, such as "this is not a contribution," "cut forms are not part of the model definition," or "we use this only as a benchmark," unless the distinction is necessary to prevent a concrete misunderstanding.
+- Prefer affirmative functional statements: state what the component does, what variables or constraints it contains, what limitation motivates the next section, or what evidence it provides.
 - Use propositions/theorems for core algorithmic claims, not for every standard modeling observation.
 - Prefer short proof sketches in the main text and move long technical proofs to the appendix when needed.
 - In method sections, each paragraph should serve one of four roles: define the algorithmic object, state why it is valid, explain what computational advantage it creates, or connect to the next algorithmic component.
 - For Phase 1, state the two benefits compactly: relaxing shared plug-in fast-charger capacity coupling decomposes the subproblem by route, and the resulting smaller LP subproblems provide dual cuts.
-- For Phase 2, emphasize that exact mixed-integer verification restores equivalence with the lifted/natural decomposition and the extensive form when the cut loop converges.
+- For Phase 2, emphasize that exact mixed-integer verification restores equivalence with the lifted formulation, the baseline decomposition, and the extensive form when the cut loop converges.
 - Avoid long prose transitions; use equations, formal statements, and concise explanatory sentences.
 - For framework drafts, keep all needed formulas, propositions, proof sketches, and algorithm boxes, but make non-formula paragraphs concise narrative-chain drafts rather than polished journal prose.
 - Framework drafts may use explicit transition sentences or short roadmap paragraphs to make the intended section logic visible during discussion.
@@ -52,6 +54,7 @@ For each section, proceed in this order:
 - Model, method, experiment, and discussion files may all be changed when the scope is approved.
 - Prefer small, traceable edits over broad rewrites.
 - Do not rewrite an entire `.tex` file unless explicitly requested.
+- When the user asks to inspect only the next round of edits, stage the current worktree state before making new changes, then leave the new changes unstaged unless asked otherwise.
 - If an editing tool or IDE plugin reports an error, stop and explain before trying another editing route.
 - Do not put internal planning labels such as `Role`, `Content plan`, or `Expected message` into final manuscript text.
 - Record missing experiments and unresolved decisions visibly in the planning notes.
