@@ -37,10 +37,10 @@ Travel times are computed from link distances using a nominal operating speed of
 The remaining parameters specify battery costs, charging rates, charging efficiencies, electricity prices, facility costs, and state-of-charge limits.
 Table~\ref{tab:parameter-settings} reports the main parameter values used in the computational experiments.
 
-The benchmark ladder consists of five methods: the extensive-form solver, natural ILS, lifted ILS, lifted two-phase, and the full method.
-The extensive-form solver directly optimizes the deterministic equivalent.
-Natural ILS applies the classical integer L-shaped decomposition induced by the original two-stage model.
-Lifted ILS uses the lifted master representation without the two-phase relaxation.
+The benchmark ladder consists of five methods: the direct extensive-form MILP, baseline integer L-shaped decomposition, lifted integer L-shaped decomposition, lifted two-phase method, and the full method.
+The direct extensive-form MILP optimizes the deterministic equivalent with a commercial solver.
+The baseline integer L-shaped decomposition applies the classical scenario decomposition induced by the original two-stage model.
+The lifted integer L-shaped decomposition uses the lifted master representation without the two-phase relaxation.
 Lifted two-phase adds the Phase 1 lower-bounding and Phase 2 verification structure.
 The full method further adds the monotonicity-based strengthened cuts.
 
@@ -67,8 +67,8 @@ The full method further adds the monotonicity-based strengthened cuts.
 \toprule
 \textbf{Instance family} & \textbf{Data source or variant} & \textbf{Varied dimension} & \textbf{Primary use} & \textbf{Compared methods} \\
 \midrule
-\texttt{S-3}, \texttt{M-3}, \texttt{B-3}, \texttt{L-3} & \texttt{tower\_small}, \texttt{tower\_medium}, \texttt{tower}, \texttt{large} & Network scale, with three scenarios fixed & Network-scale ablation & Extensive form, natural ILS, lifted ILS, lifted two-phase, full method \\
-\texttt{B-}k, $k\in\{3,5,10,20,40\}$ & \texttt{tower}, \texttt{tower\_5}, \texttt{tower\_10}, \texttt{tower\_20}, \texttt{tower\_40} & Scenario count, with base network fixed & Scenario-count scalability & Extensive form, lifted two-phase, full method \\
+\texttt{S-3}, \texttt{M-3}, \texttt{B-3}, \texttt{L-3} & \texttt{tower\_small}, \texttt{tower\_medium}, \texttt{tower}, \texttt{large} & Network scale, with three scenarios fixed & Network-scale ablation & Direct MILP, baseline integer L-shaped, lifted integer L-shaped, lifted two-phase, full method \\
+\texttt{B-}k, $k\in\{3,5,10,20,40\}$ & \texttt{tower}, \texttt{tower\_5}, \texttt{tower\_10}, \texttt{tower\_20}, \texttt{tower\_40} & Scenario count, with base network fixed & Scenario-count scalability & Direct MILP, lifted two-phase, full method \\
 \texttt{B-10-C}q, $q\in\{1,2,3,4,5\}$ & Capacity variants of \texttt{tower\_10} & Existing plug-in fast-charger units, with base network and 10 scenarios fixed & Relaxation-gap stress test & Lifted two-phase, full method \\
 \bottomrule
 \multicolumn{5}{@{}l}{\footnotesize \texttt{B-3} is the representative base instance used for solution interpretation; larger $q$ indicates more existing plug-in fast-charger units.} \\
@@ -154,7 +154,7 @@ The largest reported instances are intended to show where direct optimization an
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}llllll@{}}
 \toprule
-\textbf{Instance} & \textbf{Extensive form} & \textbf{Natural ILS} & \textbf{Lifted ILS} & \textbf{Lifted two-phase} & \textbf{Full method} \\
+\textbf{Instance} & \textbf{Direct MILP} & \textbf{Baseline integer L-shaped} & \textbf{Lifted integer L-shaped} & \textbf{Lifted two-phase} & \textbf{Full method} \\
 \midrule
 \texttt{S-3} & Conv., 4.0s & TL, 98.3\% & TL, 80.0\% & Conv., 0.3s & Conv., 0.4s \\
 \texttt{M-3} & TL, 0.28\% & skipped & skipped & Conv., 26.2s & Conv., 21.6s \\
@@ -192,12 +192,12 @@ The phase-level evidence supports the interpretation that the full method contro
 
 % Paragraph plan:
 % 1. Use the scenario-count family defined in Section~\ref{subsec:experimental-setup}.
-% 2. Compare the extensive-form solver, lifted two-phase, and full method.
+% 2. Compare the direct extensive-form MILP, lifted two-phase, and full method.
 % 3. Explain how scenario count affects total time, phase time, and iteration counts.
-% TODO: Rerun scenario-count scalability for the extensive-form solver, lifted two-phase, and full method under final settings.
+% TODO: Rerun scenario-count scalability for the direct extensive-form MILP, lifted two-phase, and full method under final settings.
 
 This subsection uses the \texttt{B-}k family, with $k\in\{3,5,10,20,40\}$, to test scenario-count scalability on the base Tower-derived network.
-The comparison is limited to the extensive-form solver, lifted two-phase, and full method because the simpler ILS variants already fail in the network-scale ablation.
+The comparison is limited to the direct extensive-form MILP, lifted two-phase method, and full method because the simpler integer L-shaped variants already fail in the network-scale ablation.
 
 \begin{table}[htbp]
 \centering
@@ -207,7 +207,7 @@ The comparison is limited to the extensive-form solver, lifted two-phase, and fu
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}llllrr@{}}
 \toprule
-\textbf{Instance} & \textbf{Extensive form} & \textbf{Lifted two-phase} & \textbf{Full method} & \textbf{Phase 1/2 (s)} & \textbf{Iters P1/P2} \\
+\textbf{Instance} & \textbf{Direct MILP} & \textbf{Lifted two-phase} & \textbf{Full method} & \textbf{Phase 1/2 (s)} & \textbf{Iters P1/P2} \\
 \midrule
 \texttt{B-3}  & OOM, 0.27\% & TL, 0.60\% & Conv., 45.4s & 29.7/15.7     & 9/3 \\
 \texttt{B-5}  & TODO & TODO & Conv., 52.8s & 36.3/16.5     & 6/3 \\

@@ -1,0 +1,76 @@
+\section{Model Notation}
+\label{app:model-details}
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{0.94}
+\caption{Summary of notation}
+\label{tab:notation}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.23\linewidth}>{\raggedright\arraybackslash}p{0.71\linewidth}@{}}
+\toprule
+\textbf{Symbol} & \textbf{Description} \\
+\midrule
+\multicolumn{2}{@{}l}{\textit{Sets and indices}} \\
+$\Omega$ & Set of future fleet-service configuration scenarios, indexed by $\omega$ \\
+$\mathcal{S}$ & Set of stations, indexed by $s$ \\
+$\mathcal{L}$ & Set of directed links between consecutive stations, indexed by $l$ \\
+$\mathcal{C}$ & Set of existing interchanges or hubs equipped with plug-in chargers, $\mathcal{C}\subseteq\mathcal{S}$ \\
+$\mathcal{R}$ & Set of routes, indexed by $r$ \\
+$\mathcal{K}$ & Set of candidate battery-capacity options, indexed by $k$ \\
+$\mathcal{M}_{\omega,r}$ & Set of bus trip chains on route $r$ under scenario $\omega$, indexed by $m$ \\
+$\mathcal{V}_{\omega,r}$ & Set of station visits on route $r$ under scenario $\omega$, indexed by $v$ \\
+$\mathcal{V}^{\mathrm{P}}_{\omega,r}$ & Set of plug-in charging visits on route $r$ under scenario $\omega$ \\
+$\mathcal{V}^{\mathrm{S}}_{\omega,r}$ & Set of SWC-eligible station visits on route $r$ under scenario $\omega$ \\
+$\mathcal{A}_{\omega,r}$ & Set of directed link traversals on route $r$ under scenario $\omega$, indexed by $a$ \\
+$\mathcal{T}_\omega$ & Relevant plug-in charging time periods under scenario $\omega$ \\
+$\mathcal{T}_v$ & Time periods during which plug-in charging visit $v$ can occupy a plug-in charger \\
+$\mathcal{G}_\omega$ & Set of generated baseline integer L-shaped cuts for scenario $\omega$ \\
+\addlinespace
+\multicolumn{2}{@{}l}{\textit{Parameters}} \\
+$p_\omega$ & Probability of scenario $\omega$ \\
+$c_s^{\mathrm{S}}$ & Equivalent cost of installing SWC at station $s$ \\
+$c_l^{\mathrm{D}}$ & Equivalent cost of installing DWC on link $l$ \\
+$c^{\mathrm{bat}}$ & Equivalent battery capacity cost per kWh \\
+$c^{\mathrm{day}},c^{\mathrm{night}}$ & Daytime and nighttime electricity prices \\
+$n_{\omega,r}$ & Fleet-size requirement for route $r$ under scenario $\omega$ \\
+$\beta_k$ & Battery capacity value represented by option $k$ \\
+$d_a$ & Energy consumption associated with directed link traversal $a$ \\
+$d_m^{0}$ & Boundary energy consumption from the hub or interchange to the first station visit of trip chain $m$ \\
+$d_m^{N}$ & Boundary energy consumption from the terminal station visit of trip chain $m$ back to the hub or interchange \\
+$U_s$ & Number of existing plug-in chargers at station $s$ \\
+$\kappa$ & Plug-in charging rate per time period \\
+$\bar{q}^{\mathrm{S}}_v$ & Maximum SWC energy available during station visit $v$ \\
+$\bar{q}^{\mathrm{D}}_a$ & Maximum DWC energy available during directed link traversal $a$ \\
+$\eta^{\mathrm{P}},\eta^{\mathrm{S}},\eta^{\mathrm{D}}$ & Charging efficiencies for plug-in charging, SWC, and DWC \\
+$\underline{\rho},\overline{\rho}$ & Minimum and maximum state-of-charge fractions \\
+\addlinespace
+\multicolumn{2}{@{}l}{\textit{Derived quantities and functions}} \\
+$s(v)$ & Physical station associated with station visit $v$ \\
+$\ell(a)$ & Directed link associated with traversal $a$ \\
+$\mathrm{tail}(a)$ & Departure station visit of traversal $a$ \\
+$\mathrm{head}(a)$ & Arrival station visit of traversal $a$ \\
+$v_m^{0}$ & First station visit of trip chain $m$ \\
+$v_m^{N}$ & Terminal station visit of trip chain $m$ \\
+$C^{\mathrm{fac}}(w)$ & Wireless facility cost scaled to the same planning unit as scenario recourse costs \\
+$C^{\mathrm{bat}}_\omega(z_\omega)$ & Scenario battery-configuration cost \\
+$C^{\mathrm{chg}}_\omega(y_\omega)$ & Scenario charging-energy cost \\
+$\Phi_\omega(w)$ & Optimal recourse value in scenario $\omega$ under facility layout $w$ \\
+$\mathcal{Z}_\omega$ & Feasible set of route-level battery-capacity choices in scenario $\omega$ \\
+\addlinespace
+\multicolumn{2}{@{}l}{\textit{Decision variables}} \\
+$w_s^{\mathrm{S}}$ & 1 if SWC is installed at station $s\in\mathcal{S}\setminus\mathcal{C}$, 0 otherwise \\
+$w_l^{\mathrm{D}}$ & 1 if DWC is installed on link $l\in\mathcal{L}$, 0 otherwise \\
+$z_{\omega,r,k}$ & 1 if route $r$ uses battery capacity option $k$ in scenario $\omega$, 0 otherwise \\
+$B_{\omega,r}$ & Selected battery capacity for route $r$ in scenario $\omega$ \\
+$y_\omega$ & Vector of scenario-level charging, plug-in occupancy, and energy-state decisions in scenario $\omega$ \\
+$q_v$ & Plug-in charging energy assigned during plug-in visit $v$ \\
+$q^{\mathrm{S}}_v$ & SWC energy assigned during SWC-eligible station visit $v$ \\
+$q^{\mathrm{D}}_a$ & DWC energy assigned to directed link traversal $a$ \\
+$q_m^{\mathrm{N}}$ & Overnight charging energy assigned after trip chain $m$ returns to the hub or interchange \\
+$e^{\mathrm{arr}}_v,e^{\mathrm{dep}}_v$ & Battery energy state at arrival and departure of station visit $v$ \\
+$x_{v\tau}$ & 1 if plug-in charging visit $v$ occupies one plug-in charger at time $\tau$, 0 otherwise \\
+\bottomrule
+\end{tabular}
+\end{table}

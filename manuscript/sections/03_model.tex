@@ -1,194 +1,227 @@
-\section{Problem Formulation and Natural Decomposition}
+\section{Problem Formulation and Baseline Decomposition}
 \label{sec:model}
 
-This section defines the stochastic wireless-charging infrastructure planning problem and the natural decomposition induced by its two-stage structure.
-The model is written at the level needed for the algorithmic developments in Section~\ref{sec:method}; detailed opportunity-window constraints can be expanded in an appendix if needed.
+This section formulates the wireless charging infrastructure planning problem as a two-stage stochastic program.
+The formulation separates long-lived facility decisions from scenario-adaptive battery and charging decisions, which provides the baseline decomposition used in Section~\ref{sec:method}.
 
-\subsection{Problem setting and two-stage decision structure}
-\label{subsec:problem-setting}
-
-We study wireless charging infrastructure planning under a finite set of medium-term service-plan scenarios, rather than single-day operational dispatch.
-Each scenario represents a possible future service plan and induces a representative operating day with route frequencies, timetables, bus trip chains, fleet requirements, and energy requirements.
-
-The first-stage decision installs stationary wireless charging (SWC) facilities and dynamic wireless charging (DWC) links before the service-plan scenario is realized.
-After a scenario is realized, the operator adapts route-level battery capacities and charging operations to that scenario.
-Existing plug-in and fast-charging facilities are treated as exogenous operational resources, so the strategic facility-location decision concerns only new wireless charging infrastructure.
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.82\textwidth]{figures/problem_description_daily_duty.png}
-    \caption{Representative operating day induced by a realized service-plan scenario. Buses follow trip chains and may use plug-in chargers, stationary wireless charging opportunities, and dynamic wireless charging opportunities. Wireless opportunities depend on the first-stage facility layout, whereas plug-in opportunities are existing operational resources.}
-    \label{fig:daily-duty}
-\end{figure}
-
-\subsection{Two-stage extensive-form formulation}
+\subsection{Two-stage stochastic formulation}
 \label{subsec:two-stage-formulation}
 
-Let $\Omega$ be the set of service-plan scenarios, and let $p_\omega$ be the probability of scenario $\omega \in \Omega$.
-Let $\mathcal{J}$ be the set of candidate wireless charging facilities, with $\mathcal{J}^{\mathrm{SWC}}$ denoting candidate stationary charging locations and $\mathcal{J}^{\mathrm{DWC}}$ denoting candidate dynamic charging links.
-The first-stage binary variable $w_j$ equals one if facility $j \in \mathcal{J}$ is installed.
-The daily-equivalent facility cost is
-\begin{equation}
-    C^{\mathrm{fac}}(w) =
-    \sum_{j \in \mathcal{J}} c^{\mathrm{fac}}_j w_j.
-    \label{eq:facility-cost}
-\end{equation}
+Let $\Omega$ be the set of service-plan scenarios, and let $p_\omega$ be the probability of scenario $\omega \in \Omega$, where $p_\omega\geq 0$ and $\sum_{\omega\in\Omega}p_\omega=1$.
+Each scenario represents one plausible future service plan and fixes the route frequencies, timetables, bus trip chains, active-fleet requirements, and trip-level energy requirements, while the operated route set $\mathcal{R}$ is common across scenarios.
+The planner first installs long-lived wireless charging facilities before the future service plan is known.
+After a scenario is realized, the operator specifies route-level battery capacities and charging-allocation decisions for the resulting trip chains.
 
-For each scenario $\omega$, the recourse decision includes a route-level battery configuration $z_\omega$ and an operating decision vector $y_\omega$.
-The binary variable $z_{\omega r k}$ equals one if route $r \in \mathcal{R}_\omega$ uses battery option $k \in \mathcal{K}_r$, and $y_\omega$ collects charging, plug-in occupancy, and energy-state decisions on the representative operating day.
-Table~\ref{tab:notation} summarizes the notation used in the formulation.
+Let $\mathcal{S}$ be the station set, $\mathcal{L}$ the directed link set between consecutive stations, and $\mathcal{C}\subseteq\mathcal{S}$ the set of existing interchanges or hubs equipped with plug-in chargers.
+Stationary wireless charging (SWC) can be installed at any station in $\mathcal{S}\setminus\mathcal{C}$, while dynamic wireless charging (DWC) can be installed on any directed link in $\mathcal{L}$.
+The first-stage binary variables $w_s^{\mathrm{S}}$ and $w_l^{\mathrm{D}}$ indicate whether SWC is installed at station $s\in\mathcal{S}\setminus\mathcal{C}$ and DWC is installed on link $l\in\mathcal{L}$, respectively.
+Existing plug-in chargers at stations in $\mathcal{C}$ are pre-existing resources with limited shared capacity and are not candidates for SWC deployment.
 
-\begin{table}[htbp]
-\centering
-\small
-\caption{Summary of notation}
-\label{tab:notation}
-\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.69\linewidth}@{}}
-\toprule
-\textbf{Symbol} & \textbf{Description} \\
-\midrule
-\multicolumn{2}{@{}l}{\textit{Sets and indices}} \\
-$\Omega$ & Set of service-plan scenarios, indexed by $\omega$ \\
-$\mathcal{J}$ & Set of candidate wireless charging facilities, indexed by $j$ \\
-$\mathcal{J}^{\mathrm{SWC}}$ & Set of candidate stationary wireless charging facilities \\
-$\mathcal{J}^{\mathrm{DWC}}$ & Set of candidate dynamic wireless charging links \\
-$\mathcal{P}$ & Set of existing plug-in charging stations, indexed by $s$ \\
-$\mathcal{R}_\omega$ & Set of routes under scenario $\omega$, indexed by $r$ \\
-$\mathcal{K}_r$ & Set of candidate battery-capacity options for route $r$, indexed by $k$ \\
-$\mathcal{E}_\omega$ & Set of electric buses under scenario $\omega$, indexed by $e$ \\
-$\mathcal{T}_{\omega e}$ & Ordered trips assigned to bus $e$ under scenario $\omega$ \\
-$\mathcal{H}_\omega$ & Time grid for plug-in charger occupancy under scenario $\omega$ \\
-\addlinespace
-\multicolumn{2}{@{}l}{\textit{Parameters}} \\
-$p_\omega$ & Probability of scenario $\omega$ \\
-$c^{\mathrm{fac}}_j$ & Daily-equivalent cost of wireless facility $j$ \\
-$c^{\mathrm{bat}}$ & Daily-equivalent battery capacity cost per kWh \\
-$n_{\omega r}$ & Number of buses assigned to route $r$ under scenario $\omega$ \\
-$\beta_{rk}$ & Battery capacity value represented by option $k$ for route $r$ \\
-$d_{\omega e t}$ & Energy consumption of bus $e$ on trip $t$ under scenario $\omega$ \\
-$a_s$ & Number of existing plug-in chargers at station $s$ \\
-$\eta$ & Charging efficiency \\
-$\underline{\rho},\overline{\rho}$ & Minimum and maximum state-of-charge fractions \\
-$M$ & Big-M constant for facility-availability constraints \\
-\addlinespace
-\multicolumn{2}{@{}l}{\textit{Derived quantities and functions}} \\
-$r(e)$ & Route operated by bus $e$ \\
-$B_{\omega r}$ & Selected battery capacity for route $r$ in scenario $\omega$ \\
-$C^{\mathrm{fac}}(w)$ & Daily-equivalent wireless facility cost \\
-$C^{\mathrm{bat}}_\omega(z_\omega)$ & Scenario battery-configuration cost \\
-$C^{\mathrm{op}}_\omega(y_\omega)$ & Scenario operating cost on the representative day \\
-$\Phi_\omega(w)$ & Optimal recourse value in scenario $\omega$ under facility layout $w$ \\
-$\mathcal{X}^{\mathrm{op}}_\omega(w,z_\omega)$ & Feasible set of scenario operational decisions under facility layout $w$ and battery configuration $z_\omega$ \\
-\addlinespace
-\multicolumn{2}{@{}l}{\textit{Decision variables}} \\
-$w_j$ & 1 if wireless facility $j$ is installed, 0 otherwise \\
-$z_{\omega r k}$ & 1 if route $r$ uses battery capacity option $k$ in scenario $\omega$, 0 otherwise \\
-$y_\omega$ & Vector of operational charging and energy-state decisions in scenario $\omega$ \\
-$q_{\omega e t}$ & Charging energy assigned to bus $e$ around trip $t$ \\
-$q^{\mathrm{wc}}_{\omega e t j}$ & Wireless charging energy from facility $j$ \\
-$E_{\omega e t}$ & Battery energy state of bus $e$ at event $t$ \\
-$x_{\omega e \tau s}$ & 1 if bus $e$ occupies plug-in station $s$ at time $\tau$, 0 otherwise \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-For a fixed facility layout $w$, the scenario recourse value is
+The compact two-stage stochastic formulation is
 \begin{align}
-    \Phi_\omega(w)
-    =
-    \min_{z_\omega,y_\omega} \quad
-        & C^{\mathrm{bat}}_\omega(z_\omega) + C^{\mathrm{op}}_\omega(y_\omega)
-        \label{eq:recourse-value} \\
-    \mathrm{s.t.} \quad
-        & \sum_{k \in \mathcal{K}_r} z_{\omega r k} = 1,
-        && r \in \mathcal{R}_\omega,
-        \label{eq:one-battery} \\
-        & B_{\omega r}
-        =
-        \sum_{k \in \mathcal{K}_r} \beta_{rk} z_{\omega r k},
-        && r \in \mathcal{R}_\omega,
-        \label{eq:battery-size} \\
-        & \underline{\rho} B_{\omega r(e)}
-        \leq
-        E_{\omega e t}
-        \leq
-        \overline{\rho} B_{\omega r(e)},
-        && e \in \mathcal{E}_\omega,\ t \in \mathcal{T}_{\omega e},
-        \label{eq:soc-bound} \\
-        & E_{\omega e,t+1}
-        =
-        E_{\omega e t}
-        -
-        d_{\omega e t}
-        +
-        \eta q_{\omega e t},
-        && e \in \mathcal{E}_\omega,\ t \in \mathcal{T}_{\omega e},
-        \label{eq:energy-balance} \\
-        & q^{\mathrm{wc}}_{\omega e t j}
-        \leq
-        M w_j,
-        && e \in \mathcal{E}_\omega,\ t \in \mathcal{T}_{\omega e},\ j \in \mathcal{J},
-        \label{eq:facility-availability} \\
-        & \sum_{e \in \mathcal{E}_\omega} x_{\omega e \tau s}
-        \leq
-        a_s,
-        && s \in \mathcal{P},\ \tau \in \mathcal{H}_\omega,
-        \label{eq:plugin-capacity} \\
-        & y_\omega \in \mathcal{X}^{\mathrm{op}}_\omega(w,z_\omega),
-        \label{eq:operation-feasible-set} \\
-        & z_{\omega r k} \in \{0,1\},
-        && r \in \mathcal{R}_\omega,\ k \in \mathcal{K}_r.
-        \label{eq:z-domain}
-\end{align}
-The recourse model selects one battery-capacity option for each route and enforces energy feasibility along each bus trip chain.
-Wireless charging variables are linked to the first-stage facility layout, whereas plug-in charging is limited by the capacity of existing chargers.
-The compact set $\mathcal{X}^{\mathrm{op}}_\omega(w,z_\omega)$ collects charging-window, duration, and variable-domain details.
-
-The two-stage stochastic formulation is
-\begin{align}
-    \min_{w} \quad
+    \min_{w^{\mathrm{S}},w^{\mathrm{D}}} \quad
         & C^{\mathrm{fac}}(w)
         +
         \sum_{\omega \in \Omega} p_\omega \Phi_\omega(w)
         \label{eq:two-stage-model} \\
     \mathrm{s.t.} \quad
-        & w_j \in \{0,1\},
-        && j \in \mathcal{J}.
-        \label{eq:w-domain}
+        & w_s^{\mathrm{S}} \in \{0,1\},
+        && s \in \mathcal{S}\setminus\mathcal{C},
+        \label{eq:swc-domain} \\
+        & w_l^{\mathrm{D}} \in \{0,1\},
+        && l \in \mathcal{L}.
+        \label{eq:dwc-domain}
 \end{align}
-The vector $w$ is nonanticipative across scenarios, while $z_\omega$ and $y_\omega$ are scenario-adaptive recourse decisions.
-Equations~\eqref{eq:recourse-value}--\eqref{eq:w-domain} define the deterministic equivalent when the scenario recourse constraints are written explicitly for all scenarios.
-Direct solution of this extensive form is used only later as a computational benchmark.
+where $w=(w^{\mathrm{S}},w^{\mathrm{D}})$ and
+\[
+    C^{\mathrm{fac}}(w)=\sum_{s \in \mathcal{S}\setminus\mathcal{C}} c_s^{\mathrm{S}} w_s^{\mathrm{S}}+\sum_{l \in \mathcal{L}} c_l^{\mathrm{D}} w_l^{\mathrm{D}}.
+\]
+All cost coefficients are expressed on a common planning-period equivalent basis.
+The vector $w$ is the nonanticipative here-and-now facility decision, and $\Phi_\omega(w)$ is the optimal second-stage value in scenario $\omega$.
 
-\subsection{Natural integer L-shaped baseline}
-\label{subsec:natural-ils}
-
-Because scenarios are coupled only through the first-stage facility vector $w$, the formulation in \eqref{eq:two-stage-model} directly induces a natural integer L-shaped decomposition.
-The baseline master problem keeps $w$ and a recourse estimator $\theta_\omega$ for each scenario:
+The scenario decisions consist of route-level battery selection variables $z_{\omega,r,k}$ and operating variables collected in $y_\omega$, including charging amounts, plug-in occupancy, and battery energy states.
+Bus fleet size and battery residual values are treated as fixed scenario data, as they are known once a scenario is realized.
+For a fixed facility layout $w$, the scenario recourse value $\Phi_\omega(w)$ is the minimum scenario cost
+\begin{equation}
+    \Phi_\omega(w)
+    =
+    \min_{z_\omega,y_\omega}
+    \left\{
+        C^{\mathrm{bat}}_\omega(z_\omega) + C^{\mathrm{chg}}_\omega(y_\omega):
+        (z_\omega,y_\omega)\in\mathcal{X}_\omega(w)
+    \right\}.
+    \label{eq:recourse-value}
+\end{equation}
+For each scenario $\omega$, the recourse formulation is defined on route-indexed trip-chain data.
+For route $r\in\mathcal R$, let $\mathcal{M}_{\omega,r}$ denote its trip chains and $\mathcal{A}_{\omega,r}$ its directed traversals.
+Each trip chain corresponds to one bus; let $n_{\omega,r}=|\mathcal{M}_{\omega,r}|$ denote the route fleet size under scenario $\omega$.
+Let $\mathcal{V}^{\mathrm{P}}_{\omega,r}$ and $\mathcal{V}^{\mathrm{S}}_{\omega,r}$ denote plug-in and SWC station visits.
+Let $\mathcal{K}$ be the set of battery options, and let $\beta_k$ be the capacity of option $k$.
+The scenario battery and charging costs are
+\[
+\begin{aligned}
+    C^{\mathrm{bat}}_\omega(z_\omega)
+    &=
+    c^{\mathrm{bat}}
+    \sum_{r \in \mathcal{R}}
+    n_{\omega,r}
+    \sum_{k \in \mathcal{K}}
+    \beta_k z_{\omega,r,k}, \\
+    C^{\mathrm{chg}}_\omega(y_\omega)
+    &=
+    c^{\mathrm{day}}
+    \left(
+    \sum_{r \in \mathcal{R}}
+    \sum_{v \in \mathcal{V}^{\mathrm{P}}_{\omega,r}} q_v^{\mathrm{P}}
+    +
+    \sum_{r \in \mathcal{R}}
+    \sum_{v \in \mathcal{V}^{\mathrm{S}}_{\omega,r}} q_v^{\mathrm{S}}
+    +
+    \sum_{r \in \mathcal{R}}
+    \sum_{a \in \mathcal{A}_{\omega,r}} q_a^{\mathrm{D}}
+    \right)
+    +
+    c^{\mathrm{night}}
+    \sum_{r \in \mathcal{R}}
+    \sum_{m \in \mathcal{M}_{\omega,r}}
+    q_m^{\mathrm{N}}.
+\end{aligned}
+\]
+The feasible set $\mathcal{X}_\omega(w)$ is described by the following constraints.
+The battery-choice constraints are
 \begin{align}
-    \min_{w,\theta} \quad
-        & C^{\mathrm{fac}}(w)
-        +
-        \sum_{\omega \in \Omega} p_\omega \theta_\omega
-        \label{eq:natural-master} \\
-    \mathrm{s.t.} \quad
-        & \theta_\omega
-        \geq
-        \alpha_{\omega c}
-        +
-        \sum_{j \in \mathcal{J}} \pi_{\omega c j} w_j,
-        && \omega \in \Omega,\ c \in \mathcal{C}_\omega,
-        \label{eq:natural-cuts} \\
-        & w_j \in \{0,1\},
-        && j \in \mathcal{J}.
-        \label{eq:natural-master-domain}
+    & \sum_{k \in \mathcal{K}} z_{\omega,r,k} = 1,
+    && r \in \mathcal{R},
+    \label{eq:one-battery} \\
+    & B_{\omega,r}
+    =
+    \sum_{k \in \mathcal{K}} \beta_k z_{\omega,r,k},
+    && r \in \mathcal{R},
+    \label{eq:battery-size} \\
+    & z_{\omega,r,k} \in \{0,1\},
+    && r \in \mathcal{R},\ k \in \mathcal{K}.
+    \label{eq:z-domain}
 \end{align}
+Let $\mathcal{T}_\omega$ be the plug-in time-slot set in scenario $\omega$, let $\mathcal{T}_v\subseteq\mathcal{T}_\omega$ denote the plug-in time slots available to visit $v$, and let $s(v)$ map visit $v$ to its station.
+Let $\kappa$ be the grid-side energy delivered by one occupied plug-in time slot, and let $U_s$ be the plug-in charger capacity at station $s$.
+The plug-in charging constraints are
+\begin{align}
+    & 0
+    \leq
+    q_v^{\mathrm{P}}
+    \leq
+    \kappa
+    \sum_{\tau \in \mathcal{T}_v} x_{v\tau},
+    && r \in \mathcal{R},\ v \in \mathcal{V}^{\mathrm{P}}_{\omega,r},
+    \label{eq:plugin-charge-limit} \\
+    & \sum_{r \in \mathcal{R}}
+    \sum_{\substack{v \in \mathcal{V}^{\mathrm{P}}_{\omega,r}:\\ s(v)=s,\ \tau\in\mathcal{T}_v}}
+    x_{v\tau}
+    \leq
+    U_s,
+    && s \in \mathcal{C},\ \tau \in \mathcal{T}_\omega,
+    \label{eq:plugin-capacity} \\
+    & x_{v\tau} \in \{0,1\},
+    && r \in \mathcal{R},\ v \in \mathcal{V}^{\mathrm{P}}_{\omega,r},\ \tau \in \mathcal{T}_v.
+    \label{eq:x-domain}
+\end{align}
+Let $\mathcal{V}_{\omega,r}$ denote the station visits of route $r$ under scenario $\omega$, with plug-in and SWC visits forming its two visit types.
+The mappings $\ell(a)$, $\mathrm{tail}(a)$, and $\mathrm{head}(a)$ map a directed traversal to its physical link and adjacent visits.
+Here $\underline{\rho}$ and $\overline{\rho}$ are admissible State of Charge; $v_m^0$, $v_m^N$, $d_m^0$, $d_m^N$, and $q_m^{\mathrm{N}}$ describe the first and last visits, depot movements, and overnight depot charging for trip chain $m$.
+Trip-level energy requirements are exogenous and do not vary with the selected battery capacity.
+Each visit and traversal is a scenario-route specific event copy, so the corresponding scenario and route indices are suppressed from event-level variables.
+All charging quantities are nonnegative continuous variables measured on the grid side, and all battery-energy states are continuous.
+For each route $r\in\mathcal R$, the route energy constraints are
+\begin{align}
+    & \underline{\rho} B_{\omega,r}
+    \leq
+    e^{\mathrm{arr}}_v
+    \leq
+    \overline{\rho} B_{\omega,r},
+    && v \in \mathcal{V}_{\omega,r},
+    \label{eq:soc-arr-bound} \\
+    & \underline{\rho} B_{\omega,r}
+    \leq
+    e^{\mathrm{dep}}_v
+    \leq
+    \overline{\rho} B_{\omega,r},
+    && v \in \mathcal{V}_{\omega,r},
+    \label{eq:soc-dep-bound} \\
+    & 0
+    \leq
+    q_v^{\mathrm{S}}
+    \leq
+    \bar{q}^{\mathrm{S}}_v w_{s(v)}^{\mathrm{S}},
+    && v \in \mathcal{V}^{\mathrm{S}}_{\omega,r},
+    \label{eq:swc-charge-limit} \\
+    & 0
+    \leq
+    q_a^{\mathrm{D}}
+    \leq
+    \bar{q}^{\mathrm{D}}_a w_{\ell(a)}^{\mathrm{D}},
+    && a \in \mathcal{A}_{\omega,r},
+    \label{eq:dwc-charge-limit} \\
+    & e^{\mathrm{dep}}_v
+    =
+    e^{\mathrm{arr}}_v
+    +
+    \eta^{\mathrm{P}}
+    q_v^{\mathrm{P}},
+    && v \in \mathcal{V}^{\mathrm{P}}_{\omega,r},
+    \label{eq:station-energy-balance} \\
+    & e^{\mathrm{dep}}_v
+    =
+    e^{\mathrm{arr}}_v
+    +
+    \eta^{\mathrm{S}}
+    q_v^{\mathrm{S}},
+    && v \in \mathcal{V}^{\mathrm{S}}_{\omega,r},
+    \label{eq:swc-station-energy-balance} \\
+    & e^{\mathrm{arr}}_{\mathrm{head}(a)}
+    =
+    e^{\mathrm{dep}}_{\mathrm{tail}(a)}
+    -
+    d_a
+    +
+    \eta^{\mathrm{D}}
+    q_a^{\mathrm{D}},
+    && a \in \mathcal{A}_{\omega,r},
+    \label{eq:link-energy-balance} \\
+    & e^{\mathrm{arr}}_{v_m^{0}}
+    =
+    \overline{\rho} B_{\omega,r}
+    -
+    d_m^{0},
+    && m \in \mathcal{M}_{\omega,r},
+    \label{eq:initial-boundary-energy} \\
+    & e^{\mathrm{dep}}_{v_m^{N}}
+    -
+    d_m^{N}
+    \geq
+    \underline{\rho} B_{\omega,r},
+    && m \in \mathcal{M}_{\omega,r},
+    \label{eq:return-boundary-energy} \\
+    & \eta^{\mathrm{P}} q_m^{\mathrm{N}}
+    =
+    \overline{\rho} B_{\omega,r}
+    -
+    e^{\mathrm{dep}}_{v_m^{N}}
+    +
+    d_m^{N},
+    && m \in \mathcal{M}_{\omega,r}.
+    \label{eq:overnight-charge-balance}
+\end{align}
+Constraints~\eqref{eq:one-battery}--\eqref{eq:z-domain} define the route-level battery choice and the induced battery capacity.
+Constraints~\eqref{eq:plugin-charge-limit}--\eqref{eq:x-domain} define plug-in charging amounts, charger occupancy, and station-time capacity.
+Constraints~\eqref{eq:soc-arr-bound}--\eqref{eq:soc-dep-bound} impose arrival and departure SoC bounds, and \eqref{eq:swc-charge-limit}--\eqref{eq:dwc-charge-limit} define SWC and DWC charging amounts enabled by installed wireless facilities.
+Constraints~\eqref{eq:station-energy-balance}--\eqref{eq:link-energy-balance} update energy at plug-in visits, SWC visits, and directed traversals, while \eqref{eq:initial-boundary-energy}--\eqref{eq:overnight-charge-balance} close each trip chain through depot movements and overnight recharge.
 
-Given a master solution $\bar{w}$, the scenario subproblem evaluates $\Phi_\omega(\bar{w})$ by solving \eqref{eq:recourse-value}--\eqref{eq:z-domain} independently for each scenario.
-If the estimator $\theta_\omega$ is too low or if the recourse problem is infeasible, the algorithm adds an integer L-shaped cut to $\mathcal{C}_\omega$ and resolves the master.
+\subsection{Natural integer L-shaped benchmark}
+\label{subsec:baseline-ils}
 
-This natural decomposition is a classical baseline rather than a contribution of this paper.
-When the cut loop converges, it solves the two-stage formulation in \eqref{eq:two-stage-model}.
-Section~\ref{sec:method} improves this baseline by changing the master representation, recourse evaluation, and cut construction.
-
-% TODO: Decide later whether detailed opportunity-window and charging-duration constraints should be expanded in an appendix.
+The two-stage stochastic formulation admits a standard integer L-shaped decomposition.
+The master problem retains the first-stage facility vector $w=(w^{\mathrm S},w^{\mathrm D})$ and introduces $\theta_\omega$ to approximate the recourse value of each scenario.
+For a trial facility layout $\bar w$, each scenario defines one mixed-integer subproblem consisting of the recourse objective \eqref{eq:recourse-value} and constraints \eqref{eq:one-battery}--\eqref{eq:overnight-charge-balance}.
+Standard integer L-shaped feasibility and optimality cuts are generated from these scenario subproblems and added iteratively to the master problem.
+We refer to this direct implementation as the natural integer L-shaped (Natural ILS) benchmark.
+It leaves route-level battery selection, plug-in occupancy integrality, and shared plug-in charger capacity inside each scenario subproblem.
