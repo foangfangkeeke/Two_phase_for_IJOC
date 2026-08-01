@@ -23,9 +23,9 @@ Paragraph-level drafts belong in the corresponding `.tex` files.
    - Organize Stream 2 around two performance dimensions: decomposition / reformulation choice and cut / separation strength.
    - End by positioning the paper as a tailored exact decomposition method for shared-resource mixed-integer recourse.
 
-3. `Problem Formulation and Baseline Decomposition`
-   - Present the compact two-stage stochastic formulation, emphasizing information structure and recourse coupling rather than model novelty.
-   - Present the baseline integer L-shaped decomposition induced by the information structure.
+3. `Problem Formulation and Recourse Structure`
+   - Present the compact two-stage stochastic formulation and complete scenario recourse model.
+   - Extract the recourse structures that motivate the algorithm: scenario separability, conditional route locality, and facility--battery resource monotonicity.
 
 4. `Reformulation-Enabled Integer L-Shaped Method`
    - Develop the lifted reformulation.
@@ -56,25 +56,35 @@ Paragraph-level drafts belong in the corresponding `.tex` files.
 
 `3.1 Two-stage stochastic formulation`
 
-- Define scenario meaning and decision timing directly before the formulation.
-- Define station, directed-link, and existing plug-in charging station sets.
-- Define SWC deployment on stations outside existing hubs and DWC deployment on directed links.
-- Define the main recourse variables and the shared plug-in capacity coupling.
-- Use route-indexed trip chains, station visits, directed link traversals, and visit-time plug-in occupancy variables to absorb bus, location, and time indices in operational constraints.
-- Group recourse constraints visibly into route battery configuration, plug-in charging use / shared capacity, and scenario-level charging / energy-feasibility constraints.
-- In the plug-in block, distinguish route-restrictable charging-use constraints from the shared station-time capacity constraint that Phase 1 relaxes.
-- Write the energy-feasibility block as route-local constraints imposed for each route, so Section 4 can reference the block directly as the route-level subproblem core.
-- Do not introduce separate hub/interchange event sets in the main model; include trip-chain boundary energy and overnight charging amounts explicitly.
-- Split energy balance into station arrival/departure transitions and directed link traversal transitions.
-- Avoid a numbered black-box operational feasibility constraint in the core model; keep remaining timing conventions in the construction of visits, traversals, and charging windows.
-- Present the compact two-stage objective and scenario recourse constraints.
-- State the model boundary while explaining the recourse formulation.
-- Identify the extensive-form stochastic MILP as the direct-solution benchmark.
-- Keep the consolidated notation table in the appendix.
+- Define service-plan scenarios, probabilities, and decision timing.
+- Make clear that scenarios fix route frequencies, timetables, trip chains, active-fleet requirements, and trip-level energy requirements; the model does not choose fleet size.
+- Define first-stage wireless facility decisions on candidate SWC stations and DWC links.
+- Present the compact two-stage stochastic objective and the scenario recourse value `Phi_omega(w)`.
+- Do not expand the recourse feasible set in this subsection.
+
+`3.2 Scenario recourse formulation`
+
+- Expand the complete scenario recourse model using route-indexed trip-chain data.
+- Organize the recourse model into four paragraph blocks: battery configuration and cost; charging cost; plug-in charging and shared capacity; wireless charging and route energy dynamics.
+- In the battery block, define route battery choices and induced battery capacity.
+- In the charging-cost block, include daytime plug-in, SWC, DWC, and overnight depot charging.
+- In the plug-in block, define plug-in charging amounts, occupancy variables, time slots, and station-time capacity.
+- In the energy block, define SoC bounds, SWC/DWC availability, station and link energy balances, depot boundary conditions, and overnight charging balance.
+- Keep model explanations short but sufficient for reproducibility.
+
+`3.3 Recourse structure`
+
+- State scenario separability and define the resulting direct baseline decomposition as Natural ILS, without formal baseline master or cut formulas.
+- State conditional route locality: fixed `(w,z_omega)` leaves the energy-dynamics block route-indexed, while shared plug-in charger capacity links plug-in occupancy across routes at each station-time pair.
+- Separate structure from algorithm operation: route locality motivates the method but should not pre-state the relaxation design in Section 3.
+- State facility--battery resource monotonicity under the model specification that trip-level energy consumption is independent of battery capacity; do not use implementation parameter names in the main text.
+- State only the monotone operational resource order in Section 3; do not use an unused-resource explanation for battery monotonicity.
+- Defer the formal resource-monotonicity proof to Section 4.3, where battery upgrades are handled by energy-state shifting.
+- Close by identifying the layered recourse structure without naming the specific algorithmic components; leave lifting, two-phase separation, and strengthened cuts to Section 4.
 
 Confirmed modeling details for `3.1`:
 
-- The operated route set is common across service-plan scenarios; scenarios change frequencies, fleet requirements, and associated trip-chain data, but do not add or remove routes.
+- The operated route set is common across service-plan scenarios; scenarios change frequencies, active-fleet requirements, and associated trip-chain data, but do not add or remove routes.
 - Each trip chain corresponds to one bus, so `n_{\omega,r}=|\mathcal{M}_{\omega,r}|`.
 - All stations in `\mathcal{S}\setminus\mathcal{C}` and all directed links in `\mathcal{L}` are candidate SWC/DWC locations.
 - Plug-in charging stations in `\mathcal{C}` are pre-existing resources; they are excluded from SWC candidates by the candidate-screening rule.
@@ -83,23 +93,17 @@ Confirmed modeling details for `3.1`:
 - Overnight charging occurs at depots, and overnight capacity is assumed sufficient to restore each bus to the upper admissible SoC before the next representative service day.
 - SWC station congestion is not modeled separately; visit-level SWC opportunity limits absorb the available charging opportunity.
 - Trip-level energy consumption is exogenous and does not vary with selected battery capacity.
-- Shared plug-in station-time capacity is the only cross-route coupling among second-stage route-level constraints.
+- Shared plug-in station-time capacity is the main explicit cross-route coupling among second-stage route-level constraints.
 
 Section 3 TODO before final submission:
 
+- Revisit the label "Natural ILS"; use a more conventional name if the target literature suggests one.
 - Synchronize Appendix notation after Section 3 symbols stabilize.
 - Decide whether to add a new decision-timeline figure for Stage 1 facilities, scenario realization, route-level battery choices, and charging-allocation recourse.
 - Keep SWC/DWC technical illustrations out of `3.1`; consider moving them to the Introduction or appendix if useful.
 - Ensure the final notation table states `\mathcal R`, `\mathcal K`, `\beta_k`, `n_{\omega,r}=|\mathcal M_{\omega,r}|`, depot boundary energy, grid-side charging quantities, and the candidate-screening rule for plug-in stations.
-- Ensure the final model-boundary text records omitted details now kept out of `3.1`: cost time-scale conversion, omitted battery degradation, sufficient overnight depot charging, no separate SWC station-time congestion, and exogenous energy consumption.
+- Ensure the final model-boundary text records omitted details now kept out of `3.1`: representative-day conversion of investment costs, omitted battery degradation, sufficient overnight depot charging, no separate SWC station-time congestion, and exogenous energy consumption.
 - Check whether objective values reported in Section 5 are decision-relevant optimized costs or total system costs with omitted scenario constants added back.
-
-`3.2 Baseline integer L-shaped decomposition`
-
-- Define the baseline master with only `w` and scenario estimators `theta`.
-- Define scenario subproblems that jointly optimize battery choices, charging amounts, plug-in occupancy, and energy states.
-- State the limitation: battery-selection integrality, operational integrality, and shared plug-in capacity remain inside the scenario MIP.
-- Transition to Section 4.
 
 Open work:
 
@@ -123,6 +127,7 @@ Open work:
 `4.3 Monotonicity-based strengthened cuts`
 
 - State the monotonicity condition.
+- Prove model-induced resource monotonicity in the method section; battery upgrades require an energy-state shifting argument because absolute SoC lower bounds also increase.
 - Define the direction-selective indicator for opening facilities and upgrading batteries.
 - State and prove strengthened feasibility and optimality cuts.
 - Position these cuts as the main distinction between lifted two-phase and the full method.
