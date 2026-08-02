@@ -25,6 +25,28 @@ bool IsRelevantCoeff(double coeff)
     return std::fabs(coeff) > kSparseCoeffTol;
 }
 
+std::string RouteThetaName(int scenarioIndex, int routeId)
+{
+    return "theta_scenario_" + std::to_string(scenarioIndex)
+        + "_route_" + std::to_string(routeId);
+}
+
+void RemovePhase1GlobalRouteThetaLink(GRBModel& model)
+{
+    model.remove(model.getConstrByName("theta_route_sum"));
+}
+
+void AddScenarioRouteThetaLink(GRBModel& model, const ScenarioSubproblemInfo& scenarioInfo,
+    const GRBVar& scenarioTheta, size_t phase2Index)
+{
+    GRBLinExpr routeThetaSum = 0.0;
+    for (int routeId : scenarioInfo.routeIds) {
+        routeThetaSum += model.getVarByName(RouteThetaName(scenarioInfo.scenarioIndex, routeId));
+    }
+    model.addConstr(routeThetaSum <= scenarioTheta,
+        "theta_route_to_p2_scenario_" + std::to_string(phase2Index));
+}
+
 using DataInitFactory = std::function<std::unique_ptr<IDataInit_LShape>(const std::string&)>;
 using SubFactory = std::function<std::unique_ptr<ISubProblem_LShape>()>;
 
@@ -160,6 +182,8 @@ Status LiftedTwoPhaseILS::Initialize()
         return ERROR;
     }
 
+    RemovePhase1GlobalRouteThetaLink(*model);
+
     scenarioThetaVars.clear();
     scenarioThetaVars.reserve(scenarioSubproblems.size());
     GRBLinExpr scenarioThetaSum = 0.0;
@@ -168,6 +192,7 @@ Status LiftedTwoPhaseILS::Initialize()
             "scenario_theta_p2_" + std::to_string(idx));
         scenarioThetaVars.push_back(gTheta);
         scenarioThetaSum += gTheta;
+        AddScenarioRouteThetaLink(*model, scenarioSubproblems[idx], gTheta, idx);
     }
     model->addConstr(scenarioThetaSum <= theta, "theta_scenario_sum_p2");
 

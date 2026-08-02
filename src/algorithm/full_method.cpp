@@ -25,6 +25,28 @@ bool IsRelevantCoeff(double coeff)
     return std::fabs(coeff) > kSparseCoeffTol;
 }
 
+std::string RouteThetaName(int scenarioIndex, int routeId)
+{
+    return "theta_scenario_" + std::to_string(scenarioIndex)
+        + "_route_" + std::to_string(routeId);
+}
+
+void RemovePhase1GlobalRouteThetaLink(GRBModel& model)
+{
+    model.remove(model.getConstrByName("theta_route_sum"));
+}
+
+void AddScenarioRouteThetaLink(GRBModel& model, const ScenarioSubproblemInfo& scenarioInfo,
+    const GRBVar& scenarioTheta, size_t phase2Index)
+{
+    GRBLinExpr routeThetaSum = 0.0;
+    for (int routeId : scenarioInfo.routeIds) {
+        routeThetaSum += model.getVarByName(RouteThetaName(scenarioInfo.scenarioIndex, routeId));
+    }
+    model.addConstr(routeThetaSum <= scenarioTheta,
+        "theta_route_to_p2_scenario_" + std::to_string(phase2Index));
+}
+
 void AddFeasibilityCut(GRBModel& model, const BendersCutInfo& cutInfo,
     const std::vector<GRBVar>& masterVars, const std::string& cutName)
 {
@@ -238,6 +260,8 @@ Status FullMethod::Initialize()
     }
 
     // Add one Phase 2 theta variable per scenario subproblem.
+    RemovePhase1GlobalRouteThetaLink(*model_);
+
     scenarioThetaVars_.clear();
     scenarioThetaVars_.reserve(scenarioSubproblems.size());
     GRBLinExpr scenarioThetaSum = 0.0;
@@ -246,6 +270,7 @@ Status FullMethod::Initialize()
             "scenario_theta_p2_" + std::to_string(idx));
         scenarioThetaVars_.push_back(gTheta);
         scenarioThetaSum += gTheta;
+        AddScenarioRouteThetaLink(*model_, scenarioSubproblems[idx], gTheta, idx);
     }
     model_->addConstr(scenarioThetaSum <= theta_, "theta_scenario_sum_p2");
 
