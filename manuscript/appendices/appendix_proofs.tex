@@ -1,11 +1,45 @@
 \section{Proofs}
 \label{app:proofs}
 
-\subsection{Farkas Feasibility Cut for Phase 1}
+\subsection{Route-Level LP Cuts for Phase 1}
 \label{app:farkas-cuts}
 
-Consider the route-level parametric LP in \eqref{eq:route-parametric-lp}.
-If it is infeasible at an evaluated configuration $(w^*,z^*_{\omega,r})$, a Farkas ray can be selected from
+For a fixed route pair $(\omega,r)$, write the Phase 1 route LP in standard form as
+\[
+    Q^R_{\omega,r}(w,z_{\omega,r})
+    =
+    \min_{y_{\omega,r}\geq 0}
+    \left\{
+    c_{\omega,r}^{\top} y_{\omega,r}:
+    A_{\omega,r} y_{\omega,r}
+    \geq
+    b_{\omega,r}
+    +
+    H_{\omega,r} w
+    +
+    G_{\omega,r} z_{\omega,r}
+    \right\}.
+\]
+If the route LP is feasible, any dual-feasible vector
+\[
+    \pi_{\omega,r}\ge0,
+    \qquad
+    A_{\omega,r}^{\top}\pi_{\omega,r}\le c_{\omega,r},
+\]
+gives the route-level optimality cut
+\[
+    \theta_{\omega,r}
+    \ge
+    \pi_{\omega,r}^{\top}
+    \left(
+    b_{\omega,r}
+    +
+    H_{\omega,r}w
+    +
+    G_{\omega,r}z_{\omega,r}
+    \right).
+\]
+If the route LP is infeasible at an evaluated configuration $(w^*,z^*_{\omega,r})$, a Farkas ray can be selected from
 \[
     \Sigma_{\omega,r}^{\mathrm F}
     =

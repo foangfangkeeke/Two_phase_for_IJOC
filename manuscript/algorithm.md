@@ -8,11 +8,10 @@ CLI names may stay short for scripts; manuscript tables should use the paper-fac
 | `wireless` | `solver` | Direct extensive-form MILP | Monolithic deterministic-equivalent benchmark |
 | `wireless` | `natural-ils` | Baseline integer L-shaped decomposition | Classical scenario decomposition induced by the original two-stage model |
 | `wireless_reform` | `lifted-ils` | Lifted integer L-shaped decomposition | Lifted master without the two-phase relaxation |
-| `wireless_reform` | `lifted-monotone` | Lifted integer L-shaped decomposition with monotonicity cuts | Cross-ablation for monotonicity strengthening |
+| `wireless_reform` | `lifted-monotone` | Lifted integer L-shaped decomposition with scenario-level monotonicity cuts | Optional diagnostic, not part of the main benchmark ladder |
 | `wireless_reform` | `lifted-two-phase-no-rsp` | Lifted two-phase method without RSP | Appendix diagnostic for the RSP enhancement |
 | `wireless_reform` | `lifted-two-phase` | Lifted two-phase method | Lifted master plus Phase 1 lower bounding and Phase 2 verification |
-| `wireless_reform` | `full-no-p1-custom` | Full method without Phase 1 custom cuts | Ablation for Phase 1 custom cuts |
-| `wireless_reform` | `full` | Full method | Complete proposed method |
+| `wireless_reform` | `full` | Full method | Lifted two-phase method plus scenario-level monotonicity cuts |
 
 Terminology notes:
 
