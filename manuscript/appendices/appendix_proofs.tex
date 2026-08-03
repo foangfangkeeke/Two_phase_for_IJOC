@@ -1,4 +1,44 @@
 \section{Proofs}
 \label{app:proofs}
 
-% TODO: Move long proof details here once the main propositions are stable.
+\subsection{Farkas Feasibility Cut for Phase 1}
+\label{app:farkas-cuts}
+
+Consider the route-level parametric LP in \eqref{eq:route-parametric-lp}.
+If it is infeasible at an evaluated configuration $(w^*,z^*_{\omega,r})$, a Farkas ray can be selected from
+\[
+    \Sigma_{\omega,r}^{\mathrm F}
+    =
+    \left\{
+    \sigma_{\omega,r}\geq 0:
+    A_{\omega,r}^{\top}\sigma_{\omega,r}\leq 0
+    \right\}
+\]
+such that
+\[
+    \hat{\sigma}_{\omega,r}^{\top}
+    \left(
+    b_{\omega,r}
+    +
+    H_{\omega,r}w^*
+    +
+    G_{\omega,r}z^*_{\omega,r}
+    \right)
+    >
+    0.
+\]
+Then any configuration with a feasible Phase 1 route relaxation must satisfy
+\begin{equation}
+    \hat{\sigma}_{\omega,r}^{\top}
+    \left(
+    b_{\omega,r}
+    +
+    H_{\omega,r}w
+    +
+    G_{\omega,r}z_{\omega,r}
+    \right)
+    \leq
+    0.
+    \label{eq:phase-one-farkas-cut}
+\end{equation}
+Thus \eqref{eq:phase-one-farkas-cut} is a valid feasibility cut for the Phase 1 relaxation.

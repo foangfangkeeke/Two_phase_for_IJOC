@@ -70,6 +70,7 @@ For each section, proceed in this order:
 ## LaTeX
 
 - Compile from `manuscript/`.
-- Use `pdflatex`, then `bibtex`, then `pdflatex` twice.
+- For routine manuscript revisions, use `pdflatex` twice. Run `bibtex` only when bibliography/citation files change or the user explicitly asks for a bibliography rebuild.
 - Do not use `run.bat` for manuscript or code builds unless explicitly requested.
 - After compiling, report success or failure, the PDF path, and important warnings or errors.
+- In displayed mathematical programs, write constraints symbolically whenever possible. Prefer equation references, indexed equations, domains, or named feasible sets over prose inside `\mathrm{s.t.}`; if clarification is needed, put it in the surrounding sentence rather than inside the constraint block.

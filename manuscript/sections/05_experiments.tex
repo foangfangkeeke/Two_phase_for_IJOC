@@ -234,7 +234,7 @@ The main diagnostic is how total time, Phase 1 time, Phase 2 time, and iteration
 This subsection uses \texttt{B-10-C1} through \texttt{B-10-C5} to test the effect of shared plug-in fast-charger capacity on the relaxation-verification structure.
 Within this subsection, we denote these five variants by \texttt{C1}--\texttt{C5}; all five are built from \texttt{B-10}, and only the number of existing plug-in fast chargers is varied.
 This changes how residual fast-charging demand, after accounting for wireless charging opportunities and battery choices, couples the route-level recourse problems.
-The experiment is designed around the Phase 1 relaxation in Proposition~\ref{prop:phase-one-lb}, which removes shared plug-in fast-charger capacity coupling to obtain route-level LP subproblems.
+The experiment is designed around the Phase 1 relaxation in Lemma~\ref{lem:phase-one-lb}, which removes shared plug-in fast-charger capacity coupling to obtain route-level LP subproblems.
 When capacity is tight, the Phase 1 relaxation is expected to be less aligned with Phase 2; when capacity is loose, the two feasible regions should be closer.
 The comparison is restricted to lifted two-phase and the full method because both use the same lifted reformulation, Phase 1 relaxation, and exact Phase 2 verification; the main difference is the monotonicity strengthening.
 The main computational question is how the relaxation gap and Phase 2 verification burden change with capacity, and whether monotonicity strengthening remains effective as capacity coupling becomes tighter.
