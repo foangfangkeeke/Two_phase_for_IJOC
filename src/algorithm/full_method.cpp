@@ -195,10 +195,9 @@ struct FullMethod::ScenarioSubProblemState {
 };
 
 FullMethod::FullMethod(ProblemType problemType,
-    std::string dataFolder, int maxIters, double tol, bool usePhase1StrengthenedCuts)
+    std::string dataFolder, int maxIters, double tol)
     : problemType(problemType), dataFolder(std::move(dataFolder)),
-      maxIters(maxIters), tolerance(tol),
-      usePhase1StrengthenedCuts(usePhase1StrengthenedCuts)
+      maxIters(maxIters), tolerance(tol)
 {}
 
 Status FullMethod::Initialize()
@@ -211,7 +210,6 @@ Status FullMethod::Initialize()
     LShapeRelaxed phase1(problemType, dataFolder, maxIters, tolerance);
     phase1.SetSolverConfig(solverConfig);
     phase1.SetQuiet(true);
-    phase1.SetUseStrengthenedCuts(usePhase1StrengthenedCuts);
 
     Status s = phase1.Initialize();
     if (s != OK) { std::cerr << "Phase 1 init failed" << std::endl; return s; }

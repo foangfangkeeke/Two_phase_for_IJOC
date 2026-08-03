@@ -144,12 +144,9 @@ int main(int argc, char* argv[])
         } else if (algLower == "full") {
             solver.SetAlgorithm(std::make_unique<FullMethod>(
                 WIRELESS_CAPACITY_REFORM, dataFolder, 5000));
-        } else if (algLower == "full-no-p1-custom") {
-            solver.SetAlgorithm(std::make_unique<FullMethod>(
-                WIRELESS_CAPACITY_REFORM, dataFolder, 5000, 1e-6, false));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;
-            cout << "valid wireless_reform algorithms: lifted-ils, lifted-monotone, lifted-two-phase, lifted-two-phase-no-rsp, full, full-no-p1-custom" << endl;
+            cout << "valid wireless_reform algorithms: lifted-ils, lifted-monotone, lifted-two-phase, lifted-two-phase-no-rsp, full" << endl;
             return 1;
         }
 

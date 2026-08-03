@@ -18,7 +18,7 @@ struct ScenarioSubproblemInfo;
 class FullMethod : public IMILPAlgorithmStrategy {
 public:
     FullMethod(ProblemType problemType, std::string dataFolder = "test_data",
-        int maxIters = 500, double tol = 1e-6, bool usePhase1StrengthenedCuts = true);
+        int maxIters = 500, double tol = 1e-6);
     Status Initialize() override;
     Status Solve() override;
     ~FullMethod() override;
@@ -30,7 +30,6 @@ private:
     std::string dataFolder;
     int maxIters;
     double tolerance;
-    bool usePhase1StrengthenedCuts;
 
     // Phase 1 results
     std::vector<double> phase1ZValues;

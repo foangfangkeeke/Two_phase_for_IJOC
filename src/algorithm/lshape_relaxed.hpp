@@ -17,7 +17,6 @@ public:
     ~LShapeRelaxed() override;
 
     void SetQuiet(bool quiet) { quiet_ = quiet; }
-    void SetUseStrengthenedCuts(bool enabled) { useStrengthenedCuts_ = enabled; }
 
     // Expose Phase 1 results and internals for Phase 2 reuse
     const std::vector<double>& GetIncumbentZValues() const { return incumbentZValues; }
@@ -44,7 +43,7 @@ private:
 
     Status EvaluateSubProblems(const std::vector<double>& zValues,
         LShapeCutInfo& cutInfo, double& subObj,
-        std::vector<double>& routeSubObjs, std::vector<LShapeCutInfo>& routeCutInfos);
+        std::vector<LShapeCutInfo>& routeCutInfos);
 
     Status ApplyWarmStart();
     void UpdateIncumbent(const std::vector<double>& zValues, double secondStageValue);
@@ -65,7 +64,6 @@ private:
     GRBVar theta;
 
     bool quiet_ = false;
-    bool useStrengthenedCuts_ = false;
     double globalLowerBound;
     double bestUpperBound;
     double bestLowerBound;
