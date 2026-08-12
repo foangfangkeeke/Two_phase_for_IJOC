@@ -22,6 +22,8 @@ public:
     Status Initialize() override;
     Status Solve() override;
     void SetExportSolution(bool enabled) { exportSolution_ = enabled; }
+    void SetFixedFacilitiesFile(std::string path) { fixedFacilitiesFile_ = std::move(path); }
+    void SetExportDirectory(std::string path) { exportDirectory_ = std::move(path); }
     ~FullMethod() override;
 
 private:
@@ -60,4 +62,6 @@ private:
     long long phase2ElapsedMs_ = 0;
     std::chrono::steady_clock::time_point phase2Start_;
     bool exportSolution_ = false;
+    std::string fixedFacilitiesFile_;
+    std::string exportDirectory_;
 };

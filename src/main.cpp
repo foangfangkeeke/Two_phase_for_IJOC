@@ -71,6 +71,8 @@ int main(int argc, char* argv[])
     string pb = "wireless";
     string dataType = "test";
     bool exportSolution = false;
+    string fixedFacilitiesFile;
+    string exportDirectory;
     for (int idx = 1; idx < argc; ++idx) {
         string arg = argv[idx];
         if (arg == "--alg" && idx + 1 < argc) {
@@ -80,6 +82,11 @@ int main(int argc, char* argv[])
         } else if (arg == "--data" && idx + 1 < argc) {
             dataType = argv[++idx];
         } else if (arg == "--export-solution") {
+            exportSolution = true;
+        } else if (arg == "--fixed-facilities" && idx + 1 < argc) {
+            fixedFacilitiesFile = argv[++idx];
+        } else if (arg == "--export-dir" && idx + 1 < argc) {
+            exportDirectory = argv[++idx];
             exportSolution = true;
         }
     }
@@ -148,6 +155,8 @@ int main(int argc, char* argv[])
             auto algorithm = std::make_unique<FullMethod>(
                 WIRELESS_CAPACITY_REFORM, dataFolder, 5000);
             algorithm->SetExportSolution(exportSolution);
+            algorithm->SetFixedFacilitiesFile(fixedFacilitiesFile);
+            algorithm->SetExportDirectory(exportDirectory);
             solver.SetAlgorithm(std::move(algorithm));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;

@@ -16,6 +16,7 @@
 #include <stdexcept>
 #include <string>
 #include <tuple>
+#include <unordered_map>
 #include <vector>
 
 namespace {
@@ -188,6 +189,69 @@ bool MeetsOuterGap(double bestUpperBound, double bestLowerBound, const SolverCon
     return relGap <= solverConfig.mipGap;
 }
 
+bool IsFacilityVariable(const std::string& name)
+{
+    return name.rfind("w_station_", 0) == 0 || name.rfind("w_link_", 0) == 0;
+}
+
+std::unordered_map<std::string, double> LoadFacilityAssignments(const fs::path& path)
+{
+    std::ifstream input(path);
+    if (!input) {
+        throw std::runtime_error("Cannot open fixed-facilities file: " + path.string());
+    }
+
+    std::string line;
+    std::getline(input, line);
+    std::unordered_map<std::string, double> assignments;
+    while (std::getline(input, line)) {
+        const size_t firstComma = line.find(',');
+        const size_t secondComma = line.find(',', firstComma + 1);
+        const size_t thirdComma = line.find(',', secondComma + 1);
+        if (firstComma == std::string::npos || secondComma == std::string::npos
+            || thirdComma == std::string::npos) {
+            throw std::runtime_error("Invalid fixed-facilities CSV row: " + line);
+        }
+
+        const std::string name = line.substr(firstComma + 1, secondComma - firstComma - 1);
+        if (!IsFacilityVariable(name)) {
+            continue;
+        }
+        assignments[name] = std::stod(line.substr(secondComma + 1, thirdComma - secondComma - 1));
+    }
+
+    if (assignments.empty()) {
+        throw std::runtime_error("No facility assignments found in: " + path.string());
+    }
+    return assignments;
+}
+
+void FixFacilityVariables(std::vector<GRBVar>& masterVars, const fs::path& path)
+{
+    const auto assignments = LoadFacilityAssignments(path);
+    size_t fixedCount = 0;
+    for (GRBVar& var : masterVars) {
+        const std::string name = var.get(GRB_StringAttr_VarName);
+        if (!IsFacilityVariable(name)) {
+            continue;
+        }
+        const auto it = assignments.find(name);
+        if (it == assignments.end()) {
+            throw std::runtime_error("Missing fixed facility assignment for: " + name);
+        }
+        const double value = it->second >= 0.5 ? 1.0 : 0.0;
+        var.set(GRB_DoubleAttr_LB, value);
+        var.set(GRB_DoubleAttr_UB, value);
+        var.set(GRB_DoubleAttr_Start, value);
+        ++fixedCount;
+    }
+    if (fixedCount != assignments.size()) {
+        throw std::runtime_error("Fixed-facilities file does not match the current facility variables");
+    }
+    std::cout << "Fixed facility variables from " << path.string()
+              << ": " << fixedCount << std::endl;
+}
+
 std::string CsvEscape(const std::string& value)
 {
     bool needsQuotes = false;
@@ -237,6 +301,10 @@ Status FullMethod::Initialize()
 
     Status s = phase1.Initialize();
     if (s != OK) { std::cerr << "Phase 1 init failed" << std::endl; return s; }
+
+    if (!fixedFacilitiesFile_.empty()) {
+        FixFacilityVariables(phase1.GetZVars(), fixedFacilitiesFile_);
+    }
 
     s = phase1.Solve();
     if (s != OK) { std::cerr << "Phase 1 solve failed" << std::endl; return s; }
@@ -713,7 +781,9 @@ void FullMethod::ExportIncumbentSolution() const
     if (!exportSolution_) return;
     if (!problemData_ || incumbentZValues_.empty()) return;
 
-    const fs::path exportDir = fs::path("results") / dataFolder / "full_solution";
+    const fs::path exportDir = exportDirectory_.empty()
+        ? fs::path("results") / dataFolder / "full_solution"
+        : fs::path(exportDirectory_);
     fs::create_directories(exportDir);
 
     const auto& masterVars = problemData_->getData<std::vector<ProblemDataVar>>("masterVars");
