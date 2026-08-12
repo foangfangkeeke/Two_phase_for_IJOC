@@ -152,7 +152,7 @@ Open work:
 - Define all main instance families in one place.
 - Use `S`, `M`, `B`, and `L` for network scale.
 - Use `B-k` for scenario-count tests.
-- Use `B-10-C1` through `B-10-C5` for capacity-coupling tests.
+- Use `B-10-C2` through `B-10-C6` for capacity-coupling tests, where `Cq` denotes the actual number of existing plug-in chargers.
 - Define compared algorithms and common solver protocol.
 
 `5.2 Solution characteristics on the base instance`
@@ -165,25 +165,27 @@ Open work:
 `5.3 Network-scale algorithmic ablation`
 
 - Use `S-3`, `M-3`, `B-3`, and `L-3`.
-- Compare direct MILP, baseline integer L-shaped, lifted integer L-shaped, lifted two-phase, and full method where meaningful.
-- Show which components expand the solvable network-scale boundary.
+- Compare direct MILP, baseline integer L-shaped, lifted integer L-shaped, lifted two-phase, and full method where runs are available.
+- Current logs support a boundary-test reading: standard decompositions fail on `S-3`, two-phase variants solve through `B-3`, and `L-3` hits the Phase 2 time limit at a small gap.
+- Do not claim that the full method strictly dominates lifted two-phase on all network-scale instances unless final reruns show it.
 
 `5.4 Scenario-count scalability`
 
 - Use `B-3`, `B-5`, `B-10`, `B-20`, and `B-40`.
-- Compare `solver`, `lifted-two-phase`, and `full`.
-- Emphasize scenario-count growth after fixing the base network.
+- Current complete run set reports the full method only.
+- Emphasize scenario-count growth after fixing the base network; all current full-method runs converge from 3 to 40 scenarios.
 
 `5.5 Capacity-coupling and relaxation-gap stress test`
 
-- Use `B-10-C1` through `B-10-C5`.
+- Use `B-10-C2` through `B-10-C6`.
 - Vary existing plug-in charger capacity to change how tight the relaxed coupling constraints are.
-- Compare lifted two-phase and full method unless final results justify full-only reporting.
+- Report the full method only in the current draft, unless additional comparison logs are added later.
 - Interpret as a boundary / stress test, not a universal robustness claim.
+- Current result pattern: `C2` times out during Phase 2; `C3`--`C6` converge, and the initial Phase 2 gap decreases as capacity increases.
 
 Open work:
 
-- Rerun final experiment tables under final instance names and algorithm settings.
+- Decide whether to rerun missing direct MILP / baseline rows or keep them as not reported.
 - Extract the `B-3` planning solution table.
 - Identify representative selected stations or links for route-sharing examples.
 - Fill reproducibility details: solver version, hardware, time limit, MIP gap, threads.

@@ -36,6 +36,7 @@ For each section, proceed in this order:
 - For Phase 1, state the two benefits compactly: relaxing shared plug-in fast-charger capacity coupling decomposes the subproblem by route, and the resulting smaller LP subproblems provide dual cuts.
 - For Phase 2, emphasize that exact mixed-integer verification restores equivalence with the lifted formulation, the baseline decomposition, and the extensive form when the cut loop converges.
 - Avoid long prose transitions; use equations, formal statements, and concise explanatory sentences.
+- Do not use suspended hyphenation in coordinated compounds. Repeat the complete compound modifier for each item instead of omitting a shared suffix after a hyphen; define event ownership directly where the event sets are introduced, and do not repeat explanations of suppressed indices after that ownership is clear.
 - For framework drafts, keep all needed formulas, propositions, proof sketches, and algorithm boxes, but make non-formula paragraphs concise narrative-chain drafts rather than polished journal prose.
 - Framework drafts may use explicit transition sentences or short roadmap paragraphs to make the intended section logic visible during discussion.
 - Final manuscript drafts should remove section-by-section roadmap prose unless the target-journal reference papers use it in the same location; replace it with natural experiment-design or argument-progression sentences.
@@ -54,6 +55,8 @@ For each section, proceed in this order:
 - Model, method, experiment, and discussion files may all be changed when the scope is approved.
 - Prefer small, traceable edits over broad rewrites.
 - Do not rewrite an entire `.tex` file unless explicitly requested.
+- When the user points out a concrete manuscript problem and the correction is clear, implement it directly unless the user explicitly asks to only discuss, judge, or plan first.
+- When revising formal method sections, state the mathematical object being changed, the single operation applied to it, and the resulting formulation. Avoid repeated verbs such as remove, project, and replace over the same constraint block unless each has a distinct mathematical role.
 - When the user asks to inspect only the next round of edits, stage the current worktree state before making new changes, then leave the new changes unstaged unless asked otherwise.
 - If an editing tool or IDE plugin reports an error, stop and explain before trying another editing route.
 - Do not put internal planning labels such as `Role`, `Content plan`, or `Expected message` into final manuscript text.

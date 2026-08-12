@@ -1,50 +1,57 @@
 \section{Literature Review}
 \label{sec:literature}
 
-This section reviews two streams of literature that define the paper's application structure and algorithmic positioning.
-The first stream is electric-bus charging and wireless infrastructure planning, which motivates the interaction among wireless facilities, battery choices, and existing plug-in fast-charging resources.
-The second stream is stochastic facility-location modeling and decomposition, which provides the methodological context for two-stage mixed-integer planning with scenario-dependent recourse.
-The review is organized to keep the transportation discussion concise and to focus on the shared-resource mixed-integer recourse structure used by the proposed algorithm.
+This paper intersects two literature streams.
+The first studies charging infrastructure, battery configuration, and energy-feasible operations for electric buses; the second develops exact decomposition methods for stochastic design problems with mixed-integer recourse.
 
 \subsection{Electric-bus charging and wireless infrastructure planning}
 \label{subsec:lit-wireless-bus}
 
-% TODO: Add verified citations for SWC/DWC planning, electric-bus battery sizing, plug-in charging scheduling, and route-level energy management.
+% TODO: Cite integrated electric-bus infrastructure, battery-sizing, and scheduling studies.
+Electric-bus planning links strategic infrastructure decisions with tactical battery and charging decisions.
+Charging-site selection and battery capacity determine the resources available to a fleet, while vehicle assignment, charging schedules, and route energy constraints determine whether those resources can support the prescribed service.
+Integrated optimization models therefore evaluate infrastructure and battery investments together with energy-feasible service operations.
 
-Electric-bus charging studies commonly coordinate infrastructure deployment, battery sizing, vehicle or charging schedules, and service feasibility.
-These decisions are often formulated as integrated optimization models because charging resources, route energy requirements, and schedule feasibility interact.
-Depot and plug-in fast-charging studies emphasize charger availability and charging schedules, whereas opportunity-charging studies add charging possibilities during service.
+% TODO: Cite depot, terminal, plug-in, and opportunity-charging studies with limited charger capacity.
+Depot and terminal charging studies focus on the timing of plug-in charging under vehicle schedules, electricity prices, and charger-capacity limits.
+Opportunity-charging models extend this interaction to charging during service, allowing energy to be replenished between trips or at selected stops.
+When chargers have finite capacity, station--time occupancy constraints couple buses or routes that would otherwise admit separate energy-feasibility calculations.
 
-Wireless charging infrastructure planning extends this setting by considering stationary wireless charging at stops and dynamic wireless charging on road links.
-This literature provides modeling elements that are central to our application: candidate wireless facilities, route-level energy feasibility, battery-capacity implications, and charging-operation constraints.
-It also motivates the coexistence of wireless facilities with existing plug-in fast-charging resources.
+% TODO: Cite SWC/DWC planning studies and work jointly considering wireless facilities and battery capacity.
+Wireless charging introduces a further infrastructure layer.
+SWC creates charging opportunities at selected stations, whereas DWC supplies energy while a bus traverses an equipped road segment.
+The associated planning literature examines how the location and extent of these facilities affect battery requirements, route energy feasibility, and investment and charging costs.
+These models establish the facility--battery trade-off that underlies the present application.
 
-Our use of this stream is structural.
-We adopt wireless-facility placement, route-level battery choices, representative-day charging operations, and existing plug-in fast chargers as the application objects of the model.
-We do not focus on real-time charging control, bus dispatch, or traffic operations; instead, these objects define a long-term planning setting whose shared-resource mixed-integer recourse structure is reviewed methodologically next.
+% TODO: Verify the application-level gap after the final electric-bus reference set is assembled.
+Together, these studies provide the main application components of our model: wireless-facility placement, route-level battery configuration, energy-feasible trip chains, and limited plug-in charging resources.
+We combine these components under service-plan uncertainty, with wireless facilities selected before the future service plan is known and battery configurations and charging decisions adapted to its realization.
+This setting links long-term infrastructure planning to shared-resource mixed-integer recourse.
 
-\subsection{Stochastic facility-location models and decomposition methods}
+\subsection{Decomposition methods for stochastic design problems}
 \label{subsec:lit-stochastic-decomposition}
 
-% TODO: Add verified citations for stochastic facility location and stochastic network design.
-% TODO: Add verified citations for integer L-shaped methods and mixed-integer recourse.
-% TODO: Add verified citations for partial Benders or lifted master reformulations.
-% TODO: Add verified citations for relaxation-based recourse switching and Benders subproblem decomposition.
-% TODO: Add verified citations for logic-based, combinatorial, and monotonicity-based Benders cuts.
+% TODO: Cite stochastic facility-location and network-design models with scenario recourse.
+Two-stage stochastic models for facility location and network design separate infrastructure choices made before uncertainty from scenario-dependent recourse.
+Scenario decomposition is particularly attractive when the deterministic equivalent is large, because fixing the first-stage design separates the evaluation of distinct scenarios.
+The computational challenge increases when the recourse contains discrete configuration or operating decisions rather than a continuous linear program.
 
-Stochastic facility-location and network-design models provide the optimization background for here-and-now infrastructure decisions under uncertain future conditions.
-In these models, scenarios typically represent uncertain demand, service requirements, or operating conditions, and the recourse problem evaluates the consequence of a first-stage design after a scenario is realized.
-Benders decomposition, integer L-shaped methods, and logic-based Benders decomposition provide the standard decomposition language for such two-stage models, especially when the deterministic equivalent is too large or the recourse problem contains discrete decisions.
+% TODO: Cite foundational Benders, integer L-shaped, and logic-based Benders methods.
+Benders decomposition and the L-shaped method use subproblem information to iteratively refine a master representation of future cost and feasibility.
+For continuous recourse, linear-programming duality supplies this information directly.
+Mixed-integer recourse instead requires integer L-shaped, logic-based, or related combinatorial mechanisms, and exact scenario evaluation can become the dominant computational burden.
 
-Within this decomposition family, computational performance is shaped by two broad design dimensions.
-The first is the decomposition or reformulation choice: what information is retained in the master problem, what remains in the scenario subproblems, and whether the subproblems can be decomposed or relaxed without losing useful bound information.
-The second is the separation strategy: how feasibility and optimality information from the subproblems is converted into cuts, and whether those cuts exploit problem-specific structure beyond a basic no-good exclusion.
+% TODO: Cite enriched-master, partial-decomposition, recourse-relaxation, and nested-decomposition studies.
+One line of research improves this process by changing the decomposition architecture.
+Richer master formulations expose selected recourse decisions or partial recourse descriptions, while lower-bounding relaxations and internal subproblem decompositions reduce the cost of scenario evaluation.
+These choices determine both the strength of the master bound and the computational effort required to generate it.
 
-Research on decomposition for mixed-integer recourse has developed techniques along both dimensions.
-On the reformulation side, stronger master representations, partial recourse descriptions, relaxed subproblems, and internal subproblem decompositions can improve lower bounds or reduce separation cost.
-On the cut side, integer L-shaped cuts, logic-based Benders cuts, combinatorial cuts, valid inequalities, and dominance-based cuts can exploit structure that is not captured by generic linear duality.
-The effectiveness and validity of these enhancements are structure dependent, which is why successful decomposition algorithms are often tailored to the recourse model rather than transferred directly from one application to another.
+% TODO: Cite combinatorial, dominance-based, and monotonicity-based Benders cuts.
+A complementary line of research strengthens the information returned by the subproblems.
+Logic-based and combinatorial cuts exploit discrete feasibility structure, while dominance relations and problem-specific valid inequalities can extend a correction beyond the single configuration at which it was generated.
+Such strengthening depends on a verifiable ordering or implication structure in the underlying recourse model.
 
-This paper follows that tailored-decomposition perspective.
-The electric-bus wireless-charging setting creates a shared-resource mixed-integer recourse structure with scenario-dependent battery choices, route-level operating decisions, and plug-in fast-charger capacity coupling.
-The proposed method instantiates the two design dimensions above through a reformulation-enabled integer L-shaped algorithm: it changes the master--subproblem organization, uses a relaxation--verification separation scheme, and derives cuts from the joint facility--battery structure while retaining exact recourse verification.
+% TODO: Reassess the methodological gap after the final decomposition reference set is assembled.
+These studies show that master representation, subproblem organization, and cut design must be matched to the recourse structure.
+The setting considered here combines scenario-dependent discrete battery configurations, conditionally route-local operations, and limited shared-resource coupling within each scenario.
+This layered structure motivates an exact decomposition method designed around their interaction rather than a direct application of scenario decomposition alone.

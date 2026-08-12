@@ -21,10 +21,12 @@ public:
         int maxIters = 500, double tol = 1e-6);
     Status Initialize() override;
     Status Solve() override;
+    void SetExportSolution(bool enabled) { exportSolution_ = enabled; }
     ~FullMethod() override;
 
 private:
     struct ScenarioSubProblemState;
+    void ExportIncumbentSolution() const;
 
     ProblemType problemType;
     std::string dataFolder;
@@ -57,4 +59,5 @@ private:
     long long phase1ElapsedMs_ = 0;
     long long phase2ElapsedMs_ = 0;
     std::chrono::steady_clock::time_point phase2Start_;
+    bool exportSolution_ = false;
 };

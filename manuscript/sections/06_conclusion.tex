@@ -1,19 +1,18 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-This paper studies a two-stage wireless charging facility-location problem for electric-bus systems under service-plan uncertainty.
-The model treats SWC and DWC deployment as strategic here-and-now decisions, while route-level battery selection and representative-day charging operations adapt after each service-plan scenario is realized.
-The resulting recourse structure captures how wireless charging opportunities affect battery requirements and residual demand for limited shared plug-in fast chargers.
+This paper studies wireless charging infrastructure planning for electric-bus systems under uncertain future service plans.
+The two-stage formulation separates here-and-now SWC and DWC deployment from scenario-adaptive route battery configuration and representative-day charging decisions.
+Its recourse combines scenario-dependent discrete configurations, route-level energy feasibility, and shared plug-in charger capacity.
+To exploit this structure, we develop an exact integer L-shaped method that lifts the battery configurations into the decomposition master, uses route-level LP recourse to generate lower bounds before exact scenario verification, and strengthens scenario cuts through a joint facility--battery resource order.
+The resulting procedure preserves the original information structure and converges finitely under exact separation.
 
-The main methodological contribution is an exact decomposition framework for this shared-resource mixed-integer recourse structure.
-The method uses an exact lifted reformulation that keeps scenario-dependent battery choices adaptive, a nested scenario--route relaxation--verification decomposition, and scenario-level resource monotonicity cuts.
-Phase 1 route-level LP relaxations obtain valid lower bounds and cuts, Phase 2 restores exact mixed-integer operational verification, and the strengthened full method applies monotonicity cuts to exact scenario recourse.
-Under exact master and recourse separation, the complete procedure converges to an optimal solution of the original two-stage formulation.
+The Tower-derived experiments identify the two-phase relaxation--verification scheme as the main computational improvement in the tested method ladder.
+The two-phase variants solve the small, medium, and base three-scenario instances, whereas the standard integer L-shaped variants do not solve even the small instance within the two-hour limit.
+On the base network, the full method solves all cases from 3 to 40 scenarios; the 40-scenario instance terminates in 926.4 seconds with a final gap below 0.004\%.
+The boundary cases also clarify where the method remains expensive: the largest three-scenario network reaches the time limit at a 0.092\% gap, and the tightest plug-in capacity setting fails to complete exact Phase 2 verification.
+Thus, after route-level lower bounding reduces the cost of early separation, exact verification becomes the principal bottleneck when the network is large or shared-capacity coupling is tight.
 
-The computational study is designed to show how each algorithmic component contributes to scalability.
-The base planning instance illustrates the type of wireless facility layout and adaptive battery decisions produced by the model.
-The ablation, scenario-scaling, and capacity-coupling experiments then evaluate when the direct extensive-form MILP and simpler decomposition variants become insufficient and when the full method remains effective.
-
-Several limitations define natural extensions.
-The current experiments use constructed service-plan scenarios, treat plug-in fast-charging infrastructure as exogenous, and do not endogenize the feedback from battery weight to route-level energy consumption.
-Future work can develop richer scenario-generation models, jointly optimize wireless and plug-in charging expansion, incorporate operational uncertainty, and apply the lifted two-phase decomposition idea to other stochastic infrastructure-planning problems with shared-resource recourse.
+The study uses constructed service-plan scenarios on a fixed route network, treats existing plug-in charger capacity as exogenous, and assumes that trip energy consumption is independent of the selected battery capacity.
+Future work could develop data-driven service-plan scenarios, jointly optimize wireless and plug-in capacity expansion, and incorporate battery-weight effects and short-term operational uncertainty.
+From an algorithmic perspective, stronger exact-verification procedures for tightly coupled recourse and tests on other stochastic design problems would help establish how broadly the layered decomposition applies.

@@ -70,6 +70,7 @@ int main(int argc, char* argv[])
     string alg = "solver";
     string pb = "wireless";
     string dataType = "test";
+    bool exportSolution = false;
     for (int idx = 1; idx < argc; ++idx) {
         string arg = argv[idx];
         if (arg == "--alg" && idx + 1 < argc) {
@@ -78,6 +79,8 @@ int main(int argc, char* argv[])
             pb = argv[++idx];
         } else if (arg == "--data" && idx + 1 < argc) {
             dataType = argv[++idx];
+        } else if (arg == "--export-solution") {
+            exportSolution = true;
         }
     }
 
@@ -142,8 +145,10 @@ int main(int argc, char* argv[])
             solver.SetAlgorithm(std::make_unique<LiftedTwoPhaseILS>(
                 WIRELESS_CAPACITY_REFORM, dataFolder, 5000, 1e-6, false));
         } else if (algLower == "full") {
-            solver.SetAlgorithm(std::make_unique<FullMethod>(
-                WIRELESS_CAPACITY_REFORM, dataFolder, 5000));
+            auto algorithm = std::make_unique<FullMethod>(
+                WIRELESS_CAPACITY_REFORM, dataFolder, 5000);
+            algorithm->SetExportSolution(exportSolution);
+            solver.SetAlgorithm(std::move(algorithm));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;
             cout << "valid wireless_reform algorithms: lifted-ils, lifted-monotone, lifted-two-phase, lifted-two-phase-no-rsp, full" << endl;

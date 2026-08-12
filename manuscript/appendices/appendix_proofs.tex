@@ -2,9 +2,9 @@
 \label{app:proofs}
 
 \subsection{Route-Level LP Cuts for Phase 1}
-\label{app:farkas-cuts}
+\label{app:route-lp-cuts}
 
-For a fixed route pair $(\omega,r)$, write the Phase 1 route LP in standard form as
+For a fixed scenario--route pair $(\omega,r)$, express the Phase 1 route LP \eqref{eq:phase-one-route-value} in the equivalent parametric form
 \[
     Q^R_{\omega,r}(w,z_{\omega,r})
     =
@@ -20,6 +20,7 @@ For a fixed route pair $(\omega,r)$, write the Phase 1 route LP in standard form
     G_{\omega,r} z_{\omega,r}
     \right\}.
 \]
+Here, $c_{\omega,r}$, $A_{\omega,r}$, $b_{\omega,r}$, $H_{\omega,r}$, and $G_{\omega,r}$ collect the corresponding fixed objective and constraint coefficients.
 If the route LP is feasible, any dual-feasible vector
 \[
     \pi_{\omega,r}\ge0,
@@ -28,7 +29,7 @@ If the route LP is feasible, any dual-feasible vector
 \]
 gives the route-level optimality cut
 \[
-    \theta_{\omega,r}
+    \theta_{\omega,r}^R
     \ge
     \pi_{\omega,r}^{\top}
     \left(
@@ -76,3 +77,20 @@ Then any configuration with a feasible Phase 1 route relaxation must satisfy
     \label{eq:phase-one-farkas-cut}
 \end{equation}
 Thus \eqref{eq:phase-one-farkas-cut} is a valid feasibility cut for the Phase 1 relaxation.
+
+\subsection{Finite convergence of the two-phase method}
+\label{app:finite-convergence}
+
+\begin{proof}[Proof of Theorem~\ref{thm:finite-convergence}]
+Proposition~\ref{prop:phase-one-lb} and cut validity make every Phase 2 restricted master a relaxation of the exact lifted formulation, so its optimal value is a valid lower bound.
+Whenever all exact scenario subproblems are proven feasible and solved to optimality, \eqref{eq:upper-bound} gives a valid upper bound.
+At any Phase 2 master configuration, exact separation either excludes an infeasible scenario configuration or enforces its exact recourse value whenever $\theta_\omega<Q_\omega(w,z_\omega)$.
+Because the binary configuration space and scenario set are finite and all corrections are retained, only finitely many such corrections can occur.
+
+At the final uncorrected master solution, every scenario is exact-feasible.
+If $\theta_\omega<Q_\omega(w,z_\omega)$ for any scenario, exact separation would add a further correction; hence $\theta_\omega\ge Q_\omega(w,z_\omega)$ at termination.
+All retained constraints on $\theta_\omega$ are valid lower bounds on $Q_\omega(w,z_\omega)$, so decreasing any $\theta_\omega$ above $Q_\omega(w,z_\omega)$ preserves master feasibility.
+Because $p_\omega>0$ and the master minimizes $\theta_\omega$, no optimal master solution can choose such an excessive value, and therefore $\theta_\omega=Q_\omega(w,z_\omega)$ for every scenario.
+The master objective then equals the exact candidate value, so $LB=UB$ when $\varepsilon=0$.
+Exactness of the lifted reformulation completes the result.
+\end{proof}

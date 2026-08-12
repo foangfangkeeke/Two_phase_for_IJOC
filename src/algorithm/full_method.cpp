@@ -7,6 +7,9 @@
 
 #include <algorithm>
 #include <cmath>
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <set>
@@ -19,6 +22,8 @@ namespace {
 constexpr double kSparseCoeffTol = 1e-12;
 constexpr double kCutKeyTol = 1e-9;
 constexpr bool kEnablePhase2RSP = true;
+
+namespace fs = std::filesystem;
 
 bool IsRelevantCoeff(double coeff)
 {
@@ -181,6 +186,25 @@ bool MeetsOuterGap(double bestUpperBound, double bestLowerBound, const SolverCon
     const double gapDenom = std::max(1.0, std::fabs(bestUpperBound));
     const double relGap = (bestUpperBound - bestLowerBound) / gapDenom;
     return relGap <= solverConfig.mipGap;
+}
+
+std::string CsvEscape(const std::string& value)
+{
+    bool needsQuotes = false;
+    for (char ch : value) {
+        if (ch == ',' || ch == '"' || ch == '\n' || ch == '\r') {
+            needsQuotes = true;
+            break;
+        }
+    }
+    if (!needsQuotes) return value;
+    std::string escaped = "\"";
+    for (char ch : value) {
+        if (ch == '"') escaped += '"';
+        escaped += ch;
+    }
+    escaped += '"';
+    return escaped;
 }
 
 } // namespace
@@ -487,6 +511,7 @@ Status FullMethod::Solve()
                     std::cout << "Phase 2 final elapsed time: " << phase2ElapsedMs_ << " ms" << std::endl;
                     std::cout << "Total elapsed time (Phase 1 + Phase 2): "
                               << (phase1ElapsedMs_ + phase2ElapsedMs_) << " ms" << std::endl;
+                    ExportIncumbentSolution();
                     return OK;
                 }
                 continue;
@@ -583,6 +608,7 @@ Status FullMethod::Solve()
                 std::cout << "Phase 2 final elapsed time: " << phase2ElapsedMs_ << " ms" << std::endl;
                 std::cout << "Total elapsed time (Phase 1 + Phase 2): "
                           << (phase1ElapsedMs_ + phase2ElapsedMs_) << " ms" << std::endl;
+                ExportIncumbentSolution();
                 return OK;
             }
             continue;
@@ -660,6 +686,7 @@ Status FullMethod::Solve()
             std::cout << "Phase 2 final elapsed time: " << phase2ElapsedMs_ << " ms" << std::endl;
             std::cout << "Total elapsed time (Phase 1 + Phase 2): "
                       << (phase1ElapsedMs_ + phase2ElapsedMs_) << " ms" << std::endl;
+            ExportIncumbentSolution();
             return OK;
         }
 
@@ -679,6 +706,93 @@ Status FullMethod::Solve()
     std::cout << "Total elapsed time (Phase 1 + Phase 2): "
               << (phase1ElapsedMs_ + phase2ElapsedMs_) << " ms" << std::endl;
     return ERROR;
+}
+
+void FullMethod::ExportIncumbentSolution() const
+{
+    if (!exportSolution_) return;
+    if (!problemData_ || incumbentZValues_.empty()) return;
+
+    const fs::path exportDir = fs::path("results") / dataFolder / "full_solution";
+    fs::create_directories(exportDir);
+
+    const auto& masterVars = problemData_->getData<std::vector<ProblemDataVar>>("masterVars");
+    const auto& scenarioSubproblems = problemData_->getData<std::vector<ScenarioSubproblemInfo>>(
+        "wireless_scenario_subproblems");
+
+    {
+        std::ofstream out(exportDir / "solution_metadata.csv");
+        out << std::fixed << std::setprecision(6);
+        out << "metric,value\n";
+        out << "best_upper_bound," << bestUpperBound_ << '\n';
+        out << "best_lower_bound," << bestLowerBound_ << '\n';
+        out << "phase1_elapsed_ms," << phase1ElapsedMs_ << '\n';
+        out << "phase2_elapsed_ms," << phase2ElapsedMs_ << '\n';
+        out << "total_elapsed_ms," << (phase1ElapsedMs_ + phase2ElapsedMs_) << '\n';
+    }
+
+    {
+        std::ofstream out(exportDir / "master_variables.csv");
+        out << std::fixed << std::setprecision(6);
+        out << "index,var_name,value,obj,lb,ub,vtype\n";
+        for (size_t idx = 0; idx < masterVars.size(); ++idx) {
+            const double value = incumbentZValues_[idx];
+            out << idx << ',' << CsvEscape(masterVars[idx].name) << ',' << value << ','
+                << masterVars[idx].obj << ',' << masterVars[idx].lb << ','
+                << masterVars[idx].ub << ',' << masterVars[idx].type << '\n';
+        }
+    }
+
+    {
+        std::ofstream out(exportDir / "subproblem_status.csv");
+        out << std::fixed << std::setprecision(6);
+        out << "subproblem_index,scenario_index,status,obj\n";
+
+        std::ofstream varOut(exportDir / "subproblem_variables.csv");
+        varOut << std::fixed << std::setprecision(6);
+        varOut << "subproblem_index,scenario_index,var_index,var_name,value,obj,lb,ub,vtype\n";
+
+        for (size_t idx = 0; idx < subProblems_.size(); ++idx) {
+            auto* sub = subProblems_[idx].get();
+            sub->strategy->UpdateSubProblem(*problemData_, *sub->model, sub->context, incumbentZValues_);
+            sub->model->optimize();
+
+            const int status = sub->model->get(GRB_IntAttr_Status);
+            double obj = 0.0;
+            if (status == GRB_OPTIMAL) {
+                obj = sub->model->get(GRB_DoubleAttr_ObjVal);
+            }
+
+            int scenarioIndex = sub->scenarioIndex;
+            if (idx < scenarioSubproblems.size()) {
+                scenarioIndex = scenarioSubproblems[idx].scenarioIndex;
+            }
+            out << idx << ',' << scenarioIndex << ',' << status << ',' << obj << '\n';
+
+            if (status != GRB_OPTIMAL) {
+                std::cout << "Solution export skipped variables for scenario subproblem " << idx
+                          << " because status=" << status << std::endl;
+                continue;
+            }
+
+            const int numVars = sub->model->get(GRB_IntAttr_NumVars);
+            GRBVar* vars = sub->model->getVars();
+            for (int vIdx = 0; vIdx < numVars; ++vIdx) {
+                const std::string name = vars[vIdx].get(GRB_StringAttr_VarName);
+                const double value = vars[vIdx].get(GRB_DoubleAttr_X);
+                const double objCoeff = vars[vIdx].get(GRB_DoubleAttr_Obj);
+                const double lb = vars[vIdx].get(GRB_DoubleAttr_LB);
+                const double ub = vars[vIdx].get(GRB_DoubleAttr_UB);
+                const char vtype = vars[vIdx].get(GRB_CharAttr_VType);
+                varOut << idx << ',' << scenarioIndex << ',' << vIdx << ','
+                       << CsvEscape(name) << ',' << value << ',' << objCoeff << ','
+                       << lb << ',' << ub << ',' << vtype << '\n';
+            }
+            delete[] vars;
+        }
+    }
+
+    std::cout << "Solution export written to " << exportDir.string() << std::endl;
 }
 
 FullMethod::~FullMethod() = default;

@@ -1,23 +1,23 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Electrifying bus fleets requires coordinated planning of charging infrastructure, battery capacity, and charging-resource usage under future service requirements.
+Electrifying bus fleets requires coordinated planning of charging infrastructure, battery capacity, and the use of limited charging resources under uncertain future service requirements.
 Wireless charging technologies expand the set of charging opportunities by allowing buses to receive energy at selected stops or road links during regular service.
-This capability turns infrastructure planning from a stand-alone siting decision into a joint planning problem involving wireless facility deployment, route-level battery configuration, and the use of existing plug-in fast chargers.
+This capability turns infrastructure planning from a stand-alone siting decision into a joint planning problem linking wireless facility deployment, route-level battery configuration, and the use of existing plug-in chargers.
 
-Wireless charging facilities are long-lived assets, whereas transit service plans may change with future demand, fleet composition, and operating policies.
-A layout that is attractive for one future service plan may perform poorly under another because buses may operate different trip chains, require different battery capacities, and compete for existing fast-charging resources at different times.
-The infrastructure decision therefore has to be made before the future fleet-service configuration is known, whereas battery-capacity and charging-resource decisions can adapt after that configuration is realized.
+Wireless charging facilities are long-lived assets, whereas transit service plans may change with future demand and procurement planning.
+A layout that is attractive for one future service plan may perform poorly under another because route frequencies, trip chains, active-fleet requirements, and charging-resource use may change.
+The infrastructure decision must therefore be made before the future service plan is known, whereas route-level battery configurations and operational decisions can adapt after a service-plan scenario is realized.
 
-The central planning trade-off is shaped by the interaction among wireless infrastructure, battery capacity, and plug-in fast-charging capacity.
-More in-route wireless charging can reduce battery requirements on some routes and shift energy replenishment away from terminals or depots.
-At the same time, wireless deployment changes the timing and amount of residual plug-in fast charging needed by different routes.
-Because plug-in fast chargers are limited shared resources, these residual demands couple route-level decisions that would otherwise be separable.
+The central planning trade-off is shaped by the interaction among wireless infrastructure, battery capacity, and finite plug-in charging capacity.
+More in-route wireless charging can reduce battery requirements on some routes and lower their residual demand for plug-in charging.
+At the same time, facility placement changes when and where that residual demand occurs.
+Because plug-in chargers are limited shared resources, concurrent charging requirements couple route-level decisions that would otherwise be separable.
 
 We capture this timing and coupling structure with a two-stage stochastic mixed-integer planning model.
 The first stage selects stationary and dynamic wireless charging facilities.
-The second stage, after a fleet-service scenario is realized, chooses scenario-adaptive battery configurations and representative-day charging schedules.
-The resulting recourse problems contain discrete battery choices, charging-scheduling decisions, and shared fast-charger capacity constraints.
+The second stage selects route-level battery configurations and, conditional on those selections, determines representative-day charging allocation and energy management for the realized service-plan scenario.
+The resulting recourse problems contain discrete battery choices, plug-in charger-occupancy decisions, and shared plug-in capacity constraints.
 Consequently, both the deterministic equivalent and the classical integer L-shaped decomposition become difficult to scale as the network and scenario set grow.
 
 To solve this model, we develop a reformulation-enabled integer L-shaped method.
@@ -25,18 +25,17 @@ The method differs from a standard integer L-shaped decomposition by changing wh
 This design preserves exactness when the cut loop converges and creates the algorithmic components evaluated in the computational study.
 
 The paper makes three contributions.
-First, it identifies a two-stage stochastic mixed-integer structure in which here-and-now facility decisions interact with scenario-dependent discrete design choices and shared-resource operational recourse.
-The wireless-charging application provides a concrete instantiation of this structure, and the formulation highlights the coupling that drives the algorithmic development.
-Second, it develops an exact reformulation-enabled integer L-shaped algorithm that combines scenario-dependent lifting, a two-phase relaxation-verification scheme, and monotonicity-strengthened cuts for mixed-integer recourse.
-Third, it provides a computational performance analysis that evaluates scalability with respect to network size and scenario count, and tests the method's adaptability when the gap between the Phase 1 relaxation and Phase 2 exact verification varies.
+First, it identifies a layered two-stage stochastic mixed-integer structure in which here-and-now facility decisions interact with scenario-dependent discrete configurations and shared-resource operational recourse.
+The wireless-charging application provides a concrete instantiation in which conditioning on battery choices reveals route-local operations, limited plug-in capacity couples routes, and wireless facilities and batteries form a joint operational resource order.
+Second, it develops an exact reformulation-enabled integer L-shaped algorithm that combines scenario-dependent decision variables lifting, a two-phase relaxation-verification scheme, and monotonicity-strengthened cuts for mixed-integer recourse.
+Third, it provides comprehensive computational evidence through an extensive algorithmic ablation study and systematic analyses of performance with respect to network size, scenario count, and the gap between the Phase 1 lower-bounding relaxation and the exact Phase 2 recourse evaluation.
 
 The experiments use wireless-charging planning instances constructed from Singapore bus-service data for routes operated by Tower Transit.
-They are designed to answer two questions: whether the model produces interpretable planning decisions, and which algorithmic components expand the solvable instance boundary.
-They also vary the available plug-in fast-charging capacity to test how the proposed method behaves as shared-resource coupling becomes tighter or looser.
+They examine whether the model produces interpretable planning decisions, how the algorithmic components affect network-scale and scenario-scale performance, and how the complete method responds as shared plug-in capacity makes the Phase 1 relaxation more or less aligned with exact verification.
 
 The remainder of the paper is organized as follows.
 Section~\ref{sec:literature} reviews related work on electric-bus charging infrastructure planning and stochastic decomposition methods.
-Section~\ref{sec:model} presents the two-stage formulation and the baseline integer L-shaped decomposition.
-Section~\ref{sec:method} develops the lifted two-phase algorithm and strengthened cuts.
+Section~\ref{sec:model} presents the two-stage formulation and identifies its recourse structure.
+Section~\ref{sec:method} develops the lifted two-phase method and monotonicity-strengthened cuts.
 Section~\ref{sec:experiments} reports the computational results.
 Section~\ref{sec:conclusion} concludes.
