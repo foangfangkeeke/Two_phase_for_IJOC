@@ -1,249 +1,364 @@
-\section{Computational Results}
+\section{Computational Experiments}
 \label{sec:experiments}
 
-This section evaluates the proposed reformulation and solution method on Tower-derived wireless charging planning instances.
-The experiments use the bus network as a realistic source of shared stops, shared links, and route-level service plans, while the main purpose of the section is to validate algorithmic performance.
+This section examines the planning implications and computational performance of the proposed method on instances derived from an operating bus network.
+The study first defines a representative base instance, then characterizes one planning solution, evaluates the effect of shared plug-in capacity on the Phase~1 relaxation, and finally assesses the algorithmic components and scalability of the method.
 
-\subsection{Experimental design and instance families}
+\subsection{Experimental setup and base instance}
 \label{subsec:experimental-setup}
+The case study is based on the Tower Transit bus network in Singapore.
+The network contains multiple interacting routes and shared charging resources, reflecting the cross-route coupling considered in the model.
+In the base instance, we select 28 routes to construct the study network displayed in Figure~\ref{fig:case-study-map}.
+The resulting network contains 493 stations and 625 directed links, including five existing plug-in charging locations at bus interchanges or hubs.
 
-The test instances are derived from the Tower Transit bus network in Singapore's Jurong area.
-The resulting data set provides a realistic spatial structure with shared stops, shared road links, and multiple routes that may use the same wireless charging infrastructure.
-We use these instances as a computational test bed rather than as a public benchmark.
-
-Each scenario represents a plausible future service plan for the same physical network, not random same-day scheduling noise.
-Scenario-dependent data include route frequencies, timetables, trip chains, active-fleet requirements, trip-level energy requirements, and charging opportunities induced by the corresponding service plan.
-The first-stage wireless charging facilities are shared across all scenarios, whereas route-level battery configurations, charging allocation, and energy management adapt after the service plan is realized.
-
-We use a compact instance code of the form \texttt{N-k}, where \texttt{N} indicates the network scale and $k$ indicates the number of service-plan scenarios.
-Specifically, \texttt{S}, \texttt{M}, \texttt{B}, and \texttt{L} denote the small, medium, base, and large Tower-derived networks, respectively.
-The capacity-coupling experiment appends \texttt{C}q to the base 10-scenario instance, where $q$ denotes the number of existing plug-in chargers at each plug-in location.
-The network-scale family fixes the scenario count at three and varies the physical network scale.
-The scenario-count family fixes the base network and varies the number of service-plan scenarios.
-Motivated by the relaxation-verification structure in Section~\ref{subsec:route-lower-bounding}, the capacity-coupling family varies plug-in charger capacity on \texttt{B-10} to change how strongly residual plug-in charging demand couples route-level recourse decisions.
-Table~\ref{tab:instance-families} summarizes the resulting instance families and their experimental roles.
-
-Travel times are computed from link distances using a nominal operating speed of 30 km/h and then rounded to the one-minute scheduling grid.\footnote{The one-minute lower bound avoids zero-duration movements on short links and absorbs acceleration, deceleration, signal delay, and station-approach time.}
-The remaining parameters specify battery costs, charging rates, charging efficiencies, electricity prices, facility costs, and state-of-charge limits.
-Table~\ref{tab:parameter-settings} reports the main parameter values used in the computational experiments.
-
-The benchmark ladder consists of five methods: the direct extensive-form MILP, baseline integer L-shaped decomposition, lifted integer L-shaped decomposition, lifted two-phase method, and the full method.
-The direct extensive-form MILP optimizes the deterministic equivalent with a commercial solver.
-The baseline integer L-shaped decomposition applies the classical scenario decomposition induced by the original two-stage model.
-The lifted integer L-shaped decomposition uses the lifted master representation without the two-phase relaxation.
-Lifted two-phase adds the Phase 1 lower-bounding and Phase 2 verification structure.
-The full implementation further adds tailored Phase 1 cuts and scenario-level monotonicity-strengthened cuts.
-Two targeted variants support cut ablations: lifted monotone adds the monotonicity cuts to the lifted single-phase method, while full without Phase 1 custom cuts isolates the effect of monotonicity strengthening under the two-phase framework.
-
-For the decomposition methods, Phase 1 switches at $\varepsilon_1=10^{-4}$ (0.01\%).
-Restricted masters and exact scenario MIPs are solved with zero solver gap, and route-level Phase 1 LPs are solved to optimality.
-The main performance runs use a 7200-second time limit.
-
-% TODO: Add exact solver version, CPU, memory, thread count, and final outer tolerance epsilon.
-% TODO: Add compact size statistics for each instance family after the final data extraction.
-% TODO: Add exact statistics for direct MILP on \texttt{B-3} and \texttt{L-3} if those runs are retained.
-
-\begin{figure}[htbp]
+\begin{figure}[!htbp]
     \centering
-    \includegraphics[width=0.88\linewidth]{figures/study_case.png}
-    \caption{Spatial layout of the base Tower-derived network in the Jurong area.}
+    \includegraphics[width=0.8\linewidth]{figures/study_case.png}
+    \caption{Spatial distribution of the Tower Transit bus network used in the case study.}
     \label{fig:case-study-map}
 \end{figure}
 
-% TODO: Check why the high-frequency scenario has fewer buses than the base scenario in the current generated data.
-\begin{table}[htbp]
+The base service plan is constructed from official Tower Transit route and timetable data.
+In the base service plan, 282 buses depart from two depots and complete 2,850 scheduled trips.
+The two perturbed scenarios apply 10\% lower and 10\% higher systemwide route frequencies, respectively, and reconstruct the associated trip chains and route fleet requirements.
+The resulting base instance statistics are summarized in Table~\ref{tab:base-instance-statistics}.
+These scenarios represent service-plan uncertainty on a fixed physical network; the route fleet requirements and trip chains are scenario dependent.
+The three scenarios are assigned equal probabilities.
+The three-scenario instance is used as the base case for detailed planning analysis.
+
+\begin{table}[!htbp]
 \centering
 \small
-\caption{Main instance families and experimental use}
-\label{tab:instance-families}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{@{}lllll@{}}
+\caption{Base instance statistics}
+\label{tab:base-instance-statistics}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.62\linewidth}>{\raggedleft\arraybackslash}p{0.30\linewidth}@{}}
 \toprule
-\textbf{Instance family} & \textbf{Data source or variant} & \textbf{Varied dimension} & \textbf{Primary use} & \textbf{Compared methods} \\
+\textbf{Item} & \textbf{Value} \\
 \midrule
-\texttt{S-3}, \texttt{M-3}, \texttt{B-3}, \texttt{L-3} & \texttt{tower\_small}, \texttt{tower\_medium}, \texttt{tower}, \texttt{tower\_large} & Network scale, with three scenarios fixed & Network-scale ablation & Direct MILP, baseline integer L-shaped, lifted integer L-shaped, lifted two-phase, full method \\
-\texttt{B-}k, $k\in\{3,5,10,20,40\}$ & \texttt{tower}, \texttt{tower\_5}, \texttt{tower\_10}, \texttt{tower\_20}, \texttt{tower\_40} & Scenario count, with base network fixed & Scenario-count scalability & Full method \\
-\texttt{B-10-C}q, $q\in\{2,3,4,5,6\}$ & Capacity variants of \texttt{tower\_10} & Existing plug-in charger units, with base network and 10 scenarios fixed & Relaxation-gap stress test & Full method \\
+Routes & 28 \\
+Physical stations & 493 \\
+Directed links & 625 \\
+Candidate SWC stations & 488 \\
+Candidate DWC links & 625 \\
+Plug-in charging locations & 5 \\
+Chargers per plug-in location & 4 \\
+Battery capacity options & 31 (20, 30, 40, ..., 320 kWh) \\
+Service scenarios & 3 \\
+Scheduled trips & 2,568/2,850/3,138 \\
+Bus number (trip chains) & 264/282/322 \\
 \bottomrule
-\multicolumn{5}{@{}l}{\footnotesize \texttt{B-3} is the representative base instance used for solution interpretation; larger $q$ indicates more existing plug-in charger units.} \\
 \end{tabular}
-}
+\par\smallskip
+\parbox{0.75\linewidth}{\footnotesize\emph{Note.} Trip and duty counts correspond to the low-frequency, base, and high-frequency scenarios, respectively.}
 \end{table}
 
-\begin{table}[htbp]
+Facility and battery capital costs are annualized and converted to representative-day equivalents to be comparable with daily charging costs.
+Table~\ref{tab:parameter-settings} summarizes the common physical and economic parameters.
+
+\begin{table}[!htbp]
 \centering
 \small
 \caption{Parameter settings for the computational experiments}
 \label{tab:parameter-settings}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.16\linewidth}>{\raggedright\arraybackslash}p{0.30\linewidth}>{\raggedright\arraybackslash}p{0.18\linewidth}>{\raggedright\arraybackslash}p{0.28\linewidth}@{}}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.34\linewidth}>{\raggedright\arraybackslash}p{0.36\linewidth}>{\raggedright\arraybackslash}p{0.22\linewidth}@{}}
 \toprule
-\textbf{Parameter} & \textbf{Description} & \textbf{Value} & \textbf{Source} \\
+\textbf{Parameter} & \textbf{Value} & \textbf{Source} \\
 \midrule
-\multicolumn{4}{@{}l}{\textit{Battery and state of charge}} \\
-$c^{\mathrm{bat}}$ & Daily-equivalent battery capacity cost & 0.148 USD/kWh/day & BloombergNEF price amortized over Wang et al. battery life \citep{bloombergnef_lithium-ion_2025,wang_reliable_2024} \\
-$\mathcal{K}$ & Candidate route-level battery options & 10-kWh increments within instance bounds & Case-data preprocessing \\
-$\underline{\rho},\overline{\rho}$ & Minimum and maximum state-of-charge fractions & 0.2, 0.8 & Wireless bus planning literature \citep{li_planning_2024} \\
+\multicolumn{3}{@{}l}{\textit{Battery and state of charge}} \\
+Battery capacity cost $c^{\mathrm{bat}}$ & 0.148 USD/kWh/day & \citet{bloombergnef_lithium-ion_2025}; \citet{wang_reliable_2024} \\
+Battery capacities $\mathcal K$ & 20--320 kWh in 10-kWh increments & -- \\
+State-of-charge bounds $(\underline{\rho},\overline{\rho})$ & $(0.2,0.8)$ & \citet{li_planning_2024} \\
 \addlinespace
-\multicolumn{4}{@{}l}{\textit{Charging operation}} \\
-$\kappa$ & Maximum plug-in energy per occupied one-minute slot & 2.5 kWh/slot & \citet{najafi_integrated_2025} \\
-$\bar q_v^{\mathrm{S}}$ & Visit-specific SWC opportunity limit & 1.0 kWh/min times eligible dwell time & \citet{wang_reliable_2024} \\
-$\bar q_a^{\mathrm{D}}$ & Traversal-specific DWC opportunity limit & 1.0 kWh/min times traversal time & \citet{wang_reliable_2024} \\
-$\eta^{\mathrm{P}}$ & Plug-in charging efficiency & 0.90 & \citet{li_planning_2024} \\
-$\eta^{\mathrm{S}}$ & Stationary wireless charging efficiency & 0.85 & \citet{sun_optimizing_2024} \\
-$\eta^{\mathrm{D}}$ & Dynamic wireless charging efficiency & 0.80 & \citet{sun_optimizing_2024} \\
-$U_s$ & Existing plug-in charger units at plug-in location $s$ & 4 chargers in the base setting & Case-study assumption \\
+\multicolumn{3}{@{}l}{\textit{Charging operation}} \\
+Plug-in energy rate $\kappa$ & 2.5 kWh per one-minute slot & \citet{najafi_integrated_2025} \\
+SWC opportunity limit $\bar q_v^{\mathrm S}$ & 1.0 kWh/min times eligible dwell time & \citet{wang_reliable_2024} \\
+DWC opportunity limit $\bar q_a^{\mathrm D}$ & 1.0 kWh/min times traversal time & \citet{wang_reliable_2024} \\
+Charging efficiencies $(\eta^{\mathrm P},\eta^{\mathrm S},\eta^{\mathrm D})$ & $(0.90,0.85,0.80)$ & \citet{li_planning_2024,sun_optimizing_2024} \\
+Plug-in chargers per location $U_s$ & 4 & -- \\
 \addlinespace
-\multicolumn{4}{@{}l}{\textit{Infrastructure and electricity cost}} \\
-$T^{\mathrm{fac}}$ & Facility amortization horizon & 30 years & \citet{wang_reliable_2024} \\
-$c_s^{\mathrm{S}}$ & Daily-equivalent cost of an SWC facility & 2.16 USD/day & \citet{wang_reliable_2024} \\
-$c_l^{\mathrm{D}}$ & Daily-equivalent cost of a DWC facility on link $l$ & 9 USD/km/day times link length, plus 0.90 USD/day & \citet{wang_reliable_2024} \\
-$c^{\mathrm{day}}$ & Daytime electricity price & 0.1922 USD/kWh & Singapore tariff data \citep{singstat_electricity_2026} \\
-$c^{\mathrm{night}}$ & Nighttime electricity price & 0.1233 USD/kWh & Singapore tariff data \citep{singstat_electricity_2026} \\
+\multicolumn{3}{@{}l}{\textit{Infrastructure and electricity cost}} \\
+Facility amortization horizon $T^{\mathrm{fac}}$ & 30 years & \citet{wang_reliable_2024} \\
+SWC facility cost $c_s^{\mathrm S}$ & 2.16 USD/day & \citet{wang_reliable_2024} \\
+DWC facility cost $c_l^{\mathrm D}$ & 9 USD/km/day times link length, plus 0.90 USD/day & \citet{wang_reliable_2024} \\
+Electricity prices $(c^{\mathrm{day}},c^{\mathrm{night}})$ & $(0.1922,0.1233)$ USD/kWh & \citet{singstat_electricity_2026} \\
 \bottomrule
 \end{tabular}
-}
+\par\smallskip
+\parbox{0.92\linewidth}{\footnotesize\emph{Note.} -- denotes a study-defined setting.}
 \end{table}
 
-\subsection{Solution characteristics on the base Tower instance}
+All experiments are implemented in C++ and solved using Gurobi 12.0.3 on an Intel Core i5-14600K processor with 32 GB of memory and a 12-thread budget.
+Each run has a 7,200-second algorithm time limit and an outer gap tolerance of $\varepsilon=10^{-4}$.
+
+\subsection{Representative planning solution}
 \label{subsec:solution-characteristics}
 
-This subsection will use the full-method solution for \texttt{B-3} to examine whether the optimized plan is interpretable at the facility, battery, and charging levels.
-Table~\ref{tab:planned-solution-summary} lists the outputs to be reported once the final decision data are extracted.
+The cost analysis establishes the representative solution's objective value and separates facility, battery, and charging components using Table~\ref{tab:representative-cost-breakdown}.
 
-\begin{table}[htbp]
+\begin{table}[!htbp]
 \centering
 \small
-\caption{Planned summary of the representative \texttt{B-3} solution}
-\label{tab:planned-solution-summary}
-\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.22\linewidth}>{\raggedright\arraybackslash}p{0.36\linewidth}>{\raggedright\arraybackslash}p{0.34\linewidth}@{}}
+\caption{Objective components of the representative planning solution}
+\label{tab:representative-cost-breakdown}
+\begin{tabular}{@{}lrr@{}}
 \toprule
-\textbf{Result block} & \textbf{Reported quantities} & \textbf{Purpose} \\
+Component & Cost (USD/day) & Share (\%) \\
 \midrule
-Cost composition & Facility, expected battery, daytime charging, and overnight charging costs & Verify how the objective is distributed across planning and recourse decisions \\
-Facility deployment & Numbers of selected SWC stations and DWC links, together with representative selected locations & Identify where the optimized layout creates charging opportunities \\
-Battery adaptation & Route-level battery capacities by scenario and their minimum, median, and maximum values & Show how battery configurations adapt across service plans \\
-Charging allocation & Plug-in, SWC, DWC, and overnight charging energy, plus peak plug-in utilization & Describe how wireless deployment and shared plug-in capacity interact \\
+Wireless facilities & 192.240 & 2.44 \\
+Scenario-dependent batteries & 856.427 & 10.88 \\
+Charging operations & 6,821.165 & 86.67 \\
+\midrule
+Total & 7,869.832 & 100.00 \\
 \bottomrule
 \end{tabular}
+\par\smallskip
+\parbox{0.86\linewidth}{\footnotesize\emph{Note.} The reported components exclude scenario-dependent constants omitted from the optimization formulation.}
 \end{table}
 
-A second compact table will list representative selected stations or links, their facility type, and the routes and scenarios that use them.
-The accompanying analysis will distinguish shared network-level deployments from route-specific charging opportunities and will relate the selected battery capacities to residual plug-in charging demand.
+The infrastructure analysis identifies the selected SWC stations and DWC links and uses Figure~\ref{fig:representative-infrastructure} to show their network placement and route sharing.
+% TODO: Insert Figure~\ref{fig:representative-infrastructure} showing selected SWC stations, selected DWC links, and representative routes on the network.
 
-% TODO: Populate both solution-characteristics tables after extracting the final B-3 decisions.
+The facility-use analysis compares candidate and selected facilities using trip arrivals for SWC and directed-traversal event copies for DWC, with aggregate statistics in Table~\ref{tab:wireless-facility-use} and selected-link details in Table~\ref{tab:selected-dwc-use}.
 
-\subsection{Network-scale algorithmic ablation}
-\label{subsec:network-scale-results}
-
-The network-scale ablation fixes the number of service-plan scenarios at three and increases the physical network size from \texttt{S-3} to \texttt{L-3}.
-Table~\ref{tab:network-ablation} reports the available runs across the core benchmark ladder and tracks how the solvable boundary changes as the lifted and two-phase components are introduced.
-
-\begin{table}[htbp]
+\begin{table}[!htbp]
 \centering
-\small
-\caption{Network-scale ablation under three service-plan scenarios}
-\label{tab:network-ablation}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{@{}lccccc@{}}
+\scriptsize
+\caption{Wireless-facility exposure and positive charging events}
+\label{tab:wireless-facility-use}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}llrrrrr@{}}
 \toprule
-\textbf{Instance} & \textbf{Direct MILP} & \textbf{Baseline integer L-shaped} & \textbf{Lifted integer L-shaped} & \textbf{Lifted two-phase} & \textbf{Full method} \\
+Mode & Scenario & Candidate exposure & Candidate charges & Selected exposure & Selected charges & Charging ratio (\%) \\
 \midrule
-\texttt{S-3} & Opt., 4.2s & TL, 98.37\% & TL, 77.84\% & Opt., 0.4s & Opt., 0.4s \\
-\texttt{M-3} & TL, 0.27\% & n.r. & n.r. & Opt., 25.8s & Opt., 25.7s \\
-\texttt{B-3} & n.r. & n.r. & n.r. & Opt., 29.4s & Opt., 32.2s \\
-\texttt{L-3} & n.r. & n.r. & n.r. & TL, 0.092\% & TL, 0.092\% \\
+SWC & Low  & 138.88 & 21.57 & 212.88 & 125.31 & 58.86 \\
+SWC & Base & 154.18 & 24.06 & 236.31 & 139.80 & 59.16 \\
+SWC & High & 169.80 & 27.07 & 260.30 & 157.26 & 60.42 \\
+\addlinespace
+DWC & Low  & 112.94 & 0.075 & 187.50 & 23.50 & 12.53 \\
+DWC & Base & 125.40 & 0.086 & 209.00 & 27.00 & 12.92 \\
+DWC & High & 138.09 & 0.098 & 229.00 & 30.50 & 13.32 \\
 \bottomrule
-\multicolumn{6}{@{}l}{\footnotesize Opt. = reached the prescribed optimality tolerance; TL = 7200s time limit; n.r. = not reported in the current run set.} \\
-\multicolumn{6}{@{}l}{\footnotesize Percentages are final relative gaps at termination.} \\
-\end{tabular}
+\end{tabular}%
 }
+\par\smallskip
+\parbox{0.96\linewidth}{\footnotesize\emph{Note.} SWC exposure is the average number of scheduled-trip arrivals per physical station, whereas DWC exposure is the average number of directed-traversal event copies per physical link. Candidate averages include all eligible facilities, and selected averages include the 84 selected SWC stations or two selected DWC links. Charges count positive event-level charging decisions, and the charging ratio divides selected charges by selected exposure. Candidate and selected DWC links have average lengths of 0.569 km and 0.500 km, respectively.}
 \end{table}
 
-The results identify the two-phase structure as the main computational transition in this run set.
-On \texttt{S-3}, the direct MILP is still easy, but the standard integer L-shaped variants make little progress within the time limit because their master lower bounds remain weak.
-Once route-level lower bounding and exact Phase 2 verification are introduced, both two-phase variants solve \texttt{S-3}, \texttt{M-3}, and \texttt{B-3}.
-Both two-phase variants reach the time limit on \texttt{L-3}; Table~\ref{tab:mechanism-contrast} reports their terminal bounds.
-
-\begin{table}[htbp]
+\begin{table}[!htbp]
 \centering
 \small
-\caption{Two-phase boundary diagnostics on the largest three-scenario instance}
-\label{tab:mechanism-contrast}
-\begin{tabular}{@{}lrrrrr@{}}
+\caption{Operational use of the selected DWC links}
+\label{tab:selected-dwc-use}
+\begin{tabular}{@{}lrrrr@{}}
 \toprule
-\textbf{Method} & \textbf{Status} & \textbf{UB} & \textbf{LB} & \textbf{Gap (\%)} & \textbf{Time (s)} \\
+Directed link & Length (km) & Low & Base & High \\
 \midrule
-Lifted two-phase & TL & 27251.656 & 27226.537 & 0.092 & 7217.5 \\
-Full method & TL & 27251.656 & 27226.537 & 0.092 & 7231.9 \\
+$115\rightarrow75$ & 0.5 & 314/43 & 349/49 & 384/55 \\
+$376\rightarrow27$ & 0.5 & 61/4 & 69/5 & 74/6 \\
 \bottomrule
-\multicolumn{6}{@{}l}{\footnotesize Both runs stop during Phase 2.} \\
+\end{tabular}
+\par\smallskip
+\parbox{0.82\linewidth}{\footnotesize\emph{Note.} Each scenario entry reports the number of traversal-event copies followed by the number of positive DWC charging events.}
+\end{table}
+
+The battery analysis uses Table~\ref{tab:representative-battery-choices} to summarize route-level battery selections across service-plan scenarios and assess their homogeneity in the representative instance.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Route battery choices in the representative planning solution}
+\label{tab:representative-battery-choices}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Scenario & Routes selecting 20 kWh & Routes selecting another option \\
+\midrule
+Low  & 28 & 0 \\
+Base & 28 & 0 \\
+High & 28 & 0 \\
+\bottomrule
 \end{tabular}
 \end{table}
 
-The identical terminal bounds place the current network-scale boundary between \texttt{B-3} and \texttt{L-3} and show no additional benefit from the full-method enhancements on this instance.
-Exact Phase 2 verification remains the limiting operation at this scale.
-
-\subsection{Scenario-count scalability}
-\label{subsec:scenario-scale-results}
-
-This subsection uses the \texttt{B-}k family, with $k\in\{3,5,10,20,40\}$, to test scenario-count scalability on the base Tower-derived network.
-To isolate growth in the scenario dimension while holding the network and algorithm fixed, Table~\ref{tab:scenario-scalability} reports the full method and separates Phase 1 and Phase 2 time.
-
-\begin{table}[htbp]
-\centering
-\small
-\caption{Scenario-count scalability on the base Tower-derived network}
-\label{tab:scenario-scalability}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{@{}lrrrrrr@{}}
-\toprule
-\textbf{Instance} & \textbf{UB} & \textbf{LB} & \textbf{Gap (\%)} & \textbf{P1 time (s)} & \textbf{P2 time (s)} & \textbf{Total (s)} \\
-\midrule
-\texttt{B-3}  & 7869.832 & 7869.814 & 0.000 & 19.2 & 13.1 & 32.2 \\
-\texttt{B-5}  & 7852.604 & 7852.340 & 0.003 & 27.4 & 30.3 & 57.7 \\
-\texttt{B-10} & 7862.021 & 7861.809 & 0.003 & 59.0 & 60.6 & 119.7 \\
-\texttt{B-20} & 7850.547 & 7850.375 & 0.002 & 126.6 & 120.8 & 247.4 \\
-\texttt{B-40} & 7849.108 & 7848.937 & 0.002 & 345.5 & 580.9 & 926.4 \\
-\bottomrule
-\multicolumn{7}{@{}l}{\footnotesize All five runs converge within the prescribed tolerance; reported times are wall-clock seconds.} \\
-\end{tabular}
-}
-\end{table}
-
-The full method solves all tested scenario counts within the prescribed tolerance.
-Total solution time increases from 32.2 seconds for \texttt{B-3} to 926.4 seconds for \texttt{B-40}, while all final gaps remain below 0.004\%.
-Both phases grow with the scenario count, and Phase 2 becomes the larger time component at 40 scenarios because each master candidate requires more exact scenario evaluations.
-
-\subsection{Capacity-coupling and relaxation-gap stress test}
+\subsection{Shared-capacity sensitivity and Phase 1 relaxation tightness}
 \label{subsec:capacity-coupling-results}
 
-This subsection uses \texttt{B-10-C2} through \texttt{B-10-C6} to test the effect of shared plug-in charger capacity on the relaxation-verification structure.
-All five variants are built from \texttt{B-10}; only the number of existing plug-in chargers is varied.
-Tighter capacity increases cross-route competition that is absent from the Phase 1 relaxation in Proposition~\ref{prop:phase-one-lb}, whereas looser capacity should bring the relaxed and exact recourse problems closer.
-Table~\ref{tab:capacity-coupling} reports the full method only and uses the initial Phase 2 gap as a transition diagnostic for the complete algorithm.
+The sensitivity experiment fixes the 28-route, ten-scenario instance and varies chargers per plug-in location from two to six, changing exact station--time capacity while leaving the Phase~1 route-level relaxation unchanged.
+% TODO: Confirm that plug-in capacity is the only input changed across the five runs and document the corresponding capacity levels without using internal run-directory names.
 
-\begin{table}[htbp]
+The transition analysis compares the Phase~1 lower bound $LB^R$ with the first finite exact-feasible Phase~2 objective $UB_0$ through $g_0=(UB_0-LB^R)/\max\{1,|UB_0|\}$ and reports the associated metrics in Table~\ref{tab:capacity-coupling}.
+Here, $UB_0$ evaluates the first reoptimized Phase~2 master candidate rather than the stored Phase~1 incumbent.
+
+\begin{table}[!htbp]
 \centering
-\small
-\caption{Capacity-coupling and relaxation-gap stress test on \texttt{B-10}}
+\scriptsize
+\caption{Shared-capacity sensitivity and Phase~1 lower-bound quality}
 \label{tab:capacity-coupling}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{@{}lrrrrrr@{}}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}rrrrrrrrl@{}}
 \toprule
-\textbf{Instance} & \textbf{Status} & \textbf{UB} & \textbf{LB} & \textbf{Final gap (\%)} & \textbf{Initial P2 gap (\%)} & \textbf{Total (s)} \\
+$U_s$ & $LB^R$ & $UB_0$ & $g_0$ (\%) & Final UB & Final gap (\%) & Phase~1 (s) & Phase~2 (s) & Status \\
 \midrule
-\texttt{C2} & TL & -- & -- & -- & -- & 7243.1 \\
-\texttt{C3} & Opt. & 7871.295 & 7870.696 & 0.008 & 0.676 & 280.5 \\
-\texttt{C4} & Opt. & 7862.021 & 7861.809 & 0.003 & 0.562 & 148.2 \\
-\texttt{C5} & Opt. & 7859.664 & 7859.497 & 0.002 & 0.532 & 95.9 \\
-\texttt{C6} & Opt. & 7859.271 & 7859.164 & 0.001 & 0.527 & 114.0 \\
+2 & 7,833.737 & --        & --    & --        & --     & 60.0 & 7,183.2 & Time limit \\
+3 & 7,833.737 & 7,887.027 & 0.676 & 7,871.295 & 0.0076 & 98.5 & 182.0 & Outer tolerance \\
+4 & 7,833.737 & 7,878.012 & 0.562 & 7,862.021 & 0.0027 & 60.2 & 87.9  & Outer tolerance \\
+5 & 7,833.737 & 7,875.673 & 0.532 & 7,859.664 & 0.0021 & 62.9 & 33.0  & Outer tolerance \\
+6 & 7,833.737 & 7,875.266 & 0.527 & 7,859.271 & 0.0014 & 61.0 & 53.0  & Outer tolerance \\
 \bottomrule
-\multicolumn{7}{@{}l}{\footnotesize \texttt{C}q denotes $q$ existing plug-in chargers at each plug-in charging location. \texttt{C2} reaches the Phase 2 time limit before a verified objective pair is recorded.} \\
-\end{tabular}
+\end{tabular}%
+}
+\par\smallskip
+\parbox{0.96\linewidth}{\footnotesize\emph{Note.} $U_s$ is the number of plug-in chargers available at each existing location. The capacity-2 run reaches the time limit without a finite exact-feasible incumbent.}
+\end{table}
+
+The results discussion assesses how shared capacity affects the initial Phase~2 gap and phase-specific time and treats the capacity-2 run as a boundary case.
+
+\subsection{Algorithmic evaluation}
+\label{subsec:algorithmic-evaluation}
+
+The algorithmic evaluation considers method components, network size, and scenario count while holding RSP screening fixed within the two-phase methods.
+An instance is denoted by $N$-$k$, where $N\in\{\mathrm{S},\mathrm{M},\mathrm{B},\mathrm{L}\}$ identifies the small, medium, base, or large network and $k$ is the number of service-plan scenarios.
+
+\subsubsection{Algorithmic comparison}
+\label{subsubsec:algorithmic-comparison}
+
+The comparison first defines S-3 through its network, service, and candidate-facility dimensions and uses this common instance for all five methods.
+
+Table~\ref{tab:algorithm-components} isolates battery-variable lifting, Phase~1 route-level LP lower bounding, exact scenario separation, and scenario-level cut strengthening.
+
+\begin{table}[!htbp]
+\centering
+\scriptsize
+\caption{Component configurations of the compared methods}
+\label{tab:algorithm-components}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}llllll@{}}
+\toprule
+Method & Recourse representation & Battery in master & Phase~1 route LPs & Exact scenario MIPs & Scenario cuts \\
+\midrule
+Extensive form & Deterministic equivalent & --  & No  & No  & -- \\
+Natural ILS & Natural recourse & No  & No  & Yes & Pointwise \\
+Lifted ILS & Lifted recourse & Yes & No  & Yes & Pointwise \\
+Lifted two-phase & Lifted recourse & Yes & Yes & Yes & Pointwise \\
+Full method & Lifted recourse & Yes & Yes & Yes & Strengthened \\
+\bottomrule
+\end{tabular}%
 }
 \end{table}
 
-As plug-in capacity increases from \texttt{C3} to \texttt{C6}, the initial Phase 2 gap falls from 0.676\% to 0.527\%, and the final optimality gaps after convergence remain below 0.008\%.
-The tightest reported setting, \texttt{C2}, is qualitatively different: Phase 1 still solves the relaxed problem quickly, but Phase 2 repeatedly separates feasibility cuts and reaches the time limit.
-Thus, the complete method handles the tested \texttt{C3}--\texttt{C6} range, while \texttt{C2} exposes a clear limitation: sufficiently tight shared capacity can make exact verification the computational bottleneck.
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Algorithmic comparison on instance S-3}
+\label{tab:algorithmic-comparison}
+\begin{tabular}{@{}lrrrrl@{}}
+\toprule
+Method & UB & LB & Gap (\%) & Time (s) & Status \\
+\midrule
+Extensive form & 397.878 & 397.878 & 0.000 & 4.2 & Optimal \\
+Natural ILS & 397.878 & 6.480 & 98.371 & 7,163.6 & Time limit \\
+Lifted ILS & 397.878 & 88.187 & 77.836 & 7,173.4 & Time limit \\
+Lifted two-phase & 397.878 & 397.878 & 0.000 & 0.4 & Optimal \\
+Full method & 397.878 & 397.878 & 0.000 & 0.4 & Optimal \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The performance comparison uses Table~\ref{tab:algorithmic-comparison} to evaluate solution status, bounds, terminal gap, and time under the component configurations in Table~\ref{tab:algorithm-components}.
+
+The mechanism analysis supplements aggregate performance with consistently defined iterations, exact scenario evaluations, and generated feasibility and optimality cuts.
+% TODO: Insert Table~\ref{tab:algorithmic-mechanisms} with iterations, exact scenario evaluations, feasibility cuts, and optimality cuts when these quantities are available on a consistent basis.
+% TODO: Define whether cut counts are aggregated across scenarios and whether multiple cuts generated in one iteration are counted separately.
+% Existing diagnostic data retained for possible appendix use: Lifted ILS with strengthened cuts reaches the time limit with a 77.79\% gap on the current small three-scenario instance; this diagnostic is not part of the fixed five-method main comparison.
+
+\subsubsection{Network scalability}
+\label{subsec:network-scale-results}
+
+The network-scale experiment fixes three service-plan scenarios and uses Table~\ref{tab:network-dimensions} to define S-3, M-3, B-3, and L-3 through growth in routes, trips, duties, and candidate facilities.
+
+\begin{table}[!htbp]
+\centering
+\scriptsize
+\caption{Dimensions of the network-scale instances}
+\label{tab:network-dimensions}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lrrrrrrrr@{}}
+\toprule
+Instance & Routes & Stations & Links & Trips & Duties & SWC candidates & DWC candidates & Plug-in locations \\
+\midrule
+S-3 & 3  & 49    & 53    & 206/230/252       & 26/28/29    & 47    & 53    & 2 \\
+M-3 & 19 & 425   & 515   & 623/690/761       & 69/70/76    & 420   & 515   & 5 \\
+B-3 & 28 & 493   & 625   & 2,568/2,850/3,138 & 264/282/322 & 488   & 625   & 5 \\
+L-3 & 59 & 1,459 & 1,822 & 5,669/6,291/6,923 & 705/762/909 & 1,451 & 1,822 & 8 \\
+\bottomrule
+\end{tabular}%
+}
+\par\smallskip
+\parbox{0.90\linewidth}{\footnotesize\emph{Note.} Trip and duty counts are ordered as low-frequency/base/high-frequency scenarios.}
+\end{table}
+
+The network-scale performance analysis uses Table~\ref{tab:network-scalability} to compare the available methods, distinguish unrun methods from failed runs, and identify the observed computational boundary.
+
+\begin{table}[!htbp]
+\centering
+\scriptsize
+\caption{Computational performance across network scales}
+\label{tab:network-scalability}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}rlrrrrrrl@{}}
+\toprule
+Instance & Method & UB & LB & Gap (\%) & Phase~1 (s) & Phase~2 (s) & Total (s) & Status \\
+\midrule
+S-3 & Extensive form    & 397.878    & 397.878    & 0.0000 & --    & --      & 4.2     & Optimal \\
+S-3 & Lifted two-phase  & 397.878    & 397.878    & 0.0000 & 0.2   & 0.1     & 0.4     & Optimal \\
+S-3 & Full method       & 397.878    & 397.878    & 0.0000 & 0.2   & 0.1     & 0.4     & Optimal \\
+\addlinespace
+M-3 & Extensive form    & 2,110.320  & 2,104.617  & 0.2703 & --    & --      & 7,201.1 & Time limit \\
+M-3 & Lifted two-phase  & 2,110.320  & 2,110.320  & 0.0000 & 18.7  & 7.0     & 25.8    & Optimal \\
+M-3 & Full method       & 2,110.320  & 2,110.320  & 0.0000 & 19.6  & 6.1     & 25.7    & Optimal \\
+\addlinespace
+B-3 & Extensive form    & --         & --         & --     & --    & --      & 563.9   & Out of memory \\
+B-3 & Lifted two-phase  & 7,869.839  & 7,869.814  & 0.0003 & 19.6  & 9.8     & 29.4    & Outer tolerance \\
+B-3 & Full method       & 7,869.832  & 7,869.814  & 0.0002 & 19.2  & 13.1    & 32.2    & Outer tolerance \\
+\addlinespace
+L-3 & Lifted two-phase  & 27,251.656 & 27,226.537 & 0.0922 & 176.7 & 7,040.9 & 7,217.5 & Time limit \\
+L-3 & Full method       & 27,251.656 & 27,226.537 & 0.0922 & 199.8 & 7,032.2 & 7,231.9 & Time limit \\
+\bottomrule
+\end{tabular}%
+}
+\par\smallskip
+\parbox{0.96\linewidth}{\footnotesize\emph{Note.} Phase~2 times for the 59-route runs equal total time minus Phase~1 time because the timeout logs do not contain a final Phase~2 elapsed-time record.}
+\end{table}
+
+\subsubsection{Scenario-count scalability}
+\label{subsec:scenario-scale-results}
+
+The scenario-scale experiment fixes the base network and defines B-3, B-5, B-10, B-20, and B-40 through their scenario-generation and probability rules.
+% TODO: Confirm whether the scenario sets are nested or independently generated, document the frequency-perturbation rule, and state the probability assigned to each scenario.
+
+The scenario-scale performance analysis uses Table~\ref{tab:scenario-scalability} to compare phase-specific and total time as the number of scenarios increases.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Computational performance as the number of scenarios increases}
+\label{tab:scenario-scalability}
+\begin{tabular}{@{}lrrrrrrr@{}}
+\toprule
+Instance & Scenarios & UB & LB & Gap (\%) & Phase~1 (s) & Phase~2 (s) & Total (s) \\
+\midrule
+B-3  & 3  & 7,869.832 & 7,869.814 & 0.0002 & 19.2  & 13.1  & 32.2 \\
+B-5  & 5  & 7,852.604 & 7,852.340 & 0.0034 & 27.4  & 30.3  & 57.7 \\
+B-10 & 10 & 7,862.021 & 7,861.809 & 0.0027 & 59.0  & 60.6  & 119.7 \\
+B-20 & 20 & 7,850.547 & 7,850.375 & 0.0022 & 126.6 & 120.8 & 247.4 \\
+B-40 & 40 & 7,849.108 & 7,848.937 & 0.0022 & 345.5 & 580.9 & 926.4 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.90\linewidth}{\footnotesize\emph{Note.} All runs reach the prescribed outer tolerance.}
+\end{table}
+
+% TODO: Add exact scenario evaluation counts after a consistent counting rule is established across all runs.
+
+The interpretation distinguishes Phase~1 and Phase~2 growth and identifies the tested solved range without extrapolating asymptotic behavior from five deterministic runs.
+
+% TODO: Add a concise chapter synthesis only after all tables are populated and checked; separate planning observations, relaxation-tightness evidence, and algorithmic performance claims.
