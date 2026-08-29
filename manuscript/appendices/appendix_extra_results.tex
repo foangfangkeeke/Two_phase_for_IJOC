@@ -1,4 +1,38 @@
 \section{Additional Computational Results}
 \label{app:extra-results}
 
+\subsection{Computational parameter settings}
+\label{app:computational-parameters}
+
+Facility and battery capital costs are annualized and converted to representative-day equivalents to be comparable with daily charging costs.
+Table~\ref{tab:parameter-settings} summarizes the common physical and economic parameters.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Parameter settings for the computational experiments}
+\label{tab:parameter-settings}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.26\linewidth}>{\raggedright\arraybackslash}p{0.37\linewidth}>{\raggedright\arraybackslash}p{0.29\linewidth}@{}}
+\toprule
+\textbf{Parameter} & \textbf{Value} & \textbf{Source} \\
+\midrule
+\multicolumn{3}{@{}l}{\textit{Battery and state of charge}} \\
+Battery capacity cost $c^{\mathrm{bat}}$ & 0.148 USD/kWh/day & \citet{bloombergnef_lithium-ion_2025}; \citet{wang_reliable_2024} \\
+State-of-charge bounds $(\underline{\rho},\overline{\rho})$ & $(0.2,0.8)$ & \citet{li_planning_2024} \\
+\addlinespace
+\multicolumn{3}{@{}l}{\textit{Charging operation}} \\
+Plug-in energy rate $\kappa$ & 2.5 kWh per one-minute slot & \citet{najafi_integrated_2025} \\
+SWC opportunity limit $\bar q_v^{\mathrm S}$ & 1.0 kWh/min times eligible dwell time & \citet{wang_reliable_2024} \\
+DWC opportunity limit $\bar q_a^{\mathrm D}$ & 1.0 kWh/min times traversal time & \citet{wang_reliable_2024} \\
+Charging efficiencies $(\eta^{\mathrm P},\eta^{\mathrm S},\eta^{\mathrm D})$ & $(0.90,0.85,0.80)$ & \citet{li_planning_2024,sun_optimizing_2024} \\
+\addlinespace
+\multicolumn{3}{@{}l}{\textit{Infrastructure and electricity cost}} \\
+Facility amortization horizon $T^{\mathrm{fac}}$ & 30 years & \citet{wang_reliable_2024} \\
+SWC facility cost $c_s^{\mathrm S}$ & 2.16 USD/day & \citet{wang_reliable_2024} \\
+DWC facility cost $c_l^{\mathrm D}$ & 9 USD/km/day times link length, plus 0.90 USD/day & \citet{wang_reliable_2024} \\
+Electricity prices $(c^{\mathrm{day}},c^{\mathrm{night}})$ & $(0.1922,0.1233)$ USD/kWh & \citet{singstat_electricity_2026} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 % TODO: Add supplementary logs, tables, or robustness checks if needed.
