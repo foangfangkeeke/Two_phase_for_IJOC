@@ -1,0 +1,23 @@
+# numScenarios
+20
+# scenario_folder,probability
+base,0.05
+lo10pct,0.05
+hi10pct,0.05
+route_984_up25,0.05
+route_941_down25,0.05
+route_173_up25,0.05
+route_284_down25,0.05
+route_41_up25,0.05
+route_992_down25,0.05
+route_282_up25,0.05
+route_945_down25,0.05
+route_871_up25,0.05
+route_78_down25,0.05
+route_453_up25,0.05
+route_183_down25,0.05
+charger_btbatok_up10,0.05
+charger_btbatok_down10,0.05
+charger_jurongeast_up10,0.05
+charger_jurongeast_down10,0.05
+charger_jurongtownhall_up10,0.05

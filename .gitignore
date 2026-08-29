@@ -1,0 +1,7 @@
+build/
+out/
+.agents/
+.claude/
+logs/
+results/
+gurobi*
