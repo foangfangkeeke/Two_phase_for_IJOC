@@ -448,7 +448,7 @@ static double CalcWirelessBatteryCostCoeffPerEB(const ModelData& data)
     return data.GetOperationCfg().priceOfUnitBat;
 }
 
-static vector<ProblemDataVar> BuildWirelessMasterVars(const ModelData& data)
+static vector<ProblemDataVar> BuildWirelessMasterVars(const ModelData& data, bool allowWirelessCharging = true)
 {
     const ChargerCfg& chargerCfg = data.GetChargerCfg();
     const NetworkCfg& networkCfg = data.GetNetworkCfg();
@@ -466,7 +466,7 @@ static vector<ProblemDataVar> BuildWirelessMasterVars(const ModelData& data)
 
         ProblemDataVar var;
         var.lb = 0.0;
-        var.ub = 1.0;
+        var.ub = allowWirelessCharging ? 1.0 : 0.0;
         var.obj = stationCost;
         var.type = GRB_BINARY;
         var.name = "w_station_s" + to_string(station);
@@ -485,7 +485,7 @@ static vector<ProblemDataVar> BuildWirelessMasterVars(const ModelData& data)
         const double dist = networkCfg.linkDistances.at(start).at(end);
         ProblemDataVar var;
         var.lb = 0.0;
-        var.ub = 1.0;
+        var.ub = allowWirelessCharging ? 1.0 : 0.0;
         var.obj = chargerCfg.priceOfUnitCharger[2] * dist +
             60 * chargerCfg.priceOfInverterPerkW * chargerCfg.chargeRate[2];
         var.type = GRB_BINARY;
@@ -1161,11 +1161,12 @@ static bool BuildWirelessOperationalSubproblem(const string& dataRootFolder, con
     return true;
 }
 
-static bool BuildWirelessChargingSolverModel(const string& dataFolder, GRBModel& model)
+static bool BuildWirelessChargingSolverModel(const string& dataFolder, GRBModel& model,
+    bool allowWirelessCharging)
 {
     const vector<WirelessScenarioConfig> scenarios = LoadWirelessScenarioConfigs(dataFolder);
     ModelData masterData(dataFolder, scenarios.front());
-    const vector<ProblemDataVar> masterVars = BuildWirelessMasterVars(masterData);
+    const vector<ProblemDataVar> masterVars = BuildWirelessMasterVars(masterData, allowWirelessCharging);
 
     GRBLinExpr obj = 0.0;
     unordered_map<string, GRBVar> masterVarsByName;
@@ -1236,15 +1237,16 @@ static bool BuildWirelessChargingRouteLShapedSubProblem(
 }
 
 WirelessChargingDataInitializationStrategy_Solver::WirelessChargingDataInitializationStrategy_Solver(
-    std::string dataFolder)
-    : dataFolder(std::move(dataFolder)) {}
+    std::string dataFolder, bool allowWirelessCharging)
+    : dataFolder(std::move(dataFolder)), allowWirelessCharging(allowWirelessCharging) {}
 
 Status WirelessChargingDataInitializationStrategy_Solver::DataInit(GRBModel& model)
 {
     std::cout << "Loaded wireless charging data from file." << std::endl;
     PrintWirelessScenarioSummary(LoadWirelessScenarioConfigs(dataFolder));
 
-    bool built = BuildWirelessChargingSolverModel(dataFolder, model);
+    std::cout << "Wireless charging option: " << (allowWirelessCharging ? 1 : 0) << std::endl;
+    bool built = BuildWirelessChargingSolverModel(dataFolder, model, allowWirelessCharging);
     return built ? OK : ERROR;
 }
 

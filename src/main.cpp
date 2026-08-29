@@ -71,6 +71,7 @@ int main(int argc, char* argv[])
     string pb = "wireless";
     string dataType = "test";
     bool exportSolution = false;
+    bool allowWirelessCharging = true;
     string fixedFacilitiesFile;
     string exportDirectory;
     for (int idx = 1; idx < argc; ++idx) {
@@ -81,6 +82,8 @@ int main(int argc, char* argv[])
             pb = argv[++idx];
         } else if (arg == "--data" && idx + 1 < argc) {
             dataType = argv[++idx];
+        } else if (arg == "--wireless-option" && idx + 1 < argc) {
+            allowWirelessCharging = std::stoi(argv[++idx]) != 0;
         } else if (arg == "--export-solution") {
             exportSolution = true;
         } else if (arg == "--fixed-facilities" && idx + 1 < argc) {
@@ -118,7 +121,11 @@ int main(int argc, char* argv[])
         solver.SetSolverConfig(LoadSolverConfig());
 
         if (algLower == "solver") {
-            solver.SetAlgorithm(std::make_unique<UsingSolver>(WIRELESS_CHARGING_NO_PLUGIN, dataFolder));
+            auto algorithm = std::make_unique<UsingSolver>(
+                WIRELESS_CHARGING_NO_PLUGIN, dataFolder, allowWirelessCharging);
+            algorithm->SetExportSolution(exportSolution);
+            algorithm->SetExportDirectory(exportDirectory);
+            solver.SetAlgorithm(std::move(algorithm));
         } else if (algLower == "natural-ils") {
             solver.SetAlgorithm(std::make_unique<WirelessNoPlugInIntegerLShaped>(dataFolder));
         } else {

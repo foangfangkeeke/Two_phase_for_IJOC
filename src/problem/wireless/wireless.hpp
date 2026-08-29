@@ -4,11 +4,12 @@
 
 class WirelessChargingDataInitializationStrategy_Solver : public IDataInitializationStrategy_Solver {
 public:
-	WirelessChargingDataInitializationStrategy_Solver(std::string dataFolder);
+	WirelessChargingDataInitializationStrategy_Solver(std::string dataFolder, bool allowWirelessCharging = true);
 	Status DataInit(GRBModel& model) override;
 
 private:
 	std::string dataFolder;
+    bool allowWirelessCharging;
 };
 
 class WirelessChargingDataInitializationStrategy_LShaped : public IDataInitializationStrategy_IntegerLShaped {

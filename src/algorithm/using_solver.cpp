@@ -2,18 +2,47 @@
 #include "wireless.hpp"
 #include "tools.hpp"
 
+#include <filesystem>
 #include <functional>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <memory>
 #include <stdexcept>
 #include <string>
 
+namespace {
+
+namespace fs = std::filesystem;
+
+std::string CsvEscape(const std::string& value)
+{
+    bool needsQuotes = false;
+    for (char ch : value) {
+        if (ch == ',' || ch == '"' || ch == '\n' || ch == '\r') {
+            needsQuotes = true;
+            break;
+        }
+    }
+    if (!needsQuotes) return value;
+    std::string escaped = "\"";
+    for (char ch : value) {
+        if (ch == '"') escaped += '"';
+        escaped += ch;
+    }
+    escaped += '"';
+    return escaped;
+}
+
+} // namespace
+
 static const std::map<
     ProblemType,
-    std::function<std::unique_ptr<IDataInitializationStrategy_Solver>(const std::string&)>> dataInitMap = {
-    {WIRELESS_CHARGING_NO_PLUGIN, [](const std::string& dataFolder){
-        return std::make_unique<WirelessChargingDataInitializationStrategy_Solver>(dataFolder);
+    std::function<std::unique_ptr<IDataInitializationStrategy_Solver>(const std::string&, bool)>> dataInitMap = {
+    {WIRELESS_CHARGING_NO_PLUGIN, [](const std::string& dataFolder, bool allowWirelessCharging){
+        return std::make_unique<WirelessChargingDataInitializationStrategy_Solver>(
+            dataFolder, allowWirelessCharging);
     }}
 };
 
@@ -23,7 +52,7 @@ Status UsingSolver::Initialize()
     if (it == dataInitMap.end()) {
         throw std::invalid_argument("Unsupported problem type");
     }
-    dataIniter = it->second(dataFolder);
+    dataIniter = it->second(dataFolder, allowWirelessCharging);
 
     env = std::make_unique<GRBEnv>(true);
     env->set("LogFile", "gurobi_log.txt");
@@ -57,7 +86,9 @@ Status UsingSolver::Solve()
         double ub = model->get(GRB_DoubleAttr_ObjVal);
         double lb = model->get(GRB_DoubleAttr_ObjBound);
         std::cout << "UB: " << ub << ", LB: " << lb << std::endl;
-        std::cout << "Solver final solve time: " << Tools::ElapsedMs(solveStart, solveEnd) << " ms" << std::endl;
+        const long long solveMs = Tools::ElapsedMs(solveStart, solveEnd);
+        std::cout << "Solver final solve time: " << solveMs << " ms" << std::endl;
+        ExportSolution(ub, lb, solveMs);
         return OK;
     }
 
@@ -68,7 +99,49 @@ Status UsingSolver::Solve()
     return ERROR;
 }
 
-UsingSolver::UsingSolver(ProblemType problemType, std::string dataFolder)
-    : problemType(problemType), dataFolder(dataFolder) {};
+UsingSolver::UsingSolver(ProblemType problemType, std::string dataFolder, bool allowWirelessCharging)
+    : problemType(problemType), dataFolder(dataFolder), allowWirelessCharging(allowWirelessCharging) {};
+
+void UsingSolver::ExportSolution(double ub, double lb, long long solveMs) const
+{
+    if (!exportSolution) return;
+
+    const fs::path exportDir = exportDirectory.empty()
+        ? fs::path("results") / dataFolder / "solver_solution"
+        : fs::path(exportDirectory);
+    fs::create_directories(exportDir);
+
+    {
+        std::ofstream out(exportDir / "solution_metadata.csv");
+        out << std::fixed << std::setprecision(6);
+        out << "metric,value\n";
+        out << "upper_bound," << ub << '\n';
+        out << "lower_bound," << lb << '\n';
+        out << "solve_elapsed_ms," << solveMs << '\n';
+        out << "wireless_option," << (allowWirelessCharging ? 1 : 0) << '\n';
+    }
+
+    {
+        std::ofstream out(exportDir / "model_variables.csv");
+        out << std::fixed << std::setprecision(6);
+        out << "index,var_name,value,obj,lb,ub,vtype\n";
+
+        const int numVars = model->get(GRB_IntAttr_NumVars);
+        GRBVar* vars = model->getVars();
+        for (int idx = 0; idx < numVars; ++idx) {
+            const std::string name = vars[idx].get(GRB_StringAttr_VarName);
+            const double value = vars[idx].get(GRB_DoubleAttr_X);
+            const double objCoeff = vars[idx].get(GRB_DoubleAttr_Obj);
+            const double varLb = vars[idx].get(GRB_DoubleAttr_LB);
+            const double varUb = vars[idx].get(GRB_DoubleAttr_UB);
+            const char vtype = vars[idx].get(GRB_CharAttr_VType);
+            out << idx << ',' << CsvEscape(name) << ',' << value << ','
+                << objCoeff << ',' << varLb << ',' << varUb << ',' << vtype << '\n';
+        }
+        delete[] vars;
+    }
+
+    std::cout << "Solution export written to " << exportDir.string() << std::endl;
+}
 
 UsingSolver::~UsingSolver() {};
