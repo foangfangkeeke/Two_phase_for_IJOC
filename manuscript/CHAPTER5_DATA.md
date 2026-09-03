@@ -196,6 +196,18 @@ the manuscript-facing percentage is calculated from the reported UB and LB.
 
 ### Battery Choices
 
+The manuscript-facing means are computed over all 140 route--scenario battery
+selections in each solution. Because the five scenarios are equally likely,
+these values also equal the probability-weighted means across scenarios.
+
+| Solution | Route--scenario selections | Mean capacity (kWh) | Maximum capacity (kWh) |
+|---|---:|---:|---:|
+| With WPT | 140 | 22.500000 | 40 |
+| Without WPT | 140 | 84.714286 | 310 |
+
+The scenario-level values below are retained as an audit of the aggregate
+statistics.
+
 | Solution | Scenario | Routes | Routes at 20 kWh | Mean capacity (kWh) | Maximum capacity (kWh) |
 |---|---:|---:|---:|---:|---:|
 | With WPT | 0 | 28 | 22 | 22.500000 | 40 |
@@ -228,14 +240,16 @@ statistics above, but not the earlier facility-exposure table.
 ### Table A: Network-Scale Instance Dimensions
 
 All Table A cases use five scenarios and five plug-in chargers per location.
-Bus counts follow the case-specific scenario order printed in the logs.
+Trip counts are the numbers of rows in the corresponding `tripDepTimes.txt`
+files. Trip and bus counts follow the case-specific scenario order printed in
+the logs.
 
-| Instance | Routes | Stations / links / PI locations | SWC / DWC candidates | Candidate total | Bus trip chains |
-|---|---:|---:|---:|---:|---:|
-| S-5 | 3 | 49 / 53 / 2 | 47 / 53 | 100 | 28 / 26 / 29 / 28 / 25 |
-| M-5 | 11 | TODO | TODO | 638 | 41 / 40 / 46 / 42 / 40 |
-| B-5 | 28 | 493 / 625 / 5 | 488 / 625 | 1,113 | 282 / 264 / 322 / 286 / 281 |
-| L-5 | 59 | 1,459 / 1,822 / 8 | 1,451 / 1,822 | 3,273 | 762 / 705 / 909 / 764 / 761 |
+| Instance | Routes | Stations / links / PI locations | SWC / DWC candidates | Candidate total | Scheduled trips | Bus trip chains |
+|---|---:|---:|---:|---:|---:|---:|
+| S-5 | 3 | 49 / 53 / 2 | 47 / 53 | 100 | 230 / 206 / 252 / 244 / 224 | 28 / 26 / 29 / 28 / 25 |
+| M-5 | 11 | TODO | TODO | 638 | 432 / 391 / 479 / 439 / 424 | 41 / 40 / 46 / 42 / 40 |
+| B-5 | 28 | 493 / 625 / 5 | 488 / 625 | 1,113 | 2,850 / 2,568 / 3,138 / 2,872 / 2,824 | 282 / 264 / 322 / 286 / 281 |
+| L-5 | 59 | 1,459 / 1,822 / 8 | 1,451 / 1,822 | 3,273 | 6,291 / 5,669 / 6,923 / 6,316 / 6,267 | 762 / 705 / 909 / 764 / 761 |
 
 The M-5 candidate total is verified from the lifted master size:
 `2,343 - 5 x 11 x 31 = 638`. The current logs do not split this total into

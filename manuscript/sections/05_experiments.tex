@@ -100,12 +100,12 @@ Metric & Without WPT & With WPT \\
 Selected SWC stations & 0 & 60 \\
 Selected DWC links & 0 & 1 \\
 Routes selecting 20 kWh per scenario & 8 & 22 \\
-Mean route battery capacity (kWh) & 82.86--85.71 & 22.50 \\
+Mean route battery capacity (kWh) & 84.71 & 22.50 \\
 Maximum selected battery capacity (kWh) & 310 & 40 \\
 \bottomrule
 \end{tabular}
 \par\smallskip
-\parbox{0.92\linewidth}{\footnotesize\emph{Note.} Battery statistics are computed separately for each of the five scenarios; ranges report the minimum and maximum scenario values. The no-WPT benchmark is solved to optimality, and the reported WPT incumbent has a 0.002032\% final gap.}
+\parbox{0.92\linewidth}{\footnotesize\emph{Note.} The 20-kWh route counts are identical in each scenario. Mean and maximum capacities are computed over all 140 route--scenario battery selections. The no-WPT benchmark is solved to optimality, and the reported WPT incumbent has a 0.002032\% final gap.}
 \end{table}
 
 % TODO: Interpret the cost substitution and battery changes without using the unverified zero-valued charging-energy fields in the current WPT export.
@@ -163,18 +163,18 @@ Table~\ref{tab:network-dimensions} summarizes the dimensions used to define S-5,
 \small
 \caption{Dimensions of the network-scale instances}
 \label{tab:network-dimensions}
-\begin{tabular}{@{}lrrr@{}}
+\begin{tabular}{@{}lrrrr@{}}
 \toprule
-Instance & Routes & Candidate wireless facilities & Buses per scenario \\
+Instance & Routes & \shortstack{Scheduled trips\\per scenario} & \shortstack{Buses\\per scenario} & \shortstack{Candidate wireless\\facilities} \\
 \midrule
-S-5 & 3  & 100   & 25--29 \\
-M-5 & 11 & 638   & 40--46 \\
-B-5 & 28 & 1,113 & 264--322 \\
-L-5 & 59 & 3,273 & 705--909 \\
+S-5 & 3  & 206--252     & 25--29   & 100 \\
+M-5 & 11 & 391--479     & 40--46   & 638 \\
+B-5 & 28 & 2,568--3,138 & 264--322 & 1,113 \\
+L-5 & 59 & 5,669--6,923 & 705--909 & 3,273 \\
 \bottomrule
 \end{tabular}
 \par\smallskip
-\parbox{0.90\linewidth}{\footnotesize\emph{Note.} Candidate wireless facilities are the combined SWC-station and DWC-link candidates. Bus counts are minimum--maximum ranges over the five scenarios.}
+\parbox{0.90\linewidth}{\footnotesize\emph{Note.} Trip and bus counts are minimum--maximum ranges over the five scenarios. Candidate wireless facilities combine the SWC-station and DWC-link candidates.}
 \end{table}
 
 Table~\ref{tab:network-scalability} compares all methods that were run at each network scale.
