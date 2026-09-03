@@ -5,6 +5,7 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{graphicx}
+\usepackage{placeins}
 \usepackage{algorithm2e}
 \usepackage{hyperref}
 
@@ -14,6 +15,7 @@
 \newtheorem{corollary}{Corollary}
 \newtheorem{theorem}{Theorem}
 \newtheorem{remark}{Remark}
+\renewcommand{\floatpagefraction}{0.80}
 
 \journal{Transportation Science}
 
@@ -21,7 +23,7 @@
 
 \begin{frontmatter}
 
-\title{Wireless Charging Facility Deployment and Adaptive Battery Configuration under Service-Plan Uncertainty}
+\title{A Two-Phase Integer L-Shaped Method for Stochastic Electric-Bus Wireless Charging Infrastructure Planning}
 
 \author[inst1]{Author Name}
 \address[inst1]{Affiliation}
@@ -48,6 +50,7 @@ Wireless charging \sep electric bus \sep stochastic programming \sep integer L-s
 \input{appendices/appendix_proofs}
 \input{appendices/appendix_extra_results}
 
+\FloatBarrier
 \bibliographystyle{elsarticle-harv}
 \bibliography{refs}
 

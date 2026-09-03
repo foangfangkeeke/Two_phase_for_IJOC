@@ -33,10 +33,11 @@ Paragraph-level drafts belong in the corresponding `.tex` files.
    - Develop monotonicity-strengthened feasibility and optimality cuts.
    - Present the complete algorithm and convergence result.
 
-5. `Computational Results`
-   - Define the Tower-derived instance families and solver protocol.
-   - Show one compact planning-solution interpretation.
-   - Validate algorithmic performance through network-scale ablation, scenario-count scalability, and capacity-coupling stress tests.
+5. `Computational Study`
+   - Define the Tower-derived base instance and common solver protocol without exposing internal experiment names.
+   - Characterize one representative planning solution.
+   - Examine shared-capacity sensitivity and Phase 1 relaxation tightness.
+   - Evaluate the method through algorithmic ablation, network scalability, and scenario-count scalability.
 
 6. `Conclusion`
    - Summarize model, method, computational evidence, limitations, and extensions.
@@ -146,49 +147,37 @@ Open work:
 
 ## Section 5 Plan
 
-`5.1 Experimental design and instance families`
+`5.1 Experimental setup and base instance`
 
 - Introduce the Tower-derived data as a realistic computational test bed, not a public benchmark.
-- Define all main instance families in one place.
-- Use `S`, `M`, `B`, and `L` for network scale.
-- Use `B-k` for scenario-count tests.
-- Use `B-10-C2` through `B-10-C6` for capacity-coupling tests, where `Cq` denotes the actual number of existing plug-in chargers.
-- Define compared algorithms and common solver protocol.
+- Define the full-network, three-scenario base instance without using internal experiment names in the manuscript text.
+- State scenario generation, common model parameters, hardware, solver, parallelization, tolerances, and time-limit policy.
 
-`5.2 Solution characteristics on the base instance`
+`5.2 Representative planning solution`
 
-- Use `B-3`.
-- Report a compact solution-summary table.
-- Show selected shared stations or links and route-sharing counts.
-- Keep interpretation short and tied to model validity.
+- Decompose representative-day cost into facility, battery, and charging or operating components after cost accounting is verified.
+- Visualize selected SWC stations and DWC links and quantify route or trip coverage.
+- Summarize scenario-dependent battery choices, charging-mode contributions, and state-of-charge feasibility.
 
-`5.3 Network-scale algorithmic ablation`
+`5.3 Shared-capacity sensitivity and Phase 1 relaxation tightness`
 
-- Use `S-3`, `M-3`, `B-3`, and `L-3`.
-- Compare direct MILP, baseline integer L-shaped, lifted integer L-shaped, lifted two-phase, and full method where runs are available.
-- Current logs support a boundary-test reading: standard decompositions fail on `S-3`, two-phase variants solve through `B-3`, and `L-3` hits the Phase 2 time limit at a small gap.
-- Do not claim that the full method strictly dominates lifted two-phase on all network-scale instances unless final reruns show it.
+- Vary plug-in charger capacity while fixing the network, scenarios, probabilities, and other parameters.
+- Compare the final Phase 1 lower bound with the first finite exact-feasible Phase 2 incumbent.
+- Define the initial Phase 2 gap precisely and state the evidence limits of the tested capacity sequence.
 
-`5.4 Scenario-count scalability`
+`5.4 Algorithmic evaluation`
 
-- Use `B-3`, `B-5`, `B-10`, `B-20`, and `B-40`.
-- Current complete run set reports the full method only.
-- Emphasize scenario-count growth after fixing the base network; all current full-method runs converge from 3 to 40 scenarios.
-
-`5.5 Capacity-coupling and relaxation-gap stress test`
-
-- Use `B-10-C2` through `B-10-C6`.
-- Vary existing plug-in charger capacity to change how tight the relaxed coupling constraints are.
-- Report the full method only in the current draft, unless additional comparison logs are added later.
-- Interpret as a boundary / stress test, not a universal robustness claim.
-- Current result pattern: `C2` times out during Phase 2; `C3`--`C6` converge, and the initial Phase 2 gap decreases as capacity increases.
+- `5.4.1 Algorithmic ablation`: compare EF, Natural ILS, Lifted ILS, Lifted two-phase, and Full on a common instance; keep the Lifted ILS plus strengthened-cuts run as an optional appendix diagnostic.
+- `5.4.2 Network scalability`: fix three scenarios and vary routes, trips, duties, and candidate facilities.
+- `5.4.3 Scenario-count scalability`: fix the network and vary the number of service-plan scenarios.
+- Treat RSP screening as a common two-phase implementation feature, not a separate algorithmic component.
 
 Open work:
 
 - Decide whether to rerun missing direct MILP / baseline rows or keep them as not reported.
-- Extract the `B-3` planning solution table.
+- Complete the representative planning solution tables and figures after cost accounting is verified.
 - Identify representative selected stations or links for route-sharing examples.
-- Fill reproducibility details: solver version, hardware, time limit, MIP gap, threads.
+- Consolidate the confirmed reproducibility details into a computational-setting table.
 - Add appendix diagnostics only after main Section 5 results are stable.
 
 ## Section 6 Plan
@@ -205,4 +194,4 @@ Open work:
 - [ ] Review Section 4 after Section 3 symbols stabilize.
 - [ ] Rewrite Section 5 after final experiments are rerun.
 - [ ] Decide appendix contents after main body stabilizes.
-- [ ] Compile after each substantial `.tex` update.
+- [ ] Compile only when the user explicitly requests LaTeX or PDF verification.

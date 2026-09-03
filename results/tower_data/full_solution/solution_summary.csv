@@ -1,9 +1,0 @@
-metric,value
-best_upper_bound,7869.831761
-best_lower_bound,7869.814383
-facility_cost,192.23999999999978
-battery_cost,856.4266669999998
-charging_cost,6821.165094
-swc_count,84
-dwc_count,2
-selected_facility_count,86

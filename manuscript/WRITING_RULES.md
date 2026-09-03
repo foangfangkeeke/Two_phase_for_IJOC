@@ -21,7 +21,7 @@ For each section, proceed in this order:
 4. Propose the paragraph structure for that subsection.
 5. After approval, summarize each paragraph as a compact narrative chain, such as A -> B -> C, so the paragraph's internal argument is visible before formal drafting.
 6. After approval, draft the formal text.
-7. Check cross-section consistency and compile when needed.
+7. Check cross-section consistency. Compile only when the user explicitly requests compilation or LaTeX/PDF verification.
 
 ## Target Style
 
@@ -73,7 +73,8 @@ For each section, proceed in this order:
 ## LaTeX
 
 - Compile from `manuscript/`.
-- For routine manuscript revisions, use `pdflatex` twice. Run `bibtex` only when bibliography/citation files change or the user explicitly asks for a bibliography rebuild.
+- Do not compile after routine manuscript revisions by default. Compile only when the user explicitly requests compilation, LaTeX verification, or PDF verification.
+- When compilation is requested, use `pdflatex` twice. Run `bibtex` only when bibliography/citation files change or the user explicitly asks for a bibliography rebuild.
 - Do not use `run.bat` for manuscript or code builds unless explicitly requested.
 - After compiling, report success or failure, the PDF path, and important warnings or errors.
 - In displayed mathematical programs, write constraints symbolically whenever possible. Prefer equation references, indexed equations, domains, or named feasible sets over prose inside `\mathrm{s.t.}`; if clarification is needed, put it in the surrounding sentence rather than inside the constraint block.
