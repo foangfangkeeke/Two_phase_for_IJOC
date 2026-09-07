@@ -324,6 +324,14 @@ Status LiftedTwoPhaseILS::Initialize()
     const auto phase1End = Tools::Clock::now();
     phase1ElapsedMs = Tools::ElapsedMs(fullAlgorithmStart, phase1End);
     std::cout << "Phase 1 elapsed time: " << phase1ElapsedMs << " ms" << std::endl;
+    if (useMonotoneCuts) {
+        const RuntimeOptions& runtimeOptions = GetRuntimeOptions();
+        const std::filesystem::path debugDir = std::filesystem::path("results")
+            / "full_phase1_plugin_debug"
+            / (dataFolder + "_sc" + std::to_string(runtimeOptions.scenarioCount)
+                + "_cap" + std::to_string(runtimeOptions.chargerCapacity));
+        phase1.DebugExportPhase1PlugInOccupancy(debugDir.string());
+    }
     if (phase1ElapsedMs / 1000.0 >= solverConfig.timeLimit) {
         std::cout << "Two-phase reached time limit after Phase 1; skip Phase 2 initialization." << std::endl;
         std::cout << "Total elapsed time (Phase 1 + Phase 2): " << phase1ElapsedMs << " ms" << std::endl;

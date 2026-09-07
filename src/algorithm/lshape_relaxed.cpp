@@ -3,20 +3,28 @@
 #include "parallel_utils.hpp"
 #include "wireless_reform.hpp"
 #include "wireless_reform_route.hpp"
+#include "wireless_reform_types.hpp"
 #include "tools.hpp"
 
 #include <algorithm>
+#include <cstdio>
 #include <cmath>
+#include <filesystem>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <limits>
+#include <map>
 #include <sstream>
 #include <stdexcept>
+#include <tuple>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace {
 constexpr bool kMultiCut = true;
 constexpr double kSparseCoeffTol = 1e-12;
+constexpr double kPhase1DebugChargeTol = 1e-7;
 
 bool IsRelevantCoeff(double coeff)
 {
@@ -79,6 +87,116 @@ void PrintBounds(double bestUpperBound, double bestLowerBound)
     } else {
         std::cout << "inf, LB=" << bestLowerBound << ", gap=1";
     }
+}
+
+struct ParsedStationChargeVar {
+    int scenario = -1;
+    int eb = -1;
+    int trip = -1;
+    int station = -1;
+    int stationIdx = -1;
+};
+
+bool ParseStationChargeVarName(const std::string& name, ParsedStationChargeVar& parsed)
+{
+    if (name.find("To_n") != std::string::npos || name.find("c_Night") != std::string::npos) {
+        return false;
+    }
+
+    int consumed = 0;
+    const int matched = std::sscanf(name.c_str(), "sc%d_c_b%d_n%d_s%d_i%d%n",
+        &parsed.scenario, &parsed.eb, &parsed.trip, &parsed.station, &parsed.stationIdx, &consumed);
+    return matched == 5 && consumed == static_cast<int>(name.size());
+}
+
+std::vector<std::string> LoadDebugScenarioFolders(const std::string& dataFolder)
+{
+    const std::filesystem::path scenarioCfg = ResolveDataFolderPath(dataFolder) / "scenarioCfg.txt";
+    std::ifstream in(scenarioCfg);
+    std::vector<std::string> scenarios;
+    bool inRows = false;
+    std::string line;
+    while (std::getline(in, line)) {
+        line = Tools::Trim(line);
+        if (line.empty()) continue;
+        if (line == "# scenario_folder,probability") {
+            inRows = true;
+            continue;
+        }
+        if (!inRows || line[0] == '#') continue;
+        scenarios.push_back(Tools::SplitAndTrim(line, ',', true).at(0));
+    }
+    return scenarios;
+}
+
+std::unordered_set<int> LoadDebugPlugInStations(const std::string& dataFolder)
+{
+    const std::filesystem::path globalCfg = ResolveDataFolderPath(dataFolder) / "globalCfg.txt";
+    std::ifstream in(globalCfg);
+    std::vector<std::string> lines;
+    std::string line;
+    while (std::getline(in, line)) {
+        lines.push_back(Tools::Trim(line));
+    }
+
+    std::unordered_set<int> stations;
+    for (size_t idx = 0; idx < lines.size(); ++idx) {
+        if (lines[idx] != "# ChargerNums") continue;
+        const int count = std::stoi(lines.at(idx + 1));
+        for (int offset = 0; offset < count; ++offset) {
+            const auto tokens = Tools::SplitAndTrim(lines.at(idx + 2 + static_cast<size_t>(offset)), ',', true);
+            stations.insert(std::stoi(tokens.at(0)));
+        }
+        break;
+    }
+    return stations;
+}
+
+double LoadDebugFastChargeRate(const std::string& dataFolder)
+{
+    const std::filesystem::path globalCfg = ResolveDataFolderPath(dataFolder) / "globalCfg.txt";
+    std::ifstream in(globalCfg);
+    std::vector<std::vector<std::string>> rows;
+    std::string line;
+    while (std::getline(in, line)) {
+        line = Tools::Trim(line);
+        if (line.empty() || line[0] == '#') continue;
+        rows.push_back(Tools::SplitAndTrim(line, ',', true));
+    }
+    return std::stod(rows.at(4).at(0));
+}
+
+std::vector<std::vector<int>> LoadDebugIntTable(const std::filesystem::path& path)
+{
+    std::ifstream in(path);
+    std::vector<std::vector<int>> rows;
+    std::string line;
+    while (std::getline(in, line)) {
+        line = Tools::Trim(line);
+        if (line.empty() || line[0] == '#') continue;
+        std::vector<int> row;
+        for (const auto& token : Tools::SplitAndTrim(line, ',', true)) {
+            row.push_back(std::stoi(token));
+        }
+        rows.push_back(std::move(row));
+    }
+    return rows;
+}
+
+struct DebugScenarioTables {
+    std::vector<std::vector<int>> stations;
+    std::vector<std::vector<int>> arrTimes;
+    std::vector<std::vector<int>> depTimes;
+};
+
+DebugScenarioTables LoadDebugScenarioTables(const std::string& dataFolder, const std::string& scenarioFolder)
+{
+    const std::filesystem::path root = ResolveDataFolderPath(dataFolder) / scenarioFolder;
+    return {
+        LoadDebugIntTable(root / "tripStations.txt"),
+        LoadDebugIntTable(root / "tripArrTimes.txt"),
+        LoadDebugIntTable(root / "tripDepTimes.txt")
+    };
 }
 
 } // namespace
@@ -429,6 +547,134 @@ void LShapeRelaxed::PrintBestSolution() const
     }
     std::cout << "Q(z): " << incumbentSecondStageValue << std::endl;
     std::cout << "UB: " << bestUpperBound << ", LB: " << bestLowerBound << std::endl;
+}
+
+void LShapeRelaxed::DebugExportPhase1PlugInOccupancy(const std::string& outputDir)
+{
+    if (incumbentZValues.empty()) {
+        std::cout << "Phase 1 plug-in occupancy debug skipped: no incumbent z values" << std::endl;
+        return;
+    }
+
+    LShapeCutInfo aggregateCutInfo;
+    double aggregatedQValue = 0.0;
+    std::vector<LShapeCutInfo> routeCutInfos;
+    std::cout << "Phase 1 plug-in occupancy debug: resolving route LP subproblems and reading subproblem solutions" << std::endl;
+    const Status status = EvaluateSubProblems(incumbentZValues, aggregateCutInfo, aggregatedQValue, routeCutInfos);
+    if (status != OK) {
+        std::cout << "Phase 1 plug-in occupancy debug skipped: route subproblem resolve failed" << std::endl;
+        return;
+    }
+
+    const std::vector<std::string> scenarioFolders = LoadDebugScenarioFolders(dataFolder);
+    const std::unordered_set<int> plugInStations = LoadDebugPlugInStations(dataFolder);
+    const double fastRate = LoadDebugFastChargeRate(dataFolder);
+    std::vector<DebugScenarioTables> scenarioTables;
+    scenarioTables.reserve(scenarioFolders.size());
+    for (const std::string& folder : scenarioFolders) {
+        scenarioTables.push_back(LoadDebugScenarioTables(dataFolder, folder));
+    }
+
+    const std::filesystem::path dir(outputDir);
+    std::filesystem::create_directories(dir);
+    std::ofstream eventsOut(dir / "phase1_plugin_charge_events.csv");
+    std::ofstream timeOut(dir / "phase1_plugin_station_time_occupancy.csv");
+
+    eventsOut << "scenario_index,scenario_folder,route_id,eb,trip,station,station_idx,"
+              << "arr_time,dep_time,window_minutes,charge,fast_rate,occupied_minutes_equiv,"
+              << "positive_charge,var_name\n";
+    timeOut << "scenario_index,scenario_folder,route_id,station,time,"
+            << "available_windows,positive_charge_windows,charge_evenly_allocated\n";
+
+    using TimeKey = std::tuple<int, int, int, int>;
+    struct TimeAgg {
+        int availableWindows = 0;
+        int positiveChargeWindows = 0;
+        double chargeEvenlyAllocated = 0.0;
+    };
+    std::map<TimeKey, TimeAgg> timeAgg;
+
+    int exportedEvents = 0;
+    int positiveEvents = 0;
+    double totalCharge = 0.0;
+
+    for (const auto& sub : subProblems) {
+        const int scenarioIndex = sub->scenarioIndex;
+        const int routeId = sub->routeId;
+        if (scenarioIndex < 0 || static_cast<size_t>(scenarioIndex) >= scenarioTables.size()) {
+            continue;
+        }
+
+        GRBModel& subModel = *sub->model;
+        const int numVars = subModel.get(GRB_IntAttr_NumVars);
+        GRBVar* vars = subModel.getVars();
+        const DebugScenarioTables& tables = scenarioTables[static_cast<size_t>(scenarioIndex)];
+        const std::string& scenarioFolder = scenarioFolders[static_cast<size_t>(scenarioIndex)];
+
+        for (int varIdx = 0; varIdx < numVars; ++varIdx) {
+            const std::string varName = vars[varIdx].get(GRB_StringAttr_VarName);
+            ParsedStationChargeVar parsed;
+            if (!ParseStationChargeVarName(varName, parsed)) {
+                continue;
+            }
+            if (plugInStations.count(parsed.station) == 0 || parsed.stationIdx != 0) {
+                continue;
+            }
+            if (parsed.trip < 0 || static_cast<size_t>(parsed.trip) >= tables.stations.size()) {
+                continue;
+            }
+            if (parsed.stationIdx < 0 ||
+                static_cast<size_t>(parsed.stationIdx) >= tables.stations[static_cast<size_t>(parsed.trip)].size()) {
+                continue;
+            }
+
+            const int arrTime = tables.arrTimes[static_cast<size_t>(parsed.trip)][static_cast<size_t>(parsed.stationIdx)];
+            const int depTime = tables.depTimes[static_cast<size_t>(parsed.trip)][static_cast<size_t>(parsed.stationIdx)];
+            const int windowMinutes = depTime - arrTime;
+            const double charge = vars[varIdx].get(GRB_DoubleAttr_X);
+            const double occupiedMinutesEquiv = fastRate > 0.0 ? charge / fastRate : 0.0;
+            const bool positiveCharge = charge > kPhase1DebugChargeTol;
+
+            eventsOut << scenarioIndex << ',' << scenarioFolder << ',' << routeId << ','
+                      << parsed.eb << ',' << parsed.trip << ',' << parsed.station << ','
+                      << parsed.stationIdx << ',' << arrTime << ',' << depTime << ','
+                      << windowMinutes << ',' << std::setprecision(12) << charge << ','
+                      << fastRate << ',' << occupiedMinutesEquiv << ','
+                      << (positiveCharge ? 1 : 0) << ',' << varName << '\n';
+
+            ++exportedEvents;
+            if (positiveCharge) {
+                ++positiveEvents;
+                totalCharge += charge;
+            }
+
+            for (int time = arrTime; time < depTime; ++time) {
+                TimeAgg& agg = timeAgg[TimeKey{scenarioIndex, routeId, parsed.station, time}];
+                ++agg.availableWindows;
+                if (positiveCharge) {
+                    ++agg.positiveChargeWindows;
+                    if (windowMinutes > 0) {
+                        agg.chargeEvenlyAllocated += charge / static_cast<double>(windowMinutes);
+                    }
+                }
+            }
+        }
+        delete[] vars;
+    }
+
+    for (const auto& [key, agg] : timeAgg) {
+        const auto& [scenarioIndex, routeId, station, time] = key;
+        const std::string& scenarioFolder = scenarioFolders[static_cast<size_t>(scenarioIndex)];
+        timeOut << scenarioIndex << ',' << scenarioFolder << ',' << routeId << ','
+                << station << ',' << time << ',' << agg.availableWindows << ','
+                << agg.positiveChargeWindows << ',' << std::setprecision(12)
+                << agg.chargeEvenlyAllocated << '\n';
+    }
+
+    std::cout << "Phase 1 plug-in occupancy debug exported to " << dir.string()
+              << ": events=" << exportedEvents
+              << ", positive_events=" << positiveEvents
+              << ", positive_charge=" << totalCharge << std::endl;
 }
 
 LShapeRelaxed::~LShapeRelaxed() = default;
