@@ -290,10 +290,11 @@ Southaven II,288
 Springdale Condo,289
 St Anthony’s Pri Sch,290
 TENGAH CC,291
-Tengah Int,292
-The Hillford,293
-The Petals Condo,294
-Toh Guan Ctr,295
-Wang-Fu Ind Pte Ltd,296
-Woh Hup Bldg,297
-Yuhua Sec Sch,298
+Tengah CC,292
+Tengah Int,293
+The Hillford,294
+The Petals Condo,295
+Toh Guan Ctr,296
+Wang-Fu Ind Pte Ltd,297
+Woh Hup Bldg,298
+Yuhua Sec Sch,299
