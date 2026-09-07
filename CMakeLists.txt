@@ -42,7 +42,6 @@ add_executable(wireless
     src/algorithm/lifted_ils.cpp
     src/algorithm/lifted_two_phase_ils.cpp
     src/algorithm/lshape_relaxed.cpp
-    src/algorithm/full_method.cpp
 )
 
 set_target_properties(wireless PROPERTIES

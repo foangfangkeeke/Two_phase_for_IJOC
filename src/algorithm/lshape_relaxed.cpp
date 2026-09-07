@@ -69,6 +69,18 @@ void AddFeasibilityCut(GRBModel& model, const LShapeCutInfo& cutInfo,
     throw std::invalid_argument("Unsupported feasibility cut sense in relaxed route framework");
 }
 
+void PrintBounds(double bestUpperBound, double bestLowerBound)
+{
+    std::cout << ", UB=";
+    if (std::isfinite(bestUpperBound)) {
+        const double denom = std::max(1.0, std::fabs(bestUpperBound));
+        std::cout << bestUpperBound << ", LB=" << bestLowerBound
+                  << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
+    } else {
+        std::cout << "inf, LB=" << bestLowerBound << ", gap=1";
+    }
+}
+
 } // namespace
 
 struct LShapeRelaxed::RouteSubProblemState {
@@ -107,7 +119,7 @@ Status LShapeRelaxed::Initialize()
     const std::vector<ProblemDataConstr> masterConstrs = dataIniter->ConstrInit(*problemData);
     const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
     InitializeBendersMasterModel(*model, masterVars, masterConstrs, zVars, theta, true);
-    model->set(GRB_DoubleParam_MIPGap, 0.0);
+    model->set(GRB_DoubleParam_MIPGap, solverConfig.mipGap);
     model->set(GRB_IntParam_Threads, ParallelConfig::MasterThreads());
     const auto dataInitEnd = Tools::Clock::now();
     std::cout << "Relaxed Route data/master initialization elapsed_ms="
@@ -251,7 +263,7 @@ Status LShapeRelaxed::EvaluateSubProblems(const std::vector<double>& zValues,
 
 Status LShapeRelaxed::ApplyWarmStart()
 {
-    bestUpperBound = 1e9;
+    bestUpperBound = std::numeric_limits<double>::infinity();
     globalLowerBound = 0.0;
     for (auto& sub : subProblems) {
         sub->strategy->SetLowerBound(0.0);
@@ -283,13 +295,19 @@ Status LShapeRelaxed::Solve()
         }
 
         const auto masterStart = Tools::Clock::now();
+        model->set(GRB_DoubleParam_MIPGap, solverConfig.mipGap);
         model->optimize();
         const auto masterEnd = Tools::Clock::now();
         const long long masterMs = Tools::ElapsedMs(masterStart, masterEnd);
         int masterStatus = model->get(GRB_IntAttr_Status);
+        const int masterSolCount = model->get(GRB_IntAttr_SolCount);
         if (!(masterStatus == GRB_OPTIMAL ||
-              (masterStatus == GRB_TIME_LIMIT && model->get(GRB_IntAttr_SolCount) > 0))) {
+              (masterStatus == GRB_TIME_LIMIT && masterSolCount > 0))) {
             std::cerr << "Relaxed Route master problem not solved, status: " << masterStatus << std::endl;
+            return ERROR;
+        }
+        if (masterSolCount <= 0) {
+            std::cerr << "Relaxed Route master has no incumbent, status: " << masterStatus << std::endl;
             return ERROR;
         }
 
@@ -324,11 +342,7 @@ Status LShapeRelaxed::Solve()
             }
 
             std::cout << "Relaxed Route iter " << iter << ", feasibility cut x" << feasCount;
-            if (std::isfinite(bestUpperBound)) {
-                std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound;
-                const double denom = std::max(1.0, std::fabs(bestUpperBound));
-                std::cout << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
-            }
+            PrintBounds(bestUpperBound, bestLowerBound);
             std::cout << ", master_ms=" << masterMs
                       << ", integer_ms=" << integerMs
                       << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, Tools::Clock::now()) << std::endl;
@@ -343,15 +357,13 @@ Status LShapeRelaxed::Solve()
         }
 
         std::cout << "Relaxed Route iter " << iter << ", theta=" << thetaValue << ", Q(z)=" << aggregatedQValue;
-        if (std::isfinite(bestUpperBound)) {
-            std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound;
-            const double denom = std::max(1.0, std::fabs(bestUpperBound));
-            std::cout << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
-        }
+        PrintBounds(bestUpperBound, bestLowerBound);
 
         const double gapDenom = std::max(1.0, std::fabs(bestUpperBound));
-        const double relGap = (bestUpperBound - bestLowerBound) / gapDenom;
-        if (relGap <= solverConfig.mipGap) {
+        const double relGap = std::isfinite(bestUpperBound)
+            ? (bestUpperBound - bestLowerBound) / gapDenom
+            : 1.0;
+        if (std::isfinite(bestUpperBound) && relGap <= solverConfig.mipGap) {
             std::cout << ", master_ms=" << masterMs
                       << ", integer_ms=" << integerMs
                       << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, Tools::Clock::now()) << std::endl;

@@ -1,9 +1,9 @@
 #include "natural_ils.hpp"
 #include "lifted_ils.hpp"
 #include "lifted_two_phase_ils.hpp"
-#include "full_method.hpp"
 #include "gurobi_c++.h"
 #include "milp_solver.hpp"
+#include "runtime_options.hpp"
 #include "solver_config.hpp"
 #include "tools.hpp"
 #include "using_solver.hpp"
@@ -26,6 +26,18 @@
 using namespace std;
 
 namespace {
+
+string BuildCaseLabel(const string& dataType, const RuntimeOptions& runtimeOptions)
+{
+    string scaleLabel = dataType;
+    if (dataType == "tower_base" || dataType == "tower") {
+        scaleLabel = "tower_base";
+    } else if (dataType.rfind("tower_", 0) == 0) {
+        scaleLabel = dataType.substr(6);
+    }
+    return scaleLabel + "_" + to_string(runtimeOptions.scenarioCount) +
+        "_cap" + to_string(runtimeOptions.chargerCapacity);
+}
 
 void RedirectProcessOutputToLog(const filesystem::path& logPath)
 {
@@ -71,10 +83,13 @@ int main(int argc, char* argv[])
     string pb = "wireless";
     string dataType = "test";
     bool exportSolution = false;
+    bool exportSummary = false;
     bool allowWirelessCharging = true;
     bool rspOptionSet = false;
     bool rspOptionValue = true;
-    string fixedFacilitiesFile;
+    bool monotoneOptionSet = false;
+    bool monotoneOptionValue = false;
+    RuntimeOptions runtimeOptions;
     string exportDirectory;
     for (int idx = 1; idx < argc; ++idx) {
         string arg = argv[idx];
@@ -89,25 +104,44 @@ int main(int argc, char* argv[])
         } else if (arg == "--rsp" && idx + 1 < argc) {
             rspOptionSet = true;
             rspOptionValue = std::stoi(argv[++idx]) != 0;
+        } else if (arg == "--monotone" && idx + 1 < argc) {
+            monotoneOptionSet = true;
+            monotoneOptionValue = std::stoi(argv[++idx]) != 0;
+        } else if (arg == "--facility-cost-scale" && idx + 1 < argc) {
+            runtimeOptions.facilityCostScale = std::stod(argv[++idx]);
+        } else if (arg == "--energy-scale" && idx + 1 < argc) {
+            runtimeOptions.energyScale = std::stod(argv[++idx]);
+        } else if (arg == "--scenario-count" && idx + 1 < argc) {
+            runtimeOptions.scenarioCount = std::stoi(argv[++idx]);
+        } else if (arg == "--cap" && idx + 1 < argc) {
+            runtimeOptions.chargerCapacity = std::stoi(argv[++idx]);
         } else if (arg == "--export-solution") {
             exportSolution = true;
-        } else if (arg == "--fixed-facilities" && idx + 1 < argc) {
-            fixedFacilitiesFile = argv[++idx];
+        } else if (arg == "--export-summary") {
+            exportSummary = true;
         } else if (arg == "--export-dir" && idx + 1 < argc) {
             exportDirectory = argv[++idx];
-            exportSolution = true;
         }
     }
 
     const string algLower = Tools::ToLower(alg);
     const string pbLower = Tools::ToLower(pb);
     const string dataFolder = dataType + "_data";
+    if (runtimeOptions.facilityCostScale <= 0.0 || runtimeOptions.energyScale <= 0.0 ||
+        runtimeOptions.scenarioCount <= 0 || runtimeOptions.chargerCapacity <= 0) {
+        throw std::invalid_argument("Runtime numeric options must be positive");
+    }
+    SetRuntimeOptions(runtimeOptions);
     const auto UseRsp = [rspOptionSet, rspOptionValue](bool defaultValue) {
         return rspOptionSet ? rspOptionValue : defaultValue;
     };
+    const auto UseMonotone = [monotoneOptionSet, monotoneOptionValue](bool defaultValue) {
+        return monotoneOptionSet ? monotoneOptionValue : defaultValue;
+    };
 
     // ── Log file setup ──
-    const filesystem::path logDir = filesystem::path("logs") / dataType;
+    const string caseLabel = BuildCaseLabel(dataType, runtimeOptions);
+    const filesystem::path logDir = filesystem::path("logs") / caseLabel;
     filesystem::create_directories(logDir);
     const auto now = chrono::system_clock::now();
     const time_t tt = chrono::system_clock::to_time_t(now);
@@ -116,13 +150,17 @@ int main(int argc, char* argv[])
     char ts[64];
     strftime(ts, sizeof(ts), "%Y-%m-%d_%H-%M-%S", &tmBuf);
     const filesystem::path logPath =
-        logDir / (alg + "_" + pb + "_" + ts + ".log");
+        logDir / (caseLabel + "_" + alg + "_" + pb + "_" + ts + ".log");
 
     cout << "Log file: " << logPath.string() << endl;
     fflush(stdout);
     RedirectProcessOutputToLog(logPath);
 
     // ... (algorithm dispatch below; stdout/stderr are redirected to the log file)
+    cout << "Runtime options: facility_cost_scale=" << runtimeOptions.facilityCostScale
+         << ", energy_scale=" << runtimeOptions.energyScale
+         << ", scenario_count=" << runtimeOptions.scenarioCount
+         << ", cap=" << runtimeOptions.chargerCapacity << endl;
 
     if (pbLower == "wireless") {
         MILPSolver solver;
@@ -132,14 +170,15 @@ int main(int argc, char* argv[])
             auto algorithm = std::make_unique<UsingSolver>(
                 WIRELESS_CHARGING_NO_PLUGIN, dataFolder, allowWirelessCharging);
             algorithm->SetExportSolution(exportSolution);
+            algorithm->SetExportSummary(exportSummary);
             algorithm->SetExportDirectory(exportDirectory);
             solver.SetAlgorithm(std::move(algorithm));
-        } else if (algLower == "natural-ils") {
+        } else if (algLower == "ils" || algLower == "natural-ils") {
             solver.SetAlgorithm(std::make_unique<WirelessNoPlugInIntegerLShaped>(
                 dataFolder, 2147483647, 1e-6, UseRsp(true)));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;
-            cout << "valid wireless algorithms: solver, natural-ils" << endl;
+            cout << "valid wireless algorithms: solver, ils, natural-ils" << endl;
             return 1;
         }
 
@@ -155,25 +194,21 @@ int main(int argc, char* argv[])
         MILPSolver solver;
         solver.SetSolverConfig(LoadSolverConfig());
 
-        if (algLower == "lifted-ils") {
+        if (algLower == "lifted-ils" || algLower == "lifted-monotone") {
+            const bool useMonotoneCuts = UseMonotone(algLower == "lifted-monotone");
             solver.SetAlgorithm(std::make_unique<LiftedILS>(
-                WIRELESS_CAPACITY_REFORM, dataFolder, 5000, 1e-6, false, UseRsp(true)));
-        } else if (algLower == "lifted-monotone") {
-            solver.SetAlgorithm(std::make_unique<LiftedILS>(
-                WIRELESS_CAPACITY_REFORM, dataFolder, 5000, 1e-6, true, UseRsp(true)));
-        } else if (algLower == "lifted-two-phase") {
-            solver.SetAlgorithm(std::make_unique<LiftedTwoPhaseILS>(
-                WIRELESS_CAPACITY_REFORM, dataFolder, 5000, 1e-6, UseRsp(true)));
-        } else if (algLower == "full") {
-            auto algorithm = std::make_unique<FullMethod>(
-                WIRELESS_CAPACITY_REFORM, dataFolder, 5000, 1e-6, UseRsp(true));
+                WIRELESS_CAPACITY_REFORM, dataFolder, 5000, 1e-6, useMonotoneCuts, UseRsp(true)));
+        } else if (algLower == "two-phase" || algLower == "lifted-two-phase" || algLower == "full") {
+            const bool useMonotoneCuts = UseMonotone(algLower == "full");
+            auto algorithm = std::make_unique<LiftedTwoPhaseILS>(
+                WIRELESS_CAPACITY_REFORM, dataFolder, 5000, 1e-6, UseRsp(true), useMonotoneCuts);
             algorithm->SetExportSolution(exportSolution);
-            algorithm->SetFixedFacilitiesFile(fixedFacilitiesFile);
+            algorithm->SetExportSummary(exportSummary);
             algorithm->SetExportDirectory(exportDirectory);
             solver.SetAlgorithm(std::move(algorithm));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;
-            cout << "valid wireless_reform algorithms: lifted-ils, lifted-monotone, lifted-two-phase, full" << endl;
+            cout << "valid wireless_reform algorithms: lifted-ils, lifted-monotone, two-phase, lifted-two-phase, full" << endl;
             return 1;
         }
 
@@ -186,6 +221,10 @@ int main(int argc, char* argv[])
     }
 
     cout << "No experiments registered for problem " << pb << endl;
-    cout << "Usage: wireless.exe --pb <problem> --alg <algorithm> --data <test|tower>" << endl;
+    cout << "Usage: wireless.exe --pb <problem> --alg <algorithm> --data <test|tower>"
+         << " [--facility-cost-scale <positive>] [--energy-scale <positive>]"
+         << " [--scenario-count <positive>] [--cap <positive>]"
+         << " [--rsp <0|1>] [--monotone <0|1>]"
+         << " [--export-solution] [--export-summary] [--export-dir <path>]" << endl;
     return 1;
 }

@@ -54,6 +54,18 @@ void AddFeasibilityCut(GRBModel& model, const LShapeCutInfo& cutInfo,
     throw std::invalid_argument("Unsupported feasibility cut sense");
 }
 
+void PrintBounds(double bestUpperBound, double bestLowerBound)
+{
+    std::cout << ", UB=";
+    if (std::isfinite(bestUpperBound)) {
+        const double denom = std::max(1.0, std::fabs(bestUpperBound));
+        std::cout << bestUpperBound << ", LB=" << bestLowerBound
+                  << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
+    } else {
+        std::cout << "inf, LB=" << bestLowerBound << ", gap=1";
+    }
+}
+
 const std::map<ProblemType, std::tuple<DataInitFactory, SubFactory>> kStrategyMap = {
     {
         WIRELESS_CAPACITY_REFORM,
@@ -131,7 +143,7 @@ Status LiftedILS::Initialize()
     const std::vector<ProblemDataConstr> masterConstrs = dataIniter->ConstrInit(*problemData);
     const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
     InitializeBendersMasterModel(*model, masterVars, masterConstrs, zVars, theta, true);
-    model->set(GRB_DoubleParam_MIPGap, 0.0);
+    model->set(GRB_DoubleParam_MIPGap, solverConfig.mipGap);
     model->set(GRB_IntParam_Presolve, solverConfig.presolve);
     model->set(GRB_IntParam_Method, solverConfig.method);
     model->set(GRB_IntParam_Threads, ParallelConfig::MasterThreads());
@@ -259,7 +271,7 @@ Status LiftedILS::EvaluateSubProblems(const std::vector<double>& zValues,
 
 Status LiftedILS::ApplyWarmStart()
 {
-    bestUpperBound = 1e9;
+    bestUpperBound = std::numeric_limits<double>::infinity();
     globalLowerBound = 0.0;
     for (auto& sub : subProblems) {
         sub->strategy->SetLowerBound(0.0);
@@ -316,23 +328,30 @@ Status LiftedILS::Solve()
             return ERROR;
         }
 
+        model->set(GRB_DoubleParam_MIPGap, solverConfig.mipGap);
         const auto masterStart = Tools::Clock::now();
         model->optimize();
         const auto masterEnd = Tools::Clock::now();
         const long long masterMs = Tools::ElapsedMs(masterStart, masterEnd);
         int masterStatus = model->get(GRB_IntAttr_Status);
+        const int masterSolCount = model->get(GRB_IntAttr_SolCount);
         if (!(masterStatus == GRB_OPTIMAL ||
-              (masterStatus == GRB_TIME_LIMIT && model->get(GRB_IntAttr_SolCount) > 0))) {
+              (masterStatus == GRB_TIME_LIMIT && masterSolCount > 0))) {
             std::cerr << (useMonotoneCuts ? "Lifted monotone ILS" : "Lifted ILS")
                       << " master problem not solved, status: " << masterStatus << std::endl;
             return ERROR;
         }
+        if (masterSolCount <= 0) {
+            std::cerr << (useMonotoneCuts ? "Lifted monotone ILS" : "Lifted ILS")
+                      << " master has no incumbent, status: " << masterStatus << std::endl;
+            return ERROR;
+        }
+        bestLowerBound = std::max(bestLowerBound, model->get(GRB_DoubleAttr_ObjBound));
 
         const BendersMasterSolution masterSolution = GetBendersMasterSolution(*model, zVars, theta);
         const std::vector<double>& zValues = masterSolution.values;
         const double fixedCost = masterSolution.firstStageValue;
         const double thetaValue = masterSolution.thetaValue;
-        bestLowerBound = std::max(bestLowerBound, model->get(GRB_DoubleAttr_ObjBound));
 
         const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
         const auto& scenarioSubproblems = problemData->getData<std::vector<ScenarioSubproblemInfo>>(
@@ -368,25 +387,6 @@ Status LiftedILS::Solve()
                             "lifted_ils_rsp_feasibility_" + std::to_string(iter) + "_sub_" + std::to_string(idx));
                         ++rspFeasCount;
                     }
-                    if (useMonotoneCuts) {
-                        const ScenarioSubproblemInfo& scenarioInfo = scenarioSubproblems[idx];
-                        const int scIdx = scenarioInfo.scenarioIndex;
-                        std::vector<std::string> scenarioFacilityNames;
-                        for (int rid : scenarioInfo.routeIds) {
-                            const auto& routeFacilityNames = facilityVarNames.at(static_cast<size_t>(scIdx))
-                                .at(static_cast<size_t>(rid));
-                            scenarioFacilityNames.insert(scenarioFacilityNames.end(),
-                                routeFacilityNames.begin(), routeFacilityNames.end());
-                        }
-                        const BendersCutInfo noGood = BuildScenarioStrengthenedNoGoodCut(
-                            masterVars, zValues, scIdx, scenarioInfo.routeIds, scenarioFacilityNames);
-                        const std::string noGoodSignature = MakeFeasibilityCutSignature(noGood);
-                        if (addedRSPFeasibilityCuts.insert(noGoodSignature).second) {
-                            AddFeasibilityCut(*model, noGood, zVars,
-                                "lifted_monotone_rsp_nogood_" + std::to_string(iter) + "_sub_" + std::to_string(idx));
-                            ++rspFeasCount;
-                        }
-                    }
                     continue;
                 }
 
@@ -401,12 +401,9 @@ Status LiftedILS::Solve()
 
             if (rspAnyInfeasible) {
                 std::cout << (useMonotoneCuts ? "Lifted monotone ILS" : "Lifted ILS")
-                          << " iter " << iter << ", RSP feasibility cut x" << rspFeasCount;
-                if (std::isfinite(bestUpperBound)) {
-                    const double denom = std::max(1.0, std::fabs(bestUpperBound));
-                    std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound
-                              << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
-                }
+                          << " iter " << iter << ", RSP feasibility cut x" << rspFeasCount
+                          << ", RSP optimality cut x" << rspOptCount;
+                PrintBounds(bestUpperBound, bestLowerBound);
                 model->update();
                 std::cout << ", master_ms=" << masterMs
                           << ", rsp_ms=" << Tools::ElapsedMs(rspStart, rspEnd)
@@ -466,11 +463,7 @@ Status LiftedILS::Solve()
         if (mipAnyInfeasible) {
             std::cout << (useMonotoneCuts ? "Lifted monotone ILS" : "Lifted ILS")
                       << " iter " << iter << ", feasibility cut x" << feasCount;
-            if (std::isfinite(bestUpperBound)) {
-                const double denom = std::max(1.0, std::fabs(bestUpperBound));
-                std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound
-                          << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
-            }
+            PrintBounds(bestUpperBound, bestLowerBound);
             model->update();
             std::cout << ", master_ms=" << masterMs << ", integer_ms=" << integerMs
                       << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, Tools::Clock::now()) << std::endl;
@@ -485,15 +478,13 @@ Status LiftedILS::Solve()
         std::cout << (useMonotoneCuts ? "Lifted monotone ILS" : "Lifted ILS")
                   << " iter " << iter
                   << ", theta=" << thetaValue << ", Q(z)=" << aggregatedQValue;
-        if (std::isfinite(bestUpperBound)) {
-            const double denom = std::max(1.0, std::fabs(bestUpperBound));
-            std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound
-                      << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
-        }
+        PrintBounds(bestUpperBound, bestLowerBound);
 
         const double gapDenom = std::max(1.0, std::fabs(bestUpperBound));
-        const double relGap = (bestUpperBound - bestLowerBound) / gapDenom;
-        if (relGap <= solverConfig.mipGap) {
+        const double relGap = std::isfinite(bestUpperBound)
+            ? (bestUpperBound - bestLowerBound) / gapDenom
+            : 1.0;
+        if (std::isfinite(bestUpperBound) && relGap <= solverConfig.mipGap) {
             const auto iterEnd = Tools::Clock::now();
             std::cout << ", master_ms=" << masterMs << ", integer_ms=" << integerMs
                       << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;

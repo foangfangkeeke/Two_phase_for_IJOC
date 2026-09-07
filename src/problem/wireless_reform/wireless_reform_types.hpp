@@ -9,6 +9,7 @@
 #include <optional>
 #include <iostream>
 #include <algorithm>
+#include "runtime_options.hpp"
 #include "tools.hpp"
 
 namespace fs = std::filesystem;
@@ -92,14 +93,21 @@ inline std::vector<WirelessScenarioConfig> LoadWirelessScenarioConfigs(const std
     const fs::path scenarioCfgPath = ResolveDataFolderPath(dataRootFolder) / "scenarioCfg.txt";
     auto rows = LoadStringTable(scenarioCfgPath);
     if (!rows.has_value()) return {};
-    const int numScenarios = std::stoi(rows->at(0).at(0));
+    const int availableScenarios = std::stoi(rows->at(0).at(0));
+    const int requestedScenarios = GetRuntimeOptions().scenarioCount;
+    const int numScenarios = requestedScenarios > 0 ? requestedScenarios : availableScenarios;
+    if (numScenarios > availableScenarios) {
+        throw std::invalid_argument("Requested scenario count exceeds scenarioCfg entries");
+    }
     std::vector<WirelessScenarioConfig> scenarios;
     scenarios.reserve(numScenarios);
     for (int idx = 0; idx < numScenarios; ++idx) {
         const auto& row = rows->at(static_cast<size_t>(idx + 1));
         WirelessScenarioConfig scenario;
         scenario.dataFolder = row.at(0);
-        scenario.probability = std::stod(row.at(1));
+        scenario.probability = (requestedScenarios > 0 || row.size() < 2)
+            ? 1.0 / static_cast<double>(numScenarios)
+            : std::stod(row.at(1));
         scenarios.push_back(scenario);
     }
     return scenarios;
@@ -246,11 +254,18 @@ private:
             }
             chargerCfg.priceOfInverterPerkW = std::stod(chargerCfgInt[chargerCfg.num]);
 
+            const RuntimeOptions& runtimeOptions = GetRuntimeOptions();
+            operationCfg.mu *= runtimeOptions.energyScale;
+            for (double& price : chargerCfg.priceOfUnitCharger) {
+                price *= runtimeOptions.facilityCostScale;
+            }
+            chargerCfg.priceOfInverterPerkW *= runtimeOptions.facilityCostScale;
+
             std::vector<std::string> chargerNumsHeader = tmpGlobalCfg->at(OFFSET_GLOBAL_CHARGER_NUMS);
             networkCfg.chargeStationNum = std::stoi(chargerNumsHeader[0]);
             for (int i = 0; i < networkCfg.chargeStationNum; i++) {
                 std::vector<std::string> chargerNumsRow = tmpGlobalCfg->at(OFFSET_GLOBAL_CHARGER_NUMS + 1 + i);
-                networkCfg.chargerNums[std::stoi(chargerNumsRow[0])] = std::stoi(chargerNumsRow[1]);
+                networkCfg.chargerNums[std::stoi(chargerNumsRow[0])] = runtimeOptions.chargerCapacity;
                 networkCfg.chargerPhys.insert(std::stoi(chargerNumsRow[0]));
             }
         }
@@ -285,7 +300,7 @@ private:
             for (int i = 0; i < networkCfg.chargeStationNum; i++) {
                 std::vector<std::string> chargerCfgNums = tmpScenarioCfg->at(
                     OFFSET_SCENARIO_CHARGER_CFG(schedulingCfg.numEB) + 1 + i);
-                networkCfg.chargerNums[std::stoi(chargerCfgNums[0])] = std::stoi(chargerCfgNums[1]);
+                networkCfg.chargerNums[std::stoi(chargerCfgNums[0])] = GetRuntimeOptions().chargerCapacity;
                 networkCfg.chargerPhys.insert(std::stoi(chargerCfgNums[0]));
             }
 

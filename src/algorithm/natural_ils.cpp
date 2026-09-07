@@ -80,6 +80,18 @@ void AddFeasibilityCut(GRBModel& model, const IntegerLShapedCutInfo& cutInfo,
 
     throw std::invalid_argument("Unsupported feasibility cut sense in integer L-shaped framework");
 }
+
+void PrintBounds(double bestUpperBound, double bestLowerBound)
+{
+    std::cout << ", UB=";
+    if (std::isfinite(bestUpperBound)) {
+        const double denom = std::max(1.0, std::fabs(bestUpperBound));
+        std::cout << bestUpperBound << ", LB=" << bestLowerBound
+                  << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
+    } else {
+        std::cout << "inf, LB=" << bestLowerBound << ", gap=1";
+    }
+}
 } // namespace
 
 struct IntegerLShaped::ScenarioSubProblem {
@@ -125,7 +137,7 @@ Status IntegerLShaped::Initialize()
     const std::vector<ProblemDataConstr> masterConstrs = dataIniter->ConstrInit(*problemData);
     const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
     InitializeBendersMasterModel(*model, masterVars, masterConstrs, zVars, theta, true);
-    model->set(GRB_DoubleParam_MIPGap, 0.0);
+    model->set(GRB_DoubleParam_MIPGap, solverConfig.mipGap);
     model->set(GRB_IntParam_Threads, ParallelConfig::MasterThreads());
     const auto dataInitEnd = Tools::Clock::now();
     std::cout << "Natural ILS data/master initialization elapsed_ms="
@@ -331,7 +343,7 @@ Status IntegerLShaped::ApplyWarmStart()
 {
     double warmL = 0.0;
     std::vector<double> scenarioLs(subProblems.size(), 0.0);
-    bestUpperBound = 1e9;
+    bestUpperBound = std::numeric_limits<double>::infinity();
 
     globalLowerBound = warmL;
     for (size_t idx = 0; idx < subProblems.size(); ++idx) {
@@ -365,22 +377,28 @@ Status IntegerLShaped::Solve()
             return ERROR;
         }
 
+        model->set(GRB_DoubleParam_MIPGap, solverConfig.mipGap);
         const auto masterStart = Tools::Clock::now();
         model->optimize();
         const auto masterEnd = Tools::Clock::now();
         const long long masterMs = Tools::ElapsedMs(masterStart, masterEnd);
         int masterStatus = model->get(GRB_IntAttr_Status);
+        const int masterSolCount = model->get(GRB_IntAttr_SolCount);
         if (!(masterStatus == GRB_OPTIMAL ||
-              (masterStatus == GRB_TIME_LIMIT && model->get(GRB_IntAttr_SolCount) > 0))) {
+              (masterStatus == GRB_TIME_LIMIT && masterSolCount > 0))) {
             std::cerr << "Natural ILS master problem not solved, status: " << masterStatus << std::endl;
             return ERROR;
         }
+        if (masterSolCount <= 0) {
+            std::cerr << "Natural ILS master has no incumbent, status: " << masterStatus << std::endl;
+            return ERROR;
+        }
+        bestLowerBound = std::max(bestLowerBound, model->get(GRB_DoubleAttr_ObjBound));
 
         const BendersMasterSolution masterSolution = GetBendersMasterSolution(*model, zVars, theta);
         const std::vector<double>& zValues = masterSolution.values;
         const double fixedCost = masterSolution.firstStageValue;
         const double thetaValue = masterSolution.thetaValue;
-        bestLowerBound = std::max(bestLowerBound, model->get(GRB_DoubleAttr_ObjBound));
 
         if (useRspCuts) {
             double relaxedQValue = 0.0;
@@ -399,11 +417,7 @@ Status IntegerLShaped::Solve()
                     "integer_l_shaped_rsp_feasibility_" + std::to_string(iter));
 
                 std::cout << "Natural ILS iter " << iter << ", RSP feasibility cut";
-                if (std::isfinite(bestUpperBound)) {
-                    std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound;
-                    const double denom = std::max(1.0, std::fabs(bestUpperBound));
-                    std::cout << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
-                }
+                PrintBounds(bestUpperBound, bestLowerBound);
 
                 model->update();
                 const auto iterEnd = Tools::Clock::now();
@@ -436,11 +450,7 @@ Status IntegerLShaped::Solve()
             AddFeasibilityCut(*model, integerCutInfo, zVars, "integer_l_shaped_feasibility_" + std::to_string(iter));
 
             std::cout << "Natural ILS iter " << iter << ", feasibility cut";
-            if (std::isfinite(bestUpperBound)) {
-                std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound;
-                const double denom = std::max(1.0, std::fabs(bestUpperBound));
-                std::cout << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
-            }
+            PrintBounds(bestUpperBound, bestLowerBound);
 
             model->update();
             const auto iterEnd = Tools::Clock::now();
@@ -459,15 +469,13 @@ Status IntegerLShaped::Solve()
         double delta = std::max(0.0, aggregatedQValue - globalLowerBound);
 
         std::cout << "Natural ILS iter " << iter << ", theta=" << thetaValue << ", Q(z)=" << aggregatedQValue;
-        if (std::isfinite(bestUpperBound)) {
-            std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound;
-            double denom = std::max(1.0, std::fabs(bestUpperBound));
-            std::cout << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
-        }
+        PrintBounds(bestUpperBound, bestLowerBound);
 
         const double gapDenom = std::max(1.0, std::fabs(bestUpperBound));
-        const double relGap = (bestUpperBound - bestLowerBound) / gapDenom;
-        if (relGap <= solverConfig.mipGap) {
+        const double relGap = std::isfinite(bestUpperBound)
+            ? (bestUpperBound - bestLowerBound) / gapDenom
+            : 1.0;
+        if (std::isfinite(bestUpperBound) && relGap <= solverConfig.mipGap) {
             const auto iterEnd = Tools::Clock::now();
             std::cout << ", master_ms=" << masterMs
 

@@ -19,6 +19,7 @@ public:
     Status Initialize();
     Status Solve();
     void SetExportSolution(bool enabled) { exportSolution = enabled; }
+    void SetExportSummary(bool enabled) { exportSummary = enabled; }
     void SetExportDirectory(std::string path) { exportDirectory = std::move(path); }
     ~UsingSolver();
 
@@ -27,6 +28,7 @@ private:
     std::string dataFolder;
     bool allowWirelessCharging;
     bool exportSolution = false;
+    bool exportSummary = false;
     std::string exportDirectory;
 
     std::unique_ptr<GRBEnv> env;

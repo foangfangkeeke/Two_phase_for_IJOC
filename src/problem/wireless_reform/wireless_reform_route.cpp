@@ -1,5 +1,6 @@
 #include "wireless_reform_route.hpp"
 #include "gurobi_c++.h"
+#include "runtime_options.hpp"
 #include "tools.hpp"
 #include <iostream>
 #include <filesystem>
@@ -26,6 +27,11 @@ namespace fs = std::filesystem;
 using linkTimeType = unordered_map<int, unordered_map<int, double>>;
 using stationTimeType = vector<vector<int>>;
 using stringCfgType = vector<vector<string>>;
+
+static bool IsPlugInTerminalStop(const unordered_set<int>& chargerPhys, int station, int stationIdx)
+{
+    return stationIdx == 0 && chargerPhys.count(station) > 0;
+}
 
 struct WirelessScenarioConfig {
     string dataFolder;
@@ -154,14 +160,21 @@ static vector<WirelessScenarioConfig> LoadWirelessScenarioConfigs(const string& 
     const fs::path scenarioCfgPath = ResolveDataFolderPath(dataRootFolder) / "scenarioCfg.txt";
     auto rows = LoadStringTable(scenarioCfgPath);
     if (!rows.has_value()) return {};
-    const int numScenarios = stoi(rows->at(0).at(0));
+    const int availableScenarios = stoi(rows->at(0).at(0));
+    const int requestedScenarios = GetRuntimeOptions().scenarioCount;
+    const int numScenarios = requestedScenarios > 0 ? requestedScenarios : availableScenarios;
+    if (numScenarios > availableScenarios) {
+        throw runtime_error("Requested scenario count exceeds scenarioCfg entries");
+    }
     vector<WirelessScenarioConfig> scenarios;
     scenarios.reserve(numScenarios);
     for (int idx = 0; idx < numScenarios; ++idx) {
         const auto& row = rows->at(static_cast<size_t>(idx + 1));
         WirelessScenarioConfig scenario;
         scenario.dataFolder = row.at(0);
-        scenario.probability = stod(row.at(1));
+        scenario.probability = (requestedScenarios > 0 || row.size() < 2)
+            ? 1.0 / static_cast<double>(numScenarios)
+            : stod(row.at(1));
         scenarios.push_back(scenario);
     }
     return scenarios;
@@ -254,6 +267,13 @@ private:
                 chargerCfg.priceOfUnitCharger.push_back(stod(chargerCfgInt[i]));
             }
             chargerCfg.priceOfInverterPerkW = stod(chargerCfgInt[chargerCfg.num]);
+
+            const RuntimeOptions& runtimeOptions = GetRuntimeOptions();
+            operationCfg.mu *= runtimeOptions.energyScale;
+            for (double& price : chargerCfg.priceOfUnitCharger) {
+                price *= runtimeOptions.facilityCostScale;
+            }
+            chargerCfg.priceOfInverterPerkW *= runtimeOptions.facilityCostScale;
         }
         return true;
     }
@@ -286,7 +306,7 @@ private:
             for (int i = 0; i < networkCfg.chargeStationNum; i++) {
                 vector<string> chargerCfgNums = tmpScenarioCfg->at(
                     OFFSET_SCENARIO_CHARGER_CFG(schedulingCfg.numEB) + 1 + i);
-                networkCfg.chargerNums[stoi(chargerCfgNums[0])] = stoi(chargerCfgNums[1]);
+                networkCfg.chargerNums[stoi(chargerCfgNums[0])] = GetRuntimeOptions().chargerCapacity;
                 networkCfg.chargerPhys.insert(stoi(chargerCfgNums[0]));
             }
 
@@ -636,11 +656,11 @@ static bool BuildRouteSubProblem(
     // === Per-EB variables (keyed by ebIdx) ===
     unordered_map<int, GRBVar> chargeNightByEb;                                          // ebIdx -> var
 
-    // charge_bns: ebIdx -> [tripIdx][station] -> var
-    unordered_map<int, vector<unordered_map<int, GRBVar>>> chargeByEb;
+    // charge_bns: ebIdx -> [tripIdx][stationIdx] -> var
+    unordered_map<int, vector<vector<GRBVar>>> chargeByEb;
 
-    // charge_bnl: ebIdx -> [tripIdx][startStation][endStation] -> var
-    unordered_map<int, vector<unordered_map<int, unordered_map<int, GRBVar>>>> chargeLinkByEb;
+    // charge_bnl: ebIdx -> [tripIdx][stationIdx] -> var
+    unordered_map<int, vector<vector<GRBVar>>> chargeLinkByEb;
 
     // energyDep_bns: ebIdx -> [tripIdx][stationIdx] -> var
     unordered_map<int, vector<vector<GRBVar>>> energyDepByEb;
@@ -660,7 +680,7 @@ static bool BuildRouteSubProblem(
         int eb = schedulingCfg.EBs[ebIdx];
         size_t numEBTrip = schedulingCfg.tripEBs[ebIdx].size();
 
-        vector<unordered_map<int, GRBVar>> charge_b;
+        vector<vector<GRBVar>> charge_b;
         vector<vector<GRBVar>> energyDep_b;
         vector<vector<GRBVar>> energyArr_b;
         charge_b.reserve(numEBTrip);
@@ -671,9 +691,10 @@ static bool BuildRouteSubProblem(
             int trip = schedulingCfg.tripEBs[ebIdx][tripIdx];
             size_t numEBTripStations = schedulingCfg.stationTrips[trip].size();
 
-            unordered_map<int, GRBVar> charge_bn;
+            vector<GRBVar> charge_bn;
             vector<GRBVar> energyDep_bn;
             vector<GRBVar> energyArr_bn;
+            charge_bn.reserve(numEBTripStations);
             energyDep_bn.reserve(numEBTripStations);
             energyArr_bn.reserve(numEBTripStations);
 
@@ -685,8 +706,12 @@ static bool BuildRouteSubProblem(
                     namePrefix + "e_Dep" + sub));
                 energyArr_bn.push_back(model.addVar(0.0, GRB_INFINITY, 0.0, GRB_CONTINUOUS,
                     namePrefix + "e_Arr" + sub));
-                charge_bn[station] = model.addVar(0.0, GRB_INFINITY, 0.0, GRB_CONTINUOUS,
-                    namePrefix + "c" + sub);
+                const double chargeUb =
+                    networkCfg.chargerPhys.count(station) && !IsPlugInTerminalStop(networkCfg.chargerPhys, station, stationIdx)
+                        ? 0.0
+                        : GRB_INFINITY;
+                charge_bn.push_back(model.addVar(0.0, chargeUb, 0.0, GRB_CONTINUOUS,
+                    namePrefix + "c" + sub));
             }
             charge_b.push_back(charge_bn);
             energyDep_b.push_back(energyDep_bn);
@@ -702,26 +727,29 @@ static bool BuildRouteSubProblem(
         int eb = schedulingCfg.EBs[ebIdx];
         size_t numEBTrip = schedulingCfg.tripEBs[ebIdx].size();
 
-        vector<unordered_map<int, unordered_map<int, GRBVar>>> charge_b;
+        vector<vector<GRBVar>> charge_b;
         charge_b.reserve(numEBTrip);
 
         for (int tripIdx = 0; tripIdx < static_cast<int>(numEBTrip); tripIdx++) {
             int tripDep = schedulingCfg.tripEBs[ebIdx][tripIdx];
             size_t numEBTripStations = schedulingCfg.stationTrips[tripDep].size();
 
-            unordered_map<int, unordered_map<int, GRBVar>> charge_bn;
+            vector<GRBVar> charge_bn;
+            charge_bn.reserve(numEBTripStations);
 
             for (int stationIdx = 0; stationIdx < static_cast<int>(numEBTripStations); stationIdx++) {
                 int stationDep = schedulingCfg.stationTrips[tripDep][stationIdx];
                 int tripArr;
                 int stationArr;
                 int stationArrIdx;
+                bool isTripTransfer = false;
                 if (stationIdx == static_cast<int>(numEBTripStations) - 1) {
                     if (tripIdx == static_cast<int>(numEBTrip) - 1)
                         continue;
                     tripArr = schedulingCfg.tripEBs[ebIdx][tripIdx + 1];
                     stationArrIdx = 0;
                     stationArr = schedulingCfg.stationTrips[tripArr][stationArrIdx];
+                    isTripTransfer = true;
                 } else {
                     tripArr = tripDep;
                     stationArrIdx = stationIdx + 1;
@@ -732,8 +760,8 @@ static bool BuildRouteSubProblem(
                     + to_string(stationDep) + "_i" + to_string(stationIdx)
                     + "To_n" + to_string(tripArr) + "_s" + to_string(stationArr)
                     + "_i" + to_string(stationArrIdx);
-                charge_bn[stationDep][stationArr] = model.addVar(0.0, GRB_INFINITY, 0.0, GRB_CONTINUOUS,
-                    namePrefix + "c" + sub);
+                charge_bn.push_back(model.addVar(0.0, isTripTransfer ? 0.0 : GRB_INFINITY, 0.0, GRB_CONTINUOUS,
+                    namePrefix + "c" + sub));
             }
             charge_b.push_back(charge_bn);
         }
@@ -749,18 +777,16 @@ static bool BuildRouteSubProblem(
     GRBLinExpr sum_day = 0;
     for (int ebIdx : routeEbIndices) {
         const auto& chargeTrips = chargeByEb[ebIdx];
-        for (const auto& chargeStationMap : chargeTrips) {
-            for (const auto& [station, chargeVar] : chargeStationMap)
+        for (const auto& chargeStationVars : chargeTrips) {
+            for (const GRBVar& chargeVar : chargeStationVars)
                 sum_day += chargeVar;
         }
     }
     for (int ebIdx : routeEbIndices) {
         const auto& chargeLinkTrips = chargeLinkByEb[ebIdx];
-        for (const auto& chargeLinkMap : chargeLinkTrips) {
-            for (const auto& [startStation, endMap] : chargeLinkMap) {
-                for (const auto& [endStation, chargeVar] : endMap)
-                    sum_day += chargeVar;
-            }
+        for (const auto& chargeLinkVars : chargeLinkTrips) {
+            for (const GRBVar& chargeVar : chargeLinkVars)
+                sum_day += chargeVar;
         }
     }
 
@@ -810,11 +836,11 @@ static bool BuildRouteSubProblem(
             int trip = schedulingCfg.tripEBs[ebIdx][tripIdx];
             for (int stationIdx = 0; stationIdx < static_cast<int>(schedulingCfg.stationTrips[trip].size()); stationIdx++) {
                 int station = schedulingCfg.stationTrips[trip][stationIdx];
-                if (!networkCfg.chargerPhys.count(station))
+                if (!IsPlugInTerminalStop(networkCfg.chargerPhys, station, stationIdx))
                     continue;
                 string sub = "_b" + to_string(eb) + "_n" + to_string(trip) + "_s" + to_string(station)
                     + "_i" + to_string(stationIdx);
-                GRBVar charge = chargeByEb[ebIdx][tripIdx][station];
+                GRBVar charge = chargeByEb[ebIdx][tripIdx][stationIdx];
                 const int stayTime = schedulingCfg.stationDepTimes[trip][stationIdx]
                     - schedulingCfg.stationArrTimes[trip][stationIdx];
                 model.addConstr(charge <= chargerCfg.chargeRate[0] * static_cast<double>(stayTime),
@@ -838,7 +864,7 @@ static bool BuildRouteSubProblem(
 
                 string sub = "_b" + to_string(eb) + "_n" + to_string(trip) + "_s" + to_string(station)
                     + "_i" + to_string(stationIdx);
-                GRBVar charge = chargeByEb[ebIdx][tripIdx][station];
+                GRBVar charge = chargeByEb[ebIdx][tripIdx][stationIdx];
                 const int stayTime = schedulingCfg.stationDepTimes[trip][stationIdx]
                     - schedulingCfg.stationArrTimes[trip][stationIdx];
                 const double chargeUpperBound = chargerCfg.chargeRate[1] * static_cast<double>(stayTime);
@@ -863,11 +889,13 @@ static bool BuildRouteSubProblem(
                 int stationDep = schedulingCfg.stationTrips[tripDep][stationIdx];
                 int tripArrIdx;
                 int stationArrIdx;
+                bool isTripTransfer = false;
                 if (stationIdx == static_cast<int>(schedulingCfg.stationTrips[tripDep].size()) - 1) {
                     if (tripIdx == static_cast<int>(schedulingCfg.tripEBs[ebIdx].size()) - 1)
                         continue;
                     tripArrIdx = tripIdx + 1;
                     stationArrIdx = 0;
+                    isTripTransfer = true;
                 } else {
                     tripArrIdx = tripIdx;
                     stationArrIdx = stationIdx + 1;
@@ -875,14 +903,17 @@ static bool BuildRouteSubProblem(
 
                 int tripArr = schedulingCfg.tripEBs[ebIdx][tripArrIdx];
                 int stationArr = schedulingCfg.stationTrips[tripArr][stationArrIdx];
-                const string masterVarName = "w_link_l" + to_string(stationDep) + "To" + to_string(stationArr);
-                const size_t masterIdx = masterIdxByName.at(masterVarName);
 
                 string subCharge = "_b" + to_string(eb) + "_n" + to_string(tripDep) + "_s"
                     + to_string(stationDep) + "_i" + to_string(stationIdx)
                     + "To_n" + to_string(tripArr) + "_s" + to_string(stationArr)
                     + "_i" + to_string(stationArrIdx);
-                GRBVar linkCharge = chargeLinkByEb[ebIdx][tripIdx][stationDep][stationArr];
+                GRBVar linkCharge = chargeLinkByEb[ebIdx][tripIdx][stationIdx];
+                if (isTripTransfer) {
+                    continue;
+                }
+                const string masterVarName = "w_link_l" + to_string(stationDep) + "To" + to_string(stationArr);
+                const size_t masterIdx = masterIdxByName.at(masterVarName);
                 int timeDep = schedulingCfg.stationDepTimes[tripDep][stationIdx];
                 int timeArr = schedulingCfg.stationArrTimes[tripArr][stationArrIdx];
                 int travelTime = timeArr - timeDep;
@@ -942,11 +973,11 @@ static bool BuildRouteSubProblem(
                 GRBVar arrE = energyArrByEb[ebIdx][tripIdx][stationIdx];
                 GRBVar depE = energyDepByEb[ebIdx][tripIdx][stationIdx];
                 if (networkCfg.chargerPhys.count(station)) {
-                    GRBVar charge = chargeByEb[ebIdx][tripIdx][station];
+                    GRBVar charge = chargeByEb[ebIdx][tripIdx][stationIdx];
                     model.addConstr(depE == arrE + charge * chargerCfg.chargeEfficiency[0],
                         "e_InnerStation" + sub);
                 } else {
-                    GRBVar charge = chargeByEb[ebIdx][tripIdx][station];
+                    GRBVar charge = chargeByEb[ebIdx][tripIdx][stationIdx];
                     model.addConstr(depE == arrE + charge * chargerCfg.chargeEfficiency[1],
                         "e_InnerStation" + sub);
                 }
@@ -965,11 +996,13 @@ static bool BuildRouteSubProblem(
 
                 int tripArrIdx;
                 int stationArrIdx;
+                bool isTripTransfer = false;
                 if (stationIdx == static_cast<int>(schedulingCfg.stationTrips[tripDep].size()) - 1) {
                     if (tripIdx == static_cast<int>(schedulingCfg.tripEBs[ebIdx].size()) - 1)
                         continue;
                     tripArrIdx = tripIdx + 1;
                     stationArrIdx = 0;
+                    isTripTransfer = true;
                 } else {
                     tripArrIdx = tripIdx;
                     stationArrIdx = stationIdx + 1;
@@ -978,12 +1011,12 @@ static bool BuildRouteSubProblem(
                 int tripArr = schedulingCfg.tripEBs[ebIdx][tripArrIdx];
                 int stationArr = schedulingCfg.stationTrips[tripArr][stationArrIdx];
                 GRBVar arrE = energyArrByEb[ebIdx][tripArrIdx][stationArrIdx];
-                double dist = networkCfg.linkDistances[stationDep][stationArr];
+                double dist = isTripTransfer ? 0.0 : networkCfg.linkDistances.at(stationDep).at(stationArr);
 
                 double C_inter = dist * operationCfg.curbWeight * operationCfg.mu * operationCfg.g / 3.6;
                 double beta_inter = -dist * operationCfg.weightPerEnergy
                     * operationCfg.mu * operationCfg.g / 3.6;
-                GRBVar linkCharge = chargeLinkByEb[ebIdx][tripIdx][stationDep][stationArr];
+                GRBVar linkCharge = chargeLinkByEb[ebIdx][tripIdx][stationIdx];
                 batteryRhsOut.push_back({model.addConstr(
                     arrE - depE - linkCharge * chargerCfg.chargeEfficiency[2] == 0.0,
                     MakeWirelessBatteryRhsConstrName(targetRouteId, batteryRhsSerial++)),

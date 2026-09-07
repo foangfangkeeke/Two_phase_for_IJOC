@@ -13,12 +13,12 @@
 # chargeEfficiency
 0.90,0.85,0.80
 # priceOfUnitCharger(plug-in USD/day,static USD/day,dynamic USD/km/day),priceOfInverterPerkW(USD/kW/day)
-0,0.18,9,0.015
+0,0.54,27,0.045
 
 # ChargerNums
 5
-218,4
-235,4
-263,4
-272,4
-411,4
+158,4
+170,4
+186,4
+192,4
+292,4

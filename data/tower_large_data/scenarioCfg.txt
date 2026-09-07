@@ -1,6 +1,8 @@
 # numScenarios
-3
+5
 # scenario_folder,probability
-base,0.333333333333
-lo10pct,0.333333333333
-hi10pct,0.333333333333
+base,0.2
+lo10pct,0.2
+hi10pct,0.2
+route_335_up25,0.2
+route_872_down25,0.2

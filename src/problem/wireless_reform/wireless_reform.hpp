@@ -67,6 +67,6 @@ private:
     std::vector<BatteryRhsConstr> batteryRhsConstrs;
     std::vector<int> routeIdByEB;
 
-    // [scenarioIdx][routeId] â†?[(capacity, masterVarIndex), ...]  flat array, no hashing
+    // [scenarioIdx][routeId] -> [(capacity, masterVarIndex), ...]  flat array, no hashing
     std::vector<std::vector<std::vector<std::pair<int, size_t>>>> capacityVarIdx;
 };

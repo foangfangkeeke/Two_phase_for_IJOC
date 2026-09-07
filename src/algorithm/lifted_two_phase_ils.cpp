@@ -2,12 +2,17 @@
 #include "lshape_monotonicity_cut.hpp"
 #include "lshape_relaxed.hpp"
 #include "parallel_utils.hpp"
+#include "runtime_options.hpp"
 #include "wireless_reform.hpp"
 #include "tools.hpp"
 
 #include <algorithm>
+#include <cctype>
 #include <cmath>
+#include <filesystem>
 #include <functional>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -15,14 +20,88 @@
 #include <set>
 #include <stdexcept>
 #include <tuple>
+#include <unordered_set>
 #include <utility>
+#include <vector>
 
 namespace {
 constexpr double kSparseCoeffTol = 1e-12;
+constexpr double kCutKeyTol = 1e-9;
+
+namespace fs = std::filesystem;
 
 bool IsRelevantCoeff(double coeff)
 {
     return std::fabs(coeff) > kSparseCoeffTol;
+}
+
+long long QuantizeCutValue(double value)
+{
+    return static_cast<long long>(std::llround(value / kCutKeyTol));
+}
+
+std::vector<int> ExtractBinaryCutTerms(const BendersCutInfo& cutInfo)
+{
+    std::vector<int> terms;
+    for (size_t idx = 0; idx < cutInfo.yCoeffs.size(); ++idx) {
+        if (IsRelevantCoeff(cutInfo.yCoeffs[idx])) {
+            terms.push_back(static_cast<int>(idx));
+        }
+    }
+    return terms;
+}
+
+double ExtractMonotoneDelta(const BendersCutInfo& cutInfo)
+{
+    for (double coeff : cutInfo.yCoeffs) {
+        if (IsRelevantCoeff(coeff)) {
+            return std::fabs(coeff);
+        }
+    }
+    return 0.0;
+}
+
+struct MonotoneFeasKey {
+    char sense = '>';
+    long long rhs = 0;
+    std::vector<int> terms;
+
+    bool operator<(const MonotoneFeasKey& other) const
+    {
+        return std::tie(sense, rhs, terms) < std::tie(other.sense, other.rhs, other.terms);
+    }
+};
+
+struct MonotoneOptKey {
+    int thetaScope = -1;
+    long long qValue = 0;
+    long long delta = 0;
+    std::vector<int> terms;
+
+    bool operator<(const MonotoneOptKey& other) const
+    {
+        return std::tie(thetaScope, qValue, delta, terms)
+            < std::tie(other.thetaScope, other.qValue, other.delta, other.terms);
+    }
+};
+
+MonotoneFeasKey BuildMonotoneFeasKey(const BendersCutInfo& cutInfo)
+{
+    return MonotoneFeasKey{
+        cutInfo.sense,
+        QuantizeCutValue(cutInfo.rhs),
+        ExtractBinaryCutTerms(cutInfo)
+    };
+}
+
+MonotoneOptKey BuildMonotoneOptKey(size_t thetaScope, const BendersCutInfo& cutInfo)
+{
+    return MonotoneOptKey{
+        static_cast<int>(thetaScope),
+        QuantizeCutValue(cutInfo.constant),
+        QuantizeCutValue(ExtractMonotoneDelta(cutInfo)),
+        ExtractBinaryCutTerms(cutInfo)
+    };
 }
 
 std::string RouteThetaName(int scenarioIndex, int routeId)
@@ -77,6 +156,102 @@ void AddFeasibilityCut(GRBModel& model, const LShapeCutInfo& cutInfo,
     throw std::invalid_argument("Unsupported feasibility cut sense");
 }
 
+bool MeetsOuterGap(double bestUpperBound, double bestLowerBound, const SolverConfig& solverConfig)
+{
+    if (!std::isfinite(bestUpperBound)) return false;
+    const double gapDenom = std::max(1.0, std::fabs(bestUpperBound));
+    const double relGap = (bestUpperBound - bestLowerBound) / gapDenom;
+    return relGap <= solverConfig.mipGap;
+}
+
+void PrintBounds(double bestUpperBound, double bestLowerBound)
+{
+    std::cout << ", UB=";
+    if (std::isfinite(bestUpperBound)) {
+        const double denom = std::max(1.0, std::fabs(bestUpperBound));
+        std::cout << bestUpperBound << ", LB=" << bestLowerBound
+                  << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
+    } else {
+        std::cout << "inf, LB=" << bestLowerBound << ", gap=1";
+    }
+}
+
+std::string CsvEscape(const std::string& value)
+{
+    bool needsQuotes = false;
+    for (char ch : value) {
+        if (ch == ',' || ch == '"' || ch == '\n' || ch == '\r') {
+            needsQuotes = true;
+            break;
+        }
+    }
+    if (!needsQuotes) return value;
+    std::string escaped = "\"";
+    for (char ch : value) {
+        if (ch == '"') escaped += '"';
+        escaped += ch;
+    }
+    escaped += '"';
+    return escaped;
+}
+
+bool StartsWith(const std::string& value, const std::string& prefix)
+{
+    return value.rfind(prefix, 0) == 0;
+}
+
+bool TryParseIntAfter(const std::string& value, const std::string& marker, size_t startPos, int& out)
+{
+    const size_t markerPos = value.find(marker, startPos);
+    if (markerPos == std::string::npos) return false;
+    size_t pos = markerPos + marker.size();
+    size_t end = pos;
+    while (end < value.size() && std::isdigit(static_cast<unsigned char>(value[end]))) {
+        ++end;
+    }
+    if (end == pos) return false;
+    out = std::stoi(value.substr(pos, end - pos));
+    return true;
+}
+
+bool ParseBatteryVarName(const std::string& name, int& scenarioIndex, int& routeId, int& capacity)
+{
+    if (!StartsWith(name, "sc")) return false;
+    size_t pos = 2;
+    size_t end = pos;
+    while (end < name.size() && std::isdigit(static_cast<unsigned char>(name[end]))) ++end;
+    if (end == pos || name.compare(end, 4, "_E_r") != 0) return false;
+    scenarioIndex = std::stoi(name.substr(pos, end - pos));
+
+    pos = end + 4;
+    end = pos;
+    while (end < name.size() && std::isdigit(static_cast<unsigned char>(name[end]))) ++end;
+    if (end == pos || name.compare(end, 4, "_cap") != 0) return false;
+    routeId = std::stoi(name.substr(pos, end - pos));
+
+    pos = end + 4;
+    end = pos;
+    while (end < name.size() && std::isdigit(static_cast<unsigned char>(name[end]))) ++end;
+    if (end == pos) return false;
+    capacity = std::stoi(name.substr(pos, end - pos));
+    return true;
+}
+
+struct FullSolutionSummary {
+    double facilityCost = 0.0;
+    double stationFacilityCost = 0.0;
+    double linkFacilityCost = 0.0;
+    double batteryCost = 0.0;
+    int selectedStationCount = 0;
+    int selectedLinkCount = 0;
+    double expectedFastChargeKwh = 0.0;
+    double expectedStaticWirelessKwh = 0.0;
+    double expectedDynamicWirelessKwh = 0.0;
+    double expectedNightChargeKwh = 0.0;
+    double expectedTotalChargeKwh = 0.0;
+    double expectedOperationalCost = 0.0;
+};
+
 const std::map<ProblemType, std::tuple<DataInitFactory, SubFactory>> kStrategyMap = {
     {
         WIRELESS_CAPACITY_REFORM,
@@ -115,12 +290,13 @@ struct LiftedTwoPhaseILS::ScenarioSubProblemState {
 };
 
 LiftedTwoPhaseILS::LiftedTwoPhaseILS(ProblemType problemType, std::string dataFolder,
-    int maxIters, double tol, bool useRspCuts)
+    int maxIters, double tol, bool useRspCuts, bool useMonotoneCuts)
     : problemType(problemType),
       dataFolder(std::move(dataFolder)),
       maxIters(maxIters),
       tolerance(tol),
       useRspCuts(useRspCuts),
+      useMonotoneCuts(useMonotoneCuts),
       globalLowerBound(0.0),
       bestUpperBound(std::numeric_limits<double>::infinity()),
       bestLowerBound(-std::numeric_limits<double>::infinity()),
@@ -332,7 +508,7 @@ Status LiftedTwoPhaseILS::EvaluateSubProblems(const std::vector<double>& zValues
 
 Status LiftedTwoPhaseILS::ApplyWarmStart()
 {
-    bestUpperBound = 1e9;
+    bestUpperBound = std::numeric_limits<double>::infinity();
     globalLowerBound = 0.0;
     for (auto& sub : subProblems) {
         sub->strategy->SetLowerBound(0.0);
@@ -374,13 +550,21 @@ Status LiftedTwoPhaseILS::Solve()
     }
     model->update();
     std::cout << "Phase 2 MIP start applied, starting Benders, RSP="
-              << (useRspCuts ? "on" : "off") << std::endl;
+              << (useRspCuts ? "on" : "off")
+              << ", monotone_cuts=" << (useMonotoneCuts ? "on" : "off") << std::endl;
 
-    model->addConstr(theta >= globalLowerBound, "theta_global_lb");
-    model->update();
+    const auto& scenarioSubproblems = problemData->getData<std::vector<ScenarioSubproblemInfo>>(
+        "wireless_scenario_subproblems");
+    const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
+    const auto& facilityVarNames = problemData->getData<std::vector<std::vector<std::vector<std::string>>>>(
+        "wireless_route_facility_var_names");
+    std::set<MonotoneFeasKey> monotoneFeasPool;
+    std::set<MonotoneOptKey> monotoneOptPool;
 
     // ── Phase 2: MIP verification with classic cuts ──
     for (int iter = 0; iter < maxIters; ++iter) {
+        int monotoneFeasDedupSkip = 0;
+        int monotoneOptDedupSkip = 0;
         const double elapsedSec = Tools::ElapsedMs(fullAlgorithmStart, Tools::Clock::now()) / 1000.0;
         if (elapsedSec >= solverConfig.timeLimit) {
             std::cout << "Phase 2 reached time limit: " << solverConfig.timeLimit << "s" << std::endl;
@@ -393,22 +577,29 @@ Status LiftedTwoPhaseILS::Solve()
             return ERROR;
         }
 
+        model->set(GRB_DoubleParam_MIPGap, solverConfig.mipGap);
         const auto masterStart = Tools::Clock::now();
         model->optimize();
         const auto masterEnd = Tools::Clock::now();
         const long long masterMs = Tools::ElapsedMs(masterStart, masterEnd);
         int masterStatus = model->get(GRB_IntAttr_Status);
+        const int masterSolCount = model->get(GRB_IntAttr_SolCount);
         if (!(masterStatus == GRB_OPTIMAL ||
-              (masterStatus == GRB_TIME_LIMIT && model->get(GRB_IntAttr_SolCount) > 0))) {
+              (masterStatus == GRB_TIME_LIMIT && masterSolCount > 0))) {
             std::cerr << "Phase 2 master not solved, status: " << masterStatus << std::endl;
             return ERROR;
         }
+        if (masterSolCount <= 0) {
+            std::cerr << "Phase 2 master has no incumbent, status: " << masterStatus << std::endl;
+            return ERROR;
+        }
+        const double masterBound = model->get(GRB_DoubleAttr_ObjBound);
+        bestLowerBound = std::max(bestLowerBound, masterBound);
 
         const BendersMasterSolution masterSolution = GetBendersMasterSolution(*model, zVars, theta);
         const std::vector<double>& zValues = masterSolution.values;
         const double fixedCost = masterSolution.firstStageValue;
         const double thetaValue = masterSolution.thetaValue;
-        bestLowerBound = std::max(bestLowerBound, model->get(GRB_DoubleAttr_ObjBound));
 
         if (useRspCuts) {
             double relaxedQValue = 0.0;
@@ -450,15 +641,27 @@ Status LiftedTwoPhaseILS::Solve()
 
             if (rspAnyInfeasible) {
                 model->update();
-                std::cout << "Phase 2 iter " << iter << ", RSP feasibility cut x" << rspFeasCount;
-                if (std::isfinite(bestUpperBound)) {
-                    const double denom = std::max(1.0, std::fabs(bestUpperBound));
-                    std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound
-                              << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
-                }
+                std::cout << "Phase 2 iter " << iter << ", RSP feasibility cut x" << rspFeasCount
+                          << ", RSP optimality cut x" << rspOptCount;
+                PrintBounds(bestUpperBound, bestLowerBound);
                 std::cout << ", master_ms=" << masterMs
                           << ", rsp_eval_ms=" << Tools::ElapsedMs(rspStart, Tools::Clock::now())
                           << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start, Tools::Clock::now()) << std::endl;
+                if (std::isfinite(bestUpperBound)) {
+                    const double gapDenom = std::max(1.0, std::fabs(bestUpperBound));
+                    const double relGap = (bestUpperBound - bestLowerBound) / gapDenom;
+                    if (relGap <= solverConfig.mipGap) {
+                        PrintBestSolution();
+                        const long long phase2Ms = Tools::ElapsedMs(phase2Start, Tools::Clock::now());
+                        phase2ElapsedMs = phase2Ms;
+                        std::cout << "Phase 2 converged." << std::endl;
+                        std::cout << "Phase 2 final elapsed time: " << phase2Ms << " ms" << std::endl;
+                        std::cout << "Total elapsed time (Phase 1 + Phase 2): "
+                                  << (phase1ElapsedMs + phase2Ms) << " ms" << std::endl;
+                        ExportIncumbentSolution();
+                        return OK;
+                    }
+                }
                 continue;
             }
             if (rspOptCount > 0) model->update();
@@ -483,24 +686,58 @@ Status LiftedTwoPhaseILS::Solve()
         for (size_t idx = 0; idx < scenarioCutInfos.size(); ++idx) {
             if (scenarioCutInfos[idx].isOptimalityCut) continue;
             mipAnyInfeasible = true;
-            const std::string cs = MakeFeasibilityCutSignature(scenarioCutInfos[idx]);
-            if (addedMIPFeasibilityCuts.insert(cs).second) {
-                AddFeasibilityCut(*model, scenarioCutInfos[idx], zVars,
-                    "p2_feas_" + std::to_string(iter) + "_" + std::to_string(idx));
-                ++mipFeasCount;
+            if (useMonotoneCuts) {
+                const ScenarioSubproblemInfo& scenarioInfo = scenarioSubproblems[idx];
+                const int scIdx = scenarioInfo.scenarioIndex;
+                std::vector<std::string> scenarioFacilityNames;
+                for (int rid : scenarioInfo.routeIds) {
+                    const auto& routeFacilityNames = facilityVarNames[scIdx][rid];
+                    scenarioFacilityNames.insert(scenarioFacilityNames.end(),
+                        routeFacilityNames.begin(), routeFacilityNames.end());
+                }
+                const BendersCutInfo noGood = BuildScenarioStrengthenedNoGoodCut(
+                    masterVars, zValues, scIdx, scenarioInfo.routeIds, scenarioFacilityNames);
+                const MonotoneFeasKey noGoodKey = BuildMonotoneFeasKey(noGood);
+                if (monotoneFeasPool.insert(noGoodKey).second) {
+                    AddFeasibilityCut(*model, noGood, zVars,
+                        "p2_sfeas_" + std::to_string(iter) + "_" + std::to_string(idx));
+                    ++mipFeasCount;
+                } else {
+                    ++monotoneFeasDedupSkip;
+                }
+            } else {
+                const std::string cs = MakeFeasibilityCutSignature(scenarioCutInfos[idx]);
+                if (addedMIPFeasibilityCuts.insert(cs).second) {
+                    AddFeasibilityCut(*model, scenarioCutInfos[idx], zVars,
+                        "p2_feas_" + std::to_string(iter) + "_" + std::to_string(idx));
+                    ++mipFeasCount;
+                }
             }
         }
 
         if (mipAnyInfeasible) {
-            std::cout << "Phase 2 iter " << iter << ", feasibility cut x" << mipFeasCount;
-            if (std::isfinite(bestUpperBound)) {
-                const double denom = std::max(1.0, std::fabs(bestUpperBound));
-                std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound
-                          << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
+            std::cout << "Phase 2 iter " << iter
+                      << (useMonotoneCuts ? ", MIP infeasible, strengthened feasibility cut x"
+                                          : ", feasibility cut x")
+                      << mipFeasCount;
+            if (monotoneFeasDedupSkip > 0) {
+                std::cout << ", monotone_feas_dedup_skip x" << monotoneFeasDedupSkip;
             }
+            PrintBounds(bestUpperBound, bestLowerBound);
             model->update();
             std::cout << ", master_ms=" << masterMs
                       << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start, Tools::Clock::now()) << std::endl;
+            if (MeetsOuterGap(bestUpperBound, bestLowerBound, solverConfig)) {
+                PrintBestSolution();
+                const long long phase2Ms = Tools::ElapsedMs(phase2Start, Tools::Clock::now());
+                phase2ElapsedMs = phase2Ms;
+                std::cout << "Phase 2 converged." << std::endl;
+                std::cout << "Phase 2 final elapsed time: " << phase2Ms << " ms" << std::endl;
+                std::cout << "Total elapsed time (Phase 1 + Phase 2): "
+                          << (phase1ElapsedMs + phase2Ms) << " ms" << std::endl;
+                ExportIncumbentSolution();
+                return OK;
+            }
             continue;
         }
 
@@ -511,37 +748,59 @@ Status LiftedTwoPhaseILS::Solve()
 
         std::cout << "Phase 2 iter " << iter << ", theta=" << thetaValue
                   << ", Q(z)=" << aggregatedQValue;
-        if (std::isfinite(bestUpperBound)) {
-            const double denom = std::max(1.0, std::fabs(bestUpperBound));
-            std::cout << ", UB=" << bestUpperBound << ", LB=" << bestLowerBound
-                      << ", gap=" << (bestUpperBound - bestLowerBound) / denom * 100.0 << "%";
-        }
+        PrintBounds(bestUpperBound, bestLowerBound);
 
         const double gapDenom = std::max(1.0, std::fabs(bestUpperBound));
-        const double relGap = (bestUpperBound - bestLowerBound) / gapDenom;
-        if (relGap <= solverConfig.mipGap) {
+        const double relGap = std::isfinite(bestUpperBound)
+            ? (bestUpperBound - bestLowerBound) / gapDenom
+            : 1.0;
+        if (std::isfinite(bestUpperBound) && relGap <= solverConfig.mipGap) {
             const auto iterEnd = Tools::Clock::now();
             std::cout << ", master_ms=" << masterMs
                       << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start, iterEnd) << std::endl;
             PrintBestSolution();
             {
                 const long long phase2Ms = Tools::ElapsedMs(phase2Start, Tools::Clock::now());
+                phase2ElapsedMs = phase2Ms;
                 std::cout << "Phase 2 converged." << std::endl;
                 std::cout << "Phase 2 final elapsed time: " << phase2Ms << " ms" << std::endl;
                 std::cout << "Total elapsed time (Phase 1 + Phase 2): "
                           << (phase1ElapsedMs + phase2Ms) << " ms" << std::endl;
             }
+            ExportIncumbentSolution();
             return OK;
         }
 
-        // Classic LP dual continuous optimality cuts (vs. strengthened in full)
+        // Exact MIP optimality cuts: ordinary pointwise cuts or the monotone component.
         for (size_t idx = 0; idx < scenarioCutInfos.size(); ++idx) {
             if (!scenarioCutInfos[idx].isOptimalityCut) continue;
-            const CutEval cutDual = BuildContinuousCut(scenarioCutInfos[idx], zValues, iter, static_cast<int>(idx));
+            LShapeCutInfo optCutInfo = scenarioCutInfos[idx];
+            if (useMonotoneCuts) {
+                const ScenarioSubproblemInfo& scenarioInfo = scenarioSubproblems[idx];
+                const int scIdx = scenarioInfo.scenarioIndex;
+                std::vector<std::string> scenarioFacilityNames;
+                for (int rid : scenarioInfo.routeIds) {
+                    const auto& routeFacilityNames = facilityVarNames[scIdx][rid];
+                    scenarioFacilityNames.insert(scenarioFacilityNames.end(),
+                        routeFacilityNames.begin(), routeFacilityNames.end());
+                }
+                optCutInfo = BuildMonotonicityStrengthenedOptimalityCut(
+                    masterVars, zValues, scIdx, scenarioInfo.routeIds, scenarioFacilityNames,
+                    scenarioQValues[idx], globalLowerBound);
+                const MonotoneOptKey optKey = BuildMonotoneOptKey(idx, optCutInfo);
+                if (!monotoneOptPool.insert(optKey).second) {
+                    ++monotoneOptDedupSkip;
+                    continue;
+                }
+            }
+            const CutEval cutDual = BuildContinuousCut(optCutInfo, zValues, iter, static_cast<int>(idx));
             model->addConstr(cutDual.expr <= scenarioThetaVars[idx], cutDual.name);
         }
 
         model->update();
+        if (monotoneOptDedupSkip > 0) {
+            std::cout << ", monotone_opt_dedup_skip x" << monotoneOptDedupSkip;
+        }
         std::cout << ", master_ms=" << masterMs
                   << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start, Tools::Clock::now()) << std::endl;
     }
@@ -549,10 +808,277 @@ Status LiftedTwoPhaseILS::Solve()
     PrintBestSolution();
     {
         const long long phase2Ms = Tools::ElapsedMs(phase2Start, Tools::Clock::now());
+        phase2ElapsedMs = phase2Ms;
         std::cout << "Phase 2 reached max iterations: " << maxIters << std::endl;
         std::cout << "Phase 2 elapsed time: " << phase2Ms << " ms" << std::endl;
         std::cout << "Total elapsed time (Phase 1 + Phase 2): "
                   << (phase1ElapsedMs + phase2Ms) << " ms" << std::endl;
     }
     return ERROR;
+}
+
+void LiftedTwoPhaseILS::ExportIncumbentSolution() const
+{
+    if (!exportSolution && !exportSummary) return;
+    if (!problemData || incumbentZValues.empty()) return;
+
+    const fs::path exportDir = exportDirectory.empty()
+        ? fs::path("results") / dataFolder / (useMonotoneCuts ? "full_solution" : "two_phase_solution")
+        : fs::path(exportDirectory);
+    fs::create_directories(exportDir);
+
+    const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
+    const auto& scenarioSubproblems = problemData->getData<std::vector<ScenarioSubproblemInfo>>(
+        "wireless_scenario_subproblems");
+    const auto& scenarioProbabilities = problemData->getData<std::vector<double>>(
+        "wireless_scenario_probabilities");
+    const auto& existingChargerStations = problemData->getData<std::vector<int>>(
+        "wireless_existing_charger_stations");
+    const std::unordered_set<int> existingChargerStationSet(
+        existingChargerStations.begin(), existingChargerStations.end());
+
+    FullSolutionSummary summary;
+
+    if (exportSolution) {
+        std::ofstream out(exportDir / "solution_metadata.csv");
+        out << std::fixed << std::setprecision(6);
+        out << "metric,value\n";
+        out << "best_upper_bound," << bestUpperBound << '\n';
+        out << "best_lower_bound," << bestLowerBound << '\n';
+        out << "phase1_elapsed_ms," << phase1ElapsedMs << '\n';
+        out << "phase2_elapsed_ms," << phase2ElapsedMs << '\n';
+        out << "total_elapsed_ms," << (phase1ElapsedMs + phase2ElapsedMs) << '\n';
+    }
+
+    if (exportSolution) {
+        std::ofstream out(exportDir / "master_variables.csv");
+        out << std::fixed << std::setprecision(6);
+        out << "index,var_name,value,obj,lb,ub,vtype\n";
+        for (size_t idx = 0; idx < masterVars.size(); ++idx) {
+            const double value = incumbentZValues[idx];
+            out << idx << ',' << CsvEscape(masterVars[idx].name) << ',' << value << ','
+                << masterVars[idx].obj << ',' << masterVars[idx].lb << ','
+                << masterVars[idx].ub << ',' << masterVars[idx].type << '\n';
+        }
+    }
+
+    if (exportSummary) {
+        std::ofstream out(exportDir / "selected_facilities.csv");
+        out << std::fixed << std::setprecision(6);
+        out << "facility_type,facility_id,from_node,to_node,var_name,selected,unit_cost,cost\n";
+
+        std::ofstream batteryOut(exportDir / "route_battery_summary.csv");
+        batteryOut << std::fixed << std::setprecision(6);
+        batteryOut << "scenario_index,route_id,probability,battery_capacity,var_name,selected,cost\n";
+
+        for (size_t idx = 0; idx < masterVars.size(); ++idx) {
+            const std::string& name = masterVars[idx].name;
+            const double value = incumbentZValues[idx];
+            const double cost = masterVars[idx].obj * value;
+
+            if (StartsWith(name, "w_station_s")) {
+                if (value > 0.5) {
+                    ++summary.selectedStationCount;
+                    summary.facilityCost += cost;
+                    summary.stationFacilityCost += cost;
+                    const std::string stationId = name.substr(std::string("w_station_s").size());
+                    out << "station," << stationId << ",,," << CsvEscape(name) << ','
+                        << value << ',' << masterVars[idx].obj << ',' << cost << '\n';
+                }
+                continue;
+            }
+
+            if (StartsWith(name, "w_link_l")) {
+                if (value > 0.5) {
+                    ++summary.selectedLinkCount;
+                    summary.facilityCost += cost;
+                    summary.linkFacilityCost += cost;
+                    const size_t prefixLen = std::string("w_link_l").size();
+                    const size_t toPos = name.find("To", prefixLen);
+                    const std::string fromNode = name.substr(prefixLen, toPos - prefixLen);
+                    const std::string toNode = name.substr(toPos + 2);
+                    out << "link,," << fromNode << ',' << toNode << ',' << CsvEscape(name) << ','
+                        << value << ',' << masterVars[idx].obj << ',' << cost << '\n';
+                }
+                continue;
+            }
+
+            int scenarioIndex = 0;
+            int routeId = 0;
+            int capacity = 0;
+            if (ParseBatteryVarName(name, scenarioIndex, routeId, capacity)) {
+                summary.batteryCost += cost;
+                if (value > 0.5) {
+                    const double probability =
+                        scenarioIndex >= 0 && static_cast<size_t>(scenarioIndex) < scenarioProbabilities.size()
+                        ? scenarioProbabilities[static_cast<size_t>(scenarioIndex)]
+                        : 0.0;
+                    batteryOut << scenarioIndex << ',' << routeId << ',' << probability << ','
+                               << capacity << ',' << CsvEscape(name) << ',' << value << ','
+                               << cost << '\n';
+                }
+            }
+        }
+    }
+
+    std::ofstream statusOut;
+    std::ofstream varOut;
+    std::ofstream scenarioOut;
+    if (exportSolution) {
+        statusOut.open(exportDir / "subproblem_status.csv");
+        statusOut << std::fixed << std::setprecision(6);
+        statusOut << "subproblem_index,scenario_index,status,obj\n";
+
+        varOut.open(exportDir / "subproblem_variables.csv");
+        varOut << std::fixed << std::setprecision(6);
+        varOut << "subproblem_index,scenario_index,var_index,var_name,value,obj,lb,ub,vtype\n";
+    }
+    if (exportSummary) {
+        scenarioOut.open(exportDir / "scenario_summary.csv");
+        scenarioOut << std::fixed << std::setprecision(6);
+        scenarioOut << "subproblem_index,scenario_index,probability,status,q_weighted,"
+                    << "q_unweighted,fast_charge_kwh,expected_fast_charge_kwh,"
+                    << "static_wireless_charge_kwh,expected_static_wireless_charge_kwh,"
+                    << "dynamic_wireless_charge_kwh,expected_dynamic_wireless_charge_kwh,"
+                    << "night_charge_kwh,expected_night_charge_kwh,total_charge_kwh,"
+                    << "expected_total_charge_kwh\n";
+    }
+
+    for (size_t idx = 0; idx < subProblems.size(); ++idx) {
+        auto* sub = subProblems[idx].get();
+        sub->strategy->UpdateSubProblem(*problemData, *sub->model, sub->context, incumbentZValues);
+        sub->model->optimize();
+
+        const int status = sub->model->get(GRB_IntAttr_Status);
+        double obj = 0.0;
+        if (status == GRB_OPTIMAL) {
+            obj = sub->model->get(GRB_DoubleAttr_ObjVal);
+        }
+
+        int scenarioIndex = sub->scenarioIndex;
+        if (idx < scenarioSubproblems.size()) {
+            scenarioIndex = scenarioSubproblems[idx].scenarioIndex;
+        }
+        const double probability =
+            scenarioIndex >= 0 && static_cast<size_t>(scenarioIndex) < scenarioProbabilities.size()
+            ? scenarioProbabilities[static_cast<size_t>(scenarioIndex)]
+            : 0.0;
+
+        if (exportSolution) {
+            statusOut << idx << ',' << scenarioIndex << ',' << status << ',' << obj << '\n';
+        }
+
+        if (status != GRB_OPTIMAL) {
+            if (exportSolution) {
+                std::cout << "Solution export skipped variables for scenario subproblem " << idx
+                          << " because status=" << status << std::endl;
+            }
+            if (exportSummary) {
+                scenarioOut << idx << ',' << scenarioIndex << ',' << probability << ',' << status
+                            << ',' << obj << ",0,0,0,0,0,0,0,0,0,0,0\n";
+            }
+            continue;
+        }
+
+        double fastChargeKwh = 0.0;
+        double staticWirelessChargeKwh = 0.0;
+        double dynamicWirelessChargeKwh = 0.0;
+        double nightChargeKwh = 0.0;
+
+        const int numVars = sub->model->get(GRB_IntAttr_NumVars);
+        GRBVar* vars = sub->model->getVars();
+        for (int vIdx = 0; vIdx < numVars; ++vIdx) {
+            const std::string name = vars[vIdx].get(GRB_StringAttr_VarName);
+            const double value = vars[vIdx].get(GRB_DoubleAttr_X);
+            const double objCoeff = vars[vIdx].get(GRB_DoubleAttr_Obj);
+            const double lb = vars[vIdx].get(GRB_DoubleAttr_LB);
+            const double ub = vars[vIdx].get(GRB_DoubleAttr_UB);
+            const char vtype = vars[vIdx].get(GRB_CharAttr_VType);
+
+            if (exportSolution) {
+                varOut << idx << ',' << scenarioIndex << ',' << vIdx << ','
+                       << CsvEscape(name) << ',' << value << ',' << objCoeff << ','
+                       << lb << ',' << ub << ',' << vtype << '\n';
+            }
+
+            if (!exportSummary || value <= 1e-7) continue;
+            const size_t firstUnderscore = name.find('_');
+            const std::string localName = firstUnderscore == std::string::npos
+                ? name : name.substr(firstUnderscore + 1);
+            if (StartsWith(localName, "c_Night_")) {
+                nightChargeKwh += value;
+            } else if (StartsWith(localName, "c_")) {
+                if (localName.find("To_") != std::string::npos) {
+                    dynamicWirelessChargeKwh += value;
+                } else {
+                    int station = -1;
+                    if (TryParseIntAfter(localName, "_s", 0, station)
+                        && existingChargerStationSet.count(station) > 0) {
+                        fastChargeKwh += value;
+                    } else {
+                        staticWirelessChargeKwh += value;
+                    }
+                }
+            }
+        }
+        delete[] vars;
+
+        if (exportSummary) {
+            const double totalChargeKwh = fastChargeKwh + staticWirelessChargeKwh
+                + dynamicWirelessChargeKwh + nightChargeKwh;
+            const double qUnweighted = probability > 0.0 ? obj / probability : 0.0;
+            summary.expectedOperationalCost += obj;
+            summary.expectedFastChargeKwh += probability * fastChargeKwh;
+            summary.expectedStaticWirelessKwh += probability * staticWirelessChargeKwh;
+            summary.expectedDynamicWirelessKwh += probability * dynamicWirelessChargeKwh;
+            summary.expectedNightChargeKwh += probability * nightChargeKwh;
+            summary.expectedTotalChargeKwh += probability * totalChargeKwh;
+
+            scenarioOut << idx << ',' << scenarioIndex << ',' << probability << ',' << status
+                        << ',' << obj << ',' << qUnweighted << ','
+                        << fastChargeKwh << ',' << probability * fastChargeKwh << ','
+                        << staticWirelessChargeKwh << ',' << probability * staticWirelessChargeKwh << ','
+                        << dynamicWirelessChargeKwh << ',' << probability * dynamicWirelessChargeKwh << ','
+                        << nightChargeKwh << ',' << probability * nightChargeKwh << ','
+                        << totalChargeKwh << ',' << probability * totalChargeKwh << '\n';
+        }
+    }
+
+    if (exportSummary) {
+        const RuntimeOptions& runtimeOptions = GetRuntimeOptions();
+        const double fixedCost = summary.facilityCost + summary.batteryCost;
+        const double finalGap = std::isfinite(bestUpperBound)
+            ? (bestUpperBound - bestLowerBound) / std::max(1.0, std::fabs(bestUpperBound))
+            : 1.0;
+
+        std::ofstream out(exportDir / "solution_summary.csv");
+        out << std::fixed << std::setprecision(6);
+        out << "metric,value\n";
+        out << "algorithm," << (useMonotoneCuts ? "full" : "lifted-two-phase") << '\n';
+        out << "data_folder," << CsvEscape(dataFolder) << '\n';
+        out << "scenario_count," << runtimeOptions.scenarioCount << '\n';
+        out << "cap," << runtimeOptions.chargerCapacity << '\n';
+        out << "facility_cost_scale," << runtimeOptions.facilityCostScale << '\n';
+        out << "energy_scale," << runtimeOptions.energyScale << '\n';
+        out << "rsp," << (useRspCuts ? 1 : 0) << '\n';
+        out << "monotone_cuts," << (useMonotoneCuts ? 1 : 0) << '\n';
+        out << "best_upper_bound," << bestUpperBound << '\n';
+        out << "best_lower_bound," << bestLowerBound << '\n';
+        out << "final_gap," << finalGap << '\n';
+        out << "facility_cost," << summary.facilityCost << '\n';
+        out << "station_facility_cost," << summary.stationFacilityCost << '\n';
+        out << "link_facility_cost," << summary.linkFacilityCost << '\n';
+        out << "expected_battery_cost," << summary.batteryCost << '\n';
+        out << "fixed_cost," << fixedCost << '\n';
+        out << "expected_operational_cost," << summary.expectedOperationalCost << '\n';
+        out << "selected_station_count," << summary.selectedStationCount << '\n';
+        out << "selected_link_count," << summary.selectedLinkCount << '\n';
+        out << "expected_fast_charge_kwh," << summary.expectedFastChargeKwh << '\n';
+        out << "expected_static_wireless_kwh," << summary.expectedStaticWirelessKwh << '\n';
+        out << "expected_dynamic_wireless_kwh," << summary.expectedDynamicWirelessKwh << '\n';
+        out << "expected_night_charge_kwh," << summary.expectedNightChargeKwh << '\n';
+        out << "expected_total_charge_kwh," << summary.expectedTotalChargeKwh << '\n';
+    }
+
+    std::cout << "Solution export written to " << exportDir.string() << std::endl;
 }
