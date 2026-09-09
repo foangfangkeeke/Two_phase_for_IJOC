@@ -189,6 +189,86 @@ struct DebugScenarioTables {
     std::vector<std::vector<int>> depTimes;
 };
 
+struct DebugPlugInEvent {
+    int routeId = -1;
+    int eb = -1;
+    int trip = -1;
+    int arrTime = 0;
+    int depTime = 0;
+    int requiredOccupancyMinutes = 0;
+};
+
+struct DebugMinimumPeakResult {
+    int minimumPeak = 0;
+    int totalRequiredOccupancyMinutes = 0;
+    std::vector<int> peakTimes;
+};
+
+DebugMinimumPeakResult SolveDebugMinimumPeak(GRBEnv& debugEnv,
+    const std::vector<DebugPlugInEvent>& events, int scenarioIndex, int station)
+{
+    DebugMinimumPeakResult result;
+    if (events.empty()) return result;
+
+    GRBModel scheduleModel(debugEnv);
+    scheduleModel.set(GRB_IntParam_OutputFlag, 0);
+    scheduleModel.set(GRB_IntParam_Threads, 1);
+    scheduleModel.set(GRB_DoubleParam_MIPGap, 0.0);
+
+    GRBVar peak = scheduleModel.addVar(0.0, static_cast<double>(events.size()), 1.0,
+        GRB_INTEGER, "minimum_peak");
+    std::map<int, std::vector<GRBVar>> occupancyVarsByTime;
+
+    for (size_t eventIdx = 0; eventIdx < events.size(); ++eventIdx) {
+        const DebugPlugInEvent& event = events[eventIdx];
+        const int windowMinutes = event.depTime - event.arrTime;
+        if (event.requiredOccupancyMinutes <= 0 ||
+            event.requiredOccupancyMinutes > windowMinutes) {
+            throw std::runtime_error("Invalid Phase 1 plug-in occupancy requirement");
+        }
+
+        GRBLinExpr eventOccupancy = 0.0;
+        for (int time = event.arrTime; time < event.depTime; ++time) {
+            GRBVar occupancy = scheduleModel.addVar(0.0, 1.0, 0.0, GRB_BINARY,
+                "x_sc" + std::to_string(scenarioIndex)
+                    + "_s" + std::to_string(station)
+                    + "_e" + std::to_string(eventIdx)
+                    + "_t" + std::to_string(time));
+            eventOccupancy += occupancy;
+            occupancyVarsByTime[time].push_back(occupancy);
+        }
+        scheduleModel.addConstr(eventOccupancy == event.requiredOccupancyMinutes,
+            "required_e" + std::to_string(eventIdx));
+        result.totalRequiredOccupancyMinutes += event.requiredOccupancyMinutes;
+    }
+
+    for (const auto& [time, occupancyVars] : occupancyVarsByTime) {
+        GRBLinExpr timeOccupancy = 0.0;
+        for (const GRBVar& occupancy : occupancyVars) {
+            timeOccupancy += occupancy;
+        }
+        scheduleModel.addConstr(timeOccupancy <= peak,
+            "peak_t" + std::to_string(time));
+    }
+
+    scheduleModel.optimize();
+    if (scheduleModel.get(GRB_IntAttr_Status) != GRB_OPTIMAL) {
+        throw std::runtime_error("Phase 1 plug-in minimum-peak scheduling did not solve to optimality");
+    }
+
+    result.minimumPeak = static_cast<int>(std::llround(peak.get(GRB_DoubleAttr_X)));
+    for (const auto& [time, occupancyVars] : occupancyVarsByTime) {
+        int timeOccupancy = 0;
+        for (const GRBVar& occupancy : occupancyVars) {
+            timeOccupancy += static_cast<int>(std::llround(occupancy.get(GRB_DoubleAttr_X)));
+        }
+        if (timeOccupancy == result.minimumPeak) {
+            result.peakTimes.push_back(time);
+        }
+    }
+    return result;
+}
+
 DebugScenarioTables LoadDebugScenarioTables(const std::string& dataFolder, const std::string& scenarioFolder)
 {
     const std::filesystem::path root = ResolveDataFolderPath(dataFolder) / scenarioFolder;
@@ -578,21 +658,29 @@ void LShapeRelaxed::DebugExportPhase1PlugInOccupancy(const std::string& outputDi
     const std::filesystem::path dir(outputDir);
     std::filesystem::create_directories(dir);
     std::ofstream eventsOut(dir / "phase1_plugin_charge_events.csv");
-    std::ofstream timeOut(dir / "phase1_plugin_station_time_occupancy.csv");
+    std::ofstream timeOut(dir / "phase1_plugin_station_time_window_overlap.csv");
+    std::ofstream peakOut(dir / "phase1_plugin_minimum_peak.csv");
 
     eventsOut << "scenario_index,scenario_folder,route_id,eb,trip,station,station_idx,"
               << "arr_time,dep_time,window_minutes,charge,fast_rate,occupied_minutes_equiv,"
-              << "positive_charge,var_name\n";
-    timeOut << "scenario_index,scenario_folder,route_id,station,time,"
-            << "available_windows,positive_charge_windows,charge_evenly_allocated\n";
+              << "required_occupancy_minutes,positive_charge,var_name\n";
+    timeOut << "scenario_index,scenario_folder,station,time,available_window_overlap,"
+            << "positive_charge_window_overlap,uniform_charge_kwh_per_min,"
+            << "uniform_fractional_occupancy\n";
+    peakOut << "scenario_index,scenario_folder,station,positive_events,"
+            << "total_required_occupancy_minutes,available_window_peak,"
+            << "positive_charge_window_peak,uniform_fractional_peak,"
+            << "minimum_required_peak,peak_time_count,first_peak_time,last_peak_time\n";
 
-    using TimeKey = std::tuple<int, int, int, int>;
+    using TimeKey = std::tuple<int, int, int>;
+    using StationKey = std::pair<int, int>;
     struct TimeAgg {
         int availableWindows = 0;
         int positiveChargeWindows = 0;
         double chargeEvenlyAllocated = 0.0;
     };
     std::map<TimeKey, TimeAgg> timeAgg;
+    std::map<StationKey, std::vector<DebugPlugInEvent>> positiveEventsByStation;
 
     int exportedEvents = 0;
     int positiveEvents = 0;
@@ -634,22 +722,34 @@ void LShapeRelaxed::DebugExportPhase1PlugInOccupancy(const std::string& outputDi
             const double charge = vars[varIdx].get(GRB_DoubleAttr_X);
             const double occupiedMinutesEquiv = fastRate > 0.0 ? charge / fastRate : 0.0;
             const bool positiveCharge = charge > kPhase1DebugChargeTol;
+            const int requiredOccupancyMinutes = positiveCharge
+                ? std::max(1, static_cast<int>(std::ceil(occupiedMinutesEquiv - 1e-9)))
+                : 0;
 
             eventsOut << scenarioIndex << ',' << scenarioFolder << ',' << routeId << ','
                       << parsed.eb << ',' << parsed.trip << ',' << parsed.station << ','
                       << parsed.stationIdx << ',' << arrTime << ',' << depTime << ','
                       << windowMinutes << ',' << std::setprecision(12) << charge << ','
-                      << fastRate << ',' << occupiedMinutesEquiv << ','
+                      << fastRate << ',' << occupiedMinutesEquiv << ',' << requiredOccupancyMinutes << ','
                       << (positiveCharge ? 1 : 0) << ',' << varName << '\n';
 
             ++exportedEvents;
             if (positiveCharge) {
                 ++positiveEvents;
                 totalCharge += charge;
+                positiveEventsByStation[StationKey{scenarioIndex, parsed.station}].push_back(
+                    DebugPlugInEvent{
+                        routeId,
+                        parsed.eb,
+                        parsed.trip,
+                        arrTime,
+                        depTime,
+                        requiredOccupancyMinutes
+                    });
             }
 
             for (int time = arrTime; time < depTime; ++time) {
-                TimeAgg& agg = timeAgg[TimeKey{scenarioIndex, routeId, parsed.station, time}];
+                TimeAgg& agg = timeAgg[TimeKey{scenarioIndex, parsed.station, time}];
                 ++agg.availableWindows;
                 if (positiveCharge) {
                     ++agg.positiveChargeWindows;
@@ -663,18 +763,65 @@ void LShapeRelaxed::DebugExportPhase1PlugInOccupancy(const std::string& outputDi
     }
 
     for (const auto& [key, agg] : timeAgg) {
-        const auto& [scenarioIndex, routeId, station, time] = key;
+        const auto& [scenarioIndex, station, time] = key;
         const std::string& scenarioFolder = scenarioFolders[static_cast<size_t>(scenarioIndex)];
-        timeOut << scenarioIndex << ',' << scenarioFolder << ',' << routeId << ','
-                << station << ',' << time << ',' << agg.availableWindows << ','
+        timeOut << scenarioIndex << ',' << scenarioFolder << ',' << station << ',' << time << ','
+                << agg.availableWindows << ','
                 << agg.positiveChargeWindows << ',' << std::setprecision(12)
-                << agg.chargeEvenlyAllocated << '\n';
+                << agg.chargeEvenlyAllocated << ',' << agg.chargeEvenlyAllocated / fastRate << '\n';
+    }
+
+    struct WindowPeaks {
+        int available = 0;
+        int positive = 0;
+        double uniformFractional = 0.0;
+    };
+    std::map<StationKey, WindowPeaks> windowPeaks;
+    for (const auto& [key, agg] : timeAgg) {
+        const auto& [scenarioIndex, station, time] = key;
+        (void)time;
+        WindowPeaks& peaks = windowPeaks[StationKey{scenarioIndex, station}];
+        peaks.available = std::max(peaks.available, agg.availableWindows);
+        peaks.positive = std::max(peaks.positive, agg.positiveChargeWindows);
+        peaks.uniformFractional = std::max(
+            peaks.uniformFractional, agg.chargeEvenlyAllocated / fastRate);
+    }
+
+    GRBEnv debugEnv(true);
+    debugEnv.set(GRB_IntParam_OutputFlag, 0);
+    debugEnv.start();
+    int overallMinimumPeak = 0;
+    for (const auto& [stationKey, peaks] : windowPeaks) {
+        const auto& [scenarioIndex, station] = stationKey;
+        const auto eventIt = positiveEventsByStation.find(stationKey);
+        const std::vector<DebugPlugInEvent> noEvents;
+        const std::vector<DebugPlugInEvent>& events = eventIt == positiveEventsByStation.end()
+            ? noEvents
+            : eventIt->second;
+        const DebugMinimumPeakResult peakResult = SolveDebugMinimumPeak(
+            debugEnv, events, scenarioIndex, station);
+        overallMinimumPeak = std::max(overallMinimumPeak, peakResult.minimumPeak);
+
+        peakOut << scenarioIndex << ','
+                << scenarioFolders[static_cast<size_t>(scenarioIndex)] << ','
+                << station << ',' << events.size() << ','
+                << peakResult.totalRequiredOccupancyMinutes << ','
+                << peaks.available << ',' << peaks.positive << ','
+                << std::setprecision(12) << peaks.uniformFractional << ','
+                << peakResult.minimumPeak << ',' << peakResult.peakTimes.size() << ',';
+        if (!peakResult.peakTimes.empty()) {
+            peakOut << peakResult.peakTimes.front() << ',' << peakResult.peakTimes.back();
+        } else {
+            peakOut << ',';
+        }
+        peakOut << '\n';
     }
 
     std::cout << "Phase 1 plug-in occupancy debug exported to " << dir.string()
               << ": events=" << exportedEvents
               << ", positive_events=" << positiveEvents
-              << ", positive_charge=" << totalCharge << std::endl;
+              << ", positive_charge=" << totalCharge
+              << ", minimum_required_peak=" << overallMinimumPeak << std::endl;
 }
 
 LShapeRelaxed::~LShapeRelaxed() = default;
