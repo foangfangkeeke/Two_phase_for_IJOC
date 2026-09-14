@@ -9,7 +9,6 @@
 typedef std::tuple<std::string, double, char> Constraint;
 
 enum ProblemType {
-    WIRELESS_CHARGING_NO_PLUGIN,
     WIRELESS_CAPACITY_REFORM,
     DEFAULT = 0x100,
 };

@@ -24,7 +24,6 @@ set(GUROBI_CORE_LIB "${GUROBI_LIB_DIR}/gurobi120.lib")
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/utils
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/problem/wireless
     ${CMAKE_CURRENT_SOURCE_DIR}/src/problem/wireless_reform
     ${CMAKE_CURRENT_SOURCE_DIR}/src/algorithm
     ${GUROBI_INCLUDE_DIR}
@@ -33,13 +32,9 @@ include_directories(
 add_executable(wireless
     src/main.cpp
     src/utils/solver_config.cpp
-    src/problem/wireless/wireless.cpp
     src/problem/wireless_reform/wireless_reform.cpp
     src/problem/wireless_reform/wireless_reform_route.cpp
-    src/algorithm/using_solver.cpp
     src/algorithm/benders_core.cpp
-    src/algorithm/natural_ils.cpp
-    src/algorithm/lifted_ils.cpp
     src/algorithm/lifted_two_phase_ils.cpp
     src/algorithm/lshape_relaxed.cpp
 )
