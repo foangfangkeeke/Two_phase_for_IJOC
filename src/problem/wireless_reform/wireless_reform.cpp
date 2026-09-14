@@ -18,7 +18,6 @@ using namespace std;
 namespace fs = std::filesystem;
 
 static constexpr int kBatteryCapacityStep = 20;
-static constexpr bool kEnableDynamicWirelessCharging = false;
 
 #define OFFSET_OPERATION_CFG 0
 #define OFFSET_CHARGING_CFG (OFFSET_OPERATION_CFG + 3)
@@ -325,7 +324,7 @@ struct OperationCfg {
     int timeMax;
 };
 
-// charger information: fast charging, static wireless charging, dynamic wireless charging
+// charger information: fast charging and static wireless charging
 struct ChargerCfg {
     int num;
     vector<double> chargeRate; // kW per minute;
@@ -559,8 +558,7 @@ static vector<vector<vector<string>>> BuildRouteFacilityVarNames(
     unordered_set<string> masterFacilityNames;
     masterFacilityNames.reserve(masterVars.size());
     for (const auto& var : masterVars) {
-        if (var.name.rfind("w_station_", 0) == 0
-            || (kEnableDynamicWirelessCharging && var.name.rfind("w_link_", 0) == 0)) {
+        if (var.name.rfind("w_station_", 0) == 0) {
             masterFacilityNames.insert(var.name);
         }
     }
@@ -587,25 +585,6 @@ static vector<vector<vector<string>>> BuildRouteFacilityVarNames(
                         facilitySet.insert(stationVarName);
                     }
 
-                    if (kEnableDynamicWirelessCharging) {
-                        int tripArr = trip;
-                        size_t stationArrIdx = stationIdx + 1;
-                        if (stationIdx + 1 == stations.size()) {
-                            if (tripIdx + 1 == trips.size()) {
-                                continue;
-                            }
-                            tripArr = trips[tripIdx + 1];
-                            stationArrIdx = 0;
-                        }
-
-                        const int stationArr = schedulingCfg.stationTrips
-                            .at(static_cast<size_t>(tripArr)).at(stationArrIdx);
-                        const string linkVarName = "w_link_l" + to_string(stations[stationIdx])
-                            + "To" + to_string(stationArr);
-                        if (masterFacilityNames.count(linkVarName) > 0) {
-                            facilitySet.insert(linkVarName);
-                        }
-                    }
                 }
             }
         }
@@ -648,29 +627,6 @@ static vector<ProblemDataVar> BuildWirelessMasterVars(const string& dataFolder, 
         var.type = GRB_BINARY;
         var.name = "w_station_s" + to_string(station);
         masterVars.push_back(var);
-    }
-
-    if (kEnableDynamicWirelessCharging) {
-        // Link variables (shared across scenarios)
-        vector<pair<int, int>> links;
-        for (const auto& [start, endMap] : networkCfg.linkDistances) {
-            for (const auto& [end, _] : endMap) {
-                links.emplace_back(start, end);
-            }
-        }
-        sort(links.begin(), links.end());
-
-        for (const auto& [start, end] : links) {
-            const double dist = networkCfg.linkDistances.at(start).at(end);
-            ProblemDataVar var;
-            var.lb = 0.0;
-            var.ub = 1.0;
-            var.obj = chargerCfg.priceOfUnitCharger[2] * dist +
-                60 * chargerCfg.priceOfInverterPerkW * chargerCfg.chargeRate[2];
-            var.type = GRB_BINARY;
-            var.name = "w_link_l" + to_string(start) + "To" + to_string(end);
-            masterVars.push_back(var);
-        }
     }
 
     // Battery capacity variables (scenario-based)
@@ -811,12 +767,6 @@ static void ComputeRouteEnergyBudget(
                     }
                     double dist = nc.linkDistances.at(station).at(nextStation);
                     totalC += dist * cPerKm;
-                    if (kEnableDynamicWirelessCharging) {
-                        // Dynamic wireless on link: depends on w_link_l{from}To{to}
-                        int travelTime = nextArrTime - depTime;
-                        string linkName = "w_link_l" + to_string(station) + "To" + to_string(nextStation);
-                        facAcc[linkName] += cc.chargeRate[2] * travelTime * cc.chargeEfficiency[2];
-                    }
                 }
             }
             totalC += nc.endDistanceEBs[worstEB] * cPerKm;
@@ -1086,7 +1036,6 @@ static bool BuildWirelessOperationalSubproblem(const string& dataRootFolder, con
 
     vector<GRBVar> chargeNight_b; // [eb]
     vector<vector<vector<GRBVar>>> charge_bns; // [eb][trip][stationIdx]
-    vector<vector<vector<GRBVar>>> charge_bnl; // [eb][trip][stationIdx]
     vector<vector<vector<GRBVar>>> energyDep_bns; // [eb][trip][station]
     vector<vector<vector<GRBVar>>> energyArr_bns; // [eb][trip][station]
 
@@ -1153,48 +1102,6 @@ static bool BuildWirelessOperationalSubproblem(const string& dataRootFolder, con
         energyArr_bns.push_back(energyArr_b);
     }
 
-    if (kEnableDynamicWirelessCharging) {
-        charge_bnl.reserve(numEB);
-        for (int ebIdx = 0; ebIdx < numEB; ebIdx++) {
-            auto eb = schedulingCfg.EBs[ebIdx];
-            size_t numEBTrip = schedulingCfg.tripEBs[ebIdx].size();
-            vector<vector<GRBVar>> charge_b;
-            charge_b.reserve(numEBTrip);
-            for (int tripIdx = 0; tripIdx < numEBTrip; tripIdx++) {
-                auto tripDep = schedulingCfg.tripEBs[ebIdx][tripIdx];
-                size_t numEBTripStations = schedulingCfg.stationTrips[tripDep].size();
-                vector<GRBVar> charge_bn;
-                charge_bn.reserve(numEBTripStations);
-                for (int stationIdx = 0; stationIdx < numEBTripStations; stationIdx++) {
-                    int stationDep = schedulingCfg.stationTrips[tripDep][stationIdx];
-                    int tripArr;
-                    int stationArr;
-                    int stationArrIdx;
-                    bool isTripTransfer = false;
-                    if (stationIdx == schedulingCfg.stationTrips[tripDep].size() - 1) {
-                        if (tripIdx == schedulingCfg.tripEBs[ebIdx].size() - 1) {
-                            continue;
-                        }
-                        tripArr = schedulingCfg.tripEBs[ebIdx][tripIdx + 1];
-                        stationArrIdx = 0;
-                        stationArr = schedulingCfg.stationTrips[tripArr][stationArrIdx];
-                        isTripTransfer = true;
-                    } else {
-                        tripArr = tripDep;
-                        stationArrIdx = stationIdx + 1;
-                        stationArr = schedulingCfg.stationTrips[tripArr][stationArrIdx];
-                    }
-
-                    string sub = "_b" + to_string(eb) + "_n" + to_string(tripDep) + "_s" + to_string(stationDep) +
-                                 "_i" + to_string(stationIdx) + "To_n" + to_string(tripArr) + "_s" + to_string(stationArr) + "_i" + to_string(stationArrIdx);
-                    charge_bn.push_back(model.addVar(0.0, isTripTransfer ? 0.0 : GRB_INFINITY, 0.0, GRB_CONTINUOUS, namePrefix + "c" + sub));
-                }
-                charge_b.push_back(charge_bn);
-            }
-            charge_bnl.push_back(charge_b);
-        }
-    }
-
     model.update();
 
     // Per-station mode: prohibit charging at non-bound chargerPhys stations
@@ -1225,33 +1132,6 @@ static bool BuildWirelessOperationalSubproblem(const string& dataRootFolder, con
         for (int tripIdx = 0; tripIdx < schedulingCfg.tripEBs[ebIdx].size(); tripIdx++) {
             for (const GRBVar& chargeVar : charge_bns[ebIdx][tripIdx]) {
                 sum_day += chargeVar;
-            }
-        }
-    }
-
-    if (kEnableDynamicWirelessCharging) {
-        for (int ebIdx : ebIndices) {
-            size_t numEBTrip = schedulingCfg.tripEBs[ebIdx].size();
-            for (int tripIdx = 0; tripIdx < numEBTrip; tripIdx++) {
-                int tripDep = schedulingCfg.tripEBs[ebIdx][tripIdx];
-                size_t numEBTripStations = schedulingCfg.stationTrips[tripDep].size();
-                for (int stationIdx = 0; stationIdx < numEBTripStations; stationIdx++) {
-                    int stationDep = schedulingCfg.stationTrips[tripDep][stationIdx];
-                    int tripArr;
-                    int stationArr;
-                    if (stationIdx == numEBTripStations - 1) {
-                        if (tripIdx == numEBTrip - 1) {
-                            continue;
-                        }
-                        tripArr = schedulingCfg.tripEBs[ebIdx][tripIdx + 1];
-                        stationArr = schedulingCfg.stationTrips[tripArr][0];
-                    } else {
-                        tripArr = tripDep;
-                        stationArr = schedulingCfg.stationTrips[tripArr][stationIdx + 1];
-                    }
-
-                    sum_day += charge_bnl[ebIdx][tripIdx][stationIdx];
-                }
             }
         }
     }
@@ -1431,58 +1311,6 @@ static bool BuildWirelessOperationalSubproblem(const string& dataRootFolder, con
         }
     }
 
-    if (kEnableDynamicWirelessCharging) {
-        // c_bnl in dynamic wireless charging links.
-        // Link availability is represented by RHS constraints tied to master z values.
-        for (int ebIdx : ebIndices) {
-            int eb = schedulingCfg.EBs[ebIdx];
-            for (int tripIdx = 0; tripIdx < schedulingCfg.tripEBs[ebIdx].size(); tripIdx++) {
-                int tripDep = schedulingCfg.tripEBs[ebIdx][tripIdx];
-                for (int stationIdx = 0; stationIdx < schedulingCfg.stationTrips[tripDep].size(); stationIdx++) {
-                    int stationDep = schedulingCfg.stationTrips[tripDep][stationIdx];
-                    int tripArrIdx;
-                    int stationArrIdx;
-                    bool isTripTransfer = false;
-                    if (stationIdx == schedulingCfg.stationTrips[tripDep].size() - 1) {
-                        if (tripIdx == schedulingCfg.tripEBs[ebIdx].size() - 1) {
-                            continue;
-                        }
-                        tripArrIdx = tripIdx + 1;
-                        stationArrIdx = 0;
-                        isTripTransfer = true;
-                    } else {
-                        tripArrIdx = tripIdx;
-                        stationArrIdx = stationIdx + 1;
-                    }
-
-                    int tripArr = schedulingCfg.tripEBs[ebIdx][tripArrIdx];
-                    int stationArr = schedulingCfg.stationTrips[tripArr][stationArrIdx];
-
-                    string subCharge = "_b" + to_string(eb) + "_n" + to_string(tripDep) + "_s" + to_string(stationDep) +
-                                       "_i" + to_string(stationIdx) + "To_n" + to_string(tripArr) + "_s" + to_string(stationArr) + "_i" + to_string(stationArrIdx);
-                    GRBVar linkCharge = charge_bnl[ebIdx][tripIdx][stationIdx];
-                    if (isTripTransfer) {
-                        continue;
-                    }
-                    const string masterVarName = "w_link_l" + to_string(stationDep) + "To" + to_string(stationArr);
-                    const size_t masterIdx = masterIdxByName.at(masterVarName);
-                    int timeDep = schedulingCfg.stationDepTimes[tripDep][stationIdx];
-                    int timeArr = schedulingCfg.stationArrTimes[tripArr][stationArrIdx];
-                    int travelTime = timeArr - timeDep;
-                    const double chargeUpperBound = chargerCfg.chargeRate[2] * static_cast<double>(travelTime);
-                    if (chargeUpperBound <= 0.0) {
-                        model.addConstr(linkCharge <= 0.0, namePrefix + "constrChargeWirelessLinkZero" + subCharge);
-                        continue;
-                    }
-
-                    GRBConstr rhsConstr = model.addConstr((1.0 / chargeUpperBound) * linkCharge <= 0.0,
-                        MakeWirelessFacilityRhsConstrName(masterIdx, facilityRhsSerial++));
-                    facilityRhsConstrs.push_back(rhsConstr);
-                }
-            }
-        }
-    }
-
     // energy of the first and the last trips -> battery capacity via RHS
     for (int ebIdx : ebIndices) {
         int eb = schedulingCfg.EBs[ebIdx];
@@ -1571,16 +1399,9 @@ static bool BuildWirelessOperationalSubproblem(const string& dataRootFolder, con
                 double dist = isTripTransfer ? 0.0 : networkCfg.linkDistances.at(stationDep).at(stationArr);
                 double C_inter = dist * operationCfg.curbWeight * operationCfg.mu * operationCfg.g / 3.6;
                 double beta_inter = -dist * operationCfg.weightPerEnergy * operationCfg.mu * operationCfg.g / 3.6;
-                if (kEnableDynamicWirelessCharging) {
-                    GRBVar linkCharge = charge_bnl[ebIdx][tripIdx][stationIdx];
-                    batteryRhsOut.push_back({model.addConstr(
-                        arrE - depE - linkCharge * chargerCfg.chargeEfficiency[2] == 0.0,
-                        MakeWirelessBatteryRhsConstrName(routeId, batteryRhsSerial++)), routeId, beta_inter, -C_inter});
-                } else {
-                    batteryRhsOut.push_back({model.addConstr(
-                        arrE - depE == 0.0,
-                        MakeWirelessBatteryRhsConstrName(routeId, batteryRhsSerial++)), routeId, beta_inter, -C_inter});
-                }
+                batteryRhsOut.push_back({model.addConstr(
+                    arrE - depE == 0.0,
+                    MakeWirelessBatteryRhsConstrName(routeId, batteryRhsSerial++)), routeId, beta_inter, -C_inter});
             }
         }
     }

@@ -242,13 +242,10 @@ bool ParseBatteryVarName(const std::string& name, int& scenarioIndex, int& route
 struct FullSolutionSummary {
     double facilityCost = 0.0;
     double stationFacilityCost = 0.0;
-    double linkFacilityCost = 0.0;
     double batteryCost = 0.0;
     int selectedStationCount = 0;
-    int selectedLinkCount = 0;
     double expectedFastChargeKwh = 0.0;
     double expectedStaticWirelessKwh = 0.0;
-    double expectedDynamicWirelessKwh = 0.0;
     double expectedNightChargeKwh = 0.0;
     double expectedTotalChargeKwh = 0.0;
     double expectedOperationalCost = 0.0;
@@ -909,7 +906,7 @@ void LiftedTwoPhaseILS::ExportIncumbentSolution() const
     if (exportSummary) {
         std::ofstream out(exportDir / "selected_facilities.csv");
         out << std::fixed << std::setprecision(6);
-        out << "facility_type,facility_id,from_node,to_node,var_name,selected,unit_cost,cost\n";
+        out << "facility_type,facility_id,var_name,selected,unit_cost,cost\n";
 
         std::ofstream batteryOut(exportDir / "route_battery_summary.csv");
         batteryOut << std::fixed << std::setprecision(6);
@@ -926,22 +923,7 @@ void LiftedTwoPhaseILS::ExportIncumbentSolution() const
                     summary.facilityCost += cost;
                     summary.stationFacilityCost += cost;
                     const std::string stationId = name.substr(std::string("w_station_s").size());
-                    out << "station," << stationId << ",,," << CsvEscape(name) << ','
-                        << value << ',' << masterVars[idx].obj << ',' << cost << '\n';
-                }
-                continue;
-            }
-
-            if (StartsWith(name, "w_link_l")) {
-                if (value > 0.5) {
-                    ++summary.selectedLinkCount;
-                    summary.facilityCost += cost;
-                    summary.linkFacilityCost += cost;
-                    const size_t prefixLen = std::string("w_link_l").size();
-                    const size_t toPos = name.find("To", prefixLen);
-                    const std::string fromNode = name.substr(prefixLen, toPos - prefixLen);
-                    const std::string toNode = name.substr(toPos + 2);
-                    out << "link,," << fromNode << ',' << toNode << ',' << CsvEscape(name) << ','
+                    out << "station," << stationId << ',' << CsvEscape(name) << ','
                         << value << ',' << masterVars[idx].obj << ',' << cost << '\n';
                 }
                 continue;
@@ -983,7 +965,6 @@ void LiftedTwoPhaseILS::ExportIncumbentSolution() const
         scenarioOut << "subproblem_index,scenario_index,probability,status,q_weighted,"
                     << "q_unweighted,fast_charge_kwh,expected_fast_charge_kwh,"
                     << "static_wireless_charge_kwh,expected_static_wireless_charge_kwh,"
-                    << "dynamic_wireless_charge_kwh,expected_dynamic_wireless_charge_kwh,"
                     << "night_charge_kwh,expected_night_charge_kwh,total_charge_kwh,"
                     << "expected_total_charge_kwh\n";
     }
@@ -1019,14 +1000,13 @@ void LiftedTwoPhaseILS::ExportIncumbentSolution() const
             }
             if (exportSummary) {
                 scenarioOut << idx << ',' << scenarioIndex << ',' << probability << ',' << status
-                            << ',' << obj << ",0,0,0,0,0,0,0,0,0,0,0\n";
+                            << ',' << obj << ",0,0,0,0,0,0,0,0,0\n";
             }
             continue;
         }
 
         double fastChargeKwh = 0.0;
         double staticWirelessChargeKwh = 0.0;
-        double dynamicWirelessChargeKwh = 0.0;
         double nightChargeKwh = 0.0;
 
         const int numVars = sub->model->get(GRB_IntAttr_NumVars);
@@ -1052,16 +1032,12 @@ void LiftedTwoPhaseILS::ExportIncumbentSolution() const
             if (StartsWith(localName, "c_Night_")) {
                 nightChargeKwh += value;
             } else if (StartsWith(localName, "c_")) {
-                if (localName.find("To_") != std::string::npos) {
-                    dynamicWirelessChargeKwh += value;
+                int station = -1;
+                if (TryParseIntAfter(localName, "_s", 0, station)
+                    && existingChargerStationSet.count(station) > 0) {
+                    fastChargeKwh += value;
                 } else {
-                    int station = -1;
-                    if (TryParseIntAfter(localName, "_s", 0, station)
-                        && existingChargerStationSet.count(station) > 0) {
-                        fastChargeKwh += value;
-                    } else {
-                        staticWirelessChargeKwh += value;
-                    }
+                    staticWirelessChargeKwh += value;
                 }
             }
         }
@@ -1069,12 +1045,11 @@ void LiftedTwoPhaseILS::ExportIncumbentSolution() const
 
         if (exportSummary) {
             const double totalChargeKwh = fastChargeKwh + staticWirelessChargeKwh
-                + dynamicWirelessChargeKwh + nightChargeKwh;
+                + nightChargeKwh;
             const double qUnweighted = probability > 0.0 ? obj / probability : 0.0;
             summary.expectedOperationalCost += obj;
             summary.expectedFastChargeKwh += probability * fastChargeKwh;
             summary.expectedStaticWirelessKwh += probability * staticWirelessChargeKwh;
-            summary.expectedDynamicWirelessKwh += probability * dynamicWirelessChargeKwh;
             summary.expectedNightChargeKwh += probability * nightChargeKwh;
             summary.expectedTotalChargeKwh += probability * totalChargeKwh;
 
@@ -1082,7 +1057,6 @@ void LiftedTwoPhaseILS::ExportIncumbentSolution() const
                         << ',' << obj << ',' << qUnweighted << ','
                         << fastChargeKwh << ',' << probability * fastChargeKwh << ','
                         << staticWirelessChargeKwh << ',' << probability * staticWirelessChargeKwh << ','
-                        << dynamicWirelessChargeKwh << ',' << probability * dynamicWirelessChargeKwh << ','
                         << nightChargeKwh << ',' << probability * nightChargeKwh << ','
                         << totalChargeKwh << ',' << probability * totalChargeKwh << '\n';
         }
@@ -1111,15 +1085,12 @@ void LiftedTwoPhaseILS::ExportIncumbentSolution() const
         out << "final_gap," << finalGap << '\n';
         out << "facility_cost," << summary.facilityCost << '\n';
         out << "station_facility_cost," << summary.stationFacilityCost << '\n';
-        out << "link_facility_cost," << summary.linkFacilityCost << '\n';
         out << "expected_battery_cost," << summary.batteryCost << '\n';
         out << "fixed_cost," << fixedCost << '\n';
         out << "expected_operational_cost," << summary.expectedOperationalCost << '\n';
         out << "selected_station_count," << summary.selectedStationCount << '\n';
-        out << "selected_link_count," << summary.selectedLinkCount << '\n';
         out << "expected_fast_charge_kwh," << summary.expectedFastChargeKwh << '\n';
         out << "expected_static_wireless_kwh," << summary.expectedStaticWirelessKwh << '\n';
-        out << "expected_dynamic_wireless_kwh," << summary.expectedDynamicWirelessKwh << '\n';
         out << "expected_night_charge_kwh," << summary.expectedNightChargeKwh << '\n';
         out << "expected_total_charge_kwh," << summary.expectedTotalChargeKwh << '\n';
     }
