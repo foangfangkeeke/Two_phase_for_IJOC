@@ -1986,44 +1986,16 @@ Status WirelessScenarioSubProblem::SolveSubProblem(const ProblemData& problemDat
         return OK;
     }
 
-    if (status == GRB_INFEASIBLE || status == GRB_INF_OR_UNBD || status == GRB_UNBOUNDED) {
-        // Sub-problem is LP -> get Farkas duals (Method=1 gives infeasibility cert)
-        const auto& masterVars = problemData.getData<std::vector<ProblemDataVar>>("masterVars");
-        try {
-            const double farkasProof = subModel.get(GRB_DoubleAttr_FarkasProof);
-            if (std::isfinite(farkasProof) && farkasProof > 1e-9) {
-                cutInfo.isOptimalityCut = false;
-                cutInfo.sense = '>';
-                cutInfo.rhs = farkasProof;
-                cutInfo.yCoeffs.assign(zValues.size(), 0.0);
-                cutInfo.constant = 0.0;
-
-                // Facility Farkas duals
-                auto& facilityRhsConstrs = context.EnsureConstrGroup(kWirelessFacilityRhsConstrGroup);
-                for (auto& constr : facilityRhsConstrs) {
-                    size_t masterIdx = 0;
-                    if (TryGetWirelessFacilityRhsMasterIndex(constr, zValues.size(), masterIdx)) {
-                        const double lambda = constr.get(GRB_DoubleAttr_FarkasDual);
-                        cutInfo.yCoeffs[masterIdx] += lambda;
-                        cutInfo.constant -= lambda * zValues[masterIdx];
-                    }
-                }
-
-                // Battery Farkas duals
-                ExtractBatteryRhsFarkasDuals(batteryRhsConstrs, zValues,
-                    static_cast<size_t>(scenarioInfo.scenarioIndex), cutInfo,
-                    capacityVarIdx);
-
-                subObj = GRB_INFINITY;
-                return OK;
-            }
-        } catch (const GRBException&) {
-            // FarkasProof not available, fall back to no-good
-        }
-
+    if (status == GRB_INFEASIBLE) {
         BuildWirelessNoGoodFeasibilityCut(zValues, cutInfo);
         subObj = GRB_INFINITY;
         return OK;
+    }
+
+    if (status == GRB_INF_OR_UNBD || status == GRB_UNBOUNDED) {
+        std::cerr << "Wireless exact MIP sub-problem ended with invalid status: "
+                  << status << std::endl;
+        return ERROR;
     }
 
     std::cerr << "Wireless L-shaped sub-problem ended with unexpected status: " << status << std::endl;
