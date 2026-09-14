@@ -1,12 +1,9 @@
-#include "natural_ils.hpp"
-#include "lifted_ils.hpp"
 #include "lifted_two_phase_ils.hpp"
 #include "gurobi_c++.h"
 #include "milp_solver.hpp"
 #include "runtime_options.hpp"
 #include "solver_config.hpp"
 #include "tools.hpp"
-#include "using_solver.hpp"
 
 #include <chrono>
 #include <cstdio>
@@ -79,12 +76,11 @@ int main(int argc, char* argv[])
 
     cout << fixed << setprecision(6);
 
-    string alg = "solver";
-    string pb = "wireless";
+    string alg = "full";
+    string pb = "wireless_reform";
     string dataType = "test";
     bool exportSolution = false;
     bool exportSummary = false;
-    bool allowWirelessCharging = true;
     bool rspOptionSet = false;
     bool rspOptionValue = true;
     int phaseProgressLogOverride = -1;
@@ -99,8 +95,6 @@ int main(int argc, char* argv[])
             pb = argv[++idx];
         } else if (arg == "--data" && idx + 1 < argc) {
             dataType = argv[++idx];
-        } else if (arg == "--wireless-option" && idx + 1 < argc) {
-            allowWirelessCharging = std::stoi(argv[++idx]) != 0;
         } else if (arg == "--rsp" && idx + 1 < argc) {
             rspOptionSet = true;
             rspOptionValue = std::stoi(argv[++idx]) != 0;
@@ -167,47 +161,11 @@ int main(int argc, char* argv[])
          << ", scenario_count=" << runtimeOptions.scenarioCount
          << ", cap=" << runtimeOptions.chargerCapacity << endl;
 
-    if (pbLower == "wireless") {
-        MILPSolver solver;
-        solver.SetSolverConfig(solverConfig);
-
-        if (algLower == "solver") {
-            auto algorithm = std::make_unique<UsingSolver>(
-                WIRELESS_CHARGING_NO_PLUGIN, dataFolder, allowWirelessCharging);
-            algorithm->SetExportSolution(exportSolution);
-            algorithm->SetExportSummary(exportSummary);
-            algorithm->SetExportDirectory(exportDirectory);
-            solver.SetAlgorithm(std::move(algorithm));
-        } else if (algLower == "natural-ils") {
-            solver.SetAlgorithm(std::make_unique<WirelessNoPlugInIntegerLShaped>(
-                dataFolder, 2147483647, 1e-6, UseRsp(true)));
-        } else {
-            cout << "invalid algorithm " << alg << " for problem " << pb << endl;
-            cout << "valid wireless algorithms: solver, natural-ils" << endl;
-            return 1;
-        }
-
-        try {
-            return solver.Run() == OK ? 0 : 1;
-        } catch (const GRBException& e) {
-            cout << "Gurobi error: code=" << e.getErrorCode()
-                 << ", message=" << e.getMessage() << endl;
-            return 1;
-        } catch (const std::exception& e) {
-            cout << "Error: " << e.what() << endl;
-            return 1;
-        }
-    }
-
     if (pbLower == "wireless_reform") {
         MILPSolver solver;
         solver.SetSolverConfig(solverConfig);
 
-        if (algLower == "lifted-ils" || algLower == "lifted-monotone") {
-            const bool useMonotoneCuts = algLower == "lifted-monotone";
-            solver.SetAlgorithm(std::make_unique<LiftedILS>(
-                WIRELESS_CAPACITY_REFORM, dataFolder, 5000, 1e-6, useMonotoneCuts, UseRsp(true)));
-        } else if (algLower == "lifted-two-phase" || algLower == "full") {
+        if (algLower == "lifted-two-phase" || algLower == "full") {
             const bool useMonotoneCuts = algLower == "full";
             auto algorithm = std::make_unique<LiftedTwoPhaseILS>(
                 WIRELESS_CAPACITY_REFORM, dataFolder, 5000, 1e-6, UseRsp(true), useMonotoneCuts);
@@ -217,7 +175,7 @@ int main(int argc, char* argv[])
             solver.SetAlgorithm(std::move(algorithm));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;
-            cout << "valid wireless_reform algorithms: lifted-ils, lifted-monotone, lifted-two-phase, full" << endl;
+            cout << "valid algorithms: lifted-two-phase, full" << endl;
             return 1;
         }
 
@@ -234,7 +192,7 @@ int main(int argc, char* argv[])
     }
 
     cout << "No experiments registered for problem " << pb << endl;
-    cout << "Usage: wireless.exe --pb <problem> --alg <algorithm> --data <test|tower>"
+    cout << "Usage: wireless.exe --pb wireless_reform --alg <lifted-two-phase|full> --data <test|tower>"
          << " [--facility-cost-scale <positive>] [--energy-scale <positive>]"
          << " [--scenario-count <positive>] [--cap <positive>]"
          << " [--rsp <0|1>]"
