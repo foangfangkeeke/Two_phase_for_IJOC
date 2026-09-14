@@ -87,8 +87,8 @@ int main(int argc, char* argv[])
     bool allowWirelessCharging = true;
     bool rspOptionSet = false;
     bool rspOptionValue = true;
-    bool monotoneOptionSet = false;
-    bool monotoneOptionValue = false;
+    int phaseProgressLogOverride = -1;
+    int phase2MasterLogOverride = -1;
     RuntimeOptions runtimeOptions;
     string exportDirectory;
     for (int idx = 1; idx < argc; ++idx) {
@@ -104,9 +104,6 @@ int main(int argc, char* argv[])
         } else if (arg == "--rsp" && idx + 1 < argc) {
             rspOptionSet = true;
             rspOptionValue = std::stoi(argv[++idx]) != 0;
-        } else if (arg == "--monotone" && idx + 1 < argc) {
-            monotoneOptionSet = true;
-            monotoneOptionValue = std::stoi(argv[++idx]) != 0;
         } else if (arg == "--facility-cost-scale" && idx + 1 < argc) {
             runtimeOptions.facilityCostScale = std::stod(argv[++idx]);
         } else if (arg == "--energy-scale" && idx + 1 < argc) {
@@ -121,6 +118,10 @@ int main(int argc, char* argv[])
             exportSummary = true;
         } else if (arg == "--export-dir" && idx + 1 < argc) {
             exportDirectory = argv[++idx];
+        } else if (arg == "--phase-progress-log" && idx + 1 < argc) {
+            phaseProgressLogOverride = std::stoi(argv[++idx]);
+        } else if (arg == "--phase2-master-log" && idx + 1 < argc) {
+            phase2MasterLogOverride = std::stoi(argv[++idx]);
         }
     }
 
@@ -135,9 +136,13 @@ int main(int argc, char* argv[])
     const auto UseRsp = [rspOptionSet, rspOptionValue](bool defaultValue) {
         return rspOptionSet ? rspOptionValue : defaultValue;
     };
-    const auto UseMonotone = [monotoneOptionSet, monotoneOptionValue](bool defaultValue) {
-        return monotoneOptionSet ? monotoneOptionValue : defaultValue;
-    };
+    SolverConfig solverConfig = LoadSolverConfig();
+    if (phaseProgressLogOverride >= 0) {
+        solverConfig.phaseProgressLog = phaseProgressLogOverride != 0;
+    }
+    if (phase2MasterLogOverride >= 0) {
+        solverConfig.phase2MasterLog = phase2MasterLogOverride != 0;
+    }
 
     // ── Log file setup ──
     const string caseLabel = BuildCaseLabel(dataType, runtimeOptions);
@@ -164,7 +169,7 @@ int main(int argc, char* argv[])
 
     if (pbLower == "wireless") {
         MILPSolver solver;
-        solver.SetSolverConfig(LoadSolverConfig());
+        solver.SetSolverConfig(solverConfig);
 
         if (algLower == "solver") {
             auto algorithm = std::make_unique<UsingSolver>(
@@ -173,17 +178,21 @@ int main(int argc, char* argv[])
             algorithm->SetExportSummary(exportSummary);
             algorithm->SetExportDirectory(exportDirectory);
             solver.SetAlgorithm(std::move(algorithm));
-        } else if (algLower == "ils" || algLower == "natural-ils") {
+        } else if (algLower == "natural-ils") {
             solver.SetAlgorithm(std::make_unique<WirelessNoPlugInIntegerLShaped>(
                 dataFolder, 2147483647, 1e-6, UseRsp(true)));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;
-            cout << "valid wireless algorithms: solver, ils, natural-ils" << endl;
+            cout << "valid wireless algorithms: solver, natural-ils" << endl;
             return 1;
         }
 
         try {
             return solver.Run() == OK ? 0 : 1;
+        } catch (const GRBException& e) {
+            cout << "Gurobi error: code=" << e.getErrorCode()
+                 << ", message=" << e.getMessage() << endl;
+            return 1;
         } catch (const std::exception& e) {
             cout << "Error: " << e.what() << endl;
             return 1;
@@ -192,14 +201,14 @@ int main(int argc, char* argv[])
 
     if (pbLower == "wireless_reform") {
         MILPSolver solver;
-        solver.SetSolverConfig(LoadSolverConfig());
+        solver.SetSolverConfig(solverConfig);
 
         if (algLower == "lifted-ils" || algLower == "lifted-monotone") {
-            const bool useMonotoneCuts = UseMonotone(algLower == "lifted-monotone");
+            const bool useMonotoneCuts = algLower == "lifted-monotone";
             solver.SetAlgorithm(std::make_unique<LiftedILS>(
                 WIRELESS_CAPACITY_REFORM, dataFolder, 5000, 1e-6, useMonotoneCuts, UseRsp(true)));
-        } else if (algLower == "two-phase" || algLower == "lifted-two-phase" || algLower == "full") {
-            const bool useMonotoneCuts = UseMonotone(algLower == "full");
+        } else if (algLower == "lifted-two-phase" || algLower == "full") {
+            const bool useMonotoneCuts = algLower == "full";
             auto algorithm = std::make_unique<LiftedTwoPhaseILS>(
                 WIRELESS_CAPACITY_REFORM, dataFolder, 5000, 1e-6, UseRsp(true), useMonotoneCuts);
             algorithm->SetExportSolution(exportSolution);
@@ -208,12 +217,16 @@ int main(int argc, char* argv[])
             solver.SetAlgorithm(std::move(algorithm));
         } else {
             cout << "invalid algorithm " << alg << " for problem " << pb << endl;
-            cout << "valid wireless_reform algorithms: lifted-ils, lifted-monotone, two-phase, lifted-two-phase, full" << endl;
+            cout << "valid wireless_reform algorithms: lifted-ils, lifted-monotone, lifted-two-phase, full" << endl;
             return 1;
         }
 
         try {
             return solver.Run() == OK ? 0 : 1;
+        } catch (const GRBException& e) {
+            cout << "Gurobi error: code=" << e.getErrorCode()
+                 << ", message=" << e.getMessage() << endl;
+            return 1;
         } catch (const std::exception& e) {
             cout << "Error: " << e.what() << endl;
             return 1;
@@ -224,7 +237,8 @@ int main(int argc, char* argv[])
     cout << "Usage: wireless.exe --pb <problem> --alg <algorithm> --data <test|tower>"
          << " [--facility-cost-scale <positive>] [--energy-scale <positive>]"
          << " [--scenario-count <positive>] [--cap <positive>]"
-         << " [--rsp <0|1>] [--monotone <0|1>]"
+         << " [--rsp <0|1>]"
+         << " [--phase-progress-log <0|1>] [--phase2-master-log <0|1>]"
          << " [--export-solution] [--export-summary] [--export-dir <path>]" << endl;
     return 1;
 }

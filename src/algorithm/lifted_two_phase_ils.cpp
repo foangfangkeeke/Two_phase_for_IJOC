@@ -2,6 +2,7 @@
 #include "lshape_monotonicity_cut.hpp"
 #include "lshape_relaxed.hpp"
 #include "parallel_utils.hpp"
+#include "progress_logger.hpp"
 #include "runtime_options.hpp"
 #include "wireless_reform.hpp"
 #include "tools.hpp"
@@ -17,6 +18,7 @@
 #include <limits>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <set>
 #include <stdexcept>
 #include <tuple>
@@ -405,7 +407,6 @@ Status LiftedTwoPhaseILS::Initialize()
         sub->env->start();
         sub->model = std::make_unique<GRBModel>(*sub->env);
         sub->model->set(GRB_IntParam_OutputFlag, 0);
-        sub->model->set(GRB_DoubleParam_MIPGap, 0.0);
         sub->model->set(GRB_IntParam_Presolve, solverConfig.presolve);
         sub->model->set(GRB_IntParam_Method, solverConfig.method);
         sub->model->set(GRB_IntParam_Threads, ParallelConfig::Phase2SubProblemThreads());
@@ -459,7 +460,7 @@ LiftedTwoPhaseILS::CutEval LiftedTwoPhaseILS::BuildContinuousCut(const LShapeCut
 Status LiftedTwoPhaseILS::EvaluateSubProblems(const std::vector<double>& zValues,
     LShapeCutInfo& cutInfo, double& subObj,
     std::vector<double>& scenarioSubObjs, std::vector<LShapeCutInfo>& scenarioCutInfos,
-    bool relaxed)
+    bool relaxed, int iter)
 {
     if (subProblems.empty()) {
         std::cerr << "Lifted two-phase ILS operational sub-problems are not initialized" << std::endl;
@@ -478,13 +479,36 @@ Status LiftedTwoPhaseILS::EvaluateSubProblems(const std::vector<double>& zValues
 
     const ProblemData* problemDataPtr = problemData;
     std::vector<SubProblemEvalResult> results;
+    std::mutex progressMutex;
     try {
         results = RunBoundedIndexedTasks(subProblems.size(),
             ParallelConfig::Phase2SubProblemConcurrency(),
-            [problemDataPtr, &zValues, relaxed, this](size_t idx) {
+            [problemDataPtr, &zValues, relaxed, iter, this, &progressMutex](size_t idx) {
                 auto& sub = subProblems[idx];
-                return EvaluateScenarioSubproblem(*problemDataPtr,
+                const char* mode = relaxed ? "RSP" : "exact";
+                const auto scenarioStart = Tools::Clock::now();
+                if (solverConfig.phaseProgressLog) {
+                    std::lock_guard<std::mutex> lock(progressMutex);
+                    std::cout << "Phase 2 iter " << iter
+                              << " scenario " << idx
+                              << " sc=" << sub->scenarioIndex
+                              << " " << mode << " start" << std::endl;
+                }
+                SubProblemEvalResult result = EvaluateScenarioSubproblem(*problemDataPtr,
                     *sub->strategy, *sub->model, sub->context, zValues, relaxed);
+                if (solverConfig.phaseProgressLog) {
+                    std::lock_guard<std::mutex> lock(progressMutex);
+                    std::cout << "Phase 2 iter " << iter
+                              << " scenario " << idx
+                              << " sc=" << sub->scenarioIndex
+                              << " " << mode
+                              << " done status=" << static_cast<int>(result.status)
+                              << " cut=" << (result.cutInfo.isOptimalityCut ? "optimality" : "feasibility")
+                              << " obj=" << result.subObj
+                              << " ms=" << Tools::ElapsedMs(scenarioStart, Tools::Clock::now())
+                              << std::endl;
+                }
+                return result;
             });
     }
     catch (const std::exception& e) {
@@ -557,9 +581,16 @@ Status LiftedTwoPhaseILS::Solve()
         zVars[idx].set(GRB_DoubleAttr_Start, phase1ZValues[idx]);
     }
     model->update();
-    std::cout << "Phase 2 MIP start applied, starting Benders, RSP="
-              << (useRspCuts ? "on" : "off")
-              << ", monotone_cuts=" << (useMonotoneCuts ? "on" : "off") << std::endl;
+    const RuntimeOptions& runtimeOptions = GetRuntimeOptions();
+    std::cout << "Phase 2 MIP start applied, starting Benders"
+              << ", RSP=" << (useRspCuts ? "on" : "off")
+              << ", monotone_cuts=" << (useMonotoneCuts ? "on" : "off")
+              << ", scenario_count=" << runtimeOptions.scenarioCount
+              << ", cap=" << runtimeOptions.chargerCapacity
+              << ", facility_cost_scale=" << runtimeOptions.facilityCostScale
+              << ", energy_scale=" << runtimeOptions.energyScale
+              << ", outer_gap=" << solverConfig.mipGap
+              << std::endl;
 
     const auto& scenarioSubproblems = problemData->getData<std::vector<ScenarioSubproblemInfo>>(
         "wireless_scenario_subproblems");
@@ -585,7 +616,8 @@ Status LiftedTwoPhaseILS::Solve()
             return ERROR;
         }
 
-        model->set(GRB_DoubleParam_MIPGap, solverConfig.mipGap);
+        model->getEnv().set(GRB_IntParam_OutputFlag, solverConfig.phase2MasterLog ? 1 : 0);
+        model->update();
         const auto masterStart = Tools::Clock::now();
         model->optimize();
         const auto masterEnd = Tools::Clock::now();
@@ -603,12 +635,17 @@ Status LiftedTwoPhaseILS::Solve()
         }
         const double masterBound = model->get(GRB_DoubleAttr_ObjBound);
         bestLowerBound = std::max(bestLowerBound, masterBound);
+        if (solverConfig.phaseProgressLog) {
+            ProgressLog::PrintMasterDone("Phase 2", iter, bestLowerBound,
+                masterMs, Tools::ElapsedMs(phase2Start, masterEnd));
+        }
 
         const BendersMasterSolution masterSolution = GetBendersMasterSolution(*model, zVars, theta);
         const std::vector<double>& zValues = masterSolution.values;
         const double fixedCost = masterSolution.firstStageValue;
         const double thetaValue = masterSolution.thetaValue;
 
+        long long rspMs = 0;
         if (useRspCuts) {
             double relaxedQValue = 0.0;
             LShapeCutInfo relaxedAggregateCutInfo;
@@ -616,11 +653,12 @@ Status LiftedTwoPhaseILS::Solve()
             std::vector<LShapeCutInfo> relaxedScenarioCutInfos;
             const auto rspStart = Tools::Clock::now();
             Status relaxedStatus = EvaluateSubProblems(zValues, relaxedAggregateCutInfo, relaxedQValue,
-                relaxedScenarioQValues, relaxedScenarioCutInfos, true);
+                relaxedScenarioQValues, relaxedScenarioCutInfos, true, iter);
             if (relaxedStatus != OK) {
                 std::cerr << "Phase 2 relaxed sub-problem evaluation failed iter " << iter << std::endl;
                 return ERROR;
             }
+            rspMs = Tools::ElapsedMs(rspStart, Tools::Clock::now());
 
             int rspFeasCount = 0;
             int rspOptCount = 0;
@@ -653,7 +691,7 @@ Status LiftedTwoPhaseILS::Solve()
                           << ", RSP optimality cut x" << rspOptCount;
                 PrintBounds(bestUpperBound, bestLowerBound);
                 std::cout << ", master_ms=" << masterMs
-                          << ", rsp_eval_ms=" << Tools::ElapsedMs(rspStart, Tools::Clock::now())
+                          << ", rsp_ms=" << rspMs
                           << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start, Tools::Clock::now()) << std::endl;
                 if (std::isfinite(bestUpperBound)) {
                     const double gapDenom = std::max(1.0, std::fabs(bestUpperBound));
@@ -673,16 +711,16 @@ Status LiftedTwoPhaseILS::Solve()
                 continue;
             }
             if (rspOptCount > 0) model->update();
-        } else {
-            std::cout << "Phase 2 iter " << iter << " RSP disabled, skip LP relaxation" << std::endl;
         }
 
         double aggregatedQValue = 0.0;
         LShapeCutInfo aggregateCutInfo;
         std::vector<double> scenarioQValues;
         std::vector<LShapeCutInfo> scenarioCutInfos;
+        const auto exactStart = Tools::Clock::now();
         Status secondStageStatus = EvaluateSubProblems(zValues, aggregateCutInfo, aggregatedQValue,
-            scenarioQValues, scenarioCutInfos, false);
+            scenarioQValues, scenarioCutInfos, false, iter);
+        const long long subproblemMs = Tools::ElapsedMs(exactStart, Tools::Clock::now());
         if (secondStageStatus != OK) {
             std::cerr << "Phase 2 sub-problem evaluation failed iter " << iter << std::endl;
             return ERROR;
@@ -734,6 +772,8 @@ Status LiftedTwoPhaseILS::Solve()
             PrintBounds(bestUpperBound, bestLowerBound);
             model->update();
             std::cout << ", master_ms=" << masterMs
+                      << ", rsp_ms=" << rspMs
+                      << ", subproblem_ms=" << subproblemMs
                       << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start, Tools::Clock::now()) << std::endl;
             if (MeetsOuterGap(bestUpperBound, bestLowerBound, solverConfig)) {
                 PrintBestSolution();
@@ -765,6 +805,8 @@ Status LiftedTwoPhaseILS::Solve()
         if (std::isfinite(bestUpperBound) && relGap <= solverConfig.mipGap) {
             const auto iterEnd = Tools::Clock::now();
             std::cout << ", master_ms=" << masterMs
+                      << ", rsp_ms=" << rspMs
+                      << ", subproblem_ms=" << subproblemMs
                       << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start, iterEnd) << std::endl;
             PrintBestSolution();
             {
@@ -810,6 +852,8 @@ Status LiftedTwoPhaseILS::Solve()
             std::cout << ", monotone_opt_dedup_skip x" << monotoneOptDedupSkip;
         }
         std::cout << ", master_ms=" << masterMs
+                  << ", rsp_ms=" << rspMs
+                  << ", subproblem_ms=" << subproblemMs
                   << ", elapsed_ms=" << Tools::ElapsedMs(phase2Start, Tools::Clock::now()) << std::endl;
     }
 

@@ -51,11 +51,16 @@ public:
         if (!algorithm->initialized) {
             Status status = algorithm->Initialize();
             if (status) {
+                std::cerr << "Algorithm initialization failed, status=" << status << std::endl;
                 return status;
             }
         }
 
-        return algorithm->Solve();
+        Status status = algorithm->Solve();
+        if (status) {
+            std::cerr << "Algorithm solve failed, status=" << status << std::endl;
+        }
+        return status;
     }
 
 private:

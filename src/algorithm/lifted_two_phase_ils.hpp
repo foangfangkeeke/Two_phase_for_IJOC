@@ -36,7 +36,7 @@ private:
     Status EvaluateSubProblems(const std::vector<double>& zValues,
         LShapeCutInfo& cutInfo, double& subObj,
         std::vector<double>& scenarioSubObjs, std::vector<LShapeCutInfo>& scenarioCutInfos,
-        bool relaxed);
+        bool relaxed, int iter);
 
     Status ApplyWarmStart();
     void UpdateIncumbent(const std::vector<double>& zValues, double secondStageValue);

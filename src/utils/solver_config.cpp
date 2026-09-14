@@ -69,6 +69,10 @@ SolverConfig LoadSolverConfig()
             config.threads = std::stoi(value);
         } else if (key == "method") {
             config.method = std::stoi(value);
+        } else if (key == "phaseProgressLog") {
+            config.phaseProgressLog = std::stoi(value) != 0;
+        } else if (key == "phase2MasterLog") {
+            config.phase2MasterLog = std::stoi(value) != 0;
         } else {
             throw std::runtime_error("Unknown solver config key: " + key);
         }

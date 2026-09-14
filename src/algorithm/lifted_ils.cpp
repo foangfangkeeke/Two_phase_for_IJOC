@@ -143,7 +143,6 @@ Status LiftedILS::Initialize()
     const std::vector<ProblemDataConstr> masterConstrs = dataIniter->ConstrInit(*problemData);
     const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
     InitializeBendersMasterModel(*model, masterVars, masterConstrs, zVars, theta, true);
-    model->set(GRB_DoubleParam_MIPGap, solverConfig.mipGap);
     model->set(GRB_IntParam_Presolve, solverConfig.presolve);
     model->set(GRB_IntParam_Method, solverConfig.method);
     model->set(GRB_IntParam_Threads, ParallelConfig::MasterThreads());
@@ -181,7 +180,6 @@ Status LiftedILS::Initialize()
         sub->env->start();
         sub->model = std::make_unique<GRBModel>(*sub->env);
         sub->model->set(GRB_IntParam_OutputFlag, 0);
-        sub->model->set(GRB_DoubleParam_MIPGap, 0.0);
         sub->model->set(GRB_IntParam_Presolve, solverConfig.presolve);
         sub->model->set(GRB_IntParam_Method, solverConfig.method);
         sub->model->set(GRB_IntParam_Threads, ParallelConfig::Phase2SubProblemThreads());
@@ -328,7 +326,6 @@ Status LiftedILS::Solve()
             return ERROR;
         }
 
-        model->set(GRB_DoubleParam_MIPGap, solverConfig.mipGap);
         const auto masterStart = Tools::Clock::now();
         model->optimize();
         const auto masterEnd = Tools::Clock::now();

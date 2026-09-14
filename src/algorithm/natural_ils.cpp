@@ -137,7 +137,6 @@ Status IntegerLShaped::Initialize()
     const std::vector<ProblemDataConstr> masterConstrs = dataIniter->ConstrInit(*problemData);
     const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
     InitializeBendersMasterModel(*model, masterVars, masterConstrs, zVars, theta, true);
-    model->set(GRB_DoubleParam_MIPGap, solverConfig.mipGap);
     model->set(GRB_IntParam_Threads, ParallelConfig::MasterThreads());
     const auto dataInitEnd = Tools::Clock::now();
     std::cout << "Natural ILS data/master initialization elapsed_ms="
@@ -160,7 +159,6 @@ Status IntegerLShaped::Initialize()
         sub->env->start();
         sub->model = std::make_unique<GRBModel>(*sub->env);
         sub->model->set(GRB_IntParam_OutputFlag, 0);
-        sub->model->set(GRB_DoubleParam_MIPGap, 0.0);
         sub->model->set(GRB_IntParam_Threads, ParallelConfig::Phase2SubProblemThreads());
         sub->context.Clear();
         sub->strategy->InitSubProblem(*problemData, scenarioIndex, *sub->model, sub->context);
@@ -377,7 +375,6 @@ Status IntegerLShaped::Solve()
             return ERROR;
         }
 
-        model->set(GRB_DoubleParam_MIPGap, solverConfig.mipGap);
         const auto masterStart = Tools::Clock::now();
         model->optimize();
         const auto masterEnd = Tools::Clock::now();

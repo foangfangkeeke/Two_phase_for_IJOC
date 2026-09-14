@@ -8,6 +8,8 @@ struct SolverConfig {
     double heuristics = 0.05;
     int threads = 12;
     int method = -1;
+    bool phaseProgressLog = true;
+    bool phase2MasterLog = true;
 };
 
 SolverConfig LoadSolverConfig();

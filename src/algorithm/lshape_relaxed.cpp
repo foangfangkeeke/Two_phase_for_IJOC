@@ -1,6 +1,7 @@
 #include "lshape_relaxed.hpp"
 
 #include "parallel_utils.hpp"
+#include "progress_logger.hpp"
 #include "wireless_reform.hpp"
 #include "wireless_reform_route.hpp"
 #include "wireless_reform_types.hpp"
@@ -213,8 +214,6 @@ DebugMinimumPeakResult SolveDebugMinimumPeak(GRBEnv& debugEnv,
     GRBModel scheduleModel(debugEnv);
     scheduleModel.set(GRB_IntParam_OutputFlag, 0);
     scheduleModel.set(GRB_IntParam_Threads, 1);
-    scheduleModel.set(GRB_DoubleParam_MIPGap, 0.0);
-
     GRBVar peak = scheduleModel.addVar(0.0, static_cast<double>(events.size()), 1.0,
         GRB_INTEGER, "minimum_peak");
     std::map<int, std::vector<GRBVar>> occupancyVarsByTime;
@@ -317,7 +316,6 @@ Status LShapeRelaxed::Initialize()
     const std::vector<ProblemDataConstr> masterConstrs = dataIniter->ConstrInit(*problemData);
     const auto& masterVars = problemData->getData<std::vector<ProblemDataVar>>("masterVars");
     InitializeBendersMasterModel(*model, masterVars, masterConstrs, zVars, theta, true);
-    model->set(GRB_DoubleParam_MIPGap, solverConfig.mipGap);
     model->set(GRB_IntParam_Threads, ParallelConfig::MasterThreads());
     const auto dataInitEnd = Tools::Clock::now();
     std::cout << "Relaxed Route data/master initialization elapsed_ms="
@@ -372,7 +370,6 @@ Status LShapeRelaxed::Initialize()
             sub->env->start();
             sub->model = std::make_unique<GRBModel>(*sub->env);
             sub->model->set(GRB_IntParam_OutputFlag, 0);
-            sub->model->set(GRB_DoubleParam_MIPGap, 0.0);
             sub->model->set(GRB_IntParam_Threads, ParallelConfig::Phase1SubProblemThreads());
             sub->context.Clear();
             sub->strategy->InitSubProblem(*problemData, scenarioIndex, *sub->model, sub->context);
@@ -493,7 +490,6 @@ Status LShapeRelaxed::Solve()
         }
 
         const auto masterStart = Tools::Clock::now();
-        model->set(GRB_DoubleParam_MIPGap, solverConfig.mipGap);
         model->optimize();
         const auto masterEnd = Tools::Clock::now();
         const long long masterMs = Tools::ElapsedMs(masterStart, masterEnd);
@@ -514,6 +510,10 @@ Status LShapeRelaxed::Solve()
         const double fixedCost = masterSolution.firstStageValue;
         const double thetaValue = masterSolution.thetaValue;
         bestLowerBound = std::max(bestLowerBound, model->get(GRB_DoubleAttr_ObjBound));
+        if (solverConfig.phaseProgressLog) {
+            ProgressLog::PrintMasterDone("Relaxed Route", iter, bestLowerBound,
+                masterMs, Tools::ElapsedMs(solveStart, masterEnd));
+        }
 
         double aggregatedQValue = 0.0;
         LShapeCutInfo aggregateCutInfo;
@@ -542,7 +542,7 @@ Status LShapeRelaxed::Solve()
             std::cout << "Relaxed Route iter " << iter << ", feasibility cut x" << feasCount;
             PrintBounds(bestUpperBound, bestLowerBound);
             std::cout << ", master_ms=" << masterMs
-                      << ", integer_ms=" << integerMs
+                      << ", subproblem_ms=" << integerMs
                       << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, Tools::Clock::now()) << std::endl;
 
             model->update();
@@ -563,7 +563,7 @@ Status LShapeRelaxed::Solve()
             : 1.0;
         if (std::isfinite(bestUpperBound) && relGap <= solverConfig.mipGap) {
             std::cout << ", master_ms=" << masterMs
-                      << ", integer_ms=" << integerMs
+                      << ", subproblem_ms=" << integerMs
                       << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, Tools::Clock::now()) << std::endl;
             if (!quiet_) {
                 PrintBestSolution();
@@ -585,7 +585,7 @@ Status LShapeRelaxed::Solve()
         {
             const auto iterEnd = Tools::Clock::now();
             std::cout << ", master_ms=" << masterMs
-                      << ", integer_ms=" << integerMs
+                      << ", subproblem_ms=" << integerMs
                       << ", elapsed_ms=" << Tools::ElapsedMs(solveStart, iterEnd) << std::endl;
         }
     }

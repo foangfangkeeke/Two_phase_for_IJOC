@@ -128,7 +128,6 @@ Status UsingSolver::Initialize()
     dataIniter = it->second(dataFolder, allowWirelessCharging);
 
     env = std::make_unique<GRBEnv>(true);
-    env->set("LogFile", "gurobi_log.txt");
     env->start();
     model = std::make_unique<GRBModel>(*env);
     model->set(GRB_IntParam_OutputFlag, 1);
