@@ -10,7 +10,7 @@
 // --- Utility: identify master variable types ---
 inline bool IsFacilityMasterVar(const std::string& name)
 {
-    return name.rfind("w_station_", 0) == 0 || name.rfind("w_link_", 0) == 0;
+    return name.rfind("w_station_", 0) == 0;
 }
 
 inline bool TryParseCapacityVar(const std::string& name, int& scenarioIndex, int& routeId, int& capacity)
