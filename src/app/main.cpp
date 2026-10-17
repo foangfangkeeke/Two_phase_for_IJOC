@@ -1,25 +1,43 @@
 #include "config/run_config.hpp"
 #include "config/solver_config.hpp"
 #include "domain/wireless_data.hpp"
+#include "model/extensive_form.hpp"
+#include "solver/copt_solver.hpp"
 
 #include <iostream>
+#include <iomanip>
 #include <stdexcept>
 
 int main(int argc, char* argv[])
 {
     try {
+        std::cout << std::fixed << std::setprecision(6);
         const ParsedCommandLine commandLine = ParseCommandLine(argc, argv);
         if (commandLine.showHelp) {
             PrintUsage();
             return 0;
         }
-        if (commandLine.config.algorithm != "data-check") {
+        if (commandLine.config.algorithm != "data-check" &&
+            commandLine.config.algorithm != "ef") {
             throw std::invalid_argument("Algorithm is not implemented on the rewrite branch yet: " +
                 commandLine.config.algorithm);
         }
 
         const SolverConfig solver = LoadSolverConfig();
         const wireless::InstanceData instance = wireless::LoadInstance(commandLine.config);
+        if (commandLine.config.algorithm == "ef") {
+            const solver::Result result = wireless::model::SolveExtensiveForm(
+                instance, commandLine.config, solver);
+            std::cout << "EF status: " << solver::ToString(result.status) << '\n';
+            if (result.hasSolution) {
+                std::cout << "UB: " << result.objective << ", LB: " << result.bound
+                          << ", gap=" << result.relativeGap * 100.0 << "%\n";
+            }
+            std::cout << "EF solve time: " << result.seconds << " s\n";
+            return result.status == solver::Status::Optimal ||
+                (result.status == solver::Status::TimeLimit && result.hasSolution) ? 0 : 1;
+        }
+
         std::cout << "data=" << instance.name
                   << ", scenarios=" << instance.scenarios.size()
                   << ", energy_per_km=" << instance.operation.energyPerKm
