@@ -1,0 +1,8 @@
+# numScenarios
+5
+# scenario_folder,probability
+hi20pct,0.2
+base,0.2
+hi10pct,0.2
+lo10pct,0.2
+lo20pct,0.2

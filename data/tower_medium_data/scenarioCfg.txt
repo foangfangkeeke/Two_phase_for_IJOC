@@ -1,0 +1,8 @@
+# numScenarios
+5
+# scenario_folder,probability
+base,0.2
+lo10pct,0.2
+hi10pct,0.2
+route_66_up25,0.2
+route_189_down25,0.2

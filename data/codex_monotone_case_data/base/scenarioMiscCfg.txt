@@ -1,0 +1,30 @@
+# NetworkCfg
+# startDistanceEBs
+0,0,0,0
+# endDistanceEBs
+0,0,0,0
+
+# SchedulingCfg
+# numEB
+1
+# EBs
+0,1,2,3
+# tripNumEBs
+3,3,3,3
+# tripEBs
+0,1,2
+3,4,5
+6,7,8
+9,10,11
+
+# chargerNums
+1
+0,1
+
+# RouteCfg
+# numRoutes
+4
+# routeNames
+R0
+# routeIdByEBs
+0,0,0,0

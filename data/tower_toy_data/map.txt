@@ -1,0 +1,9 @@
+Plug-in terminal,0
+Useful SWC A,1
+Useful SWC B,2
+Weak SWC C,3
+Weak SWC D,4
+Weak SWC E,5
+Weak SWC F,6
+Weak SWC G,7
+Weak SWC H,8

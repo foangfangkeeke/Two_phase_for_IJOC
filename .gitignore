@@ -1,0 +1,8 @@
+build/
+out/
+.agents/
+.claude/
+logs/
+results/
+gurobi*
+!src/utils/gurobi_c++.h

@@ -1,0 +1,1459 @@
+18 Woodsville,0
+3M Bldg,1
+5 Sci Pk Dr,2
+80 Robinson Rd,3
+APSN,4
+Admiralty Stn,5
+Aft 888 Plaza,6
+Aft AMK St 64/Apple SG,7
+Aft Admiral Hill,8
+Aft Aircraft Flyover,9
+Aft Airport Rd,10
+Aft Alexandra Rd,11
+Aft Allenby Rd,12
+Aft Andrew Rd,13
+Aft Andrews Ave,14
+Aft Ang Mo Kio Ave 1,15
+Aft Ang Mo Kio Ave 10,16
+Aft Ang Mo Kio Ave 2,17
+Aft Ang Mo Kio Ave 5,18
+Aft Assumption Eng Sch,19
+Aft Assyafaah Mque,20
+Aft Attap Valley Rd,21
+Aft Bartley Rd,22
+Aft Bayfront Stn Exit E,23
+Aft Beach Rd,24
+Aft Begonia Rd,25
+Aft Blk 195,26
+Aft Blk 648,27
+Aft Bras Basah Stn Exit A,28
+Aft Bt Batok East Ave 6,29
+Aft Bt Batok Stn/Blk 628,30
+Aft Bt Batok West Ave 5,31
+Aft C'wealth Dr,32
+Aft Capital Twr,33
+Aft Changi Airport Ter 2,34
+Aft Chestnut Ave,35
+Aft Chin Bee Ave,36
+Aft Chin Bee Rd,37
+Aft Chun Tin Rd,38
+Aft Clementi Ave 1,39
+Aft Clementi Ave 2,40
+Aft Clementi Fire Stn,41
+Aft Clementi Rd,42
+Aft Coronation Rd West,43
+Aft Corp Dr,44
+Aft Corp Pl,45
+Aft Corp Rd,46
+Aft Dedap Rd,47
+Aft Durban Rd,48
+Aft Duxton Plain Pk,49
+Aft ECON Medicare Ctr,50
+Aft East Coast Rd,51
+Aft East Sussex Lane,52
+Aft Eng Kong Pl,53
+Aft Esplanade Stn Exit D,54
+Aft Farrer Pk Stn Exit G,55
+Aft Florissa Pk,56
+Aft Fourth Chin Bee Rd,57
+Aft Gambas Ave,58
+Aft Hasanah Mque,59
+Aft Haw Par Glass Twr,60
+Aft Hillview Stn,61
+Aft HomeTeamNS Sembawang Resort,62
+Aft HortPark,63
+Aft Hosp Dr,64
+Aft Hume Stn Exit 2,65
+Aft Hyll on Holland,66
+Aft Jln Basong,67
+Aft Jln Buroh,68
+Aft Jln Jurong Kechil,69
+Aft Jln Kemuning,70
+Aft Jln Remaja,71
+Aft Jln Selaseh,72
+Aft Jln Terusan,73
+Aft Jln Ulu Sembawang,74
+Aft Joo Chiat Pl,75
+Aft Jurong Lake,76
+Aft Jurong Pier Rd,77
+Aft Jurong Port Rd,78
+Aft Jurong Town Hall Rd,79
+Aft Jurong West St 51,80
+Aft KJE Slip Rd,81
+Aft Kheam Hock Rd,82
+Aft Kim Chuan Rd,83
+Aft Lantana Ave,84
+Aft Lentor Gr,85
+Aft Lentor St,86
+Aft Lentor Stn Exit 4,87
+Aft Lor G Telok Kurau,88
+Aft Lor J Telok Kurau,89
+Aft Lor Nangka,90
+Aft Mandai Ave,91
+Aft Mandai Lake Rd,92
+Aft Maple Ave,93
+Aft Marsiling Lane,94
+Aft Min of Foreign Affairs,95
+Aft Moonstone Lane,96
+Aft Munshi Abdullah Ave,97
+Aft NUS High Sch,98
+Aft North Rd,99
+Aft Old Jurong Rd,100
+Aft Old Toh Tuck Rd,101
+Aft Old Upp Thomson Rd,102
+Aft PIE,103
+Aft Padang Jeringau,104
+Aft Pakistan Rd,105
+Aft Palm Green Condo,106
+Aft Pandan Gdns,107
+Aft Pandan Rd,108
+Aft Pasir Panjang Stn,109
+Aft Peirce Rd,110
+Aft Penjuru Pl,111
+Aft Penjuru Rd,112
+Aft Perpetual Succour Ch,113
+Aft Petir Stn,114
+Aft Plantation Cres,115
+Aft Promenade Stn Exit C,116
+Aft Punggol Rd,117
+Aft Quality Rd,118
+Aft Queen's Ave,119
+Aft Queenstown NPC HQ,120
+Aft River Valley Rd,121
+Aft Riverside Rd,122
+Aft S'pore Flyer,123
+Aft S'pore Science Ctr,124
+Aft SLE,125
+Aft ST Kinetics,126
+Aft Scania S'pore,127
+Aft Seletar Camp G,128
+Aft Seletar Rd,129
+Aft Sembawang Air Base,130
+Aft Sembawang Ave,131
+Aft Sembawang Shop Ctr,132
+Aft Senoko Cres,133
+Aft Senoko Dr,134
+Aft Senoko Way,135
+Aft Sg Seletar Bridge,136
+Aft Sommerville Rd,137
+Aft Sth Buona Vista Rd,138
+Aft Still Lane,139
+Aft Sunrise Gdns,140
+Aft Sunshine Lodge,141
+Aft Swiss Club Rd,142
+Aft Tagore Dr,143
+Aft The Japanese Assn,144
+Aft The Springside,145
+Aft Third Chin Bee Rd,146
+Aft Thomson Hills Dr,147
+Aft Toa Payoh Rise,148
+Aft Toh Tuck Ave,149
+Aft Toh Tuck Cres,150
+Aft Toh Tuck Lk,151
+Aft Toh Tuck Rise,152
+Aft Toh Tuck Terr,153
+Aft Tomlinson Rd,154
+Aft Upp Bt Timah Rd,155
+Aft View Rd,156
+Aft W'lands Ind Pk E3,157
+Aft W'lands Ind Pk E4,158
+Aft W'lands Ind Pk E6,159
+Aft W'lands Ind Pk E7,160
+Aft W'lands Waterfront Pk,161
+Aft Waterloo St,162
+Aft Wellington Rd,163
+Aft Windsor Pk Rd,164
+Aft Wolskel Rd,165
+Aft Woodleigh Pk,166
+Aft Yio Chu Kang Rd,167
+Aft Yishun Ave 1,168
+Aft Yishun Ave 6,169
+Aft Yuan Ching Rd,170
+Airport Police Stn,171
+Alexandra Pt,172
+Alexandra Retail Ctr,173
+Alliance Bldg,174
+Ang Mo Kio Int,175
+Ang Mo Kio Pr Sch,176
+Aries,177
+Assumption Pathway Sch,178
+Autobacs,179
+Automotive Technology,180
+Avenue Villa,181
+Ayer Rajah CC,182
+BEF BLK 435A,183
+BLK 467B,184
+Ban Joo,185
+Barossa Gdns,186
+Bayfront Stn Exit A,187
+Bayfront Stn Exit B/MBS,188
+Beauty World Stn Exit A,189
+Beauty World Stn Exit B,190
+Beauty World Stn Exit C,191
+Bedok Int,192
+Bef AMK St 64/Apple SG,193
+Bef Adana @ Thomson,194
+Bef Airport Rd,195
+Bef Al-Muttaqin Mque,196
+Bef Andrew Rd,197
+Bef Ang Mo Kio Ave 1,198
+Bef Ang Mo Kio Ave 10,199
+Bef Ang Mo Kio Ave 2,200
+Bef Ang Mo Kio Ave 5,201
+Bef Ang Mo Kio Lib,202
+Bef Architecture Dr,203
+Bef Assyafaah Mque,204
+Bef Beach Rd,205
+Bef Begonia Rd,206
+Bef Bendemeer Rd,207
+Bef Blk 113,208
+Bef Blk 2,209
+Bef Blk 322,210
+Bef Blk 39,211
+Bef Blk 440A,212
+Bef Blk 631B,213
+Bef Boon Lay Way,214
+Bef Braddell Rd,215
+Bef British American Tobacco,216
+Bef Bt Batok East Ave 6,217
+Bef Bt Batok West Ave 5,218
+Bef Bullion Pk,219
+Bef Cairnhill Rd,220
+Bef Canberra Dr,221
+Bef Cantonment Rd,222
+Bef Cashew Stn,223
+Bef Chestnut Ave,224
+Bef Chin Bee Ave,225
+Bef Chin Bee Rd,226
+Bef Chr Community Chapel,227
+Bef Crawford Bridge,228
+Bef ECON Medicare Ctr,229
+Bef Eng Kong Pl,230
+Bef Gambas Cres,231
+Bef Gerald Dr,232
+Bef Geylang Bahru Stn,233
+Bef Hasanah Mque,234
+Bef Hazel Pk Terr,235
+Bef Hume Stn Exit 2,236
+Bef Jln Basong,237
+Bef Jln Buroh,238
+Bef Jln Jurong Kechil,239
+Bef Jln Selaseh,240
+Bef Jln Tepong,241
+Bef Jln Terusan,242
+Bef Jln Todak,243
+Bef Jln Ulu Sembawang,244
+Bef Jurong East Stn,245
+Bef Jurong Pier Rd,246
+Bef Jurong Port Rd,247
+Bef Jurong Town Hall Rd,248
+Bef Jurong West St 51,249
+Bef Kallang Pl,250
+Bef Kampong Bahru Ter,251
+Bef Kent Ridge Ter,252
+Bef Keramat Rd,253
+Bef Kg Bugis,254
+Bef Khatib Stn,255
+Bef Kheam Hock Rd,256
+Bef Kim Chuan Rd,257
+Bef Lavender St,258
+Bef Lentor Stn Exit 5,259
+Bef Lor 110 Changi,260
+Bef Mandai Ave,261
+Bef Mandai Lake Rd,262
+Bef Mt Faber Lodge,263
+Bef Neil Rd,264
+Bef Novena Stn Exit B,265
+Bef Old Toh Tuck Rd,266
+Bef Old Upp Thomson Rd,267
+Bef PIE,268
+Bef Pandan Gdns,269
+Bef Pandan Road,270
+Bef Pasir Panjang PO,271
+Bef Pasir Panjang Stn,272
+Bef Pearl's Hill Terr,273
+Bef Pending Stn,274
+Bef Penjuru Cl,275
+Bef Penjuru Rd,276
+Bef Penjuru Wk,277
+Bef Plantation Cres,278
+Bef Punggol Rd,279
+Bef Quality Rd,280
+Bef Rochor Stn Exit B,281
+Bef S'pore Girls' Hme,282
+Bef SC Auto,283
+Bef SLE,284
+Bef Seah Im Rd,285
+Bef Seletar Camp G,286
+Bef Sembawang Ave,287
+Bef Sembawang Hills FC,288
+Bef Sembawang Shipyard G 3,289
+Bef Sembawang Stn,290
+Bef Senoko Ave,291
+Bef Senoko Cres,292
+Bef Senoko Dr,293
+Bef Senoko Way,294
+Bef Seventh-Day Advent Ch,295
+Bef Sg Seletar Bridge,296
+Bef Sia Huat,297
+Bef Siglap Plain,298
+Bef Sophia Rd,299
+Bef Sth Buona Vista Rd,300
+Bef Summerhill,301
+Bef Tagore Dr,302
+Bef Tagore Rd,303
+Bef Teban Gdns Rd,304
+Bef Telok Blangah Hill Pk,305
+Bef Thomson Flyover,306
+Bef Thomson Hills Dr,307
+Bef Thomson Ridge,308
+Bef Toh Guan Rd East,309
+Bef Toh Tuck Ave,310
+Bef Toh Tuck Lk,311
+Bef Toh Tuck Rise,312
+Bef Tomlinson Rd,313
+Bef Tyersall Ave,314
+Bef W'lands Ind Pk E3,315
+Bef W'lands Ind Pk E4,316
+Bef W'lands Ind Pk E7,317
+Bef W'lands Waterfront Pk,318
+Bef Windsor Pk Rd,319
+Bef Yio Chu Kang Rd,320
+Bef Yishun Ave 1,321
+Bef Yishun Ave 6,322
+Bef Yishun Stn,323
+Bef Yuhua CC,324
+Bencoolen Stn Exit B,325
+Bet Blks 13/14,326
+Bet Blks 139/140,327
+Bet Blks 201/202,328
+Bet Blks 315/318,329
+Bet Blks 318A/318B,330
+Bet Blks 325/326,331
+Bet Blks 357/359,332
+Bet Blks 415/416,333
+Bet Blks 50/51,334
+Bet Blks 524B/523D,335
+Bet Blks 801B/801C,336
+Biotronik,337
+Blk 1,338
+Blk 101,339
+Blk 102,340
+Blk 103,341
+Blk 104,342
+Blk 104C,343
+Blk 105,344
+Blk 106,345
+Blk 106A,346
+Blk 108 CP,347
+Blk 109,348
+Blk 111,349
+Blk 112,350
+Blk 114,351
+Blk 115,352
+Blk 117,353
+Blk 118,354
+Blk 119,355
+Blk 120A,356
+Blk 123B,357
+Blk 124,358
+Blk 126 CP,359
+Blk 127,360
+Blk 129,361
+Blk 129A,362
+Blk 131,363
+Blk 131D,364
+Blk 132B,365
+Blk 134,366
+Blk 140,367
+Blk 145,368
+Blk 146,369
+Blk 149,370
+Blk 15,371
+Blk 151,372
+Blk 154,373
+Blk 154A,374
+Blk 157,375
+Blk 158,376
+Blk 16,377
+Blk 161,378
+Blk 166/Aft Mei Chin Rd,379
+Blk 168,380
+Blk 169,381
+Blk 17,382
+Blk 172,383
+Blk 173,384
+Blk 174,385
+Blk 18,386
+Blk 180,387
+Blk 183,388
+Blk 184,389
+Blk 185,390
+Blk 19,391
+Blk 190,392
+Blk 190C,393
+Blk 19A CP,394
+Blk 1G,395
+Blk 201,396
+Blk 202,397
+Blk 203,398
+Blk 204,399
+Blk 206,400
+Blk 207,401
+Blk 209,402
+Blk 21,403
+Blk 210,404
+Blk 215,405
+Blk 217,406
+Blk 219,407
+Blk 220,408
+Blk 220A,409
+Blk 221B,410
+Blk 223,411
+Blk 224A,412
+Blk 225,413
+Blk 228,414
+Blk 229,415
+Blk 23,416
+Blk 230,417
+Blk 231,418
+Blk 231B,419
+Blk 233,420
+Blk 237A,421
+Blk 238,422
+Blk 239,423
+Blk 240,424
+Blk 241,425
+Blk 242,426
+Blk 244,427
+Blk 245,428
+Blk 246,429
+Blk 248,430
+Blk 248A,431
+Blk 25,432
+Blk 250,433
+Blk 252,434
+Blk 253,435
+Blk 254,436
+Blk 257A,437
+Blk 259C,438
+Blk 261,439
+Blk 266,440
+Blk 27,441
+Blk 270,442
+Blk 272,443
+Blk 283,444
+Blk 284,445
+Blk 286A,446
+Blk 288C,447
+Blk 288E,448
+Blk 289,449
+Blk 289E,450
+Blk 290H,451
+Blk 291A,452
+Blk 291E,453
+Blk 298,454
+Blk 298A,455
+Blk 3,456
+Blk 303,457
+Blk 304,458
+Blk 306,459
+Blk 306B,460
+Blk 307,461
+Blk 308,462
+Blk 309,463
+Blk 31,464
+Blk 311,465
+Blk 315,466
+Blk 316,467
+Blk 317,468
+Blk 319,469
+Blk 32,470
+Blk 320,471
+Blk 321,472
+Blk 322,473
+Blk 324,474
+Blk 324B,475
+Blk 328,476
+Blk 329,477
+Blk 331,478
+Blk 332,479
+Blk 334,480
+Blk 334B,481
+Blk 335,482
+Blk 339 CP,483
+Blk 346,484
+Blk 347,485
+Blk 35,486
+Blk 350,487
+Blk 351 CP,488
+Blk 353,489
+Blk 354,490
+Blk 354 CP,491
+Blk 355,492
+Blk 357,493
+Blk 357C,494
+Blk 358A CP,495
+Blk 365,496
+Blk 367,497
+Blk 376,498
+Blk 377,499
+Blk 382C,500
+Blk 391,501
+Blk 40,502
+Blk 402,503
+Blk 403,504
+Blk 404A CP,505
+Blk 405,506
+Blk 406,507
+Blk 407,508
+Blk 408,509
+Blk 41,510
+Blk 410,511
+Blk 411,512
+Blk 416,513
+Blk 419,514
+Blk 420,515
+Blk 422,516
+Blk 424A CP,517
+Blk 425,518
+Blk 426,519
+Blk 43,520
+Blk 430B,521
+Blk 431,522
+Blk 432C,523
+Blk 433C,524
+Blk 436A,525
+Blk 438A,526
+Blk 439C,527
+Blk 44,528
+Blk 441,529
+Blk 443D,530
+Blk 448B,531
+Blk 451A,532
+Blk 454,533
+Blk 455,534
+Blk 457,535
+Blk 458,536
+Blk 460,537
+Blk 461C,538
+Blk 463,539
+Blk 464A,540
+Blk 467C,541
+Blk 469B,542
+Blk 474,543
+Blk 477B,544
+Blk 478,545
+Blk 482A CP,546
+Blk 490,547
+Blk 490B,548
+Blk 491,549
+Blk 501,550
+Blk 502,551
+Blk 502A,552
+Blk 503,553
+Blk 504C,554
+Blk 505C,555
+Blk 506,556
+Blk 506A,557
+Blk 508 CP,558
+Blk 510,559
+Blk 512,560
+Blk 513,561
+Blk 514,562
+Blk 515,563
+Blk 517,564
+Blk 519A,565
+Blk 526,566
+Blk 531,567
+Blk 54,568
+Blk 541A CP,569
+Blk 551,570
+Blk 560A,571
+Blk 589D,572
+Blk 590A,573
+Blk 590C,574
+Blk 592A,575
+Blk 592C,576
+Blk 6,577
+Blk 601,578
+Blk 602,579
+Blk 608,580
+Blk 610,581
+Blk 615,582
+Blk 624,583
+Blk 627,584
+Blk 630,585
+Blk 632 CP,586
+Blk 634,587
+Blk 637,588
+Blk 637 CP,589
+Blk 644,590
+Blk 65,591
+Blk 662D,592
+Blk 666,593
+Blk 672C,594
+Blk 68,595
+Blk 688 CP,596
+Blk 700B,597
+Blk 701,598
+Blk 701A CP,599
+Blk 706,600
+Blk 708,601
+Blk 713,602
+Blk 722,603
+Blk 723,604
+Blk 726 Clementi West Mkt,605
+Blk 73/Geylang Bahru Stn,606
+Blk 730,607
+Blk 741,608
+Blk 759,609
+Blk 763,610
+Blk 767,611
+Blk 773,612
+Blk 774,613
+Blk 776,614
+Blk 782,615
+Blk 790,616
+Blk 793,617
+Blk 8,618
+Blk 803,619
+Blk 804B,620
+Blk 805D,621
+Blk 808,622
+Blk 810 CP,623
+Blk 825,624
+Blk 846,625
+Blk 853,626
+Blk 858,627
+Blk 864,628
+Blk 869,629
+Blk 872,630
+Blk 891C CP,631
+Blk 9,632
+Blk 932,633
+Blk 953,634
+Blk 97,635
+Blk 988B,636
+Blk L Pandan Light Ind Pk,637
+Blk T Pandan Light Ind Pk,638
+Boon Keng Stn/Blk 102,639
+Boon Lay Int,640
+British Council,641
+Broadway Hotel,642
+Bt Batok CC,643
+Bt Batok Hme for The Aged,644
+Bt Batok Int,645
+Bt Batok Polyclinic,646
+Bt Batok Swim Cplx,647
+Bt Gombak Stadium,648
+Bt Gombak Stn,649
+Bt Merah Int,650
+Bt Merah Sec Sch,651
+Bt Merah Town Ctr,652
+Bt Panjang Stn Exit A/LRT,653
+Bt Panjang Stn Exit B,654
+Bt Panjang Stn/Blk 604,655
+Bt Regency,656
+Bt View Sec Sch,657
+Bullion Pk Condo,658
+Burgundy Hill,659
+C'wealth Sec Sch,660
+CCK Polyclinic,661
+CISCO Recall,662
+CLP Intl,663
+CSC Dempsey Clubhse,664
+CWT Distripk,665
+Caltex S'pore,666
+Canberra Stn,667
+Capitol Bldg,668
+Cardiff Residence,669
+Caribbean at Keppel Bay,670
+Carrier S'pore,671
+Casa Sarina,672
+Cashew Stn,673
+Castle Green,674
+Catholic JC,675
+Cendex Ctr,676
+Ch of St. Mary,677
+Ch of St. Teresa,678
+Ch of St. Vincent de Paul,679
+Chai Chee Ind Pk,680
+Changi Airport Ter 1,681
+Changi Airport Ter 2,682
+Changi Airport Ter 3,683
+Chinatown Stn Exit C,684
+Chinatown Stn Exit E,685
+Chinese Gdn Stn,686
+Choa Chu Kang Mkt,687
+Chuan Lim Constrn,688
+Chubb S'pore,689
+Citylife @ Tampines,690
+Clariant S'pore,691
+Clementi Flyover,692
+Clementi Int,693
+Clementi Stadium,694
+Clementi Stn Exit A,695
+Clementi Stn Exit A/Mall,696
+Clementi Stn Exit B,697
+Coll of Design & Engrg,698
+Comfort Driving Ctr,699
+ComfortDelGro Engrg,700
+Compassvale Stn Exit A,701
+Compassvale Stn Exit B,702
+Concorde Hotel S'pore,703
+Corp Pl,704
+Countryside Est,705
+Countryside Gdn P/G,706
+Courts Ang Mo Kio,707
+Ctrl Fish Proc Fty,708
+Ctrl Sq,709
+Cycle & Carriage,710
+D'Ecosia,711
+Dairy Farm Mall,712
+Darul Makmur Mque,713
+Delfi Orchard,714
+Dhoby Ghaut Stn,715
+Dhoby Ghaut Stn Exit B,716
+Dieppe Barracks,717
+Dover Stn Exit A,718
+Dover Stn Exit B,719
+Downtown Stn Exit E,720
+Dulwich Coll/Blk 445,721
+Dulwich College,722
+Dynasty Lodge,723
+Empress Rd Mkt/FC,724
+Env Bldg,725
+Esplanade Bridge,726
+Eunos Stn,727
+Eunos Technolink,728
+Evergreen Pr Sch,729
+Faber Gdn,730
+Fairlodge,731
+Far East Plaza,732
+Farrer Rd Stn Exit A,733
+Farrer Rd Stn Exit B,734
+Flame Tree Pk,735
+Forest Hills Condo,736
+Forett @ Bt Timah,737
+Former Railway Stn,738
+Franklin Offshore,739
+Fu Lu Shou Cplx,740
+Fuji Oil S'pore,741
+Fullerton Sq,742
+Galen,743
+Garlick Ville,744
+Gas Svc Intl,745
+German Ctr,746
+Glendale Pk Condo,747
+Gloria Mansion,748
+Golden Hill Est,749
+Gracehaven S Army,750
+Great Eastern Mansions,751
+HarbourFront Int,752
+HarbourFront Stn Exit A,753
+HarbourFront Stn/Vivocity,754
+HarbourSide Bldg 2,755
+Haw Par Villa Stn,756
+Heng Mui Keng Terr,757
+Highgate Pk,758
+Hillbrooks,759
+Hillington Green Condo,760
+Hillview Apts,761
+Hillview Green,762
+Hillview Hts,763
+Hillview Stn,764
+Hoa Nam Bldg,765
+Holland V Stn Exit A,766
+Holland V Stn/Blk 12,767
+Holland Village,768
+Horizon Residences,769
+Hotel Royal,770
+Hse No. 45,771
+Hse No. 532,772
+Hse No. 578,773
+Hse No. 589,774
+Hua Guan Gdns,775
+Hub Synergy Pt,776
+IMM Bldg,777
+Information Technology,778
+Inst of Micro-electronics,779
+Intl Business Pk,780
+J Gateway,781
+Jamiyah Halfway Hse,782
+Jln Besar Stn Exit A,783
+Jurong Abattoir,784
+Jurong East Int,785
+Jurong East Lib,786
+Jurong East Warehse,787
+Jurong Island Checkpt,788
+Jurong Lake,789
+Jurong Polyclinic,790
+Jurong Port Workshops,791
+Jurong Sec Sch,792
+Jurong Town Hall,793
+Jurong Town Hall Int,794
+KK Women & Children Hosp,795
+Kallang Basin Swim Cplx,796
+Kallang Stn/Opp Blk 2C,797
+Kembangan Stn,798
+Keming Pr Sch,799
+Kent Ridge Sec Sch,800
+Keppel DP Blk 517,801
+Keppel DP Blk 519,802
+Keppel Workshop,803
+Khalsa Cres Drug Rehab Ctr,804
+Khatib Camp,805
+Khatib Stn Exit D,806
+King Albert Pk,807
+King Albert Pk Stn,808
+Kolam Ayer Ind Est,809
+Kwong Wai Shiu Hosp,810
+LP 159,811
+LP 162,812
+LP 94,813
+LTH Logistics,814
+Labrador Pk Stn,815
+Lakepoint Condo,816
+Lakeside Stn,817
+Lakeview Est,818
+Leedon Green,819
+Lentor Stn Exit 3,820
+Lentor Stn Exit 5,821
+Lian Aik Siong Machinery,822
+Lien Twrs,823
+Little India Stn,824
+Little India Stn Exit A,825
+LogisHub @ Clementi,826
+Lor 1 Geylang Ter,827
+Lutheran Twrs,828
+MINDEF CP,829
+MOM Svcs Ctr,830
+MacRitchie Resvr,831
+Mandai Agrotech Pk,832
+Mandai Camp 2,833
+Mandai Crematorium & Columbarium,834
+Mapletree Business City,835
+Marina Bay Financial Ctr,836
+Marina Bay Sands Theatre,837
+Marina Bay Stn,838
+Marina Ctr Ter,839
+Marine Pde Stn Exit 2,840
+Marine Pde Stn Exit 4,841
+Marine Pde Stn Exit 6,842
+Marine Pde Stn/Parkway Pde,843
+Maritime Hse,844
+Marsiling CC,845
+Marsiling Lane Mkt/FC,846
+Marsiling Mall,847
+Marsiling Pk,848
+Marsiling Pr Sch,849
+Marsiling Stn,850
+Masterdon,851
+MaxSteel Enterprise,852
+Mayflower Sec Sch,853
+Meadows @ Peirce,854
+Melati Blk 2,855
+Midview Bldg,856
+Millennia Institute,857
+Min of Defence,858
+Mjd Kassim,859
+Mont Botanik Residence,860
+Mt Alvernia Hosp,861
+NCS Hub,862
+NEWest,863
+NTUC Fairprice,864
+NUH,865
+NUS High Sch,866
+NUS Raffles Hall,867
+Nan Hua Pr Sch,868
+Napier Stn Exit 1,869
+Napier Stn Exit 2,870
+Near SATS Flight Kitchen,871
+Nee Soon Driclad Ctr,872
+Nee Soon HQ 22 SIB,873
+New Bridge Ctr,874
+Newton Life Ch,875
+Newton Stn Exit A,876
+Newton Stn Exit B,877
+Ng Teng Fong General Hosp,878
+Normanton Pk,879
+North Link Bldg,880
+Novena Lodge,881
+Novena Stn,882
+Nth Tech,883
+OPP BLK 435A,884
+OPP BLK 467B,885
+OPP ORCHARD BLVD STN,886
+OUE Bayfront,887
+Old Police Acad,888
+One Raffles Quay,889
+Opp 3M Bldg,890
+Opp APSN,891
+Opp AXA Twr,892
+Opp Admiralty Stn,893
+Opp Ahmad Ibrahim Sec Sch,894
+Opp Al-Muttaqin Mque,895
+Opp Alexandra Pt,896
+Opp Alexandra Retail Ctr,897
+Opp Andrew Rd,898
+Opp Ang Mo Kio Pr Sch,899
+Opp Angliss Bldg,900
+Opp Assumption Eng Sch,901
+Opp Auckland Rd West,902
+Opp Ayer Rajah CC,903
+Opp Beauty World Stn,904
+Opp Bencoolen Stn Exit B,905
+Opp Bendemeer Pr Sch,906
+Opp Blessed Sacrament Ch,907
+Opp Blk 101,908
+Opp Blk 101A,909
+Opp Blk 102,910
+Opp Blk 104B,911
+Opp Blk 106,912
+Opp Blk 113,913
+Opp Blk 114,914
+Opp Blk 115,915
+Opp Blk 115B,916
+Opp Blk 117,917
+Opp Blk 120,918
+Opp Blk 127,919
+Opp Blk 131D,920
+Opp Blk 140,921
+Opp Blk 144,922
+Opp Blk 149,923
+Opp Blk 158,924
+Opp Blk 16,925
+Opp Blk 161,926
+Opp Blk 169,927
+Opp Blk 174,928
+Opp Blk 180,929
+Opp Blk 19,930
+Opp Blk 195,931
+Opp Blk 2,932
+Opp Blk 201,933
+Opp Blk 203,934
+Opp Blk 217,935
+Opp Blk 219,936
+Opp Blk 227,937
+Opp Blk 236A,938
+Opp Blk 241,939
+Opp Blk 244,940
+Opp Blk 245,941
+Opp Blk 248,942
+Opp Blk 257,943
+Opp Blk 28,944
+Opp Blk 288,945
+Opp Blk 288D,946
+Opp Blk 291A,947
+Opp Blk 291E,948
+Opp Blk 303,949
+Opp Blk 305,950
+Opp Blk 311,951
+Opp Blk 315,952
+Opp Blk 317,953
+Opp Blk 32,954
+Opp Blk 322,955
+Opp Blk 325,956
+Opp Blk 334B,957
+Opp Blk 336A CP,958
+Opp Blk 347,959
+Opp Blk 350,960
+Opp Blk 364,961
+Opp Blk 382C,962
+Opp Blk 391,963
+Opp Blk 402,964
+Opp Blk 408,965
+Opp Blk 41,966
+Opp Blk 420A,967
+Opp Blk 43,968
+Opp Blk 430B,969
+Opp Blk 433B,970
+Opp Blk 437A,971
+Opp Blk 443D,972
+Opp Blk 451A,973
+Opp Blk 460,974
+Opp Blk 461,975
+Opp Blk 461C,976
+Opp Blk 469B,977
+Opp Blk 47,978
+Opp Blk 481,979
+Opp Blk 491,980
+Opp Blk 501,981
+Opp Blk 507A,982
+Opp Blk 51,983
+Opp Blk 515,984
+Opp Blk 519A,985
+Opp Blk 532,986
+Opp Blk 589D,987
+Opp Blk 590C,988
+Opp Blk 592C,989
+Opp Blk 615,990
+Opp Blk 627,991
+Opp Blk 628,992
+Opp Blk 631B,993
+Opp Blk 632 CP,994
+Opp Blk 634,995
+Opp Blk 635A,996
+Opp Blk 638A,997
+Opp Blk 646,998
+Opp Blk 65,999
+Opp Blk 66,1000
+Opp Blk 662C,1001
+Opp Blk 672C,1002
+Opp Blk 701,1003
+Opp Blk 701A,1004
+Opp Blk 709,1005
+Opp Blk 713,1006
+Opp Blk 722,1007
+Opp Blk 757,1008
+Opp Blk 757A CP,1009
+Opp Blk 773,1010
+Opp Blk 793,1011
+Opp Blk 802,1012
+Opp Blk 805D,1013
+Opp Blk 810 CP,1014
+Opp Blk 872,1015
+Opp Blk 932,1016
+Opp Blk 95,1017
+Opp Blk 953,1018
+Opp Blks 34/35,1019
+Opp Blks 469A/469B,1020
+Opp Boon Keng Stn,1021
+Opp British American Tobacco,1022
+Opp British Council,1023
+Opp Bt Batok Swim Cplx,1024
+Opp Bt Gombak Stadium,1025
+Opp Bt Gombak Stn,1026
+Opp Bt Merah Sec Sch,1027
+Opp Bt Merah Town Ctr,1028
+Opp Bt Panjang Stn,1029
+Opp Bt Timah Plaza,1030
+Opp Bt View Sec Sch,1031
+Opp Bugis Stn Exit C,1032
+Opp Bullion Pk Condo,1033
+Opp Burgundy Hill,1034
+Opp CCK Polyclinic,1035
+Opp CLP Intl,1036
+Opp Caltex S'pore,1037
+Opp Canberra Dr,1038
+Opp Canberra Stn,1039
+Opp Carrier S'pore,1040
+Opp Castle Green,1041
+Opp Catholic JC,1042
+Opp Cendex Ctr,1043
+Opp Ch of St. Teresa,1044
+Opp Chai Chee Ind Pk,1045
+Opp Chinese Gdn Stn,1046
+Opp Choa Chu Kang Mkt,1047
+Opp Chongfu Pr Sch,1048
+Opp Chr Community Chapel,1049
+Opp Christ The King Ch,1050
+Opp Citylife @ Tampines,1051
+Opp Comfort Driving Ctr,1052
+Opp Corp Pl,1053
+Opp Countryside Est,1054
+Opp Courts Ang Mo Kio,1055
+Opp Currency Hse,1056
+Opp Customs Port Br HQ,1057
+Opp Cycle & Carriage,1058
+Opp D'Ecosia,1059
+Opp Dairy Farm Mall,1060
+Opp Dairy Farm Rd,1061
+Opp Darul Makmur Mque,1062
+Opp Dedap Rd,1063
+Opp Dieppe Barracks,1064
+Opp Dulwich Coll,1065
+Opp Dunearn Sec Sch,1066
+Opp Durban Rd,1067
+Opp Dynasty Gdn II,1068
+Opp Env Bldg,1069
+Opp Eunos Stn,1070
+Opp Eunos Technolink,1071
+Opp Faber Gdn,1072
+Opp Flame Tree Pk,1073
+Opp Foh Foh Pte Ltd,1074
+Opp Former Railway Stn,1075
+Opp Four Seasons Hotel,1076
+Opp Fudu Wk P/G,1077
+Opp GB Bldg,1078
+Opp Gambas Cres,1079
+Opp Garlick Ville,1080
+Opp German Ctr,1081
+Opp Glendale Pk Condo,1082
+Opp Gloria Mansion,1083
+Opp Golden Hill Est,1084
+Opp Golden Mile Cplx,1085
+Opp Gracehaven S Army,1086
+Opp HarbourFront Int,1087
+Opp HarbourSide Bldg 2,1088
+Opp Haw Par Glass Twr,1089
+Opp Haw Par Villa Stn,1090
+Opp Heng Mui Keng Terr,1091
+Opp Highgate Pk,1092
+Opp Hillbrooks,1093
+Opp Hillview Apts,1094
+Opp Hillview Hts,1095
+Opp Holland Hill Lodge,1096
+Opp Holland Village,1097
+Opp HomeTeamNS,1098
+Opp Hong San Si Tp,1099
+Opp Hotel Royal,1100
+Opp Hse No. 19,1101
+Opp Hse No. 516,1102
+Opp IMM Bldg,1103
+Opp Intl Business Pk,1104
+Opp Jem,1105
+Opp Jln Janggus,1106
+Opp Jln Kemuning,1107
+Opp Jurong Abattoir,1108
+Opp Jurong East Lib,1109
+Opp Jurong East Warehse,1110
+Opp Jurong Lake,1111
+Opp Jurong Polyclinic,1112
+Opp Jurong Sec Sch,1113
+Opp KK Women & Child Hosp,1114
+Opp Kaily Packaging,1115
+Opp Kallang Pl,1116
+Opp Kallang Stn/Blk 2C,1117
+Opp Kampong Bahru Ter,1118
+Opp Kent Ridge Sec Sch,1119
+Opp Kent Ridge Ter,1120
+Opp Keppel DP Blk 517,1121
+Opp Keppel DP Blk 519,1122
+Opp Khalsa Cres Drug Rehab Ctr,1123
+Opp Khatib Camp,1124
+Opp Khatib Stn,1125
+Opp King Albert Pk Stn,1126
+Opp Labrador Pk Stn,1127
+Opp Lakepoint Condo,1128
+Opp Lakeside Stn,1129
+Opp Leedon Green,1130
+Opp Lian Aik Siong Machinery,1131
+Opp LogisHub @ Clementi,1132
+Opp Lutheran Twrs,1133
+Opp Luxe Ville,1134
+Opp MAS Bldg,1135
+Opp MacRitchie Resvr,1136
+Opp Mandai Agrotech Pk,1137
+Opp Mandai Camp 2,1138
+Opp Mandai Crematorium & Columbarium,1139
+Opp Mapletree Biz City,1140
+Opp Marsiling Lane Mkt/FC,1141
+Opp Marsiling Pk,1142
+Opp Marsiling Stn,1143
+Opp Mayflower Sec Sch,1144
+Opp Meadows @ Peirce,1145
+Opp Melati Blk 2,1146
+Opp Midview Bldg,1147
+Opp Mt Faber Lodge,1148
+Opp NAFA Campus 3,1149
+Opp NCS Hub,1150
+Opp NEWest,1151
+Opp NUH,1152
+Opp Nan Hua High Sch,1153
+Opp Nee Soon HQ 22 SIB,1154
+Opp Newton Life Ch,1155
+Opp Ng Teng Fong Gen Hosp,1156
+Opp Ngee Ann City,1157
+Opp North Link Bldg,1158
+Opp Northland Sec Sch,1159
+Opp Novena Ch,1160
+Opp Novena Lodge,1161
+Opp Old Police Acad,1162
+Opp Orchard Stn/ION,1163
+Opp PPL Shipyard,1164
+Opp PSB Science Pk Bldg,1165
+Opp Pacific Tech Ctr,1166
+Opp Parc Oasis,1167
+Opp Parish of Christ Ch,1168
+Opp Parkview Apts,1169
+Opp Pasir Panjang PO,1170
+Opp Pei Hwa Presby Pr Sch,1171
+Opp Peirce Rd,1172
+Opp Pending Stn,1173
+Opp Perpetual Succour Ch,1174
+Opp Petir Stn,1175
+Opp Phoenix Stn,1176
+Opp Plaza Parkroyal,1177
+Opp Police Drv Circuit,1178
+Opp Princess E Pr Sch,1179
+Opp Queen's Cl,1180
+Opp Queenstown Polyclinic,1181
+Opp Queensway Sec Sch,1182
+Opp Regent Pk,1183
+Opp Regent Villa,1184
+Opp S'pore A'space Mfg,1185
+Opp S'pore Bible Coll,1186
+Opp S'pore Girls' Hme,1187
+Opp S'pore Polo Club,1188
+Opp S'pore Science Ctr,1189
+Opp S'pore Science Pk II,1190
+Opp SBST Bt Batok Depot,1191
+Opp SBST Hougang Depot,1192
+Opp SIT Dover,1193
+Opp SMRT Ulu Pandan Depot,1194
+Opp SP SMA,1195
+Opp SPC Svc Stn,1196
+Opp ST Electronics,1197
+Opp Sanmina-SCI,1198
+Opp Sch of Science & Tech,1199
+Opp Science Pk,1200
+Opp Seagate,1201
+Opp Seasons Pk,1202
+Opp Seletar Hills Est,1203
+Opp Sembawang Air Base,1204
+Opp Sembawang Corp Industries,1205
+Opp Sembawang Hills FC,1206
+Opp Sembawang Pk,1207
+Opp Sembawang Sec Sch,1208
+Opp Sembawang Shipyard G 8,1209
+Opp Sembawang Shop Ctr,1210
+Opp Sembawang Stn,1211
+Opp Serenity Pk,1212
+Opp Shaw Twrs,1213
+Opp Sia Huat,1214
+Opp Somerset Stn,1215
+Opp Southpoint,1216
+Opp Springleaf Nature Pk,1217
+Opp Sree Maha Mariamman Tp,1218
+Opp St. Andrew's Village,1219
+Opp St. John HQ,1220
+Opp St. Margaret's Sec Sch,1221
+Opp St. Theresa's Convent,1222
+Opp St. Theresa's Hme,1223
+Opp State Ct,1224
+Opp Sumitomo Bakelite S'pore,1225
+Opp Sun Plaza,1226
+Opp Sunrise Gdns,1227
+Opp Sunshine Bakery,1228
+Opp Suntec Convention Ctr,1229
+Opp Tagore Rd,1230
+Opp Tan Boon Chong Ave,1231
+Opp Tan Tong Meng Twr,1232
+Opp Telok Blangah Stn,1233
+Opp Tg Pagar DP Blk F5,1234
+Opp The Gateway,1235
+Opp The Greenwich,1236
+Opp The Hillford,1237
+Opp The Hillside,1238
+Opp The Infiniti,1239
+Opp The JTC Summit,1240
+Opp The Japanese Assn,1241
+Opp The Japanese Sec Sch,1242
+Opp The Linear,1243
+Opp The Nautical,1244
+Opp The Nexus,1245
+Opp The Petals Condo,1246
+Opp The Ritz-Carlton,1247
+Opp Thomson Med Ctr,1248
+Opp Toh Guan Ctr,1249
+Opp Toh Tuck Cres,1250
+Opp Trellis Twrs,1251
+Opp UE Sq,1252
+Opp Uni-Tech Ctr,1253
+Opp United Sq,1254
+Opp Varsity Pk,1255
+Opp Veerasamy Rd,1256
+Opp Visionaire,1257
+Opp VivoCity,1258
+Opp W'lands Auto Hub,1259
+Opp W'lands Sunny Food,1260
+Opp Waseda S Snr High Sch,1261
+Opp Wellington Pr Sch,1262
+Opp West Bay Resort Condo,1263
+Opp Woodleigh Pk,1264
+Opp Yeo's Bldg,1265
+Opp Yio Chu Kang Stn,1266
+Opp Yishun Community Hosp,1267
+Opp Yishun Emerald,1268
+Opp Yishun Ind Pk A,1269
+Opp Yishun Sports Hall,1270
+Opp Yishun Stn,1271
+Opp Yusof Ishak Hse,1272
+Orchard Plaza,1273
+Orchard Stn Exit 13,1274
+Orchard Stn/Lucky Plaza,1275
+Orchard Stn/Tang Plaza,1276
+Outram Pk Stn Exit 4,1277
+Outram Pk Stn Exit 6/SGH,1278
+PB Packaging Systems,1279
+PPL Shipyard,1280
+PSB Science Pk Bldg,1281
+Pan Tech Ind Cplx,1282
+Parc Oasis,1283
+Parish of Christ Ch,1284
+Park Natura,1285
+Pasir Panjang Stn/FC,1286
+Pasir View Pk,1287
+Pei Hwa Presby Pr Sch,1288
+Phoenix Stn,1289
+Plaza Parkroyal,1290
+Police Drv Circuit,1291
+Potong Pasir Stn Exit B,1292
+Potong Pasir Stn Exit C,1293
+Princess E Pr Sch,1294
+Promenade Stn Exit B,1295
+Promenade Stn/Pan Pacific,1296
+Prudential Twr,1297
+Queenstown Polyclinic,1298
+Queensway Sec Sch,1299
+Raffles Hotel,1300
+Regent Hts,1301
+Regent Pk,1302
+Regent Villa,1303
+Ren Ci @ Bt Batok St 52,1304
+Republic Poly,1305
+Rochor Stn,1306
+Royal Plaza On Scotts,1307
+Royal Thai Embassy,1308
+S'goon Stn Exit A/Blk 413,1309
+S'goon Stn Exit H,1310
+S'pore Bible Coll,1311
+S'pore Food Ind,1312
+S'pore Food Ind Bldg,1313
+S'pore Polo Club,1314
+S'pore Science Ctr,1315
+S'pore Science Pk II,1316
+SBST Bt Batok Depot,1317
+SBST Hougang Depot,1318
+SDE3,1319
+SIT Dover,1320
+SLF Cplx,1321
+SMRT Ulu Pandan Depot,1322
+SMU,1323
+SP SMA,1324
+SPC Svc Stn,1325
+ST Electronics,1326
+Sanmina-SCI,1327
+Sant Ritz,1328
+Sch of Science & Tech,1329
+Sch of The Arts,1330
+Science Pk,1331
+Seagate,1332
+Seasons Pk,1333
+Selegie Ctr,1334
+Seletar Hills Est,1335
+Sembawang Camp,1336
+Sembawang Int,1337
+Sembawang Int/Opp Blk 315,1338
+Sembawang Pk,1339
+Sembawang Sec Sch,1340
+Sembawang Stn,1341
+Sengkang Int,1342
+Senkee Logistics Hub,1343
+Serenity Pk,1344
+Seventh-Day Advent Ch,1345
+Shenton Way Ter,1346
+Shunfu Est,1347
+Signature Pk Condo,1348
+Sin Soon Huat,1349
+Sixth Ave Ctr,1350
+Sixth Ave Ville,1351
+Sol Acres Condo,1352
+Somerset Stn,1353
+Somerset Youth Pk,1354
+Sommerville Pk,1355
+Southaven II,1356
+Southbank,1357
+Spanish Village,1358
+Spiritual Grace Presby Ch,1359
+Springdale Condo,1360
+Springleaf Nature Pk,1361
+Springleaf Stn Exit 2,1362
+Springleaf Stn Exit 3,1363
+Sree Maha Mariamman Tp,1364
+Sri Vadapathira K Tp,1365
+St Anthony’s Pri Sch,1366
+St. Andrew's Mission Sch,1367
+St. Andrew's Village,1368
+St. Margaret's Sec Sch,1369
+St. Michael's Pl,1370
+St. Theresa's Convent,1371
+St. Theresa's Hme,1372
+Sultan Plaza,1373
+Sumitomo Bakelite S'pore,1374
+Sun Plaza/ Sembawang Stn,1375
+Sunshine Bakery,1376
+Suntec Convention Ctr,1377
+Swanson Plastics,1378
+Symphony Suites Condo,1379
+TAK Products & Svcs,1380
+TENGAH CC,1381
+Tampines Int,1382
+Tanjong Pagar Stn Exit C,1383
+Teachers' Housing Est,1384
+Tekka Ctr,1385
+Teletech Pk,1386
+Telok Blangah Stn,1387
+Tengah CC,1388
+Tengah Int,1389
+Tentera Diraja Mque,1390
+Tg Pagar DP Blk F5,1391
+The Alpha,1392
+The Crystal Tabernacle Ch,1393
+The Esplanade,1394
+The Float @ Marina Bay,1395
+The Gateway,1396
+The Greenwich,1397
+The Hillford,1398
+The Infiniti,1399
+The Japanese Pr Sch,1400
+The Japanese Sec Sch,1401
+The Linear,1402
+The Nautical,1403
+The Nexus,1404
+The Pearl @ Mt Faber,1405
+The Petals Condo,1406
+The Sail,1407
+The Star Vista,1408
+The Tampines Trilliant,1409
+The Tessarina,1410
+Thomson CC,1411
+Thomson Flyover,1412
+Thomson Med Ctr,1413
+Toa Payoh Int,1414
+Toh Guan Ctr,1415
+Transerve,1416
+Trellis Twrs,1417
+UE Sq,1418
+UIC Bldg,1419
+United Sq/Bef Novena Stn,1420
+Upp Thomson Stn Exit 2,1421
+Upp Thomson Stn Exit 5,1422
+Varsity Pk,1423
+Vejoil Pte Ltd,1424
+Visionaire,1425
+Viz Holland,1426
+W'lands Auto Hub,1427
+W'lands Nth Stn,1428
+W'lands Sunny Food,1429
+W'lands Train Checkpt,1430
+Wang-Fu Ind Pte Ltd,1431
+Waseda S Snr High Sch,1432
+Wellington Pr Sch,1433
+West Bay Resort Condo,1434
+West Coast CC,1435
+West View Pr Sch,1436
+Whitehaven,1437
+Winsland Hse,1438
+Woh Hup Bldg,1439
+Woodlands Int,1440
+Woodlands Temp Int,1441
+Woodleigh Stn Exit A,1442
+Woodleigh Stn Exit B,1443
+Woodsvale Condo,1444
+YMCA,1445
+Yale-NUS College,1446
+Yeo's Bldg,1447
+Yew Huat Scaffolding Work,1448
+Yio Chu Kang Int,1449
+Yio Chu Kang Stn,1450
+Yishun Community Hosp,1451
+Yishun Emerald,1452
+Yishun Ind Pk A,1453
+Yishun Int,1454
+Yishun Sports Hall,1455
+Yishun Stn,1456
+Yishun Stn Exit E,1457
+Yuhua Sec Sch,1458
