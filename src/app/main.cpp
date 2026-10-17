@@ -1,3 +1,4 @@
+#include "algorithm/lifted_ils.hpp"
 #include "algorithm/natural_ils.hpp"
 #include "config/run_config.hpp"
 #include "config/solver_config.hpp"
@@ -20,7 +21,8 @@ int main(int argc, char* argv[])
         }
         if (commandLine.config.algorithm != "data-check" &&
             commandLine.config.algorithm != "ef" &&
-            commandLine.config.algorithm != "natural-ils") {
+            commandLine.config.algorithm != "natural-ils" &&
+            commandLine.config.algorithm != "lifted-ils") {
             throw std::invalid_argument("Algorithm is not implemented on the rewrite branch yet: " +
                 commandLine.config.algorithm);
         }
@@ -42,6 +44,12 @@ int main(int argc, char* argv[])
 
         if (commandLine.config.algorithm == "natural-ils") {
             const solver::Result result = wireless::algorithm::SolveNaturalIls(
+                instance, commandLine.config, solver);
+            return result.status == solver::Status::Optimal ? 0 : 1;
+        }
+
+        if (commandLine.config.algorithm == "lifted-ils") {
+            const solver::Result result = wireless::algorithm::SolveLiftedIls(
                 instance, commandLine.config, solver);
             return result.status == solver::Status::Optimal ? 0 : 1;
         }

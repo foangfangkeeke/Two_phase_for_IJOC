@@ -23,7 +23,8 @@ std::string StopSuffix(int bus, int trip, int station, size_t stationIndex)
 
 ScenarioVariables BuildScenarioInternal(Model& model, const InstanceData& instance,
     const ScenarioData& scenario, size_t scenarioIndex,
-    const FacilityVariables& facilityVariables, Expr& objective)
+    const FacilityVariables& facilityVariables, Expr& objective,
+    const ScenarioModelOptions& options)
 {
     const OperationData& operation = instance.operation;
     const ChargerData& chargers = instance.chargers;
@@ -53,7 +54,10 @@ ScenarioVariables BuildScenarioInternal(Model& model, const InstanceData& instan
         }
         const std::string name = prefix + "selectBatteryCapacity_r" + std::to_string(route);
         model.AddConstr(selectOne == 1.0, name.c_str());
-        scenarioObjective += busesByRoute.at(route) * operation.batteryUnitPrice * selectedCapacity;
+        if (options.includeBatteryCost) {
+            scenarioObjective += busesByRoute.at(route) *
+                operation.batteryUnitPrice * selectedCapacity;
+        }
     }
 
     std::vector<Var> nightCharge;
@@ -188,15 +192,17 @@ ScenarioVariables BuildScenarioInternal(Model& model, const InstanceData& instan
         }
     }
 
-    for (int station : network.plugInStations) {
-        const int plugCount = network.plugCountByStation.at(station);
-        for (int time = operation.minimumTime; time < operation.maximumTime; ++time) {
-            Expr& occupancy = stationOccupancy.at(station).at(
-                static_cast<size_t>(time - operation.minimumTime));
-            if (occupancy.Size() != 0) {
-                const std::string name = prefix + "constChargerNum_s" +
-                    std::to_string(station) + "_t" + std::to_string(time);
-                model.AddConstr(occupancy <= plugCount, name.c_str());
+    if (options.enforceSharedChargerCapacity) {
+        for (int station : network.plugInStations) {
+            const int plugCount = network.plugCountByStation.at(station);
+            for (int time = operation.minimumTime; time < operation.maximumTime; ++time) {
+                Expr& occupancy = stationOccupancy.at(station).at(
+                    static_cast<size_t>(time - operation.minimumTime));
+                if (occupancy.Size() != 0) {
+                    const std::string name = prefix + "constChargerNum_s" +
+                        std::to_string(station) + "_t" + std::to_string(time);
+                    model.AddConstr(occupancy <= plugCount, name.c_str());
+                }
             }
         }
     }
@@ -297,10 +303,11 @@ ScenarioVariables BuildScenarioInternal(Model& model, const InstanceData& instan
 
 ScenarioVariables BuildScenarioModel(Model& model, const InstanceData& instance,
     const ScenarioData& scenario, size_t scenarioIndex,
-    const FacilityVariables& facilityVariables, Expr& objective)
+    const FacilityVariables& facilityVariables, Expr& objective,
+    const ScenarioModelOptions& options)
 {
     return BuildScenarioInternal(model, instance, scenario, scenarioIndex,
-        facilityVariables, objective);
+        facilityVariables, objective, options);
 }
 
 } // namespace wireless::model

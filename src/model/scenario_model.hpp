@@ -15,8 +15,14 @@ struct ScenarioVariables {
     std::vector<std::vector<Var>> batteryChoicesByRoute;
 };
 
+struct ScenarioModelOptions {
+    bool includeBatteryCost = true;
+    bool enforceSharedChargerCapacity = true;
+};
+
 ScenarioVariables BuildScenarioModel(Model& model, const InstanceData& instance,
     const ScenarioData& scenario, size_t scenarioIndex,
-    const FacilityVariables& facilityVariables, Expr& objective);
+    const FacilityVariables& facilityVariables, Expr& objective,
+    const ScenarioModelOptions& options = {});
 
 } // namespace wireless::model

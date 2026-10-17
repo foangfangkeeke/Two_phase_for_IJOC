@@ -12,6 +12,7 @@ if(MSVC)
 endif()
 
 add_executable(wireless
+    src/algorithm/lifted_ils.cpp
     src/algorithm/natural_ils.cpp
     src/app/main.cpp
     src/config/run_config.cpp

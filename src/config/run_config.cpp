@@ -101,7 +101,7 @@ void PrintUsage()
 {
     std::cout
         << "Usage: wireless.exe --alg <algorithm> --data <name> [options]\n"
-        << "Algorithms currently available: data-check, ef, natural-ils\n"
+        << "Algorithms currently available: data-check, ef, natural-ils, lifted-ils\n"
         << "Options:\n"
         << "  --pb <wireless_reform|wireless_reform_no_wpt>\n"
         << "  --scenario-count <positive integer>\n"
