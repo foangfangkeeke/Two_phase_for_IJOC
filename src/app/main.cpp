@@ -1,3 +1,4 @@
+#include "algorithm/natural_ils.hpp"
 #include "config/run_config.hpp"
 #include "config/solver_config.hpp"
 #include "domain/wireless_data.hpp"
@@ -18,7 +19,8 @@ int main(int argc, char* argv[])
             return 0;
         }
         if (commandLine.config.algorithm != "data-check" &&
-            commandLine.config.algorithm != "ef") {
+            commandLine.config.algorithm != "ef" &&
+            commandLine.config.algorithm != "natural-ils") {
             throw std::invalid_argument("Algorithm is not implemented on the rewrite branch yet: " +
                 commandLine.config.algorithm);
         }
@@ -36,6 +38,12 @@ int main(int argc, char* argv[])
             std::cout << "EF solve time: " << result.seconds << " s\n";
             return result.status == solver::Status::Optimal ||
                 (result.status == solver::Status::TimeLimit && result.hasSolution) ? 0 : 1;
+        }
+
+        if (commandLine.config.algorithm == "natural-ils") {
+            const solver::Result result = wireless::algorithm::SolveNaturalIls(
+                instance, commandLine.config, solver);
+            return result.status == solver::Status::Optimal ? 0 : 1;
         }
 
         std::cout << "data=" << instance.name

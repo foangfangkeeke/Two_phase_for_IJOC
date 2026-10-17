@@ -12,12 +12,14 @@ if(MSVC)
 endif()
 
 add_executable(wireless
+    src/algorithm/natural_ils.cpp
     src/app/main.cpp
     src/config/run_config.cpp
     src/config/solver_config.cpp
     src/domain/wireless_data.cpp
     src/model/extensive_form.cpp
     src/model/model_helpers.cpp
+    src/model/scenario_model.cpp
     src/solver/copt_solver.cpp
 )
 

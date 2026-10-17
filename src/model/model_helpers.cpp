@@ -11,6 +11,14 @@ std::string DwcVariableName(DwcLink link)
     return "w_link_l" + std::to_string(link.first) + "To" + std::to_string(link.second);
 }
 
+double DwcFacilityCost(const InstanceData& instance, DwcLink link)
+{
+    const double distance = instance.scenarios.front().network.linkDistances
+        .at(link.first).at(link.second);
+    return instance.chargers.unitCosts.at(2) * distance +
+        60.0 * instance.chargers.inverterCostPerKw * instance.chargers.rates.at(2);
+}
+
 std::vector<DwcLink> SelectDwcCandidates(const InstanceData& instance, int limit)
 {
     std::map<DwcLink, long long> scores;
