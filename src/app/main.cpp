@@ -24,7 +24,8 @@ int main(int argc, char* argv[])
             commandLine.config.algorithm != "ef" &&
             commandLine.config.algorithm != "natural-ils" &&
             commandLine.config.algorithm != "lifted-ils" &&
-            commandLine.config.algorithm != "lifted-two-phase") {
+            commandLine.config.algorithm != "lifted-two-phase" &&
+            commandLine.config.algorithm != "full") {
             throw std::invalid_argument("Algorithm is not implemented on the rewrite branch yet: " +
                 commandLine.config.algorithm);
         }
@@ -58,6 +59,12 @@ int main(int argc, char* argv[])
 
         if (commandLine.config.algorithm == "lifted-two-phase") {
             const solver::Result result = wireless::algorithm::SolveLiftedTwoPhase(
+                instance, commandLine.config, solver);
+            return result.status == solver::Status::Optimal ? 0 : 1;
+        }
+
+        if (commandLine.config.algorithm == "full") {
+            const solver::Result result = wireless::algorithm::SolveFull(
                 instance, commandLine.config, solver);
             return result.status == solver::Status::Optimal ? 0 : 1;
         }

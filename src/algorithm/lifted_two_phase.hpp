@@ -10,4 +10,7 @@ namespace wireless::algorithm {
 solver::Result SolveLiftedTwoPhase(const InstanceData& instance,
     const RunConfig& runConfig, const SolverConfig& solverConfig);
 
+solver::Result SolveFull(const InstanceData& instance,
+    const RunConfig& runConfig, const SolverConfig& solverConfig);
+
 } // namespace wireless::algorithm

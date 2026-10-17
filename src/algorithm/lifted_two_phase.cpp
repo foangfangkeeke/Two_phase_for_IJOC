@@ -354,10 +354,32 @@ Expr Mismatch(const MasterState& master, const std::vector<double>& values,
     return result;
 }
 
+Expr MonotoneImprovements(const MasterState& master, size_t scenario,
+    const std::vector<double>& values, const std::vector<size_t>& relevant)
+{
+    const std::set<size_t> relevantSet(relevant.begin(), relevant.end());
+    Expr result(0.0);
+    for (size_t facility = 0; facility < master.facilities.size(); ++facility) {
+        if (relevantSet.count(facility) != 0 && values.at(facility) < 0.5) {
+            result += master.design.at(facility);
+        }
+    }
+    for (const auto& route : master.batteries.at(scenario)) {
+        int selectedCapacity = -1;
+        for (const BatteryLevel& level : route) {
+            if (values.at(level.index) > 0.5) selectedCapacity = level.capacity;
+        }
+        for (const BatteryLevel& level : route) {
+            if (level.capacity > selectedCapacity) result += level.variable;
+        }
+    }
+    return result;
+}
+
 } // namespace
 
-solver::Result SolveLiftedTwoPhase(const InstanceData& instance,
-    const RunConfig& runConfig, const SolverConfig& solverConfig)
+solver::Result SolveFramework(const InstanceData& instance,
+    const RunConfig& runConfig, const SolverConfig& solverConfig, bool monotoneCuts)
 {
     if (runConfig.useRsp) throw std::invalid_argument("Lifted Two-Phase does not include RSP");
     const auto start = std::chrono::steady_clock::now();
@@ -365,7 +387,7 @@ solver::Result SolveLiftedTwoPhase(const InstanceData& instance,
         ? model::SelectDwcCandidates(instance, runConfig.dwcTopN)
         : std::vector<model::DwcLink>();
     Envr environment;
-    Model model = environment.CreateModel("lifted_two_phase_master");
+    Model model = environment.CreateModel(monotoneCuts ? "full_master" : "lifted_two_phase_master");
     MasterState master = BuildMaster(model, instance, candidates);
     solver::Configure(model, solverConfig, solverConfig.phase2MasterLog);
 
@@ -425,8 +447,10 @@ solver::Result SolveLiftedTwoPhase(const InstanceData& instance,
                 scenario, values, remaining);
             subproblemSeconds += result.seconds;
             const Expr mismatch = Mismatch(master, values, subproblems.at(scenario).relevant);
+            const Expr improvements = MonotoneImprovements(master, scenario, values,
+                subproblems.at(scenario).relevant);
             if (result.status == solver::Status::Infeasible) {
-                model.AddConstr(mismatch >= 1.0,
+                model.AddConstr((monotoneCuts ? improvements : mismatch) >= 1.0,
                     ("p2_feas_" + std::to_string(iteration) + "_" +
                         std::to_string(scenario)).c_str());
                 ++feasibilityCuts;
@@ -434,8 +458,10 @@ solver::Result SolveLiftedTwoPhase(const InstanceData& instance,
             } else if (result.status == solver::Status::Optimal) {
                 recourse += result.objective;
                 if (thetaValues.at(scenario) + kTolerance < result.objective) {
-                    model.AddConstr(master.scenarioTheta.at(scenario) >=
-                        result.objective * (1.0 - mismatch),
+                    const Expr optimalityRhs = monotoneCuts
+                        ? result.objective * (1.0 - improvements)
+                        : result.objective * (1.0 - mismatch);
+                    model.AddConstr(master.scenarioTheta.at(scenario) >= optimalityRhs,
                         ("p2_opt_" + std::to_string(iteration) + "_" +
                             std::to_string(scenario)).c_str());
                     ++optimalityCuts;
@@ -463,7 +489,7 @@ solver::Result SolveLiftedTwoPhase(const InstanceData& instance,
             result.relativeGap = (upperBound - lowerBound) /
                 std::max(1.0, std::fabs(upperBound));
             result.seconds = Elapsed(start);
-            std::cout << "Lifted Two-Phase converged.\n";
+            std::cout << (monotoneCuts ? "Full" : "Lifted Two-Phase") << " converged.\n";
             return result;
         }
     }
@@ -474,6 +500,18 @@ solver::Result SolveLiftedTwoPhase(const InstanceData& instance,
     result.bound = lowerBound;
     result.seconds = Elapsed(start);
     return result;
+}
+
+solver::Result SolveLiftedTwoPhase(const InstanceData& instance,
+    const RunConfig& runConfig, const SolverConfig& solverConfig)
+{
+    return SolveFramework(instance, runConfig, solverConfig, false);
+}
+
+solver::Result SolveFull(const InstanceData& instance,
+    const RunConfig& runConfig, const SolverConfig& solverConfig)
+{
+    return SolveFramework(instance, runConfig, solverConfig, true);
 }
 
 } // namespace wireless::algorithm
