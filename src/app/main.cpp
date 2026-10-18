@@ -88,8 +88,7 @@ void PrintRuntimeOptions(const RunConfig& config)
               << ", dwc_top_n=" << config.dwcTopN
               << ", wireless_option=" << (config.allowWirelessCharging ? 1 : 0)
               << ", rsp=" << (config.useRsp ? 1 : 0)
-              << ", preprocess_bounds=" << (config.preprocessBounds ? 1 : 0)
-              << ", phase2_gap=" << config.phase2Gap << '\n';
+              << ", preprocess_bounds=" << (config.preprocessBounds ? 1 : 0) << '\n';
 }
 
 } // namespace
@@ -118,6 +117,9 @@ int main(int argc, char* argv[])
         std::cout << "Log file: " << logPath.string() << std::endl;
         RedirectOutput(logPath);
         PrintRuntimeOptions(commandLine.config);
+        std::cout << "Solver options: mip_gap=" << solver.mipGap
+                  << ", time_limit=" << solver.timeLimit
+                  << ", threads=" << solver.threads << '\n';
         const wireless::InstanceData instance = wireless::LoadInstance(commandLine.config);
         if (commandLine.config.algorithm == "ef") {
             const solver::Result result = wireless::model::SolveExtensiveForm(

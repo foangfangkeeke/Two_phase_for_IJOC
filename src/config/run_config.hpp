@@ -13,7 +13,6 @@ struct RunConfig {
     int dwcTopN = 50;
     double facilityCostScale = 1.0;
     double energyScale = 1.0;
-    double phase2Gap = -1.0;
     bool allowWirelessCharging = true;
     bool preprocessBounds = false;
     bool useRsp = false;

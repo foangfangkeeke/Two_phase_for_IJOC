@@ -57,8 +57,6 @@ ParsedCommandLine ParseCommandLine(int argc, char* argv[])
             result.config.facilityCostScale = std::stod(NextValue(argc, argv, index));
         } else if (option == "--energy-scale") {
             result.config.energyScale = std::stod(NextValue(argc, argv, index));
-        } else if (option == "--phase2-gap") {
-            result.config.phase2Gap = std::stod(NextValue(argc, argv, index));
         } else if (option == "--wireless-option") {
             result.config.allowWirelessCharging = ParseBool(NextValue(argc, argv, index), option);
         } else if (option == "--preprocess-bounds") {
@@ -86,8 +84,7 @@ ParsedCommandLine ParseCommandLine(int argc, char* argv[])
 
     RunConfig& config = result.config;
     if (config.scenarioStart < 0 || config.facilityCostScale <= 0.0 ||
-        config.energyScale <= 0.0 ||
-        (config.phase2Gap < 0.0 && config.phase2Gap != -1.0)) {
+        config.energyScale <= 0.0) {
         throw std::invalid_argument("Invalid numeric runtime option");
     }
     if (config.problem == "wireless_reform_no_wpt") config.allowWirelessCharging = false;

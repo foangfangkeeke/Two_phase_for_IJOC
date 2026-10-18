@@ -343,10 +343,9 @@ solver::Result SolveLiftedIls(const InstanceData& instance,
                   << ", subproblem_ms=" << subproblemSeconds * 1000.0
                   << ", elapsed_ms=" << ElapsedSeconds(start) * 1000.0 << '\n';
 
-        const double targetGap = runConfig.phase2Gap >= 0.0
-            ? runConfig.phase2Gap : solverConfig.mipGap;
         if (std::isfinite(upperBound) &&
-            (upperBound - lowerBound) / std::max(1.0, std::fabs(upperBound)) <= targetGap) {
+            (upperBound - lowerBound) / std::max(1.0, std::fabs(upperBound)) <=
+                solverConfig.mipGap) {
             finalResult.status = solver::Status::Optimal;
             finalResult.hasSolution = true;
             finalResult.objective = upperBound;

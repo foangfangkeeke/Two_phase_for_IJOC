@@ -537,10 +537,6 @@ solver::Result SolveFramework(const InstanceData& instance,
     }
     model.AddConstr(scenarioSum <= master.theta, "theta_scenario_sum_p2");
     model.Update();
-    const double targetGap = runConfig.phase2Gap >= 0.0
-        ? runConfig.phase2Gap : solverConfig.mipGap;
-    model.SetDblParam(COPT_DBLPARAM_RELGAP, targetGap);
-
     std::vector<ExactScenario> subproblems;
     for (size_t scenario = 0; scenario < instance.scenarios.size(); ++scenario) {
         subproblems.push_back(BuildExact(instance, scenario, candidates, master, solverConfig));
@@ -676,7 +672,7 @@ solver::Result SolveFramework(const InstanceData& instance,
                   << ", elapsed_ms=" << Elapsed(start) * 1000.0 << '\n';
 
         if (std::isfinite(upperBound) && (upperBound - lowerBound) /
-                std::max(1.0, std::fabs(upperBound)) <= targetGap) {
+                std::max(1.0, std::fabs(upperBound)) <= solverConfig.mipGap) {
             solver::Result result;
             result.status = solver::Status::Optimal;
             result.hasSolution = true;
