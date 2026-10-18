@@ -353,18 +353,20 @@ ExactScenario BuildExact(const InstanceData& instance, size_t scenario,
     model::FacilityVariables facilities;
     for (model::DwcLink candidate : candidates) {
         const std::string name = model::DwcVariableName(candidate);
-        const Var variable = result.model->AddVar(0.0, 1.0, 0.0, COPT_BINARY, name.c_str());
+        const Var variable = result.model->AddVar(0.0, 1.0, 0.0, COPT_CONTINUOUS, name.c_str());
         facilities.emplace(name, variable);
         result.facilities.push_back(variable);
     }
     Expr objective(0.0);
     result.variables = model::BuildScenarioModel(*result.model, instance,
         instance.scenarios.at(scenario), scenario, facilities, objective, {false, true});
+    for (auto& route : result.variables.batteryChoicesByRoute) {
+        for (Var& choice : route) choice.SetType(COPT_CONTINUOUS);
+    }
     result.model->SetObjective(objective, COPT_MINIMIZE);
     result.model->Update();
-    SolverConfig exact = config;
-    exact.mipGap = 0.0;
-    solver::Configure(*result.model, exact, false);
+    solver::Configure(*result.model, config, false);
+    result.model->SetIntParam(COPT_INTPARAM_LPMETHOD, 1);
 
     const std::set<model::DwcLink> used = UsedLinks(instance.scenarios.at(scenario));
     for (size_t index = 0; index < candidates.size(); ++index) {

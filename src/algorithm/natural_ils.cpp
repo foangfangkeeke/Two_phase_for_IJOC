@@ -147,7 +147,7 @@ solver::Result SolveNaturalIls(const InstanceData& instance,
         for (model::DwcLink candidate : candidates) {
             const std::string name = model::DwcVariableName(candidate);
             const Var variable = state.model->AddVar(
-                0.0, 1.0, 0.0, COPT_BINARY, name.c_str());
+                0.0, 1.0, 0.0, COPT_CONTINUOUS, name.c_str());
             facilities.emplace(name, variable);
             state.facilityVariables.push_back(variable);
         }
@@ -156,9 +156,8 @@ solver::Result SolveNaturalIls(const InstanceData& instance,
             instance.scenarios.at(scenarioIndex), scenarioIndex, facilities, objective);
         state.model->SetObjective(objective, COPT_MINIMIZE);
         state.model->Update();
-        SolverConfig exactConfig = solverConfig;
-        exactConfig.mipGap = 0.0;
-        solver::Configure(*state.model, exactConfig, false);
+        solver::Configure(*state.model, solverConfig, false);
+        state.model->SetIntParam(COPT_INTPARAM_LPMETHOD, 1);
         subproblems.push_back(std::move(state));
     }
 

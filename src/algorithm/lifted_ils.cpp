@@ -169,7 +169,8 @@ ScenarioSubproblem BuildSubproblem(const InstanceData& instance, size_t scenario
     model::FacilityVariables facilities;
     for (model::DwcLink candidate : candidates) {
         const std::string name = model::DwcVariableName(candidate);
-        const Var variable = state.model->AddVar(0.0, 1.0, 0.0, COPT_BINARY, name.c_str());
+        const Var variable = state.model->AddVar(
+            0.0, 1.0, 0.0, COPT_CONTINUOUS, name.c_str());
         facilities.emplace(name, variable);
         state.facilityVariables.push_back(variable);
     }
@@ -177,11 +178,13 @@ ScenarioSubproblem BuildSubproblem(const InstanceData& instance, size_t scenario
     state.scenarioVariables = model::BuildScenarioModel(*state.model, instance,
         instance.scenarios.at(scenarioIndex), scenarioIndex, facilities, objective,
         {false, true});
+    for (auto& route : state.scenarioVariables.batteryChoicesByRoute) {
+        for (Var& choice : route) choice.SetType(COPT_CONTINUOUS);
+    }
     state.model->SetObjective(objective, COPT_MINIMIZE);
     state.model->Update();
-    SolverConfig exactConfig = solverConfig;
-    exactConfig.mipGap = 0.0;
-    solver::Configure(*state.model, exactConfig, false);
+    solver::Configure(*state.model, solverConfig, false);
+    state.model->SetIntParam(COPT_INTPARAM_LPMETHOD, 1);
 
     const std::set<model::DwcLink> scenarioLinks = ScenarioLinks(
         instance.scenarios.at(scenarioIndex));

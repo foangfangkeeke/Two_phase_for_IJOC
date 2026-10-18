@@ -10,6 +10,9 @@ void Configure(Model& model, const SolverConfig& config, bool enableLog)
 {
     model.SetIntParam(COPT_INTPARAM_LOGTOCONSOLE, enableLog ? 1 : 0);
     model.SetDblParam(COPT_DBLPARAM_RELGAP, config.mipGap);
+    model.SetDblParam(COPT_DBLPARAM_FEASTOL, 1e-6);
+    model.SetDblParam(COPT_DBLPARAM_DUALTOL, 1e-6);
+    model.SetDblParam(COPT_DBLPARAM_INTTOL, 1e-5);
     model.SetDblParam(COPT_DBLPARAM_TIMELIMIT, config.timeLimit);
     model.SetIntParam(COPT_INTPARAM_THREADS, config.threads);
     if (config.presolve >= 0) model.SetIntParam(COPT_INTPARAM_PRESOLVE, config.presolve);
