@@ -11,6 +11,7 @@
 #include <exception>
 #include <iostream>
 #include <limits>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <set>
@@ -51,6 +52,7 @@ struct ExactScenario {
     std::vector<Var> facilities;
     model::ScenarioVariables variables;
     std::vector<size_t> relevant;
+    std::map<std::string, solver::Result> resultCache;
 };
 
 double Elapsed(const std::chrono::steady_clock::time_point& start)
@@ -381,6 +383,18 @@ ExactScenario BuildExact(const InstanceData& instance, size_t scenario,
 solver::Result EvaluateExact(ExactScenario& subproblem, const MasterState& master,
     size_t scenario, const std::vector<double>& values, double remaining)
 {
+    std::string cacheKey;
+    cacheKey.reserve(subproblem.relevant.size());
+    for (size_t index : subproblem.relevant) {
+        cacheKey.push_back(values.at(index) > 0.5 ? '1' : '0');
+    }
+    const auto cached = subproblem.resultCache.find(cacheKey);
+    if (cached != subproblem.resultCache.end()) {
+        solver::Result result = cached->second;
+        result.seconds = 0.0;
+        return result;
+    }
+
     for (size_t facility = 0; facility < subproblem.facilities.size(); ++facility) {
         subproblem.facilities.at(facility).Set(COPT_DBLINFO_LB, values.at(facility));
         subproblem.facilities.at(facility).Set(COPT_DBLINFO_UB, values.at(facility));
@@ -397,7 +411,12 @@ solver::Result EvaluateExact(ExactScenario& subproblem, const MasterState& maste
     }
     subproblem.model->SetDblParam(COPT_DBLPARAM_TIMELIMIT, std::max(0.001, remaining));
     subproblem.model->Update();
-    return solver::Solve(*subproblem.model);
+    const solver::Result result = solver::Solve(*subproblem.model);
+    if (result.status == solver::Status::Optimal ||
+        result.status == solver::Status::Infeasible) {
+        subproblem.resultCache.emplace(std::move(cacheKey), result);
+    }
+    return result;
 }
 
 Expr Mismatch(const MasterState& master, const std::vector<double>& values,
