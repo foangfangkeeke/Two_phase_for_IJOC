@@ -5,13 +5,17 @@
 #include "model/scenario_model.hpp"
 
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cmath>
+#include <exception>
 #include <iostream>
 #include <limits>
 #include <memory>
+#include <mutex>
 #include <set>
 #include <string>
+#include <thread>
 #include <vector>
 
 namespace wireless::algorithm {
@@ -52,6 +56,43 @@ struct ExactScenario {
 double Elapsed(const std::chrono::steady_clock::time_point& start)
 {
     return std::chrono::duration<double>(std::chrono::steady_clock::now() - start).count();
+}
+
+std::vector<RouteRelaxationResult> EvaluateRoutes(
+    std::vector<RouteRelaxation>& routes, const std::vector<double>& values,
+    const SolverConfig& config, const std::chrono::steady_clock::time_point& start)
+{
+    std::vector<RouteRelaxationResult> results(routes.size());
+    std::atomic<size_t> next{0};
+    std::exception_ptr firstException;
+    std::mutex exceptionMutex;
+    const size_t workerCount = std::min(routes.size(),
+        static_cast<size_t>(std::max(1, config.threads)));
+    std::vector<std::thread> workers;
+    workers.reserve(workerCount);
+    for (size_t worker = 0; worker < workerCount; ++worker) {
+        workers.emplace_back([&]() {
+            while (true) {
+                const size_t index = next.fetch_add(1);
+                if (index >= routes.size()) return;
+                try {
+                    const double remaining = config.timeLimit - Elapsed(start);
+                    if (remaining <= 0.0) {
+                        results.at(index).status = solver::Status::TimeLimit;
+                    } else {
+                        results.at(index) = routes.at(index).Evaluate(values, remaining);
+                    }
+                } catch (...) {
+                    std::lock_guard<std::mutex> lock(exceptionMutex);
+                    if (!firstException) firstException = std::current_exception();
+                    return;
+                }
+            }
+        });
+    }
+    for (std::thread& worker : workers) worker.join();
+    if (firstException) std::rethrow_exception(firstException);
+    return results;
 }
 
 std::vector<double> Values(std::vector<Var>& variables)
@@ -215,15 +256,29 @@ solver::Result RunPhaseOne(Model& model, MasterState& master,
         int feasibilityCuts = 0;
         int optimalityCuts = 0;
         double recourse = 0.0;
-        double subproblemSeconds = 0.0;
+        const auto subproblemStart = std::chrono::steady_clock::now();
+        const std::vector<RouteRelaxationResult> routeResults =
+            EvaluateRoutes(routes, values, config, start);
+        const double subproblemSeconds = Elapsed(subproblemStart);
         for (size_t index = 0; index < routes.size(); ++index) {
-            remaining = config.timeLimit - Elapsed(start);
-            const RouteRelaxationResult result = routes.at(index).Evaluate(values, remaining);
-            subproblemSeconds += result.seconds;
+            const RouteRelaxationResult& result = routeResults.at(index);
             if (result.status == solver::Status::Infeasible) {
-                model.AddConstr(RouteNoGood(master, routes.at(index), values) >= 1.0,
-                    ("p1_feas_" + std::to_string(iteration) + "_" +
-                        std::to_string(index)).c_str());
+                if (result.coefficients.empty()) {
+                    model.AddConstr(RouteNoGood(master, routes.at(index), values) >= 1.0,
+                        ("p1_feas_" + std::to_string(iteration) + "_" +
+                            std::to_string(index)).c_str());
+                } else {
+                    Expr cut(result.constant);
+                    for (size_t variable = 0; variable < result.coefficients.size(); ++variable) {
+                        const double coefficient = result.coefficients.at(variable);
+                        if (std::fabs(coefficient) > 1e-12) {
+                            cut += coefficient * master.design.at(variable);
+                        }
+                    }
+                    model.AddConstr(cut >= 0.0,
+                        ("p1_farkas_" + std::to_string(iteration) + "_" +
+                            std::to_string(index)).c_str());
+                }
                 ++feasibilityCuts;
                 infeasible = true;
             } else if (result.status == solver::Status::Optimal) {

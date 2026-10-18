@@ -86,7 +86,7 @@ RouteRelaxation::RouteRelaxation(const InstanceData& instance, size_t scenarioIn
     for (size_t index = 0; index < facilityVariables.size(); ++index) {
         const Constraint link = model_->AddConstr(facilityVariables.at(index) == 0.0,
             ("fix_w_" + std::to_string(index)).c_str());
-        links_.push_back({link, index});
+        links_.push_back({facilityVariables.at(index), link, index});
     }
     const auto& routeBatteryVariables = variables.batteryChoicesByRoute.at(0);
     if (routeBatteryVariables.size() != batteryLevels_.size()) {
@@ -95,7 +95,8 @@ RouteRelaxation::RouteRelaxation(const InstanceData& instance, size_t scenarioIn
     for (size_t level = 0; level < routeBatteryVariables.size(); ++level) {
         const Constraint link = model_->AddConstr(routeBatteryVariables.at(level) == 0.0,
             ("fix_b_" + std::to_string(level)).c_str());
-        links_.push_back({link, batteryLevels_.at(level).masterIndex});
+        links_.push_back({routeBatteryVariables.at(level), link,
+            batteryLevels_.at(level).masterIndex});
     }
 
     model_->SetObjective(objective, COPT_MINIMIZE);
@@ -123,6 +124,81 @@ RouteRelaxationResult RouteRelaxation::Evaluate(
     result.status = solved.status;
     result.objective = solved.objective;
     result.seconds = solved.seconds;
+    if (solved.status == solver::Status::Infeasible &&
+        model_->GetIntAttr(COPT_INTATTR_HASDUALFARKAS) != 0) {
+        const ConstrArray constraints = model_->GetConstrs();
+        std::vector<size_t> masterIndexByRow(
+            static_cast<size_t>(constraints.Size()), masterVariableCount_);
+        const VarArray variables = model_->GetVars();
+        std::vector<size_t> masterIndexByColumn(
+            static_cast<size_t>(variables.Size()), masterVariableCount_);
+        for (const LinkConstraint& link : links_) {
+            masterIndexByRow.at(static_cast<size_t>(link.constraint.GetIdx())) =
+                link.masterIndex;
+            masterIndexByColumn.at(static_cast<size_t>(link.variable.GetIdx())) =
+                link.masterIndex;
+        }
+
+        std::vector<double> coefficients(masterVariableCount_, 0.0);
+        double constant = 0.0;
+        bool valid = true;
+        for (int row = 0; row < constraints.Size(); ++row) {
+            const double ray = constraints[row].Get(COPT_DBLINFO_DUALFARKAS);
+            if (std::fabs(ray) <= 1e-12) continue;
+            const size_t masterIndex = masterIndexByRow.at(static_cast<size_t>(row));
+            if (masterIndex < masterVariableCount_) {
+                coefficients.at(masterIndex) -= ray;
+                continue;
+            }
+
+            const double lower = constraints[row].Get(COPT_DBLINFO_LB);
+            const double upper = constraints[row].Get(COPT_DBLINFO_UB);
+            const double slackBound = ray > 0.0 ? lower : upper;
+            if (slackBound <= -COPT_INFINITY * 0.5 ||
+                slackBound >= COPT_INFINITY * 0.5) {
+                valid = false;
+                break;
+            }
+            constant -= ray * slackBound;
+        }
+
+        if (valid) {
+            for (int column = 0; column < variables.Size(); ++column) {
+                const Column entries = model_->GetCol(variables[column]);
+                double rayCoefficient = 0.0;
+                for (size_t entry = 0; entry < entries.Size(); ++entry) {
+                    rayCoefficient += entries.GetConstr(static_cast<int>(entry)).Get(
+                        COPT_DBLINFO_DUALFARKAS) * entries.GetCoeff(
+                            static_cast<int>(entry));
+                }
+                if (std::fabs(rayCoefficient) <= 1e-12) continue;
+                const size_t masterIndex = masterIndexByColumn.at(
+                    static_cast<size_t>(column));
+                if (masterIndex < masterVariableCount_) {
+                    coefficients.at(masterIndex) += rayCoefficient;
+                    continue;
+                }
+                const double bound = rayCoefficient > 0.0
+                    ? variables[column].Get(COPT_DBLINFO_UB)
+                    : variables[column].Get(COPT_DBLINFO_LB);
+                if (bound <= -COPT_INFINITY * 0.5 || bound >= COPT_INFINITY * 0.5) {
+                    valid = false;
+                    break;
+                }
+                constant += rayCoefficient * bound;
+            }
+        }
+
+        double valueAtCurrent = constant;
+        for (size_t index = 0; index < coefficients.size(); ++index) {
+            valueAtCurrent += coefficients.at(index) * masterValues.at(index);
+        }
+        if (valid && std::isfinite(valueAtCurrent) && valueAtCurrent < -1e-8) {
+            result.coefficients = std::move(coefficients);
+            result.constant = constant;
+        }
+        return result;
+    }
     if (solved.status != solver::Status::Optimal) return result;
 
     result.coefficients.assign(masterVariableCount_, 0.0);

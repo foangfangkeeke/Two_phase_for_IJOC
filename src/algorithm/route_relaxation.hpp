@@ -41,6 +41,7 @@ public:
 
 private:
     struct LinkConstraint {
+        Var variable;
         Constraint constraint;
         size_t masterIndex = 0;
     };
