@@ -1,6 +1,7 @@
 #include "algorithm/lifted_two_phase.hpp"
 
 #include "algorithm/route_relaxation.hpp"
+#include "algorithm/scenario_relaxation.hpp"
 #include "model/model_helpers.hpp"
 #include "model/scenario_model.hpp"
 
@@ -83,6 +84,43 @@ std::vector<RouteRelaxationResult> EvaluateRoutes(
                         results.at(index).status = solver::Status::TimeLimit;
                     } else {
                         results.at(index) = routes.at(index).Evaluate(values, remaining);
+                    }
+                } catch (...) {
+                    std::lock_guard<std::mutex> lock(exceptionMutex);
+                    if (!firstException) firstException = std::current_exception();
+                    return;
+                }
+            }
+        });
+    }
+    for (std::thread& worker : workers) worker.join();
+    if (firstException) std::rethrow_exception(firstException);
+    return results;
+}
+
+std::vector<ScenarioRelaxationResult> EvaluateScenarios(
+    std::vector<ScenarioRelaxation>& scenarios, const std::vector<double>& values,
+    const SolverConfig& config, const std::chrono::steady_clock::time_point& start)
+{
+    std::vector<ScenarioRelaxationResult> results(scenarios.size());
+    std::atomic<size_t> next{0};
+    std::exception_ptr firstException;
+    std::mutex exceptionMutex;
+    const size_t workerCount = std::min(scenarios.size(),
+        static_cast<size_t>(std::max(1, config.threads)));
+    std::vector<std::thread> workers;
+    workers.reserve(workerCount);
+    for (size_t worker = 0; worker < workerCount; ++worker) {
+        workers.emplace_back([&]() {
+            while (true) {
+                const size_t index = next.fetch_add(1);
+                if (index >= scenarios.size()) return;
+                try {
+                    const double remaining = config.timeLimit - Elapsed(start);
+                    if (remaining <= 0.0) {
+                        results.at(index).status = solver::Status::TimeLimit;
+                    } else {
+                        results.at(index) = scenarios.at(index).Evaluate(values, remaining);
                     }
                 } catch (...) {
                     std::lock_guard<std::mutex> lock(exceptionMutex);
@@ -452,12 +490,23 @@ Expr MonotoneImprovements(const MasterState& master, size_t scenario,
     return result;
 }
 
+Expr AffineCut(const MasterState& master, const ScenarioRelaxationResult& result)
+{
+    Expr cut(result.constant);
+    for (size_t index = 0; index < result.coefficients.size(); ++index) {
+        const double coefficient = result.coefficients.at(index);
+        if (std::fabs(coefficient) > 1e-12) {
+            cut += coefficient * master.design.at(index);
+        }
+    }
+    return cut;
+}
+
 } // namespace
 
 solver::Result SolveFramework(const InstanceData& instance,
     const RunConfig& runConfig, const SolverConfig& solverConfig, bool monotoneCuts)
 {
-    if (runConfig.useRsp) throw std::invalid_argument("Lifted Two-Phase does not include RSP");
     const auto start = std::chrono::steady_clock::now();
     const std::vector<model::DwcLink> candidates = runConfig.allowWirelessCharging
         ? model::SelectDwcCandidates(instance, runConfig.dwcTopN)
@@ -496,7 +545,21 @@ solver::Result SolveFramework(const InstanceData& instance,
     for (size_t scenario = 0; scenario < instance.scenarios.size(); ++scenario) {
         subproblems.push_back(BuildExact(instance, scenario, candidates, master, solverConfig));
     }
-    std::cout << "Phase 2 initialized: scenarios=" << subproblems.size() << ", RSP=off\n";
+    std::vector<ScenarioRelaxation> relaxedSubproblems;
+    if (runConfig.useRsp) {
+        for (size_t scenario = 0; scenario < instance.scenarios.size(); ++scenario) {
+            std::vector<std::vector<size_t>> batteryIndices;
+            for (const auto& route : master.batteries.at(scenario)) {
+                std::vector<size_t> routeIndices;
+                for (const BatteryLevel& level : route) routeIndices.push_back(level.index);
+                batteryIndices.push_back(std::move(routeIndices));
+            }
+            relaxedSubproblems.emplace_back(instance, scenario, candidates, batteryIndices,
+                master.design.size(), solverConfig);
+        }
+    }
+    std::cout << "Phase 2 initialized: scenarios=" << subproblems.size()
+              << ", RSP=" << (runConfig.useRsp ? "on" : "off") << '\n';
 
     double upperBound = std::numeric_limits<double>::infinity();
     double lowerBound = phaseOne.bound;
@@ -517,6 +580,62 @@ solver::Result SolveFramework(const InstanceData& instance,
         int optimalityCuts = 0;
         double recourse = 0.0;
         double subproblemSeconds = 0.0;
+        double rspSeconds = 0.0;
+        int rspFeasibilityCuts = 0;
+        int rspOptimalityCuts = 0;
+        double rspRecourse = 0.0;
+        bool rspInfeasible = false;
+        if (runConfig.useRsp) {
+            const auto rspStart = std::chrono::steady_clock::now();
+            const std::vector<ScenarioRelaxationResult> rspResults =
+                EvaluateScenarios(relaxedSubproblems, values, solverConfig, start);
+            rspSeconds = Elapsed(rspStart);
+            for (size_t scenario = 0; scenario < rspResults.size(); ++scenario) {
+                const ScenarioRelaxationResult& result = rspResults.at(scenario);
+                if (result.status == solver::Status::Infeasible) {
+                    if (!result.coefficients.empty()) {
+                        model.AddConstr(AffineCut(master, result) >= 0.0,
+                            ("p2_rsp_feas_" + std::to_string(iteration) + "_" +
+                                std::to_string(scenario)).c_str());
+                    } else {
+                        const Expr mismatch = Mismatch(master, values,
+                            subproblems.at(scenario).relevant);
+                        const Expr improvements = MonotoneImprovements(master, scenario,
+                            values, subproblems.at(scenario).relevant);
+                        model.AddConstr((monotoneCuts ? improvements : mismatch) >= 1.0,
+                            ("p2_rsp_fallback_" + std::to_string(iteration) + "_" +
+                                std::to_string(scenario)).c_str());
+                    }
+                    ++rspFeasibilityCuts;
+                    rspInfeasible = true;
+                } else if (result.status == solver::Status::Optimal) {
+                    rspRecourse += result.objective;
+                    if (thetaValues.at(scenario) + kTolerance < result.objective) {
+                        model.AddConstr(master.scenarioTheta.at(scenario) >=
+                            AffineCut(master, result),
+                            ("p2_rsp_opt_" + std::to_string(iteration) + "_" +
+                                std::to_string(scenario)).c_str());
+                        ++rspOptimalityCuts;
+                    }
+                } else {
+                    solver::Result failed;
+                    failed.status = result.status;
+                    return failed;
+                }
+            }
+            model.Update();
+            if (rspInfeasible || rspOptimalityCuts > 0) {
+                std::cout << "Phase 2 iter " << iteration
+                          << ", RSP feasibility cut x" << rspFeasibilityCuts
+                          << ", RSP optimality cut x" << rspOptimalityCuts
+                          << ", RSP Q(z)=" << rspRecourse;
+                PrintBounds(upperBound, lowerBound);
+                std::cout << ", master_ms=" << masterResult.seconds * 1000.0
+                          << ", rsp_ms=" << rspSeconds * 1000.0
+                          << ", elapsed_ms=" << Elapsed(start) * 1000.0 << '\n';
+                continue;
+            }
+        }
         for (size_t scenario = 0; scenario < subproblems.size(); ++scenario) {
             remaining = solverConfig.timeLimit - Elapsed(start);
             const solver::Result result = EvaluateExact(subproblems.at(scenario), master,
@@ -552,6 +671,7 @@ solver::Result SolveFramework(const InstanceData& instance,
                        << ", optimality cut x" << optimalityCuts;
         PrintBounds(upperBound, lowerBound);
         std::cout << ", master_ms=" << masterResult.seconds * 1000.0
+                  << ", rsp_ms=" << rspSeconds * 1000.0
                   << ", subproblem_ms=" << subproblemSeconds * 1000.0
                   << ", elapsed_ms=" << Elapsed(start) * 1000.0 << '\n';
 

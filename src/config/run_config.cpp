@@ -111,5 +111,6 @@ void PrintUsage()
         << "  --facility-cost-scale <positive number>\n"
         << "  --energy-scale <positive number>\n"
         << "  --wireless-option <0|1>\n"
+        << "  --rsp <0|1> (lifted-two-phase/full only)\n"
         << "  --help, -h\n";
 }
