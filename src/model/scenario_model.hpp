@@ -18,6 +18,7 @@ struct ScenarioVariables {
 struct ScenarioModelOptions {
     bool includeBatteryCost = true;
     bool enforceSharedChargerCapacity = true;
+    std::vector<int> maximumBatteryCapacities;
 };
 
 ScenarioVariables BuildScenarioModel(Model& model, const InstanceData& instance,

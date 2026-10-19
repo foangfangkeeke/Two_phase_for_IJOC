@@ -75,8 +75,10 @@ RouteRelaxation::RouteRelaxation(const InstanceData& instance, size_t scenarioIn
     }
 
     Expr objective(0.0);
+    model::ScenarioModelOptions options{false, false};
+    options.maximumBatteryCapacities.push_back(batteryLevels.back().capacity);
     model::ScenarioVariables variables = model::BuildScenarioModel(*model_, instance,
-        routeScenario, scenarioIndex, facilities, objective, {false, false});
+        routeScenario, scenarioIndex, facilities, objective, options);
     model_->Update();
     const VarArray allVariables = model_->GetVars();
     for (int index = 0; index < allVariables.Size(); ++index) {

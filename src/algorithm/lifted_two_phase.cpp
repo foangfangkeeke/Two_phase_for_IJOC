@@ -27,6 +27,8 @@ constexpr int kBatteryStep = 20;
 constexpr int kMaximumIterations = 5000;
 constexpr double kTolerance = 1e-6;
 
+using BatteryCapacityLimits = std::vector<std::vector<int>>;
+
 struct BatteryLevel {
     int capacity = 0;
     size_t index = 0;
@@ -166,8 +168,54 @@ void PrintBounds(double upperBound, double lowerBound)
                     std::max(1.0, std::fabs(upperBound)) * 100.0 << '%';
 }
 
+BatteryCapacityLimits ComputeBatteryCapacityLimits(const InstanceData& instance)
+{
+    BatteryCapacityLimits limits;
+    limits.reserve(instance.scenarios.size());
+    const double usableSoc = instance.operation.maximumSoc -
+        instance.operation.minimumSoc;
+    for (const ScenarioData& scenario : instance.scenarios) {
+        std::vector<double> maximumEnergy(scenario.schedule.routeNames.size(), 0.0);
+        for (size_t bus = 0; bus < scenario.schedule.busIds.size(); ++bus) {
+            double distance = scenario.network.startDistanceByBus.at(bus) +
+                scenario.network.endDistanceByBus.at(bus);
+            for (int trip : scenario.schedule.tripIdsByBus.at(bus)) {
+                const auto& stations = scenario.schedule.stationsByTrip.at(
+                    static_cast<size_t>(trip));
+                for (size_t stop = 0; stop + 1 < stations.size(); ++stop) {
+                    distance += scenario.network.linkDistances.at(stations.at(stop)).at(
+                        stations.at(stop + 1));
+                }
+            }
+            const size_t route = static_cast<size_t>(
+                scenario.schedule.routeByBus.at(bus));
+            maximumEnergy.at(route) = std::max(maximumEnergy.at(route),
+                distance * instance.operation.energyPerKm);
+        }
+
+        std::vector<int> scenarioLimits;
+        scenarioLimits.reserve(maximumEnergy.size());
+        for (double energy : maximumEnergy) {
+            const double requiredCapacity = energy / usableSoc;
+            int limit = static_cast<int>(instance.operation.maximumBatteryCapacity);
+            for (int capacity = static_cast<int>(instance.operation.minimumBatteryCapacity);
+                 capacity <= static_cast<int>(instance.operation.maximumBatteryCapacity);
+                 capacity += kBatteryStep) {
+                if (capacity + kTolerance >= requiredCapacity) {
+                    limit = capacity;
+                    break;
+                }
+            }
+            scenarioLimits.push_back(limit);
+        }
+        limits.push_back(std::move(scenarioLimits));
+    }
+    return limits;
+}
+
 MasterState BuildMaster(Model& model, const InstanceData& instance,
-    const std::vector<model::DwcLink>& candidates)
+    const std::vector<model::DwcLink>& candidates,
+    const BatteryCapacityLimits& batteryCapacityLimits)
 {
     Expr objective(0.0);
     std::vector<Var> design;
@@ -194,7 +242,7 @@ MasterState BuildMaster(Model& model, const InstanceData& instance,
             const double unitCost = instance.scenarios.at(scenario).descriptor.probability *
                 busesByRoute.at(route) * instance.operation.batteryUnitPrice;
             for (int capacity = static_cast<int>(instance.operation.minimumBatteryCapacity);
-                 capacity <= static_cast<int>(instance.operation.maximumBatteryCapacity);
+                 capacity <= batteryCapacityLimits.at(scenario).at(route);
                  capacity += kBatteryStep) {
                 const Var variable = model.AddVar(0.0, 1.0, 0.0, COPT_BINARY,
                     ("sc" + std::to_string(scenario) + "_E_r" + std::to_string(route) +
@@ -398,8 +446,12 @@ ExactScenario BuildExact(const InstanceData& instance, size_t scenario,
         result.facilities.push_back(variable);
     }
     Expr objective(0.0);
+    model::ScenarioModelOptions options{false, true};
+    for (const auto& route : master.batteries.at(scenario)) {
+        options.maximumBatteryCapacities.push_back(route.back().capacity);
+    }
     result.variables = model::BuildScenarioModel(*result.model, instance,
-        instance.scenarios.at(scenario), scenario, facilities, objective, {false, true});
+        instance.scenarios.at(scenario), scenario, facilities, objective, options);
     for (auto& route : result.variables.batteryChoicesByRoute) {
         for (Var& choice : route) choice.SetType(COPT_CONTINUOUS);
     }
@@ -508,12 +560,19 @@ solver::Result SolveFramework(const InstanceData& instance,
     const RunConfig& runConfig, const SolverConfig& solverConfig, bool monotoneCuts)
 {
     const auto start = std::chrono::steady_clock::now();
+    const auto preprocessStart = std::chrono::steady_clock::now();
+    const BatteryCapacityLimits batteryCapacityLimits =
+        ComputeBatteryCapacityLimits(instance);
+    std::cout << "Battery upper-bound preprocess_ms="
+              << std::chrono::duration<double, std::milli>(
+                    std::chrono::steady_clock::now() - preprocessStart).count()
+              << '\n';
     const std::vector<model::DwcLink> candidates = runConfig.allowWirelessCharging
         ? model::SelectDwcCandidates(instance, runConfig.dwcTopN)
         : std::vector<model::DwcLink>();
     Envr environment;
     Model model = environment.CreateModel(monotoneCuts ? "full_master" : "lifted_two_phase_master");
-    MasterState master = BuildMaster(model, instance, candidates);
+    MasterState master = BuildMaster(model, instance, candidates, batteryCapacityLimits);
     solver::Configure(model, solverConfig, solverConfig.phase2MasterLog);
 
     const solver::Result phaseOne = RunPhaseOne(model, master, instance, candidates,
@@ -551,7 +610,7 @@ solver::Result SolveFramework(const InstanceData& instance,
                 batteryIndices.push_back(std::move(routeIndices));
             }
             relaxedSubproblems.emplace_back(instance, scenario, candidates, batteryIndices,
-                master.design.size(), solverConfig);
+                batteryCapacityLimits.at(scenario), master.design.size(), solverConfig);
         }
     }
     std::cout << "Phase 2 initialized: scenarios=" << subproblems.size()

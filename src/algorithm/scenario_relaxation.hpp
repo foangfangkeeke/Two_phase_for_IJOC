@@ -24,6 +24,7 @@ public:
     ScenarioRelaxation(const InstanceData& instance, size_t scenarioIndex,
         const std::vector<model::DwcLink>& candidates,
         const std::vector<std::vector<size_t>>& batteryMasterIndices,
+        const std::vector<int>& maximumBatteryCapacities,
         size_t masterVariableCount, const SolverConfig& solverConfig);
 
     ScenarioRelaxationResult Evaluate(const std::vector<double>& masterValues,

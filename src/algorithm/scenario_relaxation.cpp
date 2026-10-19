@@ -12,6 +12,7 @@ namespace wireless::algorithm {
 ScenarioRelaxation::ScenarioRelaxation(const InstanceData& instance,
     size_t scenarioIndex, const std::vector<model::DwcLink>& candidates,
     const std::vector<std::vector<size_t>>& batteryMasterIndices,
+    const std::vector<int>& maximumBatteryCapacities,
     size_t masterVariableCount, const SolverConfig& solverConfig)
     : masterVariableCount_(masterVariableCount),
       environment_(std::make_unique<Envr>())
@@ -30,9 +31,11 @@ ScenarioRelaxation::ScenarioRelaxation(const InstanceData& instance,
     }
 
     Expr objective(0.0);
+    model::ScenarioModelOptions options{false, true};
+    options.maximumBatteryCapacities = maximumBatteryCapacities;
     model::ScenarioVariables variables = model::BuildScenarioModel(*model_, instance,
         instance.scenarios.at(scenarioIndex), scenarioIndex, facilities, objective,
-        {false, true});
+        options);
     model_->Update();
     const VarArray allVariables = model_->GetVars();
     for (int index = 0; index < allVariables.Size(); ++index) {

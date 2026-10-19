@@ -42,8 +42,11 @@ ScenarioVariables BuildScenarioInternal(Model& model, const InstanceData& instan
         routeCapacities.emplace_back(0.0);
         Expr& selectedCapacity = routeCapacities.back();
         Expr selectOne(0.0);
+        const int maximumCapacity = options.maximumBatteryCapacities.empty()
+            ? static_cast<int>(operation.maximumBatteryCapacity)
+            : options.maximumBatteryCapacities.at(route);
         for (int capacity = static_cast<int>(operation.minimumBatteryCapacity);
-             capacity <= static_cast<int>(operation.maximumBatteryCapacity);
+             capacity <= maximumCapacity;
              capacity += kBatteryCapacityStep) {
             const std::string name = prefix + "E_r" + std::to_string(route) +
                 "_cap" + std::to_string(capacity);
