@@ -4,5 +4,7 @@ out/
 .claude/
 logs/
 results/
+__pycache__/
+*.pyc
 gurobi*
 !src/utils/gurobi_c++.h
