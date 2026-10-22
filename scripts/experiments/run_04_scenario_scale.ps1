@@ -1,7 +1,7 @@
 . (Join-Path $PSScriptRoot 'common.ps1')
 
 $cases = @()
-foreach ($scenarioCount in @(5, 10, 20, 40)) {
+foreach ($scenarioCount in @(5, 20, 40)) {
     $common = @(
         '--pb', 'wireless_reform',
         '--data', 'tower_base',

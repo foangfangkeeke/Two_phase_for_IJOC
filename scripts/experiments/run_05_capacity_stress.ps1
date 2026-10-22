@@ -1,7 +1,7 @@
 . (Join-Path $PSScriptRoot 'common.ps1')
 
 $cases = @()
-foreach ($capacity in @(2, 3, 4, 5)) {
+foreach ($capacity in @(2, 3, 5)) {
     $common = @(
         '--pb', 'wireless_reform',
         '--data', 'tower_base',
