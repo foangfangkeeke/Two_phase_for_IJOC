@@ -13,13 +13,12 @@ struct RunConfig {
     int dwcTopN = 50;
     double facilityCostScale = 1.0;
     double energyScale = 1.0;
+    int batteryCapacityStep = 20;
     bool allowWirelessCharging = true;
     bool preprocessBounds = false;
     bool useRsp = false;
     bool phaseProgressLog = false;
     bool phase2MasterLog = false;
-    bool batteryRepairCuts = false;
-    bool repairFacilities = false;
     bool exportSolution = false;
     bool exportSummary = false;
     std::filesystem::path exportDirectory;

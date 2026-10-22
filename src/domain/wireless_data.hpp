@@ -22,6 +22,7 @@ struct OperationData {
     double minimumSoc = 0.0;
     double minimumBatteryCapacity = 0.0;
     double maximumBatteryCapacity = 0.0;
+    int batteryCapacityStep = 20;
     double energyPerKm = 0.0;
     int minimumTime = 0;
     int maximumTime = 0;
@@ -68,5 +69,7 @@ struct InstanceData {
 };
 
 InstanceData LoadInstance(const RunConfig& config);
+std::vector<int> BatteryCapacityLevels(const OperationData& operation,
+    int maximumCapacity);
 
 } // namespace wireless

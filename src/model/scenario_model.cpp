@@ -10,8 +10,6 @@
 namespace wireless::model {
 namespace {
 
-constexpr int kBatteryCapacityStep = 20;
-
 using VariableGrid = std::vector<std::vector<std::vector<Var>>>;
 using OptionalVariableGrid = std::vector<std::vector<std::vector<std::optional<Var>>>>;
 
@@ -45,9 +43,7 @@ ScenarioVariables BuildScenarioInternal(Model& model, const InstanceData& instan
         const int maximumCapacity = options.maximumBatteryCapacities.empty()
             ? static_cast<int>(operation.maximumBatteryCapacity)
             : options.maximumBatteryCapacities.at(route);
-        for (int capacity = static_cast<int>(operation.minimumBatteryCapacity);
-             capacity <= maximumCapacity;
-             capacity += kBatteryCapacityStep) {
+        for (int capacity : BatteryCapacityLevels(operation, maximumCapacity)) {
             const std::string name = prefix + "E_r" + std::to_string(route) +
                 "_cap" + std::to_string(capacity);
             const Var choice = model.AddVar(0.0, 1.0, 0.0, COPT_BINARY, name.c_str());
@@ -79,6 +75,7 @@ ScenarioVariables BuildScenarioInternal(Model& model, const InstanceData& instan
         const std::string nightName = prefix + "c_Night_b" + std::to_string(bus);
         nightCharge.push_back(model.AddVar(
             0.0, COPT_INFINITY, 0.0, COPT_CONTINUOUS, nightName.c_str()));
+        variables.overnightCharge.push_back(nightCharge.back());
 
         std::vector<std::vector<Var>> busStopCharge;
         std::vector<std::vector<std::optional<Var>>> busLinkCharge;
@@ -102,6 +99,7 @@ ScenarioVariables BuildScenarioInternal(Model& model, const InstanceData& instan
                     ? COPT_INFINITY : 0.0;
                 tripStopCharge.push_back(model.AddVar(0.0, stopUpperBound, 0.0,
                     COPT_CONTINUOUS, (prefix + "c" + suffix).c_str()));
+                variables.daytimeCharge.push_back(tripStopCharge.back());
 
                 if (stationIndex + 1 < stations.size()) {
                     const std::string facility = DwcVariableName(
@@ -109,6 +107,7 @@ ScenarioVariables BuildScenarioInternal(Model& model, const InstanceData& instan
                     if (facilityVariables.count(facility) != 0) {
                         tripLinkCharge.emplace_back(model.AddVar(0.0, COPT_INFINITY, 0.0,
                             COPT_CONTINUOUS, (prefix + "c_link" + suffix).c_str()));
+                        variables.daytimeCharge.push_back(*tripLinkCharge.back());
                     } else {
                         tripLinkCharge.emplace_back(std::nullopt);
                     }

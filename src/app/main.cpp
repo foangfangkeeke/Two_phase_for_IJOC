@@ -57,6 +57,8 @@ void RedirectOutput(const std::filesystem::path& path)
 #endif
     std::cout.clear();
     std::cerr.clear();
+    std::cout << std::unitbuf;
+    std::cerr << std::unitbuf;
 }
 
 std::filesystem::path StartLog(const RunConfig& config)
@@ -82,13 +84,15 @@ void PrintRuntimeOptions(const RunConfig& config)
 {
     std::cout << "Runtime options: facility_cost_scale=" << config.facilityCostScale
               << ", energy_scale=" << config.energyScale
+              << ", battery_step=" << config.batteryCapacityStep
               << ", scenario_count=" << config.scenarioCount
               << ", scenario_start=" << config.scenarioStart
               << ", cap=" << config.chargerCapacity
               << ", dwc_top_n=" << config.dwcTopN
               << ", wireless_option=" << (config.allowWirelessCharging ? 1 : 0)
               << ", rsp=" << (config.useRsp ? 1 : 0)
-              << ", preprocess_bounds=" << (config.preprocessBounds ? 1 : 0) << '\n';
+              << ", preprocess_bounds=" << (config.preprocessBounds ? 1 : 0)
+              << '\n';
 }
 
 } // namespace

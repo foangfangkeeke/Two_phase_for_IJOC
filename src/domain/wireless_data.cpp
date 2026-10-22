@@ -1,5 +1,6 @@
 #include "domain/wireless_data.hpp"
 
+#include <algorithm>
 #include <cctype>
 #include <fstream>
 #include <stdexcept>
@@ -105,6 +106,7 @@ void ReadGlobalData(InstanceData& instance, const RunConfig& config,
     instance.operation.minimumSoc = std::stod(costs.at(4));
     instance.operation.minimumBatteryCapacity = std::stod(costs.at(5));
     instance.operation.maximumBatteryCapacity = std::stod(costs.at(6));
+    instance.operation.batteryCapacityStep = config.batteryCapacityStep;
     instance.operation.minimumTime = std::stoi(times.at(0));
     instance.operation.maximumTime = std::stoi(times.at(1));
     instance.operation.energyPerKm = std::stod(bus.at(0)) * config.energyScale;
@@ -200,6 +202,21 @@ InstanceData LoadInstance(const RunConfig& config)
         instance.scenarios.push_back(ReadScenario(instance, std::move(descriptor), config, globalPlugCounts));
     }
     return instance;
+}
+
+std::vector<int> BatteryCapacityLevels(const OperationData& operation,
+    int maximumCapacity)
+{
+    const int minimum = static_cast<int>(operation.minimumBatteryCapacity);
+    const int physicalMaximum = static_cast<int>(operation.maximumBatteryCapacity);
+    const int upper = std::min(maximumCapacity, physicalMaximum);
+    std::vector<int> levels;
+    for (int capacity = minimum; capacity <= upper;
+         capacity += operation.batteryCapacityStep) {
+        levels.push_back(capacity);
+    }
+    if (levels.back() != upper) levels.push_back(upper);
+    return levels;
 }
 
 } // namespace wireless

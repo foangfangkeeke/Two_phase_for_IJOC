@@ -1,4 +1,4 @@
-# Hierarchical Repair and Strengthened Monotone Cuts
+# Mixed Top-Down Repair and Strengthened Monotone Cuts
 
 ## Current Scope and Priority
 
@@ -40,25 +40,29 @@ ordinary monotone cut from the original Master candidate.
 
 ## Worktree Implementation
 
-The uncommitted repair experiment currently provides:
+The `full` algorithm always enables the retained repair-enhanced cut component.
+The `lifted-two-phase` algorithm is the matched baseline without repair. There
+is one repair strategy:
 
-- `--battery-repair-cuts <0|1>` to enable repair-enhanced cuts for `full`;
-- `--repair-facilities <0|1>` to include or exclude facility dimensions;
-- `--repair-boundary-limit <n>` to stop after `n` prefix boundaries in each
-  resource group;
-- `--repair-probe-limit <n>` to cap Exact SP probes per scenario repair;
-- `--repair-single-step <0|1>` for the cheap one-level battery experiment.
+1. Collect every scenario battery that can increase and every relevant unbuilt
+   DWC facility.
+2. Assign each battery its cost to reach the route-specific maximum and each
+   facility its construction cost, then sort all resources together by
+   decreasing incremental cost.
+3. Maximize all resources. If that design is feasible, binary-search the sorted
+   rollback prefix until the first certified-infeasible point encountered.
+4. Generate the monotone feasibility cut from that certified-infeasible anchor.
 
-The hierarchical method first searches the battery-resource sequence using
-prefix binary search and discrete battery-level refinement. It then fixes that
-certified-infeasible battery anchor and searches the facility-resource sequence.
-It distinguishes certified infeasible, feasible, and unknown outcomes, uses the
-remaining one-hour global time budget, and restores the Exact SP resource bounds
-after every search. If a search stops early, the cut uses only the largest
-anchor already certified infeasible.
+The feasibility probes use a zero objective. The method distinguishes certified
+infeasible, feasible, and unknown outcomes,
+uses the remaining global time budget, and restores Exact SP resource bounds
+after every search. On an unknown status, it safely falls back to the last known
+infeasible anchor. The former battery-first, facility-second, single-step,
+multi-anchor, and configurable-boundary variants were experimental and have
+been removed.
 
-Definitive Exact SP results are cached by scenario and resource configuration in
-the committed implementation. Cache hits do not consume solver time and do not
+Definitive Exact SP results are cached by scenario and resource configuration.
+Cache hits do not consume solver time and do not
 change the cut sequence.
 
 Feasible repair probes may update the UB only when all scenarios can be combined
@@ -161,20 +165,12 @@ iterations, but it still has no valid UB at the time limit.
 
 ## Current Assessment
 
-1. Full hierarchical maximal-anchor search is mathematically valid but too
-   expensive for routine use.
-2. Facility repair should remain disabled by default. Battery-then-facility
-   search is retained for ablation, but the medium diagnostic accepted no
-   additional facility and delayed the first UB.
-3. A strict probe cap below four is too small for the current prefix search and
-   generally returns the ordinary anchor.
-4. With RSP enabled, a one-level battery step is the best current cut-oriented
-   repair. It adds one certified resource increment with one Exact SP probe and
-   does not materially reduce the number of Master iterations completed.
-5. Prefix-boundary repair can produce an UB, but currently behaves as an
-   expensive primal heuristic rather than an efficient cut-strengthening step.
-6. No repair variant has yet shown a robust total-time advantage. It must remain
-   experimental and uncommitted.
+The historical experiments above explain why the grouped hierarchical variants
+were removed. Mixed top-down is the only retained repair strategy. A feasible
+repair endpoint updates the official incumbent only after every scenario has
+been re-solved with the original Exact SP objective. Analytical cost estimates
+are not used as upper bounds. RSP remains an independent optional component and
+is disabled by default.
 
 ## Verification
 

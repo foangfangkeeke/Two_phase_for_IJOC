@@ -57,6 +57,9 @@ ParsedCommandLine ParseCommandLine(int argc, char* argv[])
             result.config.facilityCostScale = std::stod(NextValue(argc, argv, index));
         } else if (option == "--energy-scale") {
             result.config.energyScale = std::stod(NextValue(argc, argv, index));
+        } else if (option == "--battery-step") {
+            result.config.batteryCapacityStep = ParsePositiveInt(
+                NextValue(argc, argv, index), option);
         } else if (option == "--wireless-option") {
             result.config.allowWirelessCharging = ParseBool(NextValue(argc, argv, index), option);
         } else if (option == "--preprocess-bounds") {
@@ -67,10 +70,6 @@ ParsedCommandLine ParseCommandLine(int argc, char* argv[])
             result.config.phaseProgressLog = ParseBool(NextValue(argc, argv, index), option);
         } else if (option == "--phase2-master-log") {
             result.config.phase2MasterLog = ParseBool(NextValue(argc, argv, index), option);
-        } else if (option == "--battery-repair-cuts") {
-            result.config.batteryRepairCuts = ParseBool(NextValue(argc, argv, index), option);
-        } else if (option == "--repair-facilities") {
-            result.config.repairFacilities = ParseBool(NextValue(argc, argv, index), option);
         } else if (option == "--export-solution") {
             result.config.exportSolution = true;
         } else if (option == "--export-summary") {
@@ -84,13 +83,10 @@ ParsedCommandLine ParseCommandLine(int argc, char* argv[])
 
     RunConfig& config = result.config;
     if (config.scenarioStart < 0 || config.facilityCostScale <= 0.0 ||
-        config.energyScale <= 0.0) {
+        config.energyScale <= 0.0 || config.batteryCapacityStep <= 0) {
         throw std::invalid_argument("Invalid numeric runtime option");
     }
     if (config.problem == "wireless_reform_no_wpt") config.allowWirelessCharging = false;
-    if (config.repairFacilities && !config.batteryRepairCuts) {
-        throw std::invalid_argument("--repair-facilities requires --battery-repair-cuts 1");
-    }
     return result;
 }
 
@@ -107,6 +103,7 @@ void PrintUsage()
         << "  --dwc-top-n <positive integer>\n"
         << "  --facility-cost-scale <positive number>\n"
         << "  --energy-scale <positive number>\n"
+        << "  --battery-step <positive integer kWh>\n"
         << "  --wireless-option <0|1>\n"
         << "  --rsp <0|1> (lifted-two-phase/full only)\n"
         << "  --help, -h\n";

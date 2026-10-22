@@ -13,6 +13,8 @@ using FacilityVariables = std::unordered_map<std::string, Var>;
 
 struct ScenarioVariables {
     std::vector<std::vector<Var>> batteryChoicesByRoute;
+    std::vector<Var> daytimeCharge;
+    std::vector<Var> overnightCharge;
 };
 
 struct ScenarioModelOptions {

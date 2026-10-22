@@ -16,6 +16,8 @@
 #include <memory>
 #include <mutex>
 #include <set>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <thread>
 #include <vector>
@@ -23,7 +25,6 @@
 namespace wireless::algorithm {
 namespace {
 
-constexpr int kBatteryStep = 20;
 constexpr int kMaximumIterations = 5000;
 constexpr double kTolerance = 1e-6;
 
@@ -50,13 +51,26 @@ struct MasterState {
 };
 
 struct ExactScenario {
+    struct OperatingCost {
+        double daytime = 0.0;
+        double overnight = 0.0;
+    };
+
     std::unique_ptr<Envr> environment;
     std::unique_ptr<Model> model;
+    std::unique_ptr<Expr> objective;
     std::vector<Var> facilities;
     model::ScenarioVariables variables;
     std::vector<size_t> relevant;
     std::map<std::string, solver::Result> resultCache;
+    std::map<std::string, solver::Result> feasibilityCache;
+    std::map<std::string, OperatingCost> operatingCostCache;
+    double daytimeCostMultiplier = 0.0;
+    double overnightCostMultiplier = 0.0;
 };
+
+std::string ExactCacheKey(const ExactScenario& subproblem,
+    const std::vector<double>& values);
 
 double Elapsed(const std::chrono::steady_clock::time_point& start)
 {
@@ -156,6 +170,53 @@ double DesignCost(const MasterState& state, const std::vector<double>& values)
     return result;
 }
 
+struct CostBreakdown {
+    double facilities = 0.0;
+    double batteries = 0.0;
+    double daytimeEnergy = 0.0;
+    double overnightEnergy = 0.0;
+};
+
+CostBreakdown IncumbentCostBreakdown(const MasterState& master,
+    const std::vector<double>& values, const std::vector<ExactScenario>& subproblems)
+{
+    CostBreakdown result;
+    for (size_t index = 0; index < values.size(); ++index) {
+        const double cost = master.costs.at(index) * values.at(index);
+        if (index < master.facilities.size()) result.facilities += cost;
+        else result.batteries += cost;
+    }
+    for (const ExactScenario& subproblem : subproblems) {
+        const std::string key = ExactCacheKey(subproblem, values);
+        const ExactScenario::OperatingCost& operatingCost =
+            subproblem.operatingCostCache.at(key);
+        result.daytimeEnergy += operatingCost.daytime;
+        result.overnightEnergy += operatingCost.overnight;
+    }
+    return result;
+}
+
+void PrintCostBreakdown(const char* source, const MasterState& master,
+    const std::vector<double>& values, const std::vector<ExactScenario>& subproblems)
+{
+    const CostBreakdown costs = IncumbentCostBreakdown(master, values, subproblems);
+    const double total = costs.facilities + costs.batteries +
+        costs.daytimeEnergy + costs.overnightEnergy;
+    const auto percentage = [total](double value) {
+        return total > 0.0 ? 100.0 * value / total : 0.0;
+    };
+    std::cout << "Incumbent cost distribution: source=" << source
+              << ", facility=" << costs.facilities
+              << " (" << percentage(costs.facilities) << "%)"
+              << ", battery=" << costs.batteries
+              << " (" << percentage(costs.batteries) << "%)"
+              << ", daytime_energy=" << costs.daytimeEnergy
+              << " (" << percentage(costs.daytimeEnergy) << "%)"
+              << ", overnight_energy=" << costs.overnightEnergy
+              << " (" << percentage(costs.overnightEnergy) << "%)"
+              << ", total=" << total << '\n';
+}
+
 void PrintBounds(double upperBound, double lowerBound)
 {
     std::cout << ", UB=";
@@ -198,9 +259,8 @@ BatteryCapacityLimits ComputeBatteryCapacityLimits(const InstanceData& instance)
         for (double energy : maximumEnergy) {
             const double requiredCapacity = energy / usableSoc;
             int limit = static_cast<int>(instance.operation.maximumBatteryCapacity);
-            for (int capacity = static_cast<int>(instance.operation.minimumBatteryCapacity);
-                 capacity <= static_cast<int>(instance.operation.maximumBatteryCapacity);
-                 capacity += kBatteryStep) {
+            for (int capacity : BatteryCapacityLevels(instance.operation,
+                     static_cast<int>(instance.operation.maximumBatteryCapacity))) {
                 if (capacity + kTolerance >= requiredCapacity) {
                     limit = capacity;
                     break;
@@ -241,9 +301,8 @@ MasterState BuildMaster(Model& model, const InstanceData& instance,
             Expr selectOne(0.0);
             const double unitCost = instance.scenarios.at(scenario).descriptor.probability *
                 busesByRoute.at(route) * instance.operation.batteryUnitPrice;
-            for (int capacity = static_cast<int>(instance.operation.minimumBatteryCapacity);
-                 capacity <= batteryCapacityLimits.at(scenario).at(route);
-                 capacity += kBatteryStep) {
+            for (int capacity : BatteryCapacityLevels(instance.operation,
+                     batteryCapacityLimits.at(scenario).at(route))) {
                 const Var variable = model.AddVar(0.0, 1.0, 0.0, COPT_BINARY,
                     ("sc" + std::to_string(scenario) + "_E_r" + std::to_string(route) +
                         "_cap" + std::to_string(capacity)).c_str());
@@ -435,6 +494,10 @@ ExactScenario BuildExact(const InstanceData& instance, size_t scenario,
     const SolverConfig& config)
 {
     ExactScenario result;
+    result.daytimeCostMultiplier = instance.scenarios.at(scenario).descriptor.probability *
+        instance.operation.dayEnergyPrice;
+    result.overnightCostMultiplier = instance.scenarios.at(scenario).descriptor.probability *
+        instance.operation.nightEnergyPrice;
     result.environment = std::make_unique<Envr>();
     result.model = std::make_unique<Model>(result.environment->CreateModel(
         ("phase2_scenario_" + std::to_string(scenario)).c_str()));
@@ -455,7 +518,8 @@ ExactScenario BuildExact(const InstanceData& instance, size_t scenario,
     for (auto& route : result.variables.batteryChoicesByRoute) {
         for (Var& choice : route) choice.SetType(COPT_CONTINUOUS);
     }
-    result.model->SetObjective(objective, COPT_MINIMIZE);
+    result.objective = std::make_unique<Expr>(objective);
+    result.model->SetObjective(*result.objective, COPT_MINIMIZE);
     result.model->Update();
     solver::Configure(*result.model, config, false);
     result.model->SetIntParam(COPT_INTPARAM_LPMETHOD, 1);
@@ -470,21 +534,9 @@ ExactScenario BuildExact(const InstanceData& instance, size_t scenario,
     return result;
 }
 
-solver::Result EvaluateExact(ExactScenario& subproblem, const MasterState& master,
-    size_t scenario, const std::vector<double>& values, double remaining)
+void FixExactResources(ExactScenario& subproblem, const MasterState& master,
+    size_t scenario, const std::vector<double>& values)
 {
-    std::string cacheKey;
-    cacheKey.reserve(subproblem.relevant.size());
-    for (size_t index : subproblem.relevant) {
-        cacheKey.push_back(values.at(index) > 0.5 ? '1' : '0');
-    }
-    const auto cached = subproblem.resultCache.find(cacheKey);
-    if (cached != subproblem.resultCache.end()) {
-        solver::Result result = cached->second;
-        result.seconds = 0.0;
-        return result;
-    }
-
     for (size_t facility = 0; facility < subproblem.facilities.size(); ++facility) {
         subproblem.facilities.at(facility).Set(COPT_DBLINFO_LB, values.at(facility));
         subproblem.facilities.at(facility).Set(COPT_DBLINFO_UB, values.at(facility));
@@ -499,13 +551,305 @@ solver::Result EvaluateExact(ExactScenario& subproblem, const MasterState& maste
                 COPT_DBLINFO_UB, values.at(index));
         }
     }
-    subproblem.model->SetDblParam(COPT_DBLPARAM_TIMELIMIT, std::max(0.001, remaining));
     subproblem.model->Update();
+}
+
+std::string ExactCacheKey(const ExactScenario& subproblem,
+    const std::vector<double>& values)
+{
+    std::string cacheKey;
+    cacheKey.reserve(subproblem.relevant.size());
+    for (size_t index : subproblem.relevant) {
+        cacheKey.push_back(values.at(index) > 0.5 ? '1' : '0');
+    }
+    return cacheKey;
+}
+
+solver::Result EvaluateExact(ExactScenario& subproblem, const MasterState& master,
+    size_t scenario, const std::vector<double>& values, double remaining)
+{
+    std::string cacheKey = ExactCacheKey(subproblem, values);
+    const auto cached = subproblem.resultCache.find(cacheKey);
+    if (cached != subproblem.resultCache.end()) {
+        solver::Result result = cached->second;
+        result.seconds = 0.0;
+        return result;
+    }
+
+    FixExactResources(subproblem, master, scenario, values);
+    subproblem.model->SetDblParam(COPT_DBLPARAM_TIMELIMIT, std::max(0.001, remaining));
     const solver::Result result = solver::Solve(*subproblem.model);
     if (result.status == solver::Status::Optimal ||
         result.status == solver::Status::Infeasible) {
-        subproblem.resultCache.emplace(std::move(cacheKey), result);
+        subproblem.resultCache.emplace(cacheKey, result);
+        if (result.status == solver::Status::Optimal) {
+            ExactScenario::OperatingCost operatingCost;
+            for (Var& variable : subproblem.variables.daytimeCharge) {
+                operatingCost.daytime += variable.Get(COPT_DBLINFO_VALUE) *
+                    subproblem.daytimeCostMultiplier;
+            }
+            for (Var& variable : subproblem.variables.overnightCharge) {
+                operatingCost.overnight += variable.Get(COPT_DBLINFO_VALUE) *
+                    subproblem.overnightCostMultiplier;
+            }
+            subproblem.operatingCostCache.emplace(std::move(cacheKey), operatingCost);
+        }
     }
+    return result;
+}
+
+solver::Result EvaluateExactFeasibility(ExactScenario& subproblem,
+    const MasterState& master, size_t scenario, const std::vector<double>& values,
+    double remaining)
+{
+    const std::string cacheKey = ExactCacheKey(subproblem, values);
+    const auto exact = subproblem.resultCache.find(cacheKey);
+    if (exact != subproblem.resultCache.end()) {
+        solver::Result result = exact->second;
+        result.seconds = 0.0;
+        return result;
+    }
+    const auto cached = subproblem.feasibilityCache.find(cacheKey);
+    if (cached != subproblem.feasibilityCache.end()) {
+        solver::Result result = cached->second;
+        result.seconds = 0.0;
+        return result;
+    }
+
+    FixExactResources(subproblem, master, scenario, values);
+    subproblem.model->SetObjective(Expr(0.0), COPT_MINIMIZE);
+    subproblem.model->SetDblParam(COPT_DBLPARAM_TIMELIMIT, std::max(0.001, remaining));
+    subproblem.model->Update();
+    solver::Result result;
+    try {
+        result = solver::Solve(*subproblem.model);
+    } catch (...) {
+        subproblem.model->SetObjective(*subproblem.objective, COPT_MINIMIZE);
+        subproblem.model->Update();
+        throw;
+    }
+    subproblem.model->SetObjective(*subproblem.objective, COPT_MINIMIZE);
+    subproblem.model->Update();
+    if (result.hasSolution || result.status == solver::Status::Infeasible) {
+        subproblem.feasibilityCache.emplace(cacheKey, result);
+    }
+    return result;
+}
+
+size_t SelectedBatteryLevel(const std::vector<BatteryLevel>& levels,
+    const std::vector<double>& values)
+{
+    for (size_t level = 0; level < levels.size(); ++level) {
+        if (values.at(levels.at(level).index) > 0.5) return level;
+    }
+    throw std::runtime_error("No battery level selected");
+}
+
+void SelectBatteryLevel(const std::vector<BatteryLevel>& levels, size_t selected,
+    std::vector<double>& values)
+{
+    for (size_t level = 0; level < levels.size(); ++level) {
+        values.at(levels.at(level).index) = level == selected ? 1.0 : 0.0;
+    }
+}
+
+struct RepairResource {
+    enum class Type { Facility, Battery };
+    Type type = Type::Battery;
+    size_t index = 0;
+    double cost = 0.0;
+};
+
+struct RepairResult {
+    std::vector<double> infeasibleAnchor;
+    std::vector<double> feasibleDesign;
+    double seconds = 0.0;
+    int probes = 0;
+    int acceptedResources = 0;
+};
+
+enum class ProbeClassification { Infeasible, Feasible, Unknown };
+
+struct ProbeResult {
+    ProbeClassification classification = ProbeClassification::Unknown;
+    solver::Result solve;
+};
+
+std::string BatteryVector(const MasterState& master, size_t scenario,
+    const std::vector<double>& values)
+{
+    std::ostringstream out;
+    for (size_t route = 0; route < master.batteries.at(scenario).size(); ++route) {
+        if (route != 0) out << ';';
+        const auto& levels = master.batteries.at(scenario).at(route);
+        out << route << ':' << levels.at(SelectedBatteryLevel(levels, values)).capacity;
+    }
+    return out.str();
+}
+
+std::string RepairKey(const MasterState& master, const ExactScenario& subproblem,
+    size_t scenario, const std::vector<double>& values)
+{
+    std::ostringstream out;
+    for (size_t index : subproblem.relevant) {
+        if (index < master.facilities.size()) out << (values.at(index) > 0.5 ? '1' : '0');
+    }
+    out << '|';
+    for (const auto& route : master.batteries.at(scenario)) {
+        out << SelectedBatteryLevel(route, values) << ',';
+    }
+    return out.str();
+}
+
+void MaximizeResource(const MasterState& master, size_t scenario,
+    const RepairResource& resource, std::vector<double>& values)
+{
+    if (resource.type == RepairResource::Type::Facility) {
+        values.at(resource.index) = 1.0;
+    } else {
+        const auto& levels = master.batteries.at(scenario).at(resource.index);
+        SelectBatteryLevel(levels, levels.size() - 1, values);
+    }
+}
+
+RepairResult RepairInfeasibleScenario(ExactScenario& subproblem,
+    const MasterState& master, size_t scenario,
+    const std::vector<double>& original, const SolverConfig& config,
+    const std::chrono::steady_clock::time_point& globalStart)
+{
+    const auto repairStart = std::chrono::steady_clock::now();
+    RepairResult result;
+    result.infeasibleAnchor = original;
+    double feasibleDesignCost = std::numeric_limits<double>::infinity();
+
+    const auto recordFeasibleDesign = [&](const std::vector<double>& candidate) {
+        const double cost = DesignCost(master, candidate);
+        if (cost + kTolerance < feasibleDesignCost) {
+            feasibleDesignCost = cost;
+            result.feasibleDesign = candidate;
+        }
+    };
+
+    std::set<size_t> relevantFacilities;
+    for (size_t index : subproblem.relevant) {
+        if (index < master.facilities.size()) relevantFacilities.insert(index);
+    }
+
+    std::vector<RepairResource> resources;
+    for (size_t route = 0; route < master.batteries.at(scenario).size(); ++route) {
+        const auto& levels = master.batteries.at(scenario).at(route);
+        const size_t current = SelectedBatteryLevel(levels, original);
+        if (current + 1 >= levels.size()) continue;
+        resources.push_back({RepairResource::Type::Battery, route,
+            master.costs.at(levels.back().index) -
+                master.costs.at(levels.at(current).index)});
+    }
+    for (size_t facility : relevantFacilities) {
+        if (original.at(facility) < 0.5) {
+            resources.push_back({RepairResource::Type::Facility, facility,
+                master.costs.at(facility)});
+        }
+    }
+    std::sort(resources.begin(), resources.end(),
+        [](const RepairResource& lhs, const RepairResource& rhs) {
+            if (std::fabs(lhs.cost - rhs.cost) > 1e-12) {
+                return lhs.cost > rhs.cost;
+            }
+            if (lhs.type != rhs.type) return lhs.type < rhs.type;
+            return lhs.index < rhs.index;
+        });
+
+    const auto rollbackPrefix = [&](size_t count) {
+        std::vector<double> candidate = original;
+        for (const RepairResource& resource : resources) {
+            MaximizeResource(master, scenario, resource, candidate);
+        }
+        for (size_t index = 0; index < count; ++index) {
+            const RepairResource& resource = resources.at(index);
+            if (resource.type == RepairResource::Type::Facility) {
+                candidate.at(resource.index) = original.at(resource.index);
+            } else {
+                const auto& levels = master.batteries.at(scenario).at(resource.index);
+                SelectBatteryLevel(levels, SelectedBatteryLevel(levels, original),
+                    candidate);
+            }
+        }
+        return candidate;
+    };
+
+    std::map<std::string, ProbeResult> cache;
+    const auto probe = [&](const std::vector<double>& values) {
+        const std::string key = RepairKey(master, subproblem, scenario, values);
+        const auto found = cache.find(key);
+        if (found != cache.end()) return found->second;
+
+        ProbeResult probeResult;
+        const double remaining = config.timeLimit - Elapsed(globalStart);
+        if (remaining <= 0.0) return probeResult;
+        probeResult.solve = EvaluateExactFeasibility(
+            subproblem, master, scenario, values, remaining);
+        ++result.probes;
+        result.seconds += probeResult.solve.seconds;
+        if (probeResult.solve.status == solver::Status::Infeasible) {
+            probeResult.classification = ProbeClassification::Infeasible;
+        } else if (probeResult.solve.hasSolution) {
+            probeResult.classification = ProbeClassification::Feasible;
+        }
+        cache.emplace(key, probeResult);
+        return probeResult;
+    };
+
+    try {
+        if (!resources.empty()) {
+            const std::vector<double> maximum = rollbackPrefix(0);
+            const ProbeResult maximumResult = probe(maximum);
+            if (maximumResult.classification == ProbeClassification::Infeasible) {
+                result.infeasibleAnchor = maximum;
+            } else if (maximumResult.classification == ProbeClassification::Feasible) {
+                recordFeasibleDesign(maximum);
+                size_t feasible = 0;
+                size_t infeasible = resources.size();
+                while (infeasible - feasible > 1) {
+                    const size_t middle = feasible + (infeasible - feasible) / 2;
+                    const std::vector<double> candidate = rollbackPrefix(middle);
+                    const ProbeResult middleResult = probe(candidate);
+                    if (middleResult.classification == ProbeClassification::Feasible) {
+                        feasible = middle;
+                        recordFeasibleDesign(candidate);
+                    } else if (middleResult.classification ==
+                            ProbeClassification::Infeasible) {
+                        result.infeasibleAnchor = candidate;
+                        break;
+                    } else {
+                        result.infeasibleAnchor = rollbackPrefix(infeasible);
+                        break;
+                    }
+                }
+            }
+
+            for (const RepairResource& resource : resources) {
+                if (resource.type == RepairResource::Type::Facility) {
+                    if (result.infeasibleAnchor.at(resource.index) >
+                        original.at(resource.index) + 0.5) {
+                        ++result.acceptedResources;
+                    }
+                } else {
+                    const auto& levels = master.batteries.at(scenario).at(resource.index);
+                    if (SelectedBatteryLevel(levels, result.infeasibleAnchor) >
+                        SelectedBatteryLevel(levels, original)) {
+                        ++result.acceptedResources;
+                    }
+                }
+            }
+        }
+    } catch (...) {
+        FixExactResources(subproblem, master, scenario, original);
+        throw;
+    }
+
+    FixExactResources(subproblem, master, scenario, original);
+    result.seconds = std::chrono::duration<double>(
+        std::chrono::steady_clock::now() - repairStart).count();
     return result;
 }
 
@@ -557,7 +901,8 @@ Expr AffineCut(const MasterState& master, const ScenarioRelaxationResult& result
 } // namespace
 
 solver::Result SolveFramework(const InstanceData& instance,
-    const RunConfig& runConfig, const SolverConfig& solverConfig, bool monotoneCuts)
+    const RunConfig& runConfig, const SolverConfig& solverConfig,
+    bool repairEnhancedCuts)
 {
     const auto start = std::chrono::steady_clock::now();
     const auto preprocessStart = std::chrono::steady_clock::now();
@@ -571,7 +916,8 @@ solver::Result SolveFramework(const InstanceData& instance,
         ? model::SelectDwcCandidates(instance, runConfig.dwcTopN)
         : std::vector<model::DwcLink>();
     Envr environment;
-    Model model = environment.CreateModel(monotoneCuts ? "full_master" : "lifted_two_phase_master");
+    Model model = environment.CreateModel(
+        repairEnhancedCuts ? "full_master" : "lifted_two_phase_master");
     MasterState master = BuildMaster(model, instance, candidates, batteryCapacityLimits);
     solver::Configure(model, solverConfig, solverConfig.phase2MasterLog);
 
@@ -640,6 +986,9 @@ solver::Result SolveFramework(const InstanceData& instance,
         int rspOptimalityCuts = 0;
         double rspRecourse = 0.0;
         bool rspInfeasible = false;
+        double repairSeconds = 0.0;
+        int repairProbes = 0;
+        int strengthenedCuts = 0;
         if (runConfig.useRsp) {
             const auto rspStart = std::chrono::steady_clock::now();
             const std::vector<ScenarioRelaxationResult> rspResults =
@@ -655,9 +1004,7 @@ solver::Result SolveFramework(const InstanceData& instance,
                     } else {
                         const Expr mismatch = Mismatch(master, values,
                             subproblems.at(scenario).relevant);
-                        const Expr improvements = MonotoneImprovements(master, scenario,
-                            values, subproblems.at(scenario).relevant);
-                        model.AddConstr((monotoneCuts ? improvements : mismatch) >= 1.0,
+                        model.AddConstr(mismatch >= 1.0,
                             ("p2_rsp_fallback_" + std::to_string(iteration) + "_" +
                                 std::to_string(scenario)).c_str());
                     }
@@ -687,30 +1034,60 @@ solver::Result SolveFramework(const InstanceData& instance,
                 PrintBounds(upperBound, lowerBound);
                 std::cout << ", master_ms=" << masterResult.seconds * 1000.0
                           << ", rsp_ms=" << rspSeconds * 1000.0
+                          << ", repair_probes=" << repairProbes
+                          << ", repair_ms=" << repairSeconds * 1000.0
+                          << ", strengthened_cuts=" << strengthenedCuts
                           << ", elapsed_ms=" << Elapsed(start) * 1000.0 << '\n';
                 continue;
             }
         }
+        std::vector<std::vector<double>> repairFeasibleDesigns(subproblems.size());
         for (size_t scenario = 0; scenario < subproblems.size(); ++scenario) {
             remaining = solverConfig.timeLimit - Elapsed(start);
             const solver::Result result = EvaluateExact(subproblems.at(scenario), master,
                 scenario, values, remaining);
             subproblemSeconds += result.seconds;
             const Expr mismatch = Mismatch(master, values, subproblems.at(scenario).relevant);
-            const Expr improvements = MonotoneImprovements(master, scenario, values,
-                subproblems.at(scenario).relevant);
             if (result.status == solver::Status::Infeasible) {
-                model.AddConstr((monotoneCuts ? improvements : mismatch) >= 1.0,
-                    ("p2_feas_" + std::to_string(iteration) + "_" +
-                        std::to_string(scenario)).c_str());
-                ++feasibilityCuts;
+                std::vector<std::vector<double>> infeasibleAnchors;
+                if (repairEnhancedCuts) {
+                    const RepairResult repair = RepairInfeasibleScenario(
+                        subproblems.at(scenario), master, scenario, values,
+                        solverConfig, start);
+                    repairSeconds += repair.seconds;
+                    repairProbes += repair.probes;
+                    if (!repair.feasibleDesign.empty()) {
+                        repairFeasibleDesigns.at(scenario) = repair.feasibleDesign;
+                    }
+                    infeasibleAnchors.push_back(repair.infeasibleAnchor);
+                    if (repair.acceptedResources > 0) ++strengthenedCuts;
+
+                    std::cout << "Repair iter=" << iteration
+                              << ", scenario=" << scenario
+                              << ", before=" << BatteryVector(master, scenario, values)
+                              << ", after=" << BatteryVector(master, scenario,
+                                    repair.infeasibleAnchor)
+                              << ", probes=" << repair.probes
+                              << ", repair_ms=" << repair.seconds * 1000.0
+                              << ", accepted_resources=" << repair.acceptedResources
+                              << '\n';
+                }
+                if (infeasibleAnchors.empty()) infeasibleAnchors.push_back(values);
+                for (size_t anchor = 0; anchor < infeasibleAnchors.size(); ++anchor) {
+                    const Expr improvements = MonotoneImprovements(master, scenario,
+                        infeasibleAnchors.at(anchor), subproblems.at(scenario).relevant);
+                    model.AddConstr((repairEnhancedCuts ? improvements : mismatch) >= 1.0,
+                        ("p2_feas_" + std::to_string(iteration) + "_" +
+                            std::to_string(scenario) + "_" +
+                            std::to_string(anchor)).c_str());
+                    ++feasibilityCuts;
+                }
                 infeasible = true;
             } else if (result.status == solver::Status::Optimal) {
+                repairFeasibleDesigns.at(scenario) = values;
                 recourse += result.objective;
                 if (thetaValues.at(scenario) + kTolerance < result.objective) {
-                    const Expr optimalityRhs = monotoneCuts
-                        ? result.objective * (1.0 - improvements)
-                        : result.objective * (1.0 - mismatch);
+                    const Expr optimalityRhs = result.objective * (1.0 - mismatch);
                     model.AddConstr(master.scenarioTheta.at(scenario) >= optimalityRhs,
                         ("p2_opt_" + std::to_string(iteration) + "_" +
                             std::to_string(scenario)).c_str());
@@ -718,8 +1095,59 @@ solver::Result SolveFramework(const InstanceData& instance,
                 }
             } else return result;
         }
+        double repairUpperBound = std::numeric_limits<double>::infinity();
+        if (infeasible && repairEnhancedCuts &&
+            std::all_of(repairFeasibleDesigns.begin(), repairFeasibleDesigns.end(),
+                [](const std::vector<double>& design) { return !design.empty(); })) {
+            std::vector<double> repairedDesign = values;
+            for (size_t scenario = 0; scenario < repairFeasibleDesigns.size(); ++scenario) {
+                for (size_t facility = 0; facility < master.facilities.size(); ++facility) {
+                    repairedDesign.at(facility) = std::max(
+                        repairedDesign.at(facility),
+                        repairFeasibleDesigns.at(scenario).at(facility));
+                }
+                for (const auto& route : master.batteries.at(scenario)) {
+                    for (const BatteryLevel& level : route) {
+                        repairedDesign.at(level.index) =
+                            repairFeasibleDesigns.at(scenario).at(level.index);
+                    }
+                }
+            }
+            double exactRepairRecourse = 0.0;
+            bool exactRepairSolved = true;
+            for (size_t scenario = 0; scenario < subproblems.size(); ++scenario) {
+                remaining = solverConfig.timeLimit - Elapsed(start);
+                if (remaining <= 0.0) {
+                    exactRepairSolved = false;
+                    break;
+                }
+                const solver::Result result = EvaluateExact(subproblems.at(scenario),
+                    master, scenario, repairedDesign, remaining);
+                subproblemSeconds += result.seconds;
+                if (result.status != solver::Status::Optimal) {
+                    exactRepairSolved = false;
+                    break;
+                }
+                exactRepairRecourse += result.objective;
+            }
+            if (exactRepairSolved) {
+                repairUpperBound = DesignCost(master, repairedDesign) +
+                    exactRepairRecourse;
+                if (repairUpperBound + kTolerance < upperBound) {
+                    PrintCostBreakdown("repair-exact", master, repairedDesign,
+                        subproblems);
+                    upperBound = repairUpperBound;
+                }
+            }
+        }
         model.Update();
-        if (!infeasible) upperBound = std::min(upperBound, DesignCost(master, values) + recourse);
+        if (!infeasible) {
+            const double candidateUpperBound = DesignCost(master, values) + recourse;
+            if (candidateUpperBound + kTolerance < upperBound) {
+                PrintCostBreakdown("master", master, values, subproblems);
+                upperBound = candidateUpperBound;
+            }
+        }
         std::cout << "Phase 2 iter " << iteration;
         if (infeasible) std::cout << ", feasibility cut x" << feasibilityCuts;
         else std::cout << ", theta=" << thetaValue << ", Q(z)=" << recourse
@@ -728,6 +1156,13 @@ solver::Result SolveFramework(const InstanceData& instance,
         std::cout << ", master_ms=" << masterResult.seconds * 1000.0
                   << ", rsp_ms=" << rspSeconds * 1000.0
                   << ", subproblem_ms=" << subproblemSeconds * 1000.0
+                  << ", repair_probes=" << repairProbes
+                  << ", repair_ms=" << repairSeconds * 1000.0
+                  << ", strengthened_cuts=" << strengthenedCuts
+                  << ", repair_ub=";
+        if (std::isfinite(repairUpperBound)) std::cout << repairUpperBound;
+        else std::cout << "inf";
+        std::cout
                   << ", elapsed_ms=" << Elapsed(start) * 1000.0 << '\n';
 
         if (std::isfinite(upperBound) && (upperBound - lowerBound) /
@@ -740,7 +1175,8 @@ solver::Result SolveFramework(const InstanceData& instance,
             result.relativeGap = (upperBound - lowerBound) /
                 std::max(1.0, std::fabs(upperBound));
             result.seconds = Elapsed(start);
-            std::cout << (monotoneCuts ? "Full" : "Lifted Two-Phase") << " converged.\n";
+            std::cout << (repairEnhancedCuts ? "Full" : "Lifted Two-Phase")
+                      << " converged.\n";
             return result;
         }
     }

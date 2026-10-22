@@ -17,7 +17,6 @@
 namespace wireless::algorithm {
 namespace {
 
-constexpr int kBatteryStep = 20;
 constexpr int kMaximumIterations = 5000;
 constexpr double kCutTolerance = 1e-6;
 
@@ -115,9 +114,8 @@ LiftedMaster BuildMaster(Model& master, const InstanceData& instance,
             Expr selectOne(0.0);
             const double unitCost = instance.scenarios.at(scenario).descriptor.probability *
                 busesByRoute.at(route) * instance.operation.batteryUnitPrice;
-            for (int capacity = static_cast<int>(instance.operation.minimumBatteryCapacity);
-                 capacity <= static_cast<int>(instance.operation.maximumBatteryCapacity);
-                 capacity += kBatteryStep) {
+            for (int capacity : BatteryCapacityLevels(instance.operation,
+                     static_cast<int>(instance.operation.maximumBatteryCapacity))) {
                 const std::string name = "sc" + std::to_string(scenario) + "_E_r" +
                     std::to_string(route) + "_cap" + std::to_string(capacity);
                 const Var variable = master.AddVar(
