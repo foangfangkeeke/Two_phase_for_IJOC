@@ -3,7 +3,7 @@
 ## Fixed settings
 
 - Solver: COPT
-- Time limit: 3600 seconds per run
+- Time limit: 7200 seconds per run
 - Battery step: 50 kWh
 - Energy scale: 1.0
 - Charging window: 10 minutes from the source data
@@ -23,8 +23,10 @@ Only these four scale dimensions appear in result directory names.
 | Capacity | 3 | Lifted Two-Phase, Full | 6 |
 | Total | 18 | | 72 |
 
-`R28-N5-F40-C3 / Full` is already complete and is stored under
-`results/experiments/R28-N5-F40-C3`. It is not included in the pending count.
+`R28-N5-F40-C3 / Lifted Two-Phase, Full` is already complete and is stored under
+`results/experiments/R28-N5-F40-C3`. Its fixed scenarios are `base`, `hi20pct`,
+`route_984_up25`, `route_941_down25`, and `route_453_up25`. It is not included
+in the pending count.
 
 ## Algorithm mapping
 

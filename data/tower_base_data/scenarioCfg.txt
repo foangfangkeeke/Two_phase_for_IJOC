@@ -2,14 +2,14 @@
 40
 # scenario_folder,probability
 base,0.025
-lo10pct,0.025
-hi10pct,0.025
-lo20pct,0.025
 hi20pct,0.025
 route_984_up25,0.025
 route_941_down25,0.025
-pair1_mix,0.025
 route_453_up25,0.025
+lo10pct,0.025
+hi10pct,0.025
+lo20pct,0.025
+pair1_mix,0.025
 route_173_up25,0.025
 route_284_down25,0.025
 route_41_up25,0.025

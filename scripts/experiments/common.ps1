@@ -67,7 +67,7 @@ function Invoke-ExperimentGroup {
                 Select-String -Pattern '^Log file: ' | Select-Object -Last 1).Line
             $solverLog = $solverLogLine.Substring('Log file: '.Length)
             $archivedLog = Join-Path $logDirectory ("{0}_{1}.log" -f $case.Id, $case.Algorithm)
-            Copy-Item -LiteralPath (Join-Path $root $solverLog) -Destination $archivedLog
+            Move-Item -LiteralPath (Join-Path $root $solverLog) -Destination $archivedLog
             $end = Get-Date
             $doneLine = "[{0}] DONE instance={1} algorithm={2} exit={3} elapsed_s={4:F3} solver_log={5}" -f (
                 $end.ToString('yyyy-MM-dd HH:mm:ss'),
