@@ -12,6 +12,7 @@ enum class Status {
     Optimal,
     Infeasible,
     Unbounded,
+    Numerical,
     TimeLimit,
     Interrupted,
     Unknown

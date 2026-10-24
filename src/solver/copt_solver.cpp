@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <iostream>
 
 namespace solver {
 
@@ -32,8 +33,10 @@ Result Solve(Model& model)
     else if (nativeStatus == COPT_STATUS_INFEASIBLE) result.status = Status::Infeasible;
     else if (nativeStatus == COPT_STATUS_UNBOUNDED || nativeStatus == COPT_STATUS_INF_OR_UNB) {
         result.status = Status::Unbounded;
-    } else if (nativeStatus == COPT_STATUS_TIMEOUT) result.status = Status::TimeLimit;
+    } else if (nativeStatus == COPT_STATUS_NUMERICAL) result.status = Status::Numerical;
+    else if (nativeStatus == COPT_STATUS_TIMEOUT) result.status = Status::TimeLimit;
     else if (nativeStatus == COPT_STATUS_INTERRUPTED) result.status = Status::Interrupted;
+    else std::cerr << "COPT returned unmapped status=" << nativeStatus << '\n';
 
     result.hasSolution = model.GetIntAttr(COPT_INTATTR_HASSOL) != 0;
     if (result.hasSolution) result.objective = model.GetDblAttr(COPT_DBLATTR_OBJVAL);
@@ -54,6 +57,7 @@ std::string ToString(Status status)
     case Status::Optimal: return "OPTIMAL";
     case Status::Infeasible: return "INFEASIBLE";
     case Status::Unbounded: return "UNBOUNDED";
+    case Status::Numerical: return "NUMERICAL";
     case Status::TimeLimit: return "TIME_LIMIT";
     case Status::Interrupted: return "INTERRUPTED";
     case Status::Unknown: return "UNKNOWN";

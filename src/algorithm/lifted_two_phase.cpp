@@ -1108,6 +1108,13 @@ solver::Result SolveFramework(const InstanceData& instance,
                                 std::to_string(scenario)).c_str());
                         ++rspOptimalityCuts;
                     }
+                } else if (result.status == solver::Status::Numerical ||
+                    result.status == solver::Status::TimeLimit ||
+                    result.status == solver::Status::Interrupted) {
+                    std::cout << "Phase 2 iter " << iteration
+                              << ", RSP scenario=" << scenario
+                              << " skipped after status="
+                              << solver::ToString(result.status) << '\n';
                 } else {
                     solver::Result failed;
                     failed.status = result.status;
