@@ -17,6 +17,8 @@ struct RunConfig {
     bool allowWirelessCharging = true;
     bool preprocessBounds = false;
     bool useRsp = false;
+    int rspWorkers = 0;
+    int rspThreads = 0;
     bool phaseProgressLog = false;
     bool phase2MasterLog = false;
     bool exportSolution = false;

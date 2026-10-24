@@ -13,7 +13,8 @@ ScenarioRelaxation::ScenarioRelaxation(const InstanceData& instance,
     size_t scenarioIndex, const std::vector<model::DwcLink>& candidates,
     const std::vector<std::vector<size_t>>& batteryMasterIndices,
     const std::vector<int>& maximumBatteryCapacities,
-    size_t masterVariableCount, const SolverConfig& solverConfig)
+    size_t masterVariableCount, const SolverConfig& solverConfig,
+    int threads)
     : masterVariableCount_(masterVariableCount),
       environment_(std::make_unique<Envr>())
 {
@@ -69,7 +70,7 @@ ScenarioRelaxation::ScenarioRelaxation(const InstanceData& instance,
     model_->SetObjective(objective, COPT_MINIMIZE);
     model_->Update();
     SolverConfig relaxationConfig = solverConfig;
-    relaxationConfig.threads = 1;
+    relaxationConfig.threads = threads;
     solver::Configure(*model_, relaxationConfig, false);
     model_->SetIntParam(COPT_INTPARAM_LPMETHOD, 1);
     model_->SetIntParam(COPT_INTPARAM_REQFARKASRAY, 1);

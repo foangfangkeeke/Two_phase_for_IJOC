@@ -66,6 +66,12 @@ ParsedCommandLine ParseCommandLine(int argc, char* argv[])
             result.config.preprocessBounds = ParseBool(NextValue(argc, argv, index), option);
         } else if (option == "--rsp") {
             result.config.useRsp = ParseBool(NextValue(argc, argv, index), option);
+        } else if (option == "--rsp-workers") {
+            result.config.rspWorkers = ParsePositiveInt(
+                NextValue(argc, argv, index), option);
+        } else if (option == "--rsp-threads") {
+            result.config.rspThreads = ParsePositiveInt(
+                NextValue(argc, argv, index), option);
         } else if (option == "--phase-progress-log") {
             result.config.phaseProgressLog = ParseBool(NextValue(argc, argv, index), option);
         } else if (option == "--phase2-master-log") {
@@ -106,5 +112,7 @@ void PrintUsage()
         << "  --battery-step <positive integer kWh>\n"
         << "  --wireless-option <0|1>\n"
         << "  --rsp <0|1> (lifted-two-phase/full only)\n"
+        << "  --rsp-workers <positive integer> (default: auto, up to 3)\n"
+        << "  --rsp-threads <positive integer> (default: auto within thread budget)\n"
         << "  --help, -h\n";
 }

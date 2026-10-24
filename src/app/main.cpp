@@ -91,7 +91,13 @@ void PrintRuntimeOptions(const RunConfig& config)
               << ", dwc_top_n=" << config.dwcTopN
               << ", wireless_option=" << (config.allowWirelessCharging ? 1 : 0)
               << ", rsp=" << (config.useRsp ? 1 : 0)
-              << ", preprocess_bounds=" << (config.preprocessBounds ? 1 : 0)
+              << ", rsp_workers=";
+    if (config.rspWorkers > 0) std::cout << config.rspWorkers;
+    else std::cout << "auto";
+    std::cout << ", rsp_threads=";
+    if (config.rspThreads > 0) std::cout << config.rspThreads;
+    else std::cout << "auto";
+    std::cout << ", preprocess_bounds=" << (config.preprocessBounds ? 1 : 0)
               << '\n';
 }
 

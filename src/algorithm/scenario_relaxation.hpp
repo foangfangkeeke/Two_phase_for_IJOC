@@ -25,7 +25,8 @@ public:
         const std::vector<model::DwcLink>& candidates,
         const std::vector<std::vector<size_t>>& batteryMasterIndices,
         const std::vector<int>& maximumBatteryCapacities,
-        size_t masterVariableCount, const SolverConfig& solverConfig);
+        size_t masterVariableCount, const SolverConfig& solverConfig,
+        int threads);
 
     ScenarioRelaxationResult Evaluate(const std::vector<double>& masterValues,
         double remainingSeconds);
