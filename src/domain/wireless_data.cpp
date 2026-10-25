@@ -210,9 +210,13 @@ std::vector<int> BatteryCapacityLevels(const OperationData& operation,
     const int minimum = static_cast<int>(operation.minimumBatteryCapacity);
     const int physicalMaximum = static_cast<int>(operation.maximumBatteryCapacity);
     const int upper = std::min(maximumCapacity, physicalMaximum);
+    const int step = operation.batteryCapacityStep;
+    const int first = ((minimum + step - 1) / step) * step;
+    if (upper < first) {
+        throw std::invalid_argument("Battery upper bound is below the first capacity level");
+    }
     std::vector<int> levels;
-    for (int capacity = minimum; capacity <= upper;
-         capacity += operation.batteryCapacityStep) {
+    for (int capacity = first; capacity <= upper; capacity += step) {
         levels.push_back(capacity);
     }
     if (levels.back() != upper) levels.push_back(upper);
