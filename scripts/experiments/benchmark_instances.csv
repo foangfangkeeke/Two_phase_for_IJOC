@@ -26,9 +26,9 @@ sequence,group,instance_id,data,R,N,F,C,battery_step,energy_scale,time_limit_sec
 25,main-c3,R28-N5-F10-C3,tower_base,28,5,10,3,50,1.0,7200,full,full
 26,main-c3,R28-N5-F20-C3,tower_base,28,5,20,3,50,1.0,7200,full,full
 27,main-c3,R28-N5-F50-C3,tower_base,28,5,50,3,50,1.0,7200,full,full
-28,scenario-c3,R28-N3-F50-C3,tower_base,28,3,50,3,50,1.0,7200,full,
+28,scenario-c3,R28-N3-F50-C3,tower_base,28,3,50,3,50,1.0,7200,full,full
 29,scenario-c3,R28-N10-F50-C3,tower_base,28,10,50,3,50,1.0,7200,full,
 30,scenario-c3,R28-N20-F50-C3,tower_base,28,20,50,3,50,1.0,7200,full,
 31,scenario-c3,R28-N40-F50-C3,tower_base,28,40,50,3,50,1.0,7200,full,
-32,facility-c3,R28-N5-F30-C3,tower_base,28,5,30,3,50,1.0,7200,full,
-33,facility-c3,R28-N5-F100-C3,tower_base,28,5,100,3,50,1.0,7200,full,
+32,facility-c3,R28-N5-F30-C3,tower_base,28,5,30,3,50,1.0,7200,full,full
+33,facility-c3,R28-N5-F100-C3,tower_base,28,5,100,3,50,1.0,7200,full,full
