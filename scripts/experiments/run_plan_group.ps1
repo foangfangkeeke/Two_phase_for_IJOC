@@ -26,13 +26,15 @@ $root = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
 $plan = Import-Csv (Join-Path $PSScriptRoot 'benchmark_instances.csv')
 $rows = @($plan | Where-Object {
     $_.group -eq $Group -and
-    ([string[]]($_.algorithms -split ';')) -contains $Algorithm
+    ([string[]]($_.algorithms -split ';')) -contains $Algorithm -and
+    ([string[]]($_.completed_algorithms -split ';')) -notcontains $Algorithm
 })
 if ($InstanceId) {
     $rows = @($rows | Where-Object { $_.instance_id -eq $InstanceId })
 }
 if ($rows.Count -eq 0) {
-    throw "No planned runs match group=$Group algorithm=$Algorithm instance=$InstanceId"
+    Write-Host "No pending runs match group=$Group algorithm=$Algorithm instance=$InstanceId"
+    exit 0
 }
 
 $timeLimitLine = Get-Content (Join-Path $root 'solverCfg.txt') |
