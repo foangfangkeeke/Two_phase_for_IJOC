@@ -23,6 +23,17 @@ Only these four scale dimensions appear in result directory names.
 | Capacity | 3 | Lifted Two-Phase, Full | 6 |
 | Total | 18 | | 72 |
 
+The C3 screening groups preserve the C4 runs and evaluate the corresponding
+15 C4 instances at capacity 3. The existing `R3-N5-F50-C3` and
+`R12-N5-F50-C3` Full results are reused, leaving 13 new Full runs:
+
+| Group | Instances | Pending Full runs |
+| --- | ---: | ---: |
+| Main C3 | 9 | 7 |
+| Scenario C3 | 4 | 4 |
+| Facility C3 | 2 | 2 |
+| Total | 15 | 13 |
+
 `R28-N5-F40-C3 / Lifted Two-Phase, Full` is already complete and is stored under
 `results/experiments/R28-N5-F40-C3`. Its fixed scenarios are `base`, `hi20pct`,
 `route_984_up25`, `route_941_down25`, and `route_453_up25`. It is not included

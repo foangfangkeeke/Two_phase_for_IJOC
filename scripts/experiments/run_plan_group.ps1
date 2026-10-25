@@ -1,6 +1,14 @@
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('main', 'scenario', 'facility', 'capacity')]
+    [ValidateSet(
+        'main',
+        'scenario',
+        'facility',
+        'capacity',
+        'main-c3',
+        'scenario-c3',
+        'facility-c3'
+    )]
     [string]$Group,
 
     [Parameter(Mandatory = $true)]
