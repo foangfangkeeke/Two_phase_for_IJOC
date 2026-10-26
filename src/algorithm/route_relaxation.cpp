@@ -56,7 +56,7 @@ RouteRelaxation::RouteRelaxation(const InstanceData& instance, size_t scenarioIn
     const SolverConfig& solverConfig)
     : scenarioIndex_(scenarioIndex), routeIndex_(routeIndex),
       masterVariableCount_(masterVariableCount), batteryLevels_(batteryLevels),
-      environment_(std::make_unique<Envr>())
+      environment_(std::make_unique<Envr>(solver::CreateEnvironment()))
 {
     model_ = std::make_unique<Model>(environment_->CreateModel(
         ("route_relax_sc" + std::to_string(scenarioIndex) + "_r" +

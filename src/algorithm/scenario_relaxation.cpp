@@ -16,7 +16,7 @@ ScenarioRelaxation::ScenarioRelaxation(const InstanceData& instance,
     size_t masterVariableCount, const SolverConfig& solverConfig,
     int threads)
     : masterVariableCount_(masterVariableCount),
-      environment_(std::make_unique<Envr>())
+      environment_(std::make_unique<Envr>(solver::CreateEnvironment()))
 {
     model_ = std::make_unique<Model>(environment_->CreateModel(
         ("rsp_scenario_" + std::to_string(scenarioIndex)).c_str()));

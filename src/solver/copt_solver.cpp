@@ -1,11 +1,22 @@
 #include "solver/copt_solver.hpp"
 
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cmath>
 #include <iostream>
 
 namespace solver {
+
+Envr CreateEnvironment()
+{
+    static std::atomic<bool> bannerShown{false};
+    if (!bannerShown.exchange(true)) return Envr();
+
+    EnvrConfig config;
+    config.Set("nobanner", "1");
+    return Envr(config);
+}
 
 void Configure(Model& model, const SolverConfig& config, bool enableLog)
 {

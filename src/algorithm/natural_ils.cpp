@@ -106,7 +106,7 @@ solver::Result SolveNaturalIls(const InstanceData& instance,
         ? model::SelectDwcCandidates(instance, runConfig.dwcTopN)
         : std::vector<model::DwcLink>();
 
-    Envr masterEnvironment;
+    Envr masterEnvironment = solver::CreateEnvironment();
     Model master = masterEnvironment.CreateModel("natural_ils_master");
     std::vector<Var> masterFacilities;
     std::vector<double> facilityCosts;
@@ -140,7 +140,7 @@ solver::Result SolveNaturalIls(const InstanceData& instance,
     subproblems.reserve(instance.scenarios.size());
     for (size_t scenarioIndex = 0; scenarioIndex < instance.scenarios.size(); ++scenarioIndex) {
         ScenarioSubproblem state;
-        state.environment = std::make_unique<Envr>();
+        state.environment = std::make_unique<Envr>(solver::CreateEnvironment());
         state.model = std::make_unique<Model>(state.environment->CreateModel(
             ("natural_scenario_" + std::to_string(scenarioIndex)).c_str()));
         model::FacilityVariables facilities;

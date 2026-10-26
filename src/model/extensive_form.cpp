@@ -10,7 +10,7 @@ namespace wireless::model {
 solver::Result SolveExtensiveForm(const InstanceData& instance, const RunConfig& runConfig,
     const SolverConfig& solverConfig)
 {
-    Envr environment;
+    Envr environment = solver::CreateEnvironment();
     Model model = environment.CreateModel("wireless_extensive_form");
     FacilityVariables facilityVariables;
     Expr objective(0.0);

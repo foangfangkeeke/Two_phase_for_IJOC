@@ -101,6 +101,17 @@ void PrintRuntimeOptions(const RunConfig& config)
               << '\n';
 }
 
+void PrintInstanceSummary(const wireless::InstanceData& instance)
+{
+    std::cout << "Instance: data=" << instance.name << ", scenario_folders=";
+    for (size_t index = 0; index < instance.scenarios.size(); ++index) {
+        if (index != 0) std::cout << ';';
+        std::cout << instance.scenarios.at(index).descriptor.folder;
+    }
+    std::cout << ", battery_range=[" << instance.operation.minimumBatteryCapacity
+              << ',' << instance.operation.maximumBatteryCapacity << "]\n";
+}
+
 } // namespace
 
 int main(int argc, char* argv[])
@@ -131,6 +142,7 @@ int main(int argc, char* argv[])
                   << ", time_limit=" << solver.timeLimit
                   << ", threads=" << solver.threads << '\n';
         const wireless::InstanceData instance = wireless::LoadInstance(commandLine.config);
+        PrintInstanceSummary(instance);
         if (commandLine.config.algorithm == "ef") {
             const solver::Result result = wireless::model::SolveExtensiveForm(
                 instance, commandLine.config, solver);
@@ -159,13 +171,15 @@ int main(int argc, char* argv[])
         if (commandLine.config.algorithm == "lifted-two-phase") {
             const solver::Result result = wireless::algorithm::SolveLiftedTwoPhase(
                 instance, commandLine.config, solver);
-            return result.status == solver::Status::Optimal ? 0 : 1;
+            return result.status == solver::Status::Optimal ||
+                result.status == solver::Status::TimeLimit ? 0 : 1;
         }
 
         if (commandLine.config.algorithm == "full") {
             const solver::Result result = wireless::algorithm::SolveFull(
                 instance, commandLine.config, solver);
-            return result.status == solver::Status::Optimal ? 0 : 1;
+            return result.status == solver::Status::Optimal ||
+                result.status == solver::Status::TimeLimit ? 0 : 1;
         }
 
         std::cout << "data=" << instance.name

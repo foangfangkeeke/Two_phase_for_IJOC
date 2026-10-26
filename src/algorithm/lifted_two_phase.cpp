@@ -499,7 +499,7 @@ ExactScenario BuildExact(const InstanceData& instance, size_t scenario,
         instance.operation.dayEnergyPrice;
     result.overnightCostMultiplier = instance.scenarios.at(scenario).descriptor.probability *
         instance.operation.nightEnergyPrice;
-    result.environment = std::make_unique<Envr>();
+    result.environment = std::make_unique<Envr>(solver::CreateEnvironment());
     result.model = std::make_unique<Model>(result.environment->CreateModel(
         ("phase2_scenario_" + std::to_string(scenario)).c_str()));
     model::FacilityVariables facilities;
@@ -1010,7 +1010,7 @@ solver::Result SolveFramework(const InstanceData& instance,
     const std::vector<model::DwcLink> candidates = runConfig.allowWirelessCharging
         ? model::SelectDwcCandidates(instance, runConfig.dwcTopN)
         : std::vector<model::DwcLink>();
-    Envr environment;
+    Envr environment = solver::CreateEnvironment();
     Model model = environment.CreateModel(
         repairEnhancedCuts ? "full_master" : "lifted_two_phase_master");
     MasterState master = BuildMaster(model, instance, candidates, batteryCapacityLimits);
@@ -1077,6 +1077,22 @@ solver::Result SolveFramework(const InstanceData& instance,
 
     double upperBound = std::numeric_limits<double>::infinity();
     double lowerBound = phaseOne.bound;
+    const auto finalResult = [&](solver::Status status) {
+        solver::Result result;
+        result.status = status;
+        result.hasSolution = std::isfinite(upperBound);
+        result.objective = upperBound;
+        result.bound = lowerBound;
+        result.relativeGap = result.hasSolution
+            ? (upperBound - lowerBound) / std::max(1.0, std::fabs(upperBound))
+            : 1.0;
+        result.seconds = Elapsed(start);
+        std::cout << (repairEnhancedCuts ? "Full" : "Lifted Two-Phase")
+                  << " status=" << solver::ToString(status);
+        PrintBounds(upperBound, lowerBound);
+        std::cout << ", elapsed_ms=" << result.seconds * 1000.0 << '\n';
+        return result;
+    };
     constexpr int kRepairFailureThreshold = 2;
     std::vector<int> unresolvedFailures(subproblems.size(), 0);
     for (int iteration = 0; iteration < kMaximumIterations; ++iteration) {
@@ -1084,6 +1100,10 @@ solver::Result SolveFramework(const InstanceData& instance,
         if (remaining <= 0.0) break;
         model.SetDblParam(COPT_DBLPARAM_TIMELIMIT, remaining);
         const solver::Result masterResult = solver::Solve(model);
+        if (masterResult.status == solver::Status::TimeLimit) {
+            lowerBound = std::max(lowerBound, masterResult.bound);
+            break;
+        }
         if (!masterResult.hasSolution) return masterResult;
         lowerBound = std::max(lowerBound, masterResult.bound);
         const std::vector<double> values = Values(master.design);
@@ -1109,6 +1129,7 @@ solver::Result SolveFramework(const InstanceData& instance,
             subproblems.size(), values);
         bool allRspInfeasibleRepaired = true;
         if (runConfig.useRsp) {
+            bool rspTimedOut = false;
             std::vector<bool> rspCertifiedInfeasible(subproblems.size(), false);
             const auto rspStart = std::chrono::steady_clock::now();
             const std::vector<ScenarioRelaxationResult> rspResults =
@@ -1190,12 +1211,16 @@ solver::Result SolveFramework(const InstanceData& instance,
                               << ", RSP scenario=" << scenario
                               << " skipped after status="
                               << solver::ToString(result.status) << '\n';
+                    if (result.status == solver::Status::TimeLimit) {
+                        rspTimedOut = true;
+                    }
                 } else {
                     solver::Result failed;
                     failed.status = result.status;
                     return failed;
                 }
             }
+            if (rspTimedOut || solverConfig.timeLimit - Elapsed(start) <= 0.0) break;
             if (repairEnhancedCuts && rspInfeasible && allRspInfeasibleRepaired) {
                 const RepairIncumbent incumbent = EvaluateCombinedRepair(
                     subproblems, master, values, rspRepairDesigns,
@@ -1239,9 +1264,14 @@ solver::Result SolveFramework(const InstanceData& instance,
                 continue;
             }
         }
+        bool exactTimedOut = false;
         std::vector<std::vector<double>> repairFeasibleDesigns(subproblems.size());
         for (size_t scenario = 0; scenario < subproblems.size(); ++scenario) {
             remaining = solverConfig.timeLimit - Elapsed(start);
+            if (remaining <= 0.0) {
+                exactTimedOut = true;
+                break;
+            }
             const solver::Result result = EvaluateExact(subproblems.at(scenario), master,
                 scenario, values, remaining);
             subproblemSeconds += result.seconds;
@@ -1306,8 +1336,12 @@ solver::Result SolveFramework(const InstanceData& instance,
                             std::to_string(scenario)).c_str());
                     ++optimalityCuts;
                 }
+            } else if (result.status == solver::Status::TimeLimit) {
+                exactTimedOut = true;
+                break;
             } else return result;
         }
+        if (exactTimedOut) break;
         if (infeasible && repairEnhancedCuts &&
             std::all_of(repairFeasibleDesigns.begin(), repairFeasibleDesigns.end(),
                 [](const std::vector<double>& design) { return !design.empty(); })) {
@@ -1352,26 +1386,12 @@ solver::Result SolveFramework(const InstanceData& instance,
 
         if (std::isfinite(upperBound) && (upperBound - lowerBound) /
                 std::max(1.0, std::fabs(upperBound)) <= solverConfig.mipGap) {
-            solver::Result result;
-            result.status = solver::Status::Optimal;
-            result.hasSolution = true;
-            result.objective = upperBound;
-            result.bound = lowerBound;
-            result.relativeGap = (upperBound - lowerBound) /
-                std::max(1.0, std::fabs(upperBound));
-            result.seconds = Elapsed(start);
             std::cout << (repairEnhancedCuts ? "Full" : "Lifted Two-Phase")
                       << " converged.\n";
-            return result;
+            return finalResult(solver::Status::Optimal);
         }
     }
-    solver::Result result;
-    result.status = solver::Status::TimeLimit;
-    result.hasSolution = std::isfinite(upperBound);
-    result.objective = upperBound;
-    result.bound = lowerBound;
-    result.seconds = Elapsed(start);
-    return result;
+    return finalResult(solver::Status::TimeLimit);
 }
 
 solver::Result SolveLiftedTwoPhase(const InstanceData& instance,

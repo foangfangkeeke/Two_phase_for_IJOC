@@ -27,6 +27,7 @@ struct Result {
     double seconds = 0.0;
 };
 
+Envr CreateEnvironment();
 void Configure(Model& model, const SolverConfig& config, bool enableLog = false);
 Result Solve(Model& model);
 std::string ToString(Status status);

@@ -161,7 +161,7 @@ ScenarioSubproblem BuildSubproblem(const InstanceData& instance, size_t scenario
     const SolverConfig& solverConfig)
 {
     ScenarioSubproblem state;
-    state.environment = std::make_unique<Envr>();
+    state.environment = std::make_unique<Envr>(solver::CreateEnvironment());
     state.model = std::make_unique<Model>(state.environment->CreateModel(
         ("lifted_scenario_" + std::to_string(scenarioIndex)).c_str()));
     model::FacilityVariables facilities;
@@ -255,7 +255,7 @@ solver::Result SolveLiftedIls(const InstanceData& instance,
     const std::vector<model::DwcLink> candidates = runConfig.allowWirelessCharging
         ? model::SelectDwcCandidates(instance, runConfig.dwcTopN)
         : std::vector<model::DwcLink>();
-    Envr environment;
+    Envr environment = solver::CreateEnvironment();
     Model masterModel = environment.CreateModel("lifted_ils_master");
     LiftedMaster master = BuildMaster(masterModel, instance, candidates);
     solver::Configure(masterModel, solverConfig, solverConfig.phase2MasterLog);
