@@ -1124,7 +1124,18 @@ solver::Result SolveFramework(const InstanceData& instance,
 
     const solver::Result phaseOne = RunPhaseOne(model, master, instance, candidates,
         solverConfig, start);
-    if (phaseOne.status != solver::Status::Optimal) return phaseOne;
+    if (phaseOne.status != solver::Status::Optimal) {
+        solver::Result result = phaseOne;
+        result.hasSolution = false;
+        result.objective = std::numeric_limits<double>::infinity();
+        result.relativeGap = 1.0;
+        result.seconds = Elapsed(start);
+        std::cout << (repairEnhancedCuts ? "Full" : "Lifted Two-Phase")
+                  << " status=" << solver::ToString(result.status);
+        PrintBounds(result.objective, result.bound);
+        std::cout << ", elapsed_ms=" << result.seconds * 1000.0 << '\n';
+        return result;
+    }
     std::cout << "Phase 1 completed: UB=" << phaseOne.objective
               << ", LB=" << phaseOne.bound
               << ", elapsed_ms=" << Elapsed(start) * 1000.0 << '\n';
@@ -1201,6 +1212,10 @@ solver::Result SolveFramework(const InstanceData& instance,
         std::cout << ", elapsed_ms=" << result.seconds * 1000.0 << '\n';
         return result;
     };
+    const auto hasConverged = [&]() {
+        return std::isfinite(upperBound) && (upperBound - lowerBound) /
+            std::max(1.0, std::fabs(upperBound)) <= kPhaseTwoTargetGap;
+    };
     constexpr int kRepairFailureThreshold = 2;
     std::vector<int> unresolvedFailures(subproblems.size(), 0);
     for (int iteration = 0; iteration < kMaximumIterations; ++iteration) {
@@ -1212,8 +1227,9 @@ solver::Result SolveFramework(const InstanceData& instance,
             lowerBound = std::max(lowerBound, masterResult.bound);
             break;
         }
-        if (!masterResult.hasSolution) return masterResult;
+        if (!masterResult.hasSolution) return finalResult(masterResult.status);
         lowerBound = std::max(lowerBound, masterResult.bound);
+        if (hasConverged()) return finalResult(solver::Status::Optimal);
         const std::vector<double> values = Values(master.design);
         const double thetaValue = master.theta.Get(COPT_DBLINFO_VALUE);
         std::vector<double> thetaValues;
@@ -1290,9 +1306,7 @@ solver::Result SolveFramework(const InstanceData& instance,
                         rspTimedOut = true;
                     }
                 } else {
-                    solver::Result failed;
-                    failed.status = result.status;
-                    return failed;
+                    return finalResult(result.status);
                 }
             }
             if (rspTimedOut || solverConfig.timeLimit - Elapsed(start) <= 0.0) break;
@@ -1383,6 +1397,7 @@ solver::Result SolveFramework(const InstanceData& instance,
                 else std::cout << "inf";
                 std::cout
                           << ", elapsed_ms=" << Elapsed(start) * 1000.0 << '\n';
+                if (hasConverged()) return finalResult(solver::Status::Optimal);
                 continue;
             }
         }
@@ -1411,8 +1426,8 @@ solver::Result SolveFramework(const InstanceData& instance,
                 recourse += result.objective;
                 const Expr mismatch = Mismatch(master, values,
                     subproblems.at(scenario).relevant);
-                if (thetaValues.at(scenario) + kTolerance < result.objective) {
-                    const Expr optimalityRhs = result.objective * (1.0 - mismatch);
+                if (thetaValues.at(scenario) + kTolerance < result.bound) {
+                    const Expr optimalityRhs = result.bound * (1.0 - mismatch);
                     model.AddConstr(master.scenarioTheta.at(scenario) >= optimalityRhs,
                         ("p2_opt_" + std::to_string(iteration) + "_" +
                             std::to_string(scenario)).c_str());
@@ -1421,7 +1436,7 @@ solver::Result SolveFramework(const InstanceData& instance,
             } else if (result.status == solver::Status::TimeLimit) {
                 exactTimedOut = true;
                 break;
-            } else return result;
+            } else return finalResult(result.status);
         }
         if (exactTimedOut) break;
         std::vector<int> exactRepairIndex(subproblems.size(), -1);
@@ -1522,8 +1537,7 @@ solver::Result SolveFramework(const InstanceData& instance,
         std::cout
                   << ", elapsed_ms=" << Elapsed(start) * 1000.0 << '\n';
 
-        if (std::isfinite(upperBound) && (upperBound - lowerBound) /
-                std::max(1.0, std::fabs(upperBound)) <= kPhaseTwoTargetGap) {
+        if (hasConverged()) {
             std::cout << (repairEnhancedCuts ? "Full" : "Lifted Two-Phase")
                       << " converged.\n";
             return finalResult(solver::Status::Optimal);
