@@ -107,11 +107,15 @@ LiftedMaster BuildMaster(Model& master, const InstanceData& instance,
     std::vector<RouteBatteryLevels> batteryVariables;
     batteryVariables.resize(instance.scenarios.size());
     for (size_t scenario = 0; scenario < instance.scenarios.size(); ++scenario) {
-        const ScheduleData& schedule = instance.scenarios.at(scenario).schedule;
+        const ScenarioData& scenarioData = instance.scenarios.at(scenario);
+        const ScheduleData& schedule = scenarioData.schedule;
         const std::vector<int> busesByRoute = model::CountBusesByRoute(schedule);
+        const std::vector<model::MaximumTripEnergyChain> energyChains =
+            model::BuildMaximumTripEnergyChains(instance, scenarioData, candidates);
         batteryVariables.at(scenario).resize(schedule.routeNames.size());
         for (size_t route = 0; route < schedule.routeNames.size(); ++route) {
             Expr selectOne(0.0);
+            Expr availableEnergy(energyChains.at(route).plugInOpportunity);
             const double unitCost = instance.scenarios.at(scenario).descriptor.probability *
                 busesByRoute.at(route) * instance.operation.batteryUnitPrice;
             for (int capacity : BatteryCapacityLevels(instance.operation,
@@ -128,9 +132,20 @@ LiftedMaster BuildMaster(Model& master, const InstanceData& instance,
                     capacity, flatIndex, variable);
                 objective += cost * variable;
                 selectOne += variable;
+                availableEnergy +=
+                    (instance.operation.maximumSoc - instance.operation.minimumSoc) *
+                    capacity * variable;
             }
             master.AddConstr(selectOne == 1.0,
                 ("selectCap_sc" + std::to_string(scenario) + "_r" +
+                    std::to_string(route)).c_str());
+            for (size_t facility = 0; facility < facilities.size(); ++facility) {
+                availableEnergy += energyChains.at(route).dwcOpportunities.at(facility) *
+                    facilities.at(facility);
+            }
+            // Usable initial energy plus optimistic charging must cover the duty chain.
+            master.AddConstr(availableEnergy >= energyChains.at(route).consumption,
+                ("maxChargeEnergy_sc" + std::to_string(scenario) + "_r" +
                     std::to_string(route)).c_str());
         }
     }

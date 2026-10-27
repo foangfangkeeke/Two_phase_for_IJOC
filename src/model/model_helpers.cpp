@@ -64,4 +64,80 @@ bool IsPlugInTerminalStop(const NetworkData& network, int station, size_t statio
     return stationIndex == 0 && network.plugInStations.count(station) != 0;
 }
 
+std::vector<MaximumTripEnergyChain> BuildMaximumTripEnergyChains(
+    const InstanceData& instance, const ScenarioData& scenario,
+    const std::vector<DwcLink>& candidates)
+{
+    const ScheduleData& schedule = scenario.schedule;
+    const NetworkData& network = scenario.network;
+    const OperationData& operation = instance.operation;
+    const ChargerData& chargers = instance.chargers;
+
+    std::map<DwcLink, size_t> candidateIndex;
+    for (size_t index = 0; index < candidates.size(); ++index) {
+        candidateIndex.emplace(candidates.at(index), index);
+    }
+
+    std::vector<size_t> representative(
+        schedule.routeNames.size(), schedule.busIds.size());
+    for (size_t bus = 0; bus < schedule.busIds.size(); ++bus) {
+        const size_t route = static_cast<size_t>(schedule.routeByBus.at(bus));
+        const size_t current = representative.at(route);
+        if (current == schedule.busIds.size() ||
+            schedule.tripIdsByBus.at(bus).size() >
+                schedule.tripIdsByBus.at(current).size()) {
+            representative.at(route) = bus;
+        }
+    }
+
+    std::vector<MaximumTripEnergyChain> chains;
+    chains.reserve(schedule.routeNames.size());
+    for (size_t route = 0; route < schedule.routeNames.size(); ++route) {
+        // The first bus with the largest trip count is the route's representative;
+        // ties deliberately follow input order instead of comparing directions.
+        const size_t bus = representative.at(route);
+        if (bus == schedule.busIds.size()) {
+            throw std::runtime_error("Route has no assigned bus: " +
+                schedule.routeNames.at(route));
+        }
+
+        MaximumTripEnergyChain chain;
+        chain.busIndex = bus;
+        chain.tripCount = schedule.tripIdsByBus.at(bus).size();
+        chain.dwcOpportunities.assign(candidates.size(), 0.0);
+        double distance = network.startDistanceByBus.at(bus) +
+            network.endDistanceByBus.at(bus);
+
+        for (int trip : schedule.tripIdsByBus.at(bus)) {
+            const size_t tripIndex = static_cast<size_t>(trip);
+            const auto& stations = schedule.stationsByTrip.at(tripIndex);
+            const auto& arrivals = schedule.arrivalTimesByTrip.at(tripIndex);
+            const auto& departures = schedule.departureTimesByTrip.at(tripIndex);
+            for (size_t stationIndex = 0; stationIndex < stations.size(); ++stationIndex) {
+                const int station = stations.at(stationIndex);
+                if (IsPlugInTerminalStop(network, station, stationIndex)) {
+                    const int duration = departures.at(stationIndex) -
+                        arrivals.at(stationIndex);
+                    chain.plugInOpportunity += chargers.rates.at(0) * duration *
+                        chargers.efficiencies.at(0);
+                }
+                if (stationIndex + 1 == stations.size()) continue;
+
+                const int nextStation = stations.at(stationIndex + 1);
+                distance += network.linkDistances.at(station).at(nextStation);
+                const auto candidate = candidateIndex.find({station, nextStation});
+                if (candidate != candidateIndex.end()) {
+                    const int duration = arrivals.at(stationIndex + 1) -
+                        departures.at(stationIndex);
+                    chain.dwcOpportunities.at(candidate->second) +=
+                        chargers.rates.at(2) * duration * chargers.efficiencies.at(2);
+                }
+            }
+        }
+        chain.consumption = distance * operation.energyPerKm;
+        chains.push_back(std::move(chain));
+    }
+    return chains;
+}
+
 } // namespace wireless::model
