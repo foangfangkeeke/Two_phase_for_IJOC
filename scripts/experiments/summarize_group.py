@@ -21,6 +21,12 @@ PHASE_ONE_RE = re.compile(
     r"Phase 1 completed: UB=(?P<ub>[-+0-9.eE]+), "
     r"LB=(?P<lb>[-+0-9.eE]+), elapsed_ms=(?P<elapsed>[-+0-9.eE]+)"
 )
+FINAL_RE = re.compile(
+    r"^(?:Full|Lifted Two-Phase) status=(?P<status>\S+), "
+    r"UB=(?P<ub>[-+0-9.eEinfINF]+), LB=(?P<lb>[-+0-9.eE]+), "
+    r"gap=(?P<gap>[-+0-9.eE]+%|1), elapsed_ms=(?P<elapsed>[-+0-9.eE]+)$",
+    re.MULTILINE,
+)
 REPAIR_PROBES_RE = re.compile(r"repair_probes=(\d+)")
 REPAIR_TIME_RE = re.compile(
     r"^Phase 2 iter .*?repair_ms=([-+0-9.eE]+)", re.MULTILINE
@@ -58,6 +64,23 @@ def summarize(log_path: Path, algorithm: str) -> dict[str, str]:
         }
 
     matches = list(ITERATION_RE.finditer(text))
+    final_matches = list(FINAL_RE.finditer(text))
+    if final_matches:
+        final = final_matches[-1]
+        ub = parse_bound(final.group("ub"))
+        gap = "" if not math.isfinite(ub) else final.group("gap").removesuffix("%")
+        return {
+            "status": final.group("status"),
+            "iterations": str(int(matches[-1].group("iteration")) + 1) if matches else "0",
+            "ub": format_number(ub),
+            "lb": f"{float(final.group('lb')):.6f}",
+            "gap_percent": gap,
+            "solver_elapsed_seconds": f"{float(final.group('elapsed')) / 1000.0:.6f}",
+            "repair_probes": str(sum(map(int, REPAIR_PROBES_RE.findall(text)))),
+            "repair_seconds": f"{sum(map(float, REPAIR_TIME_RE.findall(text))) / 1000.0:.6f}",
+            "strengthened_cuts": str(sum(map(int, STRENGTHENED_RE.findall(text)))),
+        }
+
     if matches:
         last = matches[-1]
         ub = parse_bound(last.group("ub"))
@@ -81,7 +104,7 @@ def summarize(log_path: Path, algorithm: str) -> dict[str, str]:
         return {
             "status": "Phase1Only",
             "iterations": "0",
-            "ub": phase_one.group("ub"),
+            "ub": "inf",
             "lb": phase_one.group("lb"),
             "gap_percent": "",
             "solver_elapsed_seconds": f"{float(phase_one.group('elapsed')) / 1000.0:.6f}",
