@@ -615,6 +615,45 @@ solver::Result EvaluateExact(ExactScenario& subproblem, const MasterState& maste
     return result;
 }
 
+std::vector<solver::Result> EvaluateExactScenarios(
+    std::vector<ExactScenario>& subproblems, const MasterState& master,
+    const std::vector<double>& values, const SolverConfig& config,
+    const std::chrono::steady_clock::time_point& start, int workerLimit)
+{
+    std::vector<solver::Result> results(subproblems.size());
+    std::atomic<size_t> next{0};
+    std::exception_ptr firstException;
+    std::mutex exceptionMutex;
+    const size_t workerCount = std::min(subproblems.size(),
+        static_cast<size_t>(std::max(1, workerLimit)));
+    std::vector<std::thread> workers;
+    workers.reserve(workerCount);
+    for (size_t worker = 0; worker < workerCount; ++worker) {
+        workers.emplace_back([&]() {
+            while (true) {
+                const size_t scenario = next.fetch_add(1);
+                if (scenario >= subproblems.size()) return;
+                try {
+                    const double remaining = config.timeLimit - Elapsed(start);
+                    if (remaining <= 0.0) {
+                        results.at(scenario).status = solver::Status::TimeLimit;
+                    } else {
+                        results.at(scenario) = EvaluateExact(subproblems.at(scenario),
+                            master, scenario, values, remaining);
+                    }
+                } catch (...) {
+                    std::lock_guard<std::mutex> lock(exceptionMutex);
+                    if (!firstException) firstException = std::current_exception();
+                    return;
+                }
+            }
+        });
+    }
+    for (std::thread& worker : workers) worker.join();
+    if (firstException) std::rethrow_exception(firstException);
+    return results;
+}
+
 solver::Result EvaluateExactFeasibility(ExactScenario& subproblem,
     const MasterState& master, size_t scenario, const std::vector<double>& values,
     double remaining)
@@ -1053,23 +1092,26 @@ solver::Result SolveFramework(const InstanceData& instance,
     }
     model.AddConstr(scenarioSum <= master.theta, "theta_scenario_sum_p2");
     model.Update();
+    const int scenarioWorkerLimit = runConfig.rspWorkers > 0
+        ? runConfig.rspWorkers : std::min(3, solverConfig.threads);
+    const int actualScenarioWorkers = std::min(
+        static_cast<int>(instance.scenarios.size()), scenarioWorkerLimit);
+    const int actualScenarioThreads = runConfig.rspThreads > 0
+        ? runConfig.rspThreads
+        : std::max(1, solverConfig.threads / actualScenarioWorkers);
+    if (actualScenarioWorkers * actualScenarioThreads > solverConfig.threads) {
+        throw std::invalid_argument(
+            "Phase 2 scenario workers multiplied by scenario threads exceeds "
+            "solver thread budget");
+    }
+    SolverConfig scenarioSolverConfig = solverConfig;
+    scenarioSolverConfig.threads = actualScenarioThreads;
     std::vector<ExactScenario> subproblems;
     for (size_t scenario = 0; scenario < instance.scenarios.size(); ++scenario) {
-        subproblems.push_back(BuildExact(instance, scenario, candidates, master, solverConfig));
+        subproblems.push_back(BuildExact(instance, scenario, candidates, master,
+            scenarioSolverConfig));
     }
     std::vector<ScenarioRelaxation> relaxedSubproblems;
-    const int rspWorkerLimit = runConfig.rspWorkers > 0
-        ? runConfig.rspWorkers : std::min(3, solverConfig.threads);
-    const int actualRspWorkers = std::min(static_cast<int>(instance.scenarios.size()),
-        rspWorkerLimit);
-    const int actualRspThreads = runConfig.rspThreads > 0
-        ? runConfig.rspThreads
-        : std::max(1, solverConfig.threads / actualRspWorkers);
-    if (runConfig.useRsp && actualRspWorkers * actualRspThreads >
-            solverConfig.threads) {
-        throw std::invalid_argument(
-            "RSP workers multiplied by RSP threads exceeds solver thread budget");
-    }
     if (runConfig.useRsp) {
         for (size_t scenario = 0; scenario < instance.scenarios.size(); ++scenario) {
             std::vector<std::vector<size_t>> batteryIndices;
@@ -1080,16 +1122,14 @@ solver::Result SolveFramework(const InstanceData& instance,
             }
             relaxedSubproblems.emplace_back(instance, scenario, candidates, batteryIndices,
                 batteryCapacityLimits.at(scenario), master.design.size(), solverConfig,
-                actualRspThreads);
+                actualScenarioThreads);
         }
     }
     std::cout << "Phase 2 initialized: scenarios=" << subproblems.size()
               << ", target_gap=" << kPhaseTwoTargetGap * 100.0 << '%'
+              << ", scenario_workers=" << actualScenarioWorkers
+              << ", scenario_threads=" << actualScenarioThreads
               << ", RSP=" << (runConfig.useRsp ? "on" : "off");
-    if (runConfig.useRsp) {
-        std::cout << ", rsp_workers=" << actualRspWorkers
-                  << ", rsp_threads=" << actualRspThreads;
-    }
     std::cout << '\n';
 
     double upperBound = std::numeric_limits<double>::infinity();
@@ -1151,7 +1191,7 @@ solver::Result SolveFramework(const InstanceData& instance,
             const auto rspStart = std::chrono::steady_clock::now();
             const std::vector<ScenarioRelaxationResult> rspResults =
                 EvaluateScenarios(relaxedSubproblems, values, solverConfig, start,
-                    actualRspWorkers);
+                    actualScenarioWorkers);
             rspSeconds = Elapsed(rspStart);
             for (size_t scenario = 0; scenario < rspResults.size(); ++scenario) {
                 const ScenarioRelaxationResult& result = rspResults.at(scenario);
@@ -1283,15 +1323,15 @@ solver::Result SolveFramework(const InstanceData& instance,
         }
         bool exactTimedOut = false;
         std::vector<std::vector<double>> repairFeasibleDesigns(subproblems.size());
+        remaining = solverConfig.timeLimit - Elapsed(start);
+        if (remaining <= 0.0) break;
+        const auto exactStart = std::chrono::steady_clock::now();
+        const std::vector<solver::Result> exactResults = EvaluateExactScenarios(
+            subproblems, master, values, solverConfig, start,
+            actualScenarioWorkers);
+        subproblemSeconds += Elapsed(exactStart);
         for (size_t scenario = 0; scenario < subproblems.size(); ++scenario) {
-            remaining = solverConfig.timeLimit - Elapsed(start);
-            if (remaining <= 0.0) {
-                exactTimedOut = true;
-                break;
-            }
-            const solver::Result result = EvaluateExact(subproblems.at(scenario), master,
-                scenario, values, remaining);
-            subproblemSeconds += result.seconds;
+            const solver::Result& result = exactResults.at(scenario);
             const Expr mismatch = Mismatch(master, values, subproblems.at(scenario).relevant);
             if (result.status == solver::Status::Infeasible) {
                 if (repairEnhancedCuts) ++unresolvedFailures.at(scenario);

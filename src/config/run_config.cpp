@@ -35,6 +35,7 @@ bool ParseBool(const std::string& value, const std::string& option)
 ParsedCommandLine ParseCommandLine(int argc, char* argv[])
 {
     ParsedCommandLine result;
+    bool rspSpecified = false;
     for (int index = 1; index < argc; ++index) {
         const std::string option = argv[index];
         if (option == "--help" || option == "-h") {
@@ -66,6 +67,7 @@ ParsedCommandLine ParseCommandLine(int argc, char* argv[])
             result.config.preprocessBounds = ParseBool(NextValue(argc, argv, index), option);
         } else if (option == "--rsp") {
             result.config.useRsp = ParseBool(NextValue(argc, argv, index), option);
+            rspSpecified = true;
         } else if (option == "--rsp-workers") {
             result.config.rspWorkers = ParsePositiveInt(
                 NextValue(argc, argv, index), option);
@@ -88,6 +90,10 @@ ParsedCommandLine ParseCommandLine(int argc, char* argv[])
     }
 
     RunConfig& config = result.config;
+    if (!rspSpecified &&
+        (config.algorithm == "lifted-two-phase" || config.algorithm == "full")) {
+        config.useRsp = true;
+    }
     if (config.scenarioStart < 0 || config.facilityCostScale <= 0.0 ||
         config.energyScale <= 0.0 || config.batteryCapacityStep <= 0) {
         throw std::invalid_argument("Invalid numeric runtime option");
@@ -111,8 +117,8 @@ void PrintUsage()
         << "  --energy-scale <positive number>\n"
         << "  --battery-step <positive integer kWh>\n"
         << "  --wireless-option <0|1>\n"
-        << "  --rsp <0|1> (lifted-two-phase/full only)\n"
-        << "  --rsp-workers <positive integer> (default: auto, up to 3)\n"
-        << "  --rsp-threads <positive integer> (default: auto within thread budget)\n"
+        << "  --rsp <0|1> (default: 1 for lifted-two-phase/full)\n"
+        << "  --rsp-workers <positive integer> (Phase 2 scenario workers; default: up to 3)\n"
+        << "  --rsp-threads <positive integer> (threads per Phase 2 scenario; default: auto)\n"
         << "  --help, -h\n";
 }
