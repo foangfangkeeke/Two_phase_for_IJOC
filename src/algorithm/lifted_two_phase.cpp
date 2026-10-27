@@ -27,6 +27,7 @@ namespace {
 
 constexpr int kMaximumIterations = 5000;
 constexpr double kTolerance = 1e-6;
+constexpr double kPhaseTwoTargetGap = 0.01;
 
 using BatteryCapacityLimits = std::vector<std::vector<int>>;
 
@@ -1083,6 +1084,7 @@ solver::Result SolveFramework(const InstanceData& instance,
         }
     }
     std::cout << "Phase 2 initialized: scenarios=" << subproblems.size()
+              << ", target_gap=" << kPhaseTwoTargetGap * 100.0 << '%'
               << ", RSP=" << (runConfig.useRsp ? "on" : "off");
     if (runConfig.useRsp) {
         std::cout << ", rsp_workers=" << actualRspWorkers
@@ -1400,7 +1402,7 @@ solver::Result SolveFramework(const InstanceData& instance,
                   << ", elapsed_ms=" << Elapsed(start) * 1000.0 << '\n';
 
         if (std::isfinite(upperBound) && (upperBound - lowerBound) /
-                std::max(1.0, std::fabs(upperBound)) <= solverConfig.mipGap) {
+                std::max(1.0, std::fabs(upperBound)) <= kPhaseTwoTargetGap) {
             std::cout << (repairEnhancedCuts ? "Full" : "Lifted Two-Phase")
                       << " converged.\n";
             return finalResult(solver::Status::Optimal);
