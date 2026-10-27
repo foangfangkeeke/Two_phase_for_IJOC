@@ -1305,7 +1305,6 @@ solver::Result SolveFramework(const InstanceData& instance,
                 for (const ScenarioRepairResult& completed : repairs) {
                     const size_t scenario = completed.scenario;
                     const RepairResult& repair = completed.repair;
-                    unresolvedFailures.at(scenario) = 0;
                     repairProbes += repair.probes;
                     if (!repair.feasibleDesign.empty()) {
                         rspRepairDesigns.at(scenario) = repair.feasibleDesign;
@@ -1355,7 +1354,11 @@ solver::Result SolveFramework(const InstanceData& instance,
                 }
             }
             model.Update();
-            if (rspInfeasible || rspOptimalityCuts > 0) {
+            // RSP is only a screening relaxation.  A feasible relaxation does not
+            // certify feasibility of the integer scenario problem, so retain any
+            // RSP optimality cuts and continue to Exact SP whenever every RSP is
+            // feasible.
+            if (rspInfeasible) {
                 if (repairEnhancedCuts) {
                     for (size_t scenario = 0;
                         scenario < rspCertifiedInfeasible.size(); ++scenario) {
@@ -1434,7 +1437,6 @@ solver::Result SolveFramework(const InstanceData& instance,
                 const size_t scenario = completed.scenario;
                 const RepairResult& repair = completed.repair;
                 exactRepairIndex.at(scenario) = static_cast<int>(index);
-                unresolvedFailures.at(scenario) = 0;
                 repairProbes += repair.probes;
                 if (!repair.feasibleDesign.empty()) {
                     repairFeasibleDesigns.at(scenario) = repair.feasibleDesign;
