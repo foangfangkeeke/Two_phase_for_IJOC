@@ -1363,9 +1363,8 @@ solver::Result SolveFramework(const InstanceData& instance,
                         subproblems);
                     upperBound = repairUpperBound;
                 }
-                if (std::isfinite(repairUpperBound)) {
-                    std::fill(unresolvedFailures.begin(), unresolvedFailures.end(), 0);
-                }
+                // A repaired incumbent is a different resource design.  It does not
+                // break the infeasibility streak of the current Master candidates.
             }
             model.Update();
             // RSP is only a screening relaxation.  A feasible relaxation does not
@@ -1507,9 +1506,8 @@ solver::Result SolveFramework(const InstanceData& instance,
                     subproblems);
                 upperBound = repairUpperBound;
             }
-            if (std::isfinite(repairUpperBound)) {
-                std::fill(unresolvedFailures.begin(), unresolvedFailures.end(), 0);
-            }
+            // A repaired incumbent is a different resource design.  It does not
+            // break the infeasibility streak of the current Master candidates.
         }
         model.Update();
         if (!infeasible) {
