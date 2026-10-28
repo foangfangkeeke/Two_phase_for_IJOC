@@ -15,6 +15,12 @@ PHASE2_RE = re.compile(
     r"Phase 2 iter (?P<iteration>\d+), .*?UB=(?P<ub>[-+0-9.eEinfINF]+), "
     r"LB=(?P<lb>[-+0-9.eE]+), .*?elapsed_ms=(?P<elapsed>[-+0-9.eE]+)"
 )
+FINAL_RE = re.compile(
+    r"^(?:Full|Lifted Two-Phase) status=\S+, "
+    r"UB=(?P<ub>[-+0-9.eEinfINF]+), LB=(?P<lb>[-+0-9.eE]+), "
+    r"gap=(?:[-+0-9.eE]+%|1), elapsed_ms=(?P<elapsed>[-+0-9.eE]+)$",
+    re.MULTILINE,
+)
 
 
 @dataclass
@@ -43,6 +49,22 @@ def parse_log(path: Path) -> Progress:
         time.append(max(0.0, elapsed))
         lower_bound.append(float(match.group("lb")))
         upper_bound.append(parse_upper_bound(match.group("ub")))
+
+    final_matches = list(FINAL_RE.finditer(text))
+    if final_matches:
+        final = final_matches[-1]
+        elapsed = max(
+            0.0, float(final.group("elapsed")) / 1000.0 - phase1_time
+        )
+        final_lb = float(final.group("lb"))
+        final_ub = parse_upper_bound(final.group("ub"))
+        if len(time) > 1 and math.isclose(elapsed, time[-1]):
+            lower_bound[-1] = final_lb
+            upper_bound[-1] = final_ub
+        else:
+            time.append(elapsed)
+            lower_bound.append(final_lb)
+            upper_bound.append(final_ub)
 
     if len(time) == 1:
         raise ValueError(f"No Phase 2 iteration rows found in {path}")
