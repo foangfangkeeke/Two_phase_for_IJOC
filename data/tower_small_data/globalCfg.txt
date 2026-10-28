@@ -1,6 +1,6 @@
 # OperationCfg
 # priceOfPowerDay(USD/kWh),priceOfPowerNight(USD/kWh),priceOfUnitBat(USD/kWh/day),socMax,socMin,capacityMin,capacityMax
-0.1922,0.1233,0.148,0.8,0.2,20,320
+0.1922,0.1233,0.148,0.8,0.2,50,600
 # timeMin,timeMax,timeInterval
 0,1600,1
 # energyPerKm(kWh/km)

@@ -2,7 +2,7 @@
 5
 # scenario_folder,probability
 base,0.2
-lo10pct,0.2
-hi10pct,0.2
-route_66_up25,0.2
-route_189_down25,0.2
+charger_tengah_up15,0.2
+charger_jurongeast_up10,0.2
+charger_btbatok_up10,0.2
+route_189_up15,0.2

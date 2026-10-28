@@ -190,111 +190,110 @@ Jurong Island Checkpt,188
 Jurong Polyclinic,189
 Jurong Port Workshops,190
 Jurong Sec Sch,191
-Jurong Town Hall Int,192
-Keming Pr Sch,193
-Lakepoint Condo,194
-Lakeside Stn,195
-LogisHub @ Clementi,196
-Midview Bldg,197
-Millennia Institute,198
-Mont Botanik Residence,199
-NUS High Sch,200
-Nan Hua Pr Sch,201
-Ng Teng Fong General Hosp,202
-OPP BLK 435A,203
-Opp Beauty World Stn,204
-Opp Blk 102,205
-Opp Blk 114,206
-Opp Blk 115,207
-Opp Blk 117,208
-Opp Blk 120,209
-Opp Blk 127,210
-Opp Blk 158,211
-Opp Blk 19,212
-Opp Blk 217,213
-Opp Blk 227,214
-Opp Blk 236A,215
-Opp Blk 288D,216
-Opp Blk 291A,217
-Opp Blk 291E,218
-Opp Blk 305,219
-Opp Blk 315,220
-Opp Blk 317,221
-Opp Blk 322,222
-Opp Blk 347,223
-Opp Blk 364,224
-Opp Blk 420A,225
-Opp Blk 437A,226
-Opp Blk 443D,227
-Opp Blk 451A,228
-Opp Blk 460,229
-Opp Blk 461,230
-Opp Blk 461C,231
-Opp Blk 481,232
-Opp Blk 515,233
-Opp Blk 628,234
-Opp Blk 65,235
-Opp Bt Batok Swim Cplx,236
-Opp Bt Gombak Stadium,237
-Opp Bt Gombak Stn,238
-Opp Bt Timah Plaza,239
-Opp Bt View Sec Sch,240
-Opp Burgundy Hill,241
-Opp Carrier S'pore,242
-Opp Corp Pl,243
-Opp German Ctr,244
-Opp Highgate Pk,245
-Opp Hillbrooks,246
-Opp Hillview Apts,247
-Opp Hillview Hts,248
-Opp HomeTeamNS,249
-Opp Hse No. 19,250
-Opp IMM Bldg,251
-Opp Jurong Abattoir,252
-Opp Jurong East Warehse,253
-Opp Jurong Polyclinic,254
-Opp Jurong Sec Sch,255
-Opp Lakepoint Condo,256
-Opp Lakeside Stn,257
-Opp LogisHub @ Clementi,258
-Opp Midview Bldg,259
-Opp Nan Hua High Sch,260
-Opp Ng Teng Fong Gen Hosp,261
-Opp Parc Oasis,262
-Opp Pei Hwa Presby Pr Sch,263
-Opp S'pore A'space Mfg,264
-Opp S'pore Science Ctr,265
-Opp SBST Bt Batok Depot,266
-Opp SMRT Ulu Pandan Depot,267
-Opp SPC Svc Stn,268
-Opp The Hillford,269
-Opp The Hillside,270
-Opp The JTC Summit,271
-Opp The Petals Condo,272
-Opp Toh Guan Ctr,273
-Opp Toh Tuck Cres,274
-Opp Uni-Tech Ctr,275
-Parc Oasis,276
-Park Natura,277
-Pei Hwa Presby Pr Sch,278
-Regent Hts,279
-Ren Ci @ Bt Batok St 52,280
-S'pore Science Ctr,281
-SBST Bt Batok Depot,282
-SMRT Ulu Pandan Depot,283
-SPC Svc Stn,284
-Seventh-Day Advent Ch,285
-Signature Pk Condo,286
-Sin Soon Huat,287
-Southaven II,288
-Springdale Condo,289
-St Anthony’s Pri Sch,290
-TENGAH CC,291
-Tengah CC,292
-Tengah Int,293
-The Hillford,294
-The Petals Condo,295
-Toh Guan Ctr,296
-Wang-Fu Ind Pte Ltd,297
-Woh Hup Bldg,298
-Yuhua Sec Sch,299
+Keming Pr Sch,192
+Lakepoint Condo,193
+Lakeside Stn,194
+LogisHub @ Clementi,195
+Midview Bldg,196
+Millennia Institute,197
+Mont Botanik Residence,198
+NUS High Sch,199
+Nan Hua Pr Sch,200
+Ng Teng Fong General Hosp,201
+OPP BLK 435A,202
+Opp Beauty World Stn,203
+Opp Blk 102,204
+Opp Blk 114,205
+Opp Blk 115,206
+Opp Blk 117,207
+Opp Blk 120,208
+Opp Blk 127,209
+Opp Blk 158,210
+Opp Blk 19,211
+Opp Blk 217,212
+Opp Blk 227,213
+Opp Blk 236A,214
+Opp Blk 288D,215
+Opp Blk 291A,216
+Opp Blk 291E,217
+Opp Blk 305,218
+Opp Blk 315,219
+Opp Blk 317,220
+Opp Blk 322,221
+Opp Blk 347,222
+Opp Blk 364,223
+Opp Blk 420A,224
+Opp Blk 437A,225
+Opp Blk 443D,226
+Opp Blk 451A,227
+Opp Blk 460,228
+Opp Blk 461,229
+Opp Blk 461C,230
+Opp Blk 481,231
+Opp Blk 515,232
+Opp Blk 628,233
+Opp Blk 65,234
+Opp Bt Batok Swim Cplx,235
+Opp Bt Gombak Stadium,236
+Opp Bt Gombak Stn,237
+Opp Bt Timah Plaza,238
+Opp Bt View Sec Sch,239
+Opp Burgundy Hill,240
+Opp Carrier S'pore,241
+Opp Corp Pl,242
+Opp German Ctr,243
+Opp Highgate Pk,244
+Opp Hillbrooks,245
+Opp Hillview Apts,246
+Opp Hillview Hts,247
+Opp HomeTeamNS,248
+Opp Hse No. 19,249
+Opp IMM Bldg,250
+Opp Jurong Abattoir,251
+Opp Jurong East Warehse,252
+Opp Jurong Polyclinic,253
+Opp Jurong Sec Sch,254
+Opp Lakepoint Condo,255
+Opp Lakeside Stn,256
+Opp LogisHub @ Clementi,257
+Opp Midview Bldg,258
+Opp Nan Hua High Sch,259
+Opp Ng Teng Fong Gen Hosp,260
+Opp Parc Oasis,261
+Opp Pei Hwa Presby Pr Sch,262
+Opp S'pore A'space Mfg,263
+Opp S'pore Science Ctr,264
+Opp SBST Bt Batok Depot,265
+Opp SMRT Ulu Pandan Depot,266
+Opp SPC Svc Stn,267
+Opp The Hillford,268
+Opp The Hillside,269
+Opp The JTC Summit,270
+Opp The Petals Condo,271
+Opp Toh Guan Ctr,272
+Opp Toh Tuck Cres,273
+Opp Uni-Tech Ctr,274
+Parc Oasis,275
+Park Natura,276
+Pei Hwa Presby Pr Sch,277
+Regent Hts,278
+Ren Ci @ Bt Batok St 52,279
+S'pore Science Ctr,280
+SBST Bt Batok Depot,281
+SMRT Ulu Pandan Depot,282
+SPC Svc Stn,283
+Seventh-Day Advent Ch,284
+Signature Pk Condo,285
+Sin Soon Huat,286
+Southaven II,287
+Springdale Condo,288
+St Anthony’s Pri Sch,289
+TENGAH CC,290
+Tengah CC,291
+Tengah Int,292
+The Hillford,293
+The Petals Condo,294
+Toh Guan Ctr,295
+Wang-Fu Ind Pte Ltd,296
+Woh Hup Bldg,297
+Yuhua Sec Sch,298
