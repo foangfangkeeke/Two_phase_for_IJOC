@@ -8,43 +8,38 @@
 - Energy scale: 1.0
 - Charging window: 10 minutes from the source data
 - Scenario start: 0
-- RSP allocation for Lifted Two-Phase and Full: 3 workers x 4 threads
+- RSP allocation for Natural ILS, Lifted ILS, Lifted Two-Phase, and Full:
+  3 workers x 4 threads
 
 The instance identifier is `R{routes}-N{scenarios}-F{candidate facilities}-C{capacity}`.
 Only these four scale dimensions appear in result directory names.
 
-## Pending instance groups
+## Planned instance groups
 
 | Group | Instances | Algorithms | Runs |
 | --- | ---: | --- | ---: |
-| Main | 9 | EF, Natural ILS without RSP, Natural ILS, Lifted ILS, Lifted Two-Phase, Full | 54 |
+| Main | 9 | EF, Natural ILS, Lifted ILS, Lifted Two-Phase, Full | 45 |
 | Scenario | 4 | Lifted Two-Phase, Full | 8 |
 | Facility | 2 | Lifted Two-Phase, Full | 4 |
 | Capacity | 3 | Lifted Two-Phase, Full | 6 |
-| Total | 18 | | 72 |
+| Total | 18 | | 63 |
 
 The C3 screening groups preserve the C4 runs and evaluate the corresponding
-15 C4 instances at capacity 3. The existing `R3-N5-F50-C3` and
-`R12-N5-F50-C3` Full results are reused, leaving 13 new Full runs:
+15 C4 instances at capacity 3. Because the canonical scenario sets were
+regenerated, all 15 Full runs must be recomputed:
 
 | Group | Instances | Pending Full runs |
 | --- | ---: | ---: |
-| Main C3 | 9 | 7 |
+| Main C3 | 9 | 9 |
 | Scenario C3 | 4 | 4 |
 | Facility C3 | 2 | 2 |
-| Total | 15 | 13 |
-
-`R28-N5-F40-C3 / Lifted Two-Phase, Full` is already complete and is stored under
-`results/experiments/R28-N5-F40-C3`. Its fixed scenarios are `base`, `hi20pct`,
-`route_984_up25`, `route_941_down25`, and `route_453_up25`. It is not included
-in the pending count.
+| Total | 15 | 15 |
 
 ## Algorithm mapping
 
 | Plan name | Command settings |
 | --- | --- |
 | `ef` | `--alg ef --rsp 0` |
-| `natural-ils-no-rsp` | `--alg natural-ils --rsp 0` |
 | `natural-ils` | `--alg natural-ils --rsp 1` |
 | `lifted-ils` | `--alg lifted-ils --rsp 1` |
 | `lifted-two-phase` | `--alg lifted-two-phase --rsp 1` |
@@ -63,6 +58,7 @@ in the pending count.
 Examples:
 
 ```powershell
+.\scripts\experiments\run_plan_group.ps1 -Group main -InstanceId R3-N5-F10-C4
 .\scripts\experiments\run_plan_group.ps1 -Group main -Algorithm full
 .\scripts\experiments\run_plan_group.ps1 -Group scenario -Algorithm lifted-two-phase
 .\scripts\experiments\run_plan_group.ps1 -Group capacity -Algorithm full
