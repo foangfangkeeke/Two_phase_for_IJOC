@@ -277,7 +277,7 @@ BatteryCapacityLimits ComputeBatteryCapacityLimits(const InstanceData& instance)
 
 MasterState BuildMaster(Model& model, const InstanceData& instance,
     const std::vector<model::DwcLink>& candidates,
-    const BatteryCapacityLimits& batteryCapacityLimits)
+    const BatteryCapacityLimits& batteryCapacityLimits, bool useValidInequality)
 {
     Expr objective(0.0);
     std::vector<Var> design;
@@ -326,14 +326,16 @@ MasterState BuildMaster(Model& model, const InstanceData& instance,
             model.AddConstr(selectOne == 1.0,
                 ("selectCap_sc" + std::to_string(scenario) + "_r" +
                     std::to_string(route)).c_str());
-            for (size_t facility = 0; facility < facilities.size(); ++facility) {
-                availableEnergy += energyChains.at(route).dwcOpportunities.at(facility) *
-                    facilities.at(facility);
+            if (useValidInequality) {
+                for (size_t facility = 0; facility < facilities.size(); ++facility) {
+                    availableEnergy += energyChains.at(route).dwcOpportunities.at(facility) *
+                        facilities.at(facility);
+                }
+                // Usable initial energy plus optimistic charging must cover the duty chain.
+                model.AddConstr(availableEnergy >= energyChains.at(route).consumption,
+                    ("maxChargeEnergy_sc" + std::to_string(scenario) + "_r" +
+                        std::to_string(route)).c_str());
             }
-            // Usable initial energy plus optimistic charging must cover the duty chain.
-            model.AddConstr(availableEnergy >= energyChains.at(route).consumption,
-                ("maxChargeEnergy_sc" + std::to_string(scenario) + "_r" +
-                    std::to_string(route)).c_str());
         }
     }
 
@@ -1119,7 +1121,8 @@ solver::Result SolveFramework(const InstanceData& instance,
     Envr environment = solver::CreateEnvironment();
     Model model = environment.CreateModel(
         repairEnhancedCuts ? "full_master" : "lifted_two_phase_master");
-    MasterState master = BuildMaster(model, instance, candidates, batteryCapacityLimits);
+    MasterState master = BuildMaster(model, instance, candidates, batteryCapacityLimits,
+        runConfig.useValidInequality);
     solver::Configure(model, solverConfig, solverConfig.phase2MasterLog);
 
     const solver::Result phaseOne = RunPhaseOne(model, master, instance, candidates,

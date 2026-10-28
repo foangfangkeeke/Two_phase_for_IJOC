@@ -144,7 +144,7 @@ std::set<model::DwcLink> ScenarioLinks(const ScenarioData& scenario)
 }
 
 LiftedMaster BuildMaster(Model& master, const InstanceData& instance,
-    const std::vector<model::DwcLink>& candidates)
+    const std::vector<model::DwcLink>& candidates, bool useValidInequality)
 {
     Expr objective(0.0);
     std::vector<Var> designVariables;
@@ -195,14 +195,16 @@ LiftedMaster BuildMaster(Model& master, const InstanceData& instance,
             master.AddConstr(selectOne == 1.0,
                 ("selectCap_sc" + std::to_string(scenario) + "_r" +
                     std::to_string(route)).c_str());
-            for (size_t facility = 0; facility < facilities.size(); ++facility) {
-                availableEnergy += energyChains.at(route).dwcOpportunities.at(facility) *
-                    facilities.at(facility);
+            if (useValidInequality) {
+                for (size_t facility = 0; facility < facilities.size(); ++facility) {
+                    availableEnergy += energyChains.at(route).dwcOpportunities.at(facility) *
+                        facilities.at(facility);
+                }
+                // Usable initial energy plus optimistic charging must cover the duty chain.
+                master.AddConstr(availableEnergy >= energyChains.at(route).consumption,
+                    ("maxChargeEnergy_sc" + std::to_string(scenario) + "_r" +
+                        std::to_string(route)).c_str());
             }
-            // Usable initial energy plus optimistic charging must cover the duty chain.
-            master.AddConstr(availableEnergy >= energyChains.at(route).consumption,
-                ("maxChargeEnergy_sc" + std::to_string(scenario) + "_r" +
-                    std::to_string(route)).c_str());
         }
     }
 
@@ -325,7 +327,8 @@ solver::Result SolveLiftedIls(const InstanceData& instance,
         : std::vector<model::DwcLink>();
     Envr environment = solver::CreateEnvironment();
     Model masterModel = environment.CreateModel("lifted_ils_master");
-    LiftedMaster master = BuildMaster(masterModel, instance, candidates);
+    LiftedMaster master = BuildMaster(
+        masterModel, instance, candidates, runConfig.useValidInequality);
     solver::Configure(masterModel, solverConfig, solverConfig.phase2MasterLog);
 
     std::vector<ScenarioSubproblem> subproblems;
@@ -365,7 +368,9 @@ solver::Result SolveLiftedIls(const InstanceData& instance,
     }
     std::cout << "Lifted ILS initialized: master_vars=" << master.designVariables.size()
               << ", scenarios=" << subproblems.size() << ", RSP="
-              << (runConfig.useRsp ? "on" : "off");
+              << (runConfig.useRsp ? "on" : "off")
+              << ", valid_inequality="
+              << (runConfig.useValidInequality ? "on" : "off");
     if (runConfig.useRsp) {
         std::cout << ", rsp_workers=" << relaxationWorkers
                   << ", rsp_threads=" << relaxationThreads;

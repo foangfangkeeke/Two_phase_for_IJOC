@@ -16,6 +16,7 @@ struct RunConfig {
     int batteryCapacityStep = 20;
     bool allowWirelessCharging = true;
     bool preprocessBounds = false;
+    bool useValidInequality = true;
     bool useRsp = false;
     int rspWorkers = 0;
     int rspThreads = 0;

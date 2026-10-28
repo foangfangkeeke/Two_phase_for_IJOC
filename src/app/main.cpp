@@ -98,6 +98,7 @@ void PrintRuntimeOptions(const RunConfig& config)
     if (config.rspThreads > 0) std::cout << config.rspThreads;
     else std::cout << "auto";
     std::cout << ", preprocess_bounds=" << (config.preprocessBounds ? 1 : 0)
+              << ", valid_inequality=" << (config.useValidInequality ? 1 : 0)
               << '\n';
 }
 

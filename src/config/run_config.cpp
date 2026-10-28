@@ -65,6 +65,9 @@ ParsedCommandLine ParseCommandLine(int argc, char* argv[])
             result.config.allowWirelessCharging = ParseBool(NextValue(argc, argv, index), option);
         } else if (option == "--preprocess-bounds") {
             result.config.preprocessBounds = ParseBool(NextValue(argc, argv, index), option);
+        } else if (option == "--valid-inequality") {
+            result.config.useValidInequality = ParseBool(
+                NextValue(argc, argv, index), option);
         } else if (option == "--rsp") {
             result.config.useRsp = ParseBool(NextValue(argc, argv, index), option);
             rspSpecified = true;
@@ -118,6 +121,7 @@ void PrintUsage()
         << "  --energy-scale <positive number>\n"
         << "  --battery-step <positive integer kWh>\n"
         << "  --wireless-option <0|1>\n"
+        << "  --valid-inequality <0|1> (default: 1)\n"
         << "  --rsp <0|1> (default: 1 for all ILS and two-phase algorithms)\n"
         << "  --rsp-workers <positive integer> (Phase 2 scenario workers; default: up to 3)\n"
         << "  --rsp-threads <positive integer> (threads per Phase 2 scenario; default: auto)\n"
