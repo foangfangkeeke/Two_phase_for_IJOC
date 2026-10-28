@@ -2,10 +2,10 @@
 40
 # scenario_folder,probability
 base,0.025
-jurongeast_peakcore_up15,0.025
-btbatok_peakcore_up15,0.025
-charger_jurongtownhall_up15,0.025
-charger_clementi_up15,0.025
+charger_btbatok_up15,0.025
+global_down10,0.025
+route_453_up15,0.025
+route_941_down15,0.025
 charger_tengah_up15,0.025
 jurongeast_peak549_up15,0.025
 charger_jurongeast_up10,0.025
@@ -31,7 +31,7 @@ jurongeast_peakcore_up10,0.025
 jurongeast_peak549_up10,0.025
 jurongeast_dualpeak_up15,0.025
 btbatok_peakcore_up10,0.025
-charger_btbatok_up15,0.025
+global_up10,0.025
 charger_jurongeast_up15,0.025
 charger_jurongtownhall_up10,0.025
 charger_clementi_up10,0.025
