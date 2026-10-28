@@ -1,16 +1,21 @@
 #include "algorithm/lifted_ils.hpp"
 
+#include "algorithm/scenario_relaxation.hpp"
 #include "model/model_helpers.hpp"
 #include "model/scenario_model.hpp"
 
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cmath>
+#include <exception>
 #include <iostream>
 #include <limits>
 #include <memory>
+#include <mutex>
 #include <set>
 #include <string>
+#include <thread>
 #include <unordered_map>
 #include <vector>
 
@@ -74,6 +79,57 @@ Expr BuildMismatch(const std::vector<Var>& variables,
         else mismatch += variables.at(index);
     }
     return mismatch;
+}
+
+Expr BuildAffineExpression(const LiftedMaster& master,
+    const ScenarioRelaxationResult& result)
+{
+    Expr expression(result.constant);
+    for (size_t index = 0; index < result.coefficients.size(); ++index) {
+        if (std::fabs(result.coefficients.at(index)) > 1e-12) {
+            expression += result.coefficients.at(index) *
+                master.designVariables.at(index);
+        }
+    }
+    return expression;
+}
+
+std::vector<ScenarioRelaxationResult> EvaluateRelaxations(
+    std::vector<ScenarioRelaxation>& relaxations,
+    const std::vector<double>& values, const SolverConfig& solverConfig,
+    const std::chrono::steady_clock::time_point& start, int workerLimit)
+{
+    std::vector<ScenarioRelaxationResult> results(relaxations.size());
+    std::atomic<size_t> next{0};
+    std::exception_ptr firstException;
+    std::mutex exceptionMutex;
+    const size_t workerCount = std::min(relaxations.size(),
+        static_cast<size_t>(std::max(1, workerLimit)));
+    std::vector<std::thread> workers;
+    workers.reserve(workerCount);
+    for (size_t worker = 0; worker < workerCount; ++worker) {
+        workers.emplace_back([&]() {
+            try {
+                while (true) {
+                    const size_t scenario = next.fetch_add(1);
+                    if (scenario >= relaxations.size()) break;
+                    const double remaining = solverConfig.timeLimit - ElapsedSeconds(start);
+                    if (remaining <= 0.0) {
+                        results.at(scenario).status = solver::Status::TimeLimit;
+                    } else {
+                        results.at(scenario) = relaxations.at(scenario).Evaluate(
+                            values, remaining);
+                    }
+                }
+            } catch (...) {
+                std::lock_guard<std::mutex> lock(exceptionMutex);
+                if (!firstException) firstException = std::current_exception();
+            }
+        });
+    }
+    for (std::thread& worker : workers) worker.join();
+    if (firstException) std::rethrow_exception(firstException);
+    return results;
 }
 
 std::set<model::DwcLink> ScenarioLinks(const ScenarioData& scenario)
@@ -263,9 +319,6 @@ void PrintBounds(double upperBound, double lowerBound)
 solver::Result SolveLiftedIls(const InstanceData& instance,
     const RunConfig& runConfig, const SolverConfig& solverConfig)
 {
-    if (runConfig.useRsp) {
-        throw std::invalid_argument("The rewritten Lifted ILS does not include RSP");
-    }
     const auto start = std::chrono::steady_clock::now();
     const std::vector<model::DwcLink> candidates = runConfig.allowWirelessCharging
         ? model::SelectDwcCandidates(instance, runConfig.dwcTopN)
@@ -281,8 +334,43 @@ solver::Result SolveLiftedIls(const InstanceData& instance,
         subproblems.push_back(BuildSubproblem(
             instance, scenario, candidates, master, solverConfig));
     }
+
+    const int relaxationWorkerLimit = runConfig.rspWorkers > 0
+        ? runConfig.rspWorkers : std::min(3, solverConfig.threads);
+    const int relaxationWorkers = std::min(
+        static_cast<int>(instance.scenarios.size()), relaxationWorkerLimit);
+    const int relaxationThreads = runConfig.rspThreads > 0
+        ? runConfig.rspThreads
+        : std::max(1, solverConfig.threads / relaxationWorkers);
+    if (relaxationWorkers * relaxationThreads > solverConfig.threads) {
+        throw std::invalid_argument(
+            "RSP workers multiplied by RSP threads exceeds solver thread budget");
+    }
+    std::vector<ScenarioRelaxation> relaxedSubproblems;
+    if (runConfig.useRsp) {
+        relaxedSubproblems.reserve(instance.scenarios.size());
+        for (size_t scenario = 0; scenario < instance.scenarios.size(); ++scenario) {
+            std::vector<std::vector<size_t>> batteryIndices;
+            for (const auto& route : master.batteryVariables.at(scenario)) {
+                std::vector<size_t> routeIndices;
+                for (const BatteryMasterLevel& level : route) {
+                    routeIndices.push_back(level.flatIndex);
+                }
+                batteryIndices.push_back(std::move(routeIndices));
+            }
+            relaxedSubproblems.emplace_back(instance, scenario, candidates,
+                batteryIndices, std::vector<int>{}, master.designVariables.size(),
+                solverConfig, relaxationThreads);
+        }
+    }
     std::cout << "Lifted ILS initialized: master_vars=" << master.designVariables.size()
-              << ", scenarios=" << subproblems.size() << ", RSP=off\n";
+              << ", scenarios=" << subproblems.size() << ", RSP="
+              << (runConfig.useRsp ? "on" : "off");
+    if (runConfig.useRsp) {
+        std::cout << ", rsp_workers=" << relaxationWorkers
+                  << ", rsp_threads=" << relaxationThreads;
+    }
+    std::cout << '\n';
 
     double upperBound = std::numeric_limits<double>::infinity();
     double lowerBound = -std::numeric_limits<double>::infinity();
@@ -306,6 +394,64 @@ solver::Result SolveLiftedIls(const InstanceData& instance,
             thetaValues.push_back(variable.Get(COPT_DBLINFO_VALUE));
         }
         const double thetaValue = master.theta.Get(COPT_DBLINFO_VALUE);
+
+        double rspSeconds = 0.0;
+        int rspFeasibilityCuts = 0;
+        int rspOptimalityCuts = 0;
+        double rspRecourse = 0.0;
+        if (runConfig.useRsp) {
+            const auto rspStart = std::chrono::steady_clock::now();
+            const std::vector<ScenarioRelaxationResult> rspResults =
+                EvaluateRelaxations(relaxedSubproblems, values, solverConfig,
+                    start, relaxationWorkers);
+            rspSeconds = ElapsedSeconds(rspStart);
+            bool rspInfeasible = false;
+            for (size_t scenario = 0; scenario < rspResults.size(); ++scenario) {
+                const ScenarioRelaxationResult& result = rspResults.at(scenario);
+                if (result.status == solver::Status::Infeasible) {
+                    if (!result.coefficients.empty()) {
+                        masterModel.AddConstr(BuildAffineExpression(master, result) >= 0.0,
+                            ("lifted_rsp_feas_" + std::to_string(iteration) + "_" +
+                                std::to_string(scenario)).c_str());
+                    } else {
+                        masterModel.AddConstr(BuildMismatch(master.designVariables, values,
+                            subproblems.at(scenario).relevantMasterIndices) >= 1.0,
+                            ("lifted_rsp_fallback_" + std::to_string(iteration) + "_" +
+                                std::to_string(scenario)).c_str());
+                    }
+                    ++rspFeasibilityCuts;
+                    rspInfeasible = true;
+                } else if (result.status == solver::Status::Optimal) {
+                    rspRecourse += result.objective;
+                    if (thetaValues.at(scenario) + kCutTolerance < result.objective) {
+                        masterModel.AddConstr(master.scenarioTheta.at(scenario) >=
+                            BuildAffineExpression(master, result),
+                            ("lifted_rsp_opt_" + std::to_string(iteration) + "_" +
+                                std::to_string(scenario)).c_str());
+                        ++rspOptimalityCuts;
+                    }
+                } else {
+                    finalResult.status = result.status;
+                    finalResult.hasSolution = std::isfinite(upperBound);
+                    finalResult.objective = upperBound;
+                    finalResult.bound = lowerBound;
+                    finalResult.seconds = ElapsedSeconds(start);
+                    return finalResult;
+                }
+            }
+            masterModel.Update();
+            if (rspInfeasible) {
+                std::cout << "Lifted ILS iter " << iteration
+                          << ", RSP feasibility cut x" << rspFeasibilityCuts
+                          << ", RSP optimality cut x" << rspOptimalityCuts
+                          << ", RSP Q(z)=" << rspRecourse;
+                PrintBounds(upperBound, lowerBound);
+                std::cout << ", master_ms=" << masterResult.seconds * 1000.0
+                          << ", rsp_ms=" << rspSeconds * 1000.0
+                          << ", elapsed_ms=" << ElapsedSeconds(start) * 1000.0 << '\n';
+                continue;
+            }
+        }
 
         bool infeasible = false;
         int feasibilityCuts = 0;
@@ -353,6 +499,8 @@ solver::Result SolveLiftedIls(const InstanceData& instance,
                        << ", optimality cut x" << optimalityCuts;
         PrintBounds(upperBound, lowerBound);
         std::cout << ", master_ms=" << masterResult.seconds * 1000.0
+                  << ", rsp_optimality_cut=" << rspOptimalityCuts
+                  << ", rsp_ms=" << rspSeconds * 1000.0
                   << ", subproblem_ms=" << subproblemSeconds * 1000.0
                   << ", elapsed_ms=" << ElapsedSeconds(start) * 1000.0 << '\n';
 

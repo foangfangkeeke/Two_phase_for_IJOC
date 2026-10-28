@@ -91,7 +91,8 @@ ParsedCommandLine ParseCommandLine(int argc, char* argv[])
 
     RunConfig& config = result.config;
     if (!rspSpecified &&
-        (config.algorithm == "lifted-two-phase" || config.algorithm == "full")) {
+        (config.algorithm == "natural-ils" || config.algorithm == "lifted-ils" ||
+            config.algorithm == "lifted-two-phase" || config.algorithm == "full")) {
         config.useRsp = true;
     }
     if (config.scenarioStart < 0 || config.facilityCostScale <= 0.0 ||
@@ -117,7 +118,7 @@ void PrintUsage()
         << "  --energy-scale <positive number>\n"
         << "  --battery-step <positive integer kWh>\n"
         << "  --wireless-option <0|1>\n"
-        << "  --rsp <0|1> (default: 1 for lifted-two-phase/full)\n"
+        << "  --rsp <0|1> (default: 1 for all ILS and two-phase algorithms)\n"
         << "  --rsp-workers <positive integer> (Phase 2 scenario workers; default: up to 3)\n"
         << "  --rsp-threads <positive integer> (threads per Phase 2 scenario; default: auto)\n"
         << "  --help, -h\n";

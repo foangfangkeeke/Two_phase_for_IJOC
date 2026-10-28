@@ -26,7 +26,7 @@ public:
         const std::vector<std::vector<size_t>>& batteryMasterIndices,
         const std::vector<int>& maximumBatteryCapacities,
         size_t masterVariableCount, const SolverConfig& solverConfig,
-        int threads);
+        int threads, bool includeBatteryCost = false);
 
     ScenarioRelaxationResult Evaluate(const std::vector<double>& masterValues,
         double remainingSeconds);

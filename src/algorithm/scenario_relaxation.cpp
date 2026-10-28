@@ -14,7 +14,7 @@ ScenarioRelaxation::ScenarioRelaxation(const InstanceData& instance,
     const std::vector<std::vector<size_t>>& batteryMasterIndices,
     const std::vector<int>& maximumBatteryCapacities,
     size_t masterVariableCount, const SolverConfig& solverConfig,
-    int threads)
+    int threads, bool includeBatteryCost)
     : masterVariableCount_(masterVariableCount),
       environment_(std::make_unique<Envr>(solver::CreateEnvironment()))
 {
@@ -32,7 +32,7 @@ ScenarioRelaxation::ScenarioRelaxation(const InstanceData& instance,
     }
 
     Expr objective(0.0);
-    model::ScenarioModelOptions options{false, true};
+    model::ScenarioModelOptions options{includeBatteryCost, true};
     options.maximumBatteryCapacities = maximumBatteryCapacities;
     model::ScenarioVariables variables = model::BuildScenarioModel(*model_, instance,
         instance.scenarios.at(scenarioIndex), scenarioIndex, facilities, objective,
@@ -48,22 +48,24 @@ ScenarioRelaxation::ScenarioRelaxation(const InstanceData& instance,
             ("fix_w_" + std::to_string(index)).c_str());
         links_.push_back({facilityVariables.at(index), link, index});
     }
-    if (variables.batteryChoicesByRoute.size() != batteryMasterIndices.size()) {
-        throw std::runtime_error("Scenario relaxation route count mismatch");
-    }
-    for (size_t route = 0; route < variables.batteryChoicesByRoute.size(); ++route) {
-        if (variables.batteryChoicesByRoute.at(route).size() !=
-            batteryMasterIndices.at(route).size()) {
-            throw std::runtime_error("Scenario relaxation battery level mismatch");
+    if (!batteryMasterIndices.empty()) {
+        if (variables.batteryChoicesByRoute.size() != batteryMasterIndices.size()) {
+            throw std::runtime_error("Scenario relaxation route count mismatch");
         }
-        for (size_t level = 0;
-             level < variables.batteryChoicesByRoute.at(route).size(); ++level) {
-            const Var variable = variables.batteryChoicesByRoute.at(route).at(level);
-            const Constraint link = model_->AddConstr(variable == 0.0,
-                ("fix_b_r" + std::to_string(route) + "_l" +
-                    std::to_string(level)).c_str());
-            links_.push_back({variable, link,
-                batteryMasterIndices.at(route).at(level)});
+        for (size_t route = 0; route < variables.batteryChoicesByRoute.size(); ++route) {
+            if (variables.batteryChoicesByRoute.at(route).size() !=
+                batteryMasterIndices.at(route).size()) {
+                throw std::runtime_error("Scenario relaxation battery level mismatch");
+            }
+            for (size_t level = 0;
+                 level < variables.batteryChoicesByRoute.at(route).size(); ++level) {
+                const Var variable = variables.batteryChoicesByRoute.at(route).at(level);
+                const Constraint link = model_->AddConstr(variable == 0.0,
+                    ("fix_b_r" + std::to_string(route) + "_l" +
+                        std::to_string(level)).c_str());
+                links_.push_back({variable, link,
+                    batteryMasterIndices.at(route).at(level)});
+            }
         }
     }
 
