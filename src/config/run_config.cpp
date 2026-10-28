@@ -98,6 +98,9 @@ ParsedCommandLine ParseCommandLine(int argc, char* argv[])
             config.algorithm == "lifted-two-phase" || config.algorithm == "full")) {
         config.useRsp = true;
     }
+    if (config.algorithm == "no-dwc-feasibility") {
+        config.allowWirelessCharging = false;
+    }
     if (config.scenarioStart < 0 || config.facilityCostScale <= 0.0 ||
         config.energyScale <= 0.0 || config.batteryCapacityStep <= 0) {
         throw std::invalid_argument("Invalid numeric runtime option");
@@ -110,7 +113,7 @@ void PrintUsage()
 {
     std::cout
         << "Usage: wireless.exe --alg <algorithm> --data <name> [options]\n"
-        << "Algorithms currently available: data-check, ef, natural-ils, lifted-ils, lifted-two-phase, full\n"
+        << "Algorithms currently available: data-check, no-dwc-feasibility, ef, natural-ils, lifted-ils, lifted-two-phase, full\n"
         << "Options:\n"
         << "  --pb <wireless_reform|wireless_reform_no_wpt>\n"
         << "  --scenario-count <positive integer>\n"
@@ -125,5 +128,6 @@ void PrintUsage()
         << "  --rsp <0|1> (default: 1 for all ILS and two-phase algorithms)\n"
         << "  --rsp-workers <positive integer> (Phase 2 scenario workers; default: up to 3)\n"
         << "  --rsp-threads <positive integer> (threads per Phase 2 scenario; default: auto)\n"
+        << "  no-dwc-feasibility fixes every route battery at its maximum and solves zero-objective Exact MIPs\n"
         << "  --help, -h\n";
 }

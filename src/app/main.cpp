@@ -1,3 +1,4 @@
+#include "algorithm/feasibility_diagnostics.hpp"
 #include "algorithm/lifted_ils.hpp"
 #include "algorithm/lifted_two_phase.hpp"
 #include "algorithm/natural_ils.hpp"
@@ -125,6 +126,7 @@ int main(int argc, char* argv[])
             return 0;
         }
         if (commandLine.config.algorithm != "data-check" &&
+            commandLine.config.algorithm != "no-dwc-feasibility" &&
             commandLine.config.algorithm != "ef" &&
             commandLine.config.algorithm != "natural-ils" &&
             commandLine.config.algorithm != "lifted-ils" &&
@@ -144,6 +146,12 @@ int main(int argc, char* argv[])
                   << ", threads=" << solver.threads << '\n';
         const wireless::InstanceData instance = wireless::LoadInstance(commandLine.config);
         PrintInstanceSummary(instance);
+        if (commandLine.config.algorithm == "no-dwc-feasibility") {
+            const solver::Result result =
+                wireless::algorithm::DiagnoseNoDwcFeasibility(
+                    instance, commandLine.config, solver);
+            return result.hasSolution ? 0 : 1;
+        }
         if (commandLine.config.algorithm == "ef") {
             const solver::Result result = wireless::model::SolveExtensiveForm(
                 instance, commandLine.config, solver);

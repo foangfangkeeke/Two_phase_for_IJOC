@@ -12,6 +12,7 @@ if(MSVC)
 endif()
 
 add_executable(wireless
+    src/algorithm/feasibility_diagnostics.cpp
     src/algorithm/lifted_ils.cpp
     src/algorithm/lifted_two_phase.cpp
     src/algorithm/natural_ils.cpp
