@@ -3,6 +3,6 @@
 # scenario_folder,probability
 base,0.2
 charger_tengah_up15,0.2
-charger_btbatok_up10,0.2
+global_down10,0.2
 route_945_up15,0.2
-route_992_up15,0.2
+route_992_down15,0.2
