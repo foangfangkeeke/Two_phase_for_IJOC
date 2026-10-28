@@ -310,3 +310,48 @@ C2 L2P 运行，因此不得把该实例描述为已经完成 C2 对比。
 - repair UB 组合与验证方式；
 - 场景组成、顺序、线路数、概率或数据内容；
 - 电池范围/步长、F、C、线程数、gap 或时间限制。
+
+## 12. R28 正式实验的无 DWC 可行性 gate
+
+R28 的正式性能实验开始前，必须先在相同场景、容量、电池档位和线程
+设置下验证完全不建设 DWC 时原整数问题仍然可行。该检查防止把数据本身
+超出 plug-in 与电池资源上限造成的不可行误判为算法困难。
+
+当前 R28-N5 固定场景顺序为：
+
+1. `base`；
+2. `charger_btbatok_up15`；
+3. `global_down10`；
+4. `route_453_up15`；
+5. `route_941_down15`。
+
+使用独立的零目标 Exact-MIP 诊断，不运行 Master、RSP、cut 或 repair：
+
+```powershell
+.\out\wireless.exe --alg no-dwc-feasibility --data tower_base --scenario-count 5 --scenario-start 0 --cap 4 --battery-step 50 --energy-scale 1 --rsp-workers 3 --rsp-threads 4
+```
+
+该诊断强制日志中的 `wireless_option=0`，不创建 DWC 变量，将各线路电池
+固定为物理最大档位，并保留共享 plug-in 容量及占用二进制变量。目标函数
+恒为 0。`--rsp-workers` 和 `--rsp-threads` 在这里仅复用现有场景并行参数，
+并不构建或求解 RSP。只有 `has_solution=1` 才构成场景可行证据；只有
+`INFEASIBLE` 才构成严格不可行证据，超时或数值状态且无解时记为未知。
+
+2026-10-29 的 R28-N5/C4/50-kWh 基准验证结果：
+
+- 电池范围为 50--600 kWh，诊断固定所有线路为 600 kWh；
+- 采用 3 个场景 worker、每个 4 个 COPT 线程；
+- `base`、`charger_btbatok_up15`、`global_down10`、
+  `route_453_up15` 和 `route_941_down15` 均返回 `OPTIMAL` 且
+  `has_solution=1`；
+- 五个场景各自求解约 1.21--1.56 秒；模型构建及求解的总墙钟时间约
+  9.030 秒；
+- 汇总结果为 `FEASIBLE`。该零目标诊断不计算原问题目标值、UB 或 gap。
+
+此前完整 `wireless_reform_no_wpt + Full` 流程也曾得到零设施的有限可行
+解，可作为交叉检查；正式 gate 统一使用上述独立诊断，避免把 Master、cut
+和 repair 性能混入数据可行性判断。
+
+因此，该 R28-N5/C4/50-kWh 场景组在完全不建设 DWC 时具有整数可行解。
+该结果是数据可行性 gate，不是 DWC 算法的性能对比结论。若场景顺序、
+电池上限、C、充电窗口或能耗参数变化，必须重新执行本检查。
