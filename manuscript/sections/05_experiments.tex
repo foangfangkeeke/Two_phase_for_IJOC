@@ -1,0 +1,356 @@
+\FloatBarrier
+\section{Computational Experiments}
+\label{sec:experiments}
+
+This section evaluates the proposed method on instances derived from an operating bus network.
+We first define the base instance and characterize a representative solution, then evaluate the algorithmic components and scalability, and finally examine sensitivity to problem characteristics.
+
+\subsection{Experimental setup and base instance}
+\label{subsec:experimental-setup}
+The experiments use instances derived from the Tower Transit bus network in Singapore.
+The study network contains 28 routes, 493 physical stations, 625 directed links, and five existing plug-in charging locations, as shown in Figure~\ref{fig:case-study-map}.
+The 488 stations without plug-in charging are candidate SWC locations, and all directed links are candidate DWC locations.
+The interacting routes and shared charging resources induce the cross-route coupling represented in the operational model.
+% TODO: Add the authoritative citation or data-source reference for the Singapore/Tower Transit instances.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\linewidth]{figures/study_case.png}
+    \caption{Spatial distribution of the Tower Transit bus network used to construct the test instances.}
+    \label{fig:case-study-map}
+\end{figure}
+
+The base service plan is constructed from official Tower Transit route and timetable data and contains 282 buses (trip chains) and 2,850 scheduled trips.
+We form five equally likely service-plan scenarios on the fixed physical network: the base plan, systemwide frequency changes of $-10\%$ and $+10\%$, a 25\% frequency increase on route 984, and a 25\% frequency decrease on route 941.
+Trip chains and fleet requirements are reconstructed after each frequency perturbation.
+This five-scenario instance is the representative base instance for the analyses below unless otherwise specified.
+
+Table~\ref{tab:base-instance-statistics} summarizes the resulting instance.
+The ranges in trip and bus counts show how the service-plan perturbations change the operational problem while the physical network and candidate facilities remain fixed.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Base instance statistics}
+\label{tab:base-instance-statistics}
+\begin{tabular}{@{}lr@{}}
+\toprule
+Item & Value \\
+\midrule
+Routes & 28 \\
+Physical stations & 493 \\
+Directed links & 625 \\
+Candidate SWC stations & 488 \\
+Candidate DWC links & 625 \\
+Plug-in charging locations & 5 \\
+Chargers per plug-in location & 5 \\
+Battery capacity options & 31 (20, 30, \ldots, 320 kWh) \\
+Service scenarios & 5 \\
+Scheduled trips per scenario & 2,568--3,138 \\
+Buses (trip chains) per scenario & 264--322 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.92\linewidth}{\footnotesize\emph{Note.} Scenario-dependent trip and bus counts are reported as minimum--maximum ranges across the five scenarios.}
+\end{table}
+
+Facility and battery capital costs are expressed as representative-day equivalents so that they are comparable with daily charging costs.
+Unless otherwise specified, wireless-facility costs are set to three times the base values reported with the remaining physical and economic parameters in Appendix~\ref{app:computational-parameters}.
+
+The algorithms are implemented in C++ using Gurobi 12.0.3 and run on an Intel Core i5-14600K processor with 32 GB of memory under a 12-thread budget.
+Each run has a 7,200-second time limit; restricted masters and exact scenario MIPs are solved with zero solver gap, and both the Phase~1 switching tolerance $\varepsilon_1$ and the final outer tolerance $\varepsilon$ are set to $10^{-4}$ (0.01\%).
+Our code and data are available in the GitHub repository (\url{https://github.com/foangfangkeeke/Two_phase_for_IJOC}).
+
+\subsection{Representative planning solution}
+\label{subsec:solution-characteristics}
+
+We use the base instance to characterize a representative solution and compare it with a controlled no-WPT benchmark.
+The benchmark disables SWC and DWC while retaining the same scenarios and plug-in resources and reoptimizing the scenario-dependent battery configurations and charging operations.
+Tables~\ref{tab:representative-cost-breakdown} and~\ref{tab:representative-plan-summary} report the objective components and selected planning outcomes used in the comparison.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Objective components with and without wireless power transfer}
+\label{tab:representative-cost-breakdown}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Component (USD/day) & Without WPT & With WPT & Difference \\
+\midrule
+Wireless facilities & 0.000 & 405.000 & 405.000 \\
+Scenario-dependent batteries & 4,187.216 & 986.272 & $-3,200.944$ \\
+Charging operations & 5,906.569 & 6,783.867 & 877.298 \\
+\midrule
+Total & 10,093.785 & 8,175.139 & $-1,918.646$ \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.92\linewidth}{\footnotesize\emph{Note.} Difference is With WPT minus Without WPT. The reported components exclude scenario-dependent constants omitted from the optimization formulation.}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Battery and facility outcomes in the representative comparison}
+\label{tab:representative-plan-summary}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Metric & Without WPT & With WPT \\
+\midrule
+Selected SWC stations & 0 & 60 \\
+Selected DWC links & 0 & 1 \\
+Routes selecting 20 kWh per scenario & 8 & 22 \\
+Mean route battery capacity (kWh) & 84.71 & 22.50 \\
+Maximum selected battery capacity (kWh) & 310 & 40 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.92\linewidth}{\footnotesize\emph{Note.} The 20-kWh route counts are identical in each scenario. Mean and maximum capacities are computed over all 140 route--scenario battery selections. The no-WPT benchmark is solved to optimality, and the reported WPT incumbent has a 0.002032\% final gap.}
+\end{table}
+
+% TODO: Interpret the cost substitution and battery changes without using the unverified zero-valued charging-energy fields in the current WPT export.
+
+\subsection{Algorithmic performance and scalability}
+\label{subsec:algorithmic-evaluation}
+
+This section first uses an ablation comparison to identify the contribution of the proposed algorithmic components and then examines computational performance as network size and scenario count increase.
+We denote an instance by $N$-$k$, where $N\in\{\mathrm{S},\mathrm{M},\mathrm{B},\mathrm{L}\}$ indicates increasing network size, with $\mathrm{B}$ denoting the base network mentioned in Section~\ref{subsec:experimental-setup}, and $k$ is the number of service-plan scenarios.
+For example, B-5 denotes the base network with five scenarios.
+
+We use EF for the extensive-form formulation and ILS for the natural integer L-shaped method.
+In the remaining method names, L denotes the variable-lifted reformulation, M denotes the monotonicity-strengthened cuts, and 2P denotes the two-phase separation scheme.
+The resulting variants are EF, ILS, L-ILS, L-ILS-M, L2P-ILS, and Full, where Full combines all components mentioned above.
+In particular, ILS versus L-ILS isolates lifting, while the remaining matched pairs identify the effects of two-phase separation and monotonicity strengthening under otherwise identical configurations.
+All decomposition variants use RSP screening, which is held fixed rather than treated as an ablation component.
+
+Table~\ref{tab:algorithm-components} summarizes the component configuration of each method.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Algorithmic components included in each method}
+\label{tab:algorithm-components}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Method
+& \shortstack{Integer L-shaped\\decomposition}
+& \shortstack{Lifted\\reformulation}
+& \shortstack{Monotonicity-\\strengthened cuts}
+& \shortstack{Two-phase\\separation} \\
+\midrule
+EF      & $\times$     & $\times$     & $\times$     & $\times$ \\
+ILS     & $\checkmark$ & $\times$     & $\times$     & $\times$ \\
+L-ILS   & $\checkmark$ & $\checkmark$ & $\times$     & $\times$ \\
+L-ILS-M & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\times$ \\
+L2P-ILS & $\checkmark$ & $\checkmark$ & $\times$     & $\checkmark$ \\
+Full    & $\checkmark$ & $\checkmark$ & $\checkmark$ & $\checkmark$ \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.80\linewidth}{\footnotesize\emph{Note.} A check mark indicates that the named component is included.}
+\end{table}
+
+The matched comparisons in Table~\ref{tab:network-scalability} report the performance of these component configurations as network size increases.
+
+\subsubsection{Network scalability}
+\label{subsec:network-scale-results}
+
+The network-scale experiment fixes five service-plan scenarios and five plug-in chargers per location.
+Table~\ref{tab:network-dimensions} summarizes the dimensions used to define S-5, M-5, B-5, and L-5.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Dimensions of the network-scale instances}
+\label{tab:network-dimensions}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Instance & Routes & \shortstack{Scheduled trips\\per scenario} & \shortstack{Buses\\per scenario} & \shortstack{Candidate wireless\\facilities} \\
+\midrule
+S-5 & 3  & 206--252     & 25--29   & 100 \\
+M-5 & 11 & 391--479     & 40--46   & 638 \\
+B-5 & 28 & 2,568--3,138 & 264--322 & 1,113 \\
+L-5 & 59 & 5,669--6,923 & 705--909 & 3,273 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.90\linewidth}{\footnotesize\emph{Note.} Trip and bus counts are minimum--maximum ranges over the five scenarios. Candidate wireless facilities combine the SWC-station and DWC-link candidates.}
+\end{table}
+
+Table~\ref{tab:network-scalability} compares all methods that were run at each network scale.
+
+\begin{table}[!htbp]
+\centering
+\scriptsize
+\caption{Computational performance across network scales}
+\label{tab:network-scalability}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Instance & EF & ILS & L-ILS & L-ILS-M & L2P-ILS & Full \\
+\midrule
+S-5 & \shortstack{2.707 / 0.0097\\Opt.} & \shortstack{1.555 / 0.000000\\Conv.} & \shortstack{0.280 / 0.000000\\Conv.} & \shortstack{0.305 / 0.000000\\Conv.} & \shortstack{0.526 / 0.000000\\Conv.} & \shortstack{0.563 / 0.000000\\Conv.} \\
+M-5 & \shortstack{7,200.758 / 0.0278\\TL} & \shortstack{7,200.029 / 0.662437\\TL} & \shortstack{7,207.227 / --\\TL-NI} & \shortstack{7,234.061 / --\\TL-NI} & \shortstack{5.613 / 0.003085\\Conv.} & \shortstack{5.288 / 0.003085\\Conv.} \\
+B-5 & \shortstack{5,469.130 / 1.1639\\OOM} & \shortstack{8,359.261 / 0.858418\\TL} & NR & NR & \shortstack{135.543 / 0.002032\\Conv.} & \shortstack{133.674 / 0.002032\\Conv.} \\
+L-5 & \shortstack{656.130 / --\\OOM-NI} & \shortstack{$\geq 7,200$ / --\\TL-NI} & NR & NR & \shortstack{7,230.550 / 0.152628\\TL} & \shortstack{7,510.302 / 0.015066\\TL} \\
+\bottomrule
+\end{tabular}%
+}
+\par\smallskip
+\parbox{0.97\linewidth}{\footnotesize\emph{Note.} Each result reports total time in seconds / final gap in percent, followed by status. Opt., Conv., TL, OOM, NI, and NR denote solver optimality, outer convergence, time limit, out of memory, no finite incumbent, and not run, respectively.}
+\end{table}
+
+% TODO: Replace the provisional L-5 ILS elapsed time and recover its terminal lower bound when the deleted terminal log is restored.
+
+Table~\ref{tab:network-phase-times} records the phase-specific times for the two-phase variants.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Phase-specific times across network scales}
+\label{tab:network-phase-times}
+\begin{tabular}{@{}llrrr@{}}
+\toprule
+Instance & Method & Phase~1 (s) & Phase~2 (s) & Total (s) \\
+\midrule
+S-5 & L2P-ILS & 0.297 & 0.229 & 0.526 \\
+S-5 & Full    & 0.327 & 0.236 & 0.563 \\
+M-5 & L2P-ILS & 4.433 & 1.180 & 5.613 \\
+M-5 & Full    & 4.149 & 1.139 & 5.288 \\
+B-5 & L2P-ILS & 83.716 & 51.827 & 135.543 \\
+B-5 & Full    & 85.312 & 48.362 & 133.674 \\
+L-5 & L2P-ILS & 2,431.407 & 4,799.143 & 7,230.550 \\
+L-5 & Full    & 2,338.616 & 5,171.686 & 7,510.302 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% TODO: Analyze the matched algorithm comparisons and phase-time shifts without treating unrun cells as failures.
+
+\subsubsection{Scenario-count scalability}
+\label{subsec:scenario-scale-results}
+
+The scenario-scale experiment fixes the base network and five plug-in chargers per location and increases the number of equally likely scenarios from 5 to 40.
+The scenario sets are nested: each larger set retains all scenarios in the preceding set.
+Table~\ref{tab:scenario-scalability} compares EF, L2P-ILS, and Full, the methods run throughout this series.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Computational performance as the number of scenarios increases}
+\label{tab:scenario-scalability}
+\begin{tabular}{@{}lrccc@{}}
+\toprule
+Instance & Scenarios & EF & L2P-ILS & Full \\
+\midrule
+B-5  & 5  & \shortstack{5,469.130 / 1.1639\\OOM} & \shortstack{135.543 / 0.002032\\Conv.} & \shortstack{133.674 / 0.002032\\Conv.} \\
+B-10 & 10 & \shortstack{7,202.652 / 2.6843\\TL} & \shortstack{574.103 / 0.002044\\Conv.} & \shortstack{232.253 / 0.002044\\Conv.} \\
+B-20 & 20 & \shortstack{985.030 / --\\OOM-NI} & \shortstack{469.096 / 0.009122\\Conv.} & \shortstack{339.781 / 0.005732\\Conv.} \\
+B-40 & 40 & \shortstack{1,378.010 / --\\OOM-NI} & \shortstack{10,107.386 / 0.305541\\TL} & \shortstack{4,275.907 / 0.008980\\Conv.} \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.94\linewidth}{\footnotesize\emph{Note.} Each result reports total time in seconds / final gap in percent, followed by the status notation defined in Table~\ref{tab:network-scalability}.}
+\end{table}
+
+Table~\ref{tab:scenario-phase-times} reports the corresponding phase-specific times for L2P-ILS and Full.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Phase-specific times as the scenario count increases}
+\label{tab:scenario-phase-times}
+\begin{tabular}{@{}llrrr@{}}
+\toprule
+Instance & Method & Phase~1 (s) & Phase~2 (s) & Total (s) \\
+\midrule
+B-5  & L2P-ILS & 83.716 & 51.827 & 135.543 \\
+B-5  & Full    & 85.312 & 48.362 & 133.674 \\
+B-10 & L2P-ILS & 108.002 & 466.101 & 574.103 \\
+B-10 & Full    & 112.536 & 119.717 & 232.253 \\
+B-20 & L2P-ILS & 224.357 & 244.739 & 469.096 \\
+B-20 & Full    & 222.099 & 117.682 & 339.781 \\
+B-40 & L2P-ILS & 711.627 & 9,395.759 & 10,107.386 \\
+B-40 & Full    & 730.102 & 3,545.805 & 4,275.907 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% TODO: Analyze scenario-count scalability and distinguish Phase~1 growth from the exact Phase~2 verification burden.
+
+\subsection{Sensitivity to problem characteristics}
+\label{subsec:capacity-coupling-results}
+
+The sensitivity experiment fixes the 28-route, ten-scenario instance and varies the number of plug-in chargers per location from two to six.
+Table~\ref{tab:capacity-performance} compares the resulting performance of L2P-ILS and Full.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Algorithmic performance across plug-in capacity levels}
+\label{tab:capacity-performance}
+\begin{tabular}{@{}rcc@{}}
+\toprule
+Chargers per location & L2P-ILS & Full \\
+\midrule
+2 & \shortstack{7,244.384 / --\\TL-NI} & \shortstack{12,166.001 / --\\TL-NI} \\
+3 & \shortstack{1,527.893 / 0.004080\\Conv.} & \shortstack{321.357 / 0.002958\\Conv.} \\
+4 & \shortstack{303.083 / 0.008554\\Conv.} & \shortstack{222.819 / 0.009541\\Conv.} \\
+5 & \shortstack{574.103 / 0.002044\\Conv.} & \shortstack{232.253 / 0.002044\\Conv.} \\
+6 & \shortstack{782.882 / 0.001056\\Conv.} & \shortstack{210.261 / 0.007782\\Conv.} \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.92\linewidth}{\footnotesize\emph{Note.} Each result reports total time in seconds / final gap in percent, followed by status. The capacity-2 runs terminate without a finite exact-feasible incumbent.}
+\end{table}
+
+The transition analysis compares the Phase~1 lower bound $LB^R$ with the first finite exact-feasible Phase~2 objective $UB_0$ through $g_0=(UB_0-LB^R)/\max\{1,|UB_0|\}$ and reports the associated metrics in Table~\ref{tab:capacity-coupling}.
+Here, $UB_0$ evaluates the first reoptimized Phase~2 master candidate rather than the stored Phase~1 incumbent.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Phase~1 lower-bound quality across plug-in capacity levels}
+\label{tab:capacity-coupling}
+\begin{tabular}{@{}rrrr@{}}
+\toprule
+Chargers per location & $LB^R$ & $UB_0$ & $g_0$ (\%) \\
+\midrule
+2 & 8,158.993391 & --           & --       \\
+3 & 8,158.993391 & 8,199.668562 & 0.496059 \\
+4 & 8,158.993391 & 8,190.618101 & 0.386109 \\
+5 & 8,158.993391 & 8,188.301086 & 0.357922 \\
+6 & 8,158.993391 & 8,187.898441 & 0.353022 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.92\linewidth}{\footnotesize\emph{Note.} No finite exact-feasible Phase~2 incumbent is found at capacity 2. The transition values are identical for L2P-ILS and Full at capacities 3--6.}
+\end{table}
+
+L2P-ILS and Full share the same Phase~1 architecture and differ in whether resource-monotonicity-strengthened scenario cuts are enabled in Phase~2.
+Table~\ref{tab:capacity-phase-times} therefore compares their Phase~2 master iterations and times directly.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Phase~2 performance with and without resource-monotonicity-strengthened cuts}
+\label{tab:capacity-phase-times}
+\begin{tabular}{@{}rrrrrr@{}}
+\toprule
+& \multicolumn{2}{c}{Master iterations} & \multicolumn{2}{c}{Time (s)} & \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+\shortstack{Chargers per\\location} & L2P-ILS & Full & L2P-ILS & Full & \shortstack{Time ratio\\(L2P/Full)} \\
+\midrule
+2 & 122 & 104 & 7,134.404 & 12,057.097 & -- \\
+3 & 14  & 5   & 1,402.638 & 208.363    & 6.73 \\
+4 & 3   & 3   & 176.624   & 112.805    & 1.57 \\
+5 & 7   & 3   & 466.101   & 119.717    & 3.89 \\
+6 & 10  & 2   & 652.848   & 95.969     & 6.80 \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{0.94\linewidth}{\footnotesize\emph{Note.} Iteration counts include the iteration indexed zero. The time ratio is omitted at capacity 2 because neither method finds a finite exact-feasible incumbent; for these two incomplete runs, Phase~2 time is total time minus Phase~1 time.}
+\end{table}
+
+% TODO: Analyze the capacity boundary, initial Phase~2 gap, and the incremental effect of monotonicity-strengthened cuts on Phase~2 performance.
+% TODO: Add a concise chapter synthesis after the result interpretations are written.

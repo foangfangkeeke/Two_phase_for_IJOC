@@ -1,0 +1,479 @@
+\FloatBarrier
+\section{Methodology}
+\label{sec:method}
+
+This section develops an exact integer L-shaped method for the two-stage formulation.
+The method has three main components: a lifted value-function reformulation, a two-phase separation scheme, and resource-monotonicity-strengthened cuts.
+
+\subsection{Lifted value-function reformulation}
+\label{subsec:lifted-reformulation}
+
+In a natural integer L-shaped decomposition of \eqref{eq:two-stage-model}, only the facility variables $w$ are explicit among the discrete configuration decisions, while each scenario recourse evaluation jointly optimizes the battery configuration $z_\omega$ and the operational decisions $(x_\omega,y_\omega)$.
+This aggregation keeps the battery choice embedded in the mixed-integer recourse problem.
+Consequently, the master-side support of the integer L-shaped cuts is restricted to the facility variables.
+
+We therefore make $z_\omega$ explicit in the lifted decomposition.
+The facility layout $w$ remains a here-and-now decision, whereas $z_\omega$ and $(x_\omega,y_\omega)$ remain scenario-adaptive decisions made after scenario $\omega$ is realized.
+Thus, lifting changes which variables are visible to the decomposition master, but it does not change the information structure.
+
+To make this separation explicit, we first condition on a candidate facility--battery configuration.
+For a fixed $(w,z_\omega)$, the route battery capacities are fixed through \eqref{eq:battery-size}, and the remaining scenario evaluation is the exact operational MIP
+\begin{equation}
+\begin{aligned}
+    Q_\omega(w,z_\omega)
+    =
+    \min_{x_\omega,y_\omega}\quad
+    & C^{\mathrm{chg}}_\omega(y_\omega) \\
+    \mathrm{s.t.}\quad
+    & \eqref{eq:plugin-charge-limit}\text{--}\eqref{eq:x-domain},\\
+    & \eqref{eq:swc-charge-limit}\text{--}
+      \eqref{eq:overnight-charge-balance},
+      && r\in\mathcal R.
+\end{aligned}
+\label{eq:operational-recourse}
+\end{equation}
+The first constraint group retains scenario-level plug-in occupancy and shared-capacity constraints, while the second contains all route-indexed operational constraints.
+If this MIP is infeasible, we set $Q_\omega(w,z_\omega)=+\infty$.
+
+With $Q_\omega$ defined in this way, the scenario value in \eqref{eq:recourse-value} satisfies
+\begin{equation}
+    \begin{aligned}
+    \Phi_\omega(w)
+    =
+    \min_{z_\omega}\quad &
+    C^{\mathrm{bat}}_\omega(z_\omega)
+    +
+    Q_\omega(w,z_\omega) \\
+    \mathrm{s.t.}\quad
+    & \eqref{eq:one-battery}\text{--}\eqref{eq:z-domain}.
+    \end{aligned}
+    \label{eq:lifted-scenario-value}
+\end{equation}
+Let $z=(z_\omega)_{\omega\in\Omega}$ collect the scenario-dependent battery-selection vectors.
+Substituting \eqref{eq:lifted-scenario-value} into the original two-stage formulation \eqref{eq:two-stage-model} yields the following exact lifted value-function formulation:
+\begin{equation}
+\begin{aligned}
+    V^L
+    =
+    \min_{w,z}\quad
+        & \left[
+        C^{\mathrm{fac}}(w)
+        +
+        \sum_{\omega\in\Omega}p_\omega
+        C_\omega^{\mathrm{bat}}(z_\omega)
+        \right]
+        +
+        \sum_{\omega\in\Omega}p_\omega
+        Q_\omega(w,z_\omega)
+        \\
+    \mathrm{s.t.}\quad
+        & \eqref{eq:swc-domain}\text{--}\eqref{eq:dwc-domain},\\
+        & \eqref{eq:one-battery}\text{--}\eqref{eq:z-domain},
+        && \omega\in\Omega.
+\end{aligned}
+\label{eq:exact-lifted-formulation}
+\end{equation}
+In this formulation, both the facility variables $w$ and the scenario-dependent battery variables $z_\omega$ are explicit in the decomposition, whereas the remaining operational decisions are represented through the conditional value function $Q_\omega(w,z_\omega)$.
+The lifted formulation is exact because \eqref{eq:lifted-scenario-value} simply rewrites each scenario recourse value as the sum of battery cost and the exact conditional operational value.
+It changes the decomposition structure but not the decision timing, information structure, feasible first-stage decisions, or optimal value of \eqref{eq:two-stage-model}.
+
+\subsection{Relaxation and route-level separation}
+\label{subsec:route-lower-bounding}
+
+The lifted reformulation makes the scenario battery variables explicit, but exact lifted integer L-shaped separation remains computationally demanding.
+For each candidate $(w,z_\omega)$, exact scenario evaluation must solve an operational MIP with route coupling from shared plug-in capacity and binary plug-in occupancy.
+The route-level lower-bounding procedure developed in this section constitutes Phase 1 of the proposed method.
+
+Partition the operating vector by route as $y_\omega=(y_{\omega,r})_{r\in\mathcal R}$, with
+$C_\omega^{\mathrm{chg}}(y_\omega)=\sum_{r\in\mathcal R}C_{\omega,r}^{\mathrm{chg}}(y_{\omega,r})$.
+The plug-in charging block \eqref{eq:plugin-charge-limit}--\eqref{eq:x-domain} comprises charging-limit, shared-capacity, and occupancy-domain constraint families.
+Phase 1 removes the shared station--time capacity family \eqref{eq:plugin-capacity} and equivalently replaces the other two families with
+\begin{equation}
+    0\le q_v^{\mathrm P}\le \kappa|\mathcal T_v|,
+    \qquad
+    v\in\mathcal V_{\omega,r}^{\mathrm P}.
+    \label{eq:phase-one-plugin-aggregate-bound}
+\end{equation}
+The resulting relaxation separates by route.
+For a fixed route configuration $(w,z_{\omega,r})$, all constraints in the following LP are imposed for route $r$.
+The route-level LP value is
+\begin{equation}
+\begin{aligned}
+    Q^R_{\omega,r}(w,z_{\omega,r})
+    =
+    \min_{y_{\omega,r}}\quad
+    & C_{\omega,r}^{\mathrm{chg}}(y_{\omega,r})\\
+    \mathrm{s.t.}\quad
+    & \eqref{eq:swc-charge-limit}\text{--}\eqref{eq:overnight-charge-balance},\\
+    & \eqref{eq:phase-one-plugin-aggregate-bound}.
+\end{aligned}
+\label{eq:phase-one-route-value}
+\end{equation}
+We set $Q_{\omega,r}^R(w,z_{\omega,r})=+\infty$ if this route LP is infeasible.
+Let $Q_\omega^R(w,z_\omega)=\sum_{r\in\mathcal R}Q_{\omega,r}^R(w,z_{\omega,r})$ denote the aggregate Phase 1 value for scenario $\omega$.
+Substituting $Q_\omega^R$ for $Q_\omega$ in \eqref{eq:exact-lifted-formulation} gives the Phase 1 lower-bounding formulation:
+\begin{equation}
+\begin{aligned}
+    V^R
+    =
+    \min_{w,z}\quad
+        & \left[
+        C^{\mathrm{fac}}(w)
+        +
+        \sum_{\omega\in\Omega}p_\omega
+        C_\omega^{\mathrm{bat}}(z_\omega)
+        \right]
+        +
+        \sum_{\omega\in\Omega}p_\omega
+        Q_\omega^R(w,z_\omega)
+        \\
+    \mathrm{s.t.}\quad
+        & \eqref{eq:swc-domain}\text{--}\eqref{eq:dwc-domain},\\
+        & \eqref{eq:one-battery}\text{--}\eqref{eq:z-domain},
+        && \omega\in\Omega.
+\end{aligned}
+\label{eq:phase-one-lower-bounding-formulation}
+\end{equation}
+
+\begin{proposition}[Validity of the Phase 1 relaxation]
+\label{prop:phase-one-lb}
+For any lifted design configuration $(w,z_\omega)$ satisfying the design and battery-selection constraints,
+\begin{equation}
+    Q^R_\omega(w,z_\omega) \leq Q_\omega(w,z_\omega).
+    \label{eq:phase-one-lb}
+\end{equation}
+If any route-level Phase 1 LP is infeasible, the exact operational subproblem is infeasible.
+\end{proposition}
+
+\begin{proof}
+If the exact operational problem is infeasible, then $Q_\omega(w,z_\omega)=+\infty$ and \eqref{eq:phase-one-lb} holds by convention.
+Otherwise, consider any feasible exact operational solution $(x_\omega,y_\omega)$.
+Constraints~\eqref{eq:plugin-charge-limit} and \eqref{eq:x-domain} imply that its plug-in charging amounts satisfy \eqref{eq:phase-one-plugin-aggregate-bound}.
+All remaining constraints are unchanged and route-local; hence, the route-specific components $y_{\omega,r}$ form a feasible solution to \eqref{eq:phase-one-route-value} for every route $r$.
+Because the charging cost is route additive, the aggregate cost of these route solutions equals $C_\omega^{\mathrm{chg}}(y_\omega)$.
+Minimizing over the route LPs and then over the exact operational solutions gives $Q_\omega^R(w,z_\omega)\leq Q_\omega(w,z_\omega)$.
+The same construction shows that exact feasibility requires every route LP to be feasible, proving the final statement.
+\end{proof}
+The converse does not hold in general: feasibility of all route LPs does not guarantee exact scenario feasibility because Phase 1 omits the shared plug-in capacity constraints.
+Because \eqref{eq:phase-one-lower-bounding-formulation} and \eqref{eq:exact-lifted-formulation} have the same lifted design domain, Proposition~\ref{prop:phase-one-lb} implies $V^R\le V^L$.
+
+To solve the Phase 1 formulation by integer L-shaped separation, introduce an epigraph proxy $\theta_{\omega,r}^R$ for each route value $Q_{\omega,r}^R(w,z_{\omega,r})$.
+Let $\mathcal F_{\omega,r}^R$ and $\mathcal O_{\omega,r}^R$ denote the current route-level feasibility and optimality cut pools, and write $\theta^R=\{\theta_{\omega,r}^R\}_{\omega\in\Omega,r\in\mathcal R}$.
+The Phase 1 restricted master is
+\begin{equation}
+\begin{aligned}
+    \min_{w,z,\theta^R}\quad
+        & \left[
+        C^{\mathrm{fac}}(w)
+        +
+        \sum_{\omega\in\Omega}p_\omega
+        C_\omega^{\mathrm{bat}}(z_\omega)
+        \right]
+        +
+        \sum_{\omega\in\Omega}p_\omega
+        \sum_{r\in\mathcal R}\theta_{\omega,r}^R
+        \\
+    \mathrm{s.t.}\quad
+        & \eqref{eq:swc-domain}\text{--}\eqref{eq:dwc-domain},
+        \\
+        & \eqref{eq:one-battery}\text{--}\eqref{eq:z-domain},
+        && \omega\in\Omega,
+        \\
+        & \theta_{\omega,r}^R\ge0,
+        && \omega\in\Omega,\ r\in\mathcal R,
+        \\
+        & \psi_{\omega,r}^R(w,z_{\omega,r})\ge0,
+        && \omega\in\Omega,\ r\in\mathcal R,\ \psi_{\omega,r}^R\in\mathcal F_{\omega,r}^R,
+        \\
+        & \theta_{\omega,r}^R\ge\varphi_{\omega,r}^R(w,z_{\omega,r}),
+        && \omega\in\Omega,\ r\in\mathcal R,\ \varphi_{\omega,r}^R\in\mathcal O_{\omega,r}^R.
+\end{aligned}
+\label{eq:phase-one-master}
+\end{equation}
+Each feasible route LP yields a dual optimality cut in $(w,z_{\omega,r},\theta_{\omega,r}^R)$, whereas an infeasible route LP yields a Farkas feasibility cut.
+Appendix~\ref{app:route-lp-cuts} gives their explicit forms.
+
+By Proposition~\ref{prop:phase-one-lb}, Phase 2 can retain the Phase 1 lower bound, Phase 1 route proxies and accumulated Phase 1 cut pools.
+
+\subsection{Resource monotonicity and strengthened scenario cuts}
+\label{subsec:resource-monotonicity}
+
+We first establish a scenario-level resource order and then use it to strengthen the pointwise integer L-shaped cuts employed in exact scenario separation.
+As in \eqref{eq:operational-recourse}, set $Q_\omega(w,z_\omega)=+\infty$ when the exact operational MIP is infeasible.
+The argument uses the model specification that trip-level energy requirements do not vary with the selected battery capacity.
+
+\emph{Resource order and monotonicity.}
+Let $\mathcal W$ index all candidate SWC stations and DWC links, and let $w_j$ denote the corresponding binary facility variable.
+Fixed plug-in charger capacities are not included in this resource order.
+For route $r$, write $B_{\omega,r}(z_{\omega,r})=\sum_{k\in\mathcal K}\beta_k z_{\omega,r,k}$.
+For two scenario configurations satisfying the design constraints \eqref{eq:swc-domain}--\eqref{eq:dwc-domain} and battery-selection constraints \eqref{eq:one-battery}--\eqref{eq:z-domain}, write
+$(w,z_\omega)\preceq_\omega(\bar w,\bar z_\omega)$ if
+\[
+    w_j\le \bar w_j,\quad j\in\mathcal W,
+    \qquad
+    B_{\omega,r}(z_{\omega,r})\le B_{\omega,r}(\bar z_{\omega,r}),\quad
+    r\in\mathcal R.
+\]
+
+\begin{proposition}[Scenario-level resource monotonicity]
+\label{prop:resource-monotonicity}
+For a fixed scenario $\omega\in\Omega$, if
+$(w,z_\omega)\preceq_\omega(\bar w,\bar z_\omega)$, then
+\[
+    Q_\omega(\bar w,\bar z_\omega)\le Q_\omega(w,z_\omega).
+\]
+\end{proposition}
+
+\begin{proof}
+If $Q_\omega(w,z_\omega)=+\infty$, the inequality is immediate.
+Otherwise, take any feasible exact operating solution $(x_\omega,y_\omega)$ under $(w,z_\omega)$ and keep all occupancy and charging decisions unchanged.
+The plug-in constraints remain feasible, and the SWC and DWC charging bounds remain valid because the corresponding facility variables weakly increase.
+For each route $r$, write $B_{\omega,r}=B_{\omega,r}(z_{\omega,r})$, $\bar B_{\omega,r}=B_{\omega,r}(\bar z_{\omega,r})$, and $\Delta_r=\bar B_{\omega,r}-B_{\omega,r}\ge0$.
+Increase every arrival and departure energy state on that route by $\overline\rho\Delta_r$.
+This common shift preserves all station and link energy-balance equations.
+Moreover, if $\underline\rho B_{\omega,r}\le e\le\overline\rho B_{\omega,r}$, then, since $\overline\rho\ge\underline\rho$,
+\[
+    \underline\rho\bar B_{\omega,r}
+    \le
+    e+\overline\rho\Delta_r
+    \le
+    \overline\rho\bar B_{\omega,r}.
+\]
+The initial boundary equality is preserved exactly, while the return lower bound remains valid because its left-hand side increases by $\overline\rho\Delta_r$ and its right-hand side by $\underline\rho\Delta_r$.
+It also preserves the overnight balance because both $\overline\rho B_{\omega,r}$ and the terminal departure energy increase by $\overline\rho\Delta_r$.
+
+Hence the transformed solution is feasible under $(\bar w,\bar z_\omega)$ and has the same operational objective value.
+Minimization therefore gives $Q_\omega(\bar w,\bar z_\omega)\le Q_\omega(w,z_\omega)$.
+\end{proof}
+
+This monotonicity concerns $Q_\omega$ only and does not imply monotonicity of $C_\omega^{\mathrm{bat}}(z_\omega)+Q_\omega(w,z_\omega)$, because larger batteries may have higher battery cost.
+
+\begin{corollary}[Scenario-level dominance implications]
+\label{cor:resource-dominance}
+For any two scenario configurations $(w,z_\omega)$ and $(w^*,z_\omega^*)$ satisfying the design and battery-selection constraints, Proposition~\ref{prop:resource-monotonicity} implies:
+\begin{align}
+    Q_\omega(w^*,z_\omega^*)=+\infty,\ 
+    (w,z_\omega)\preceq_\omega(w^*,z_\omega^*)
+    &\Rightarrow
+    Q_\omega(w,z_\omega)=+\infty,
+    \label{eq:dominance-infeasibility}\\
+    Q_\omega(w^*,z_\omega^*)<+\infty,\ 
+    (w,z_\omega)\preceq_\omega(w^*,z_\omega^*)
+    &\Rightarrow
+    Q_\omega(w,z_\omega)\ge Q_\omega(w^*,z_\omega^*).
+    \label{eq:dominance-value}
+\end{align}
+\end{corollary}
+
+\emph{Pointwise and strengthened cuts.}
+Consider an evaluated scenario configuration $(w^*,z_\omega^*)$.
+Let $Q_\omega^*=Q_\omega(w^*,z_\omega^*)$ denote its exact operational value, and let $k_{\omega,r}^*$ be the selected battery option on route $r$.
+Because charging costs are nonnegative, we use $L_\omega=0$ as a global lower bound and impose $\theta_\omega\ge L_\omega$.
+The pointwise mismatch expression is
+\[
+    D_\omega(w,z_\omega;w^*,z_\omega^*)
+    =
+    \sum_{j\in\mathcal W:w_j^*=0}w_j
+    +
+    \sum_{j\in\mathcal W:w_j^*=1}(1-w_j)
+    +
+    \sum_{r\in\mathcal R}
+    \left(1-z_{\omega,r,k^*_{\omega,r}}\right).
+\]
+The pointwise scenario cuts are
+\[
+\begin{aligned}
+    D_\omega(w,z_\omega;w^*,z_\omega^*)
+    &\ge 1,
+    && \text{if } Q_\omega^*=+\infty,\\
+    \theta_\omega
+    &\ge
+    Q_\omega^*
+    -
+    (Q_\omega^*-L_\omega)
+    D_\omega(w,z_\omega;w^*,z_\omega^*),
+    && \text{if } Q_\omega^*<+\infty.
+\end{aligned}
+\]
+Under the binary facility domains and the route-level battery-choice constraints, $D_\omega=0$ if and only if $(w,z_\omega)=(w^*,z_\omega^*)$; otherwise $D_\omega\ge1$, yielding the standard pointwise feasibility and optimality corrections.
+
+Corollary~\ref{cor:resource-dominance} extends these pointwise corrections to dominated resource configurations.
+Define the scenario-level monotonicity mismatch expression
+\[
+    I_\omega(w,z_\omega;w^*,z_\omega^*)
+    =
+    \sum_{j\in\mathcal W:w_j^*=0}w_j
+    +
+    \sum_{r\in\mathcal R}
+    \sum_{k\in\mathcal K:\beta_k>\beta_{k^*_{\omega,r}}}
+    z_{\omega,r,k}.
+\]
+The monotonicity-strengthened scenario cuts are
+\[
+\begin{aligned}
+    I_\omega(w,z_\omega;w^*,z_\omega^*)
+    &\ge 1,
+    && \text{if } Q_\omega^*=+\infty,\\
+    \theta_\omega
+    &\ge
+    Q_\omega^*
+    -
+    (Q_\omega^*-L_\omega)
+    I_\omega(w,z_\omega;w^*,z_\omega^*),
+    && \text{if } Q_\omega^*<+\infty.
+\end{aligned}
+\]
+Under the binary facility domains and the route-level battery-choice constraints, $I_\omega$ is a nonnegative integer.
+Moreover, $I_\omega=0$ implies $(w,z_\omega)\preceq_\omega(w^*,z_\omega^*)$.
+If $Q_\omega^*=+\infty$, Corollary~\ref{cor:resource-dominance} therefore implies that every configuration with $I_\omega=0$ is infeasible, proving the strengthened feasibility cut.
+If $Q_\omega^*<+\infty$ and $I_\omega=0$, the same corollary gives $Q_\omega(w,z_\omega)\ge Q_\omega^*$.
+For $I_\omega\ge1$, the feasibility cut is satisfied and
+\[
+    Q_\omega^*-(Q_\omega^*-L_\omega)I_\omega\le L_\omega,
+\]
+so the optimality cut is valid under $\theta_\omega\ge L_\omega$.
+Since $I_\omega\le D_\omega$ and $Q_\omega^*-L_\omega\ge0$, the strengthened feasibility and optimality cuts weakly dominate their pointwise counterparts.
+
+\subsection{Complete procedure and convergence}
+\label{subsec:complete-procedure}
+
+Let $LB^R$ and $UB^R$ denote the current lower and upper bounds on the Phase 1 formulation \eqref{eq:phase-one-lower-bounding-formulation}.
+For a prescribed phase-switch tolerance $\varepsilon_1\ge0$, Phase 1 switches when
+\[
+    g^R
+    =
+    \frac{UB^R-LB^R}{\max\{1,|UB^R|\}}
+    \leq
+    \varepsilon_1.
+\]
+Set $g^R=+\infty$ until a finite $UB^R$ is available.
+By Proposition~\ref{prop:phase-one-lb}, $LB^R$ is a valid lower bound on both the Phase 1 formulation and the exact lifted formulation, whereas $UB^R$ applies only to the Phase 1 relaxation and is not an exact incumbent bound.
+The tolerance $\varepsilon_1$ controls the computational effort devoted to Phase 1 without affecting the validity of Phase 2.
+
+At the phase transition, Phase 2 retains the Phase 1 route proxies and route-level cut pools and introduces a scenario-level proxy $\theta_\omega$ for the exact operational value $Q_\omega(w,z_\omega)$.
+The linking constraint $\theta_\omega\ge\sum_{r\in\mathcal R}\theta_{\omega,r}^R$ transfers the retained route-level lower bounds to the scenario level.
+Let $\mathcal F_\omega$ denote the Phase 2 scenario-level feasibility cut pool, including RSP and exact scenario feasibility cuts, and let $\mathcal O_\omega$ denote the corresponding optimality cut pool.
+The Phase 2 restricted master is
+\begin{equation}
+\begin{aligned}
+    \min_{w,z,\theta^R,\theta}\quad
+        & \left[
+        C^{\mathrm{fac}}(w)
+        +
+        \sum_{\omega\in\Omega}p_\omega
+        C_\omega^{\mathrm{bat}}(z_\omega)
+        \right]
+        +
+        \sum_{\omega\in\Omega}p_\omega
+        \theta_\omega
+        \\
+    \mathrm{s.t.}\quad
+        & \eqref{eq:swc-domain}\text{--}\eqref{eq:dwc-domain},
+        \\
+        & \eqref{eq:one-battery}\text{--}\eqref{eq:z-domain},
+        && \omega\in\Omega,
+        \\
+        & \theta_{\omega,r}^R\ge0,
+        && \omega\in\Omega,\ r\in\mathcal R,
+        \\
+        & \psi_{\omega,r}^R(w,z_{\omega,r})\ge0,
+        && \omega\in\Omega,\ r\in\mathcal R,\ \psi_{\omega,r}^R\in\mathcal F_{\omega,r}^R,
+        \\
+        & \theta_{\omega,r}^R\ge\varphi_{\omega,r}^R(w,z_{\omega,r}),
+        && \omega\in\Omega,\ r\in\mathcal R,\ \varphi_{\omega,r}^R\in\mathcal O_{\omega,r}^R,
+        \\
+        & \theta_\omega\ge\sum_{r\in\mathcal R}\theta_{\omega,r}^R,
+        && \omega\in\Omega,
+        \\
+        & \theta_\omega\ge L_\omega,
+        && \omega\in\Omega,
+        \\
+        & \psi_\omega(w,z_\omega)\ge0,
+        && \omega\in\Omega,\ \psi_\omega\in\mathcal F_\omega,
+        \\
+        & \theta_\omega\ge\varphi_\omega(w,z_\omega),
+        && \omega\in\Omega,\ \varphi_\omega\in\mathcal O_\omega.
+\end{aligned}
+\label{eq:phase-two-master}
+\end{equation}
+
+Before invoking exact MIP separation, each Phase~2 master candidate $(w,z,\theta^R,\theta)$ is screened scenario by scenario using a scenario-level relaxed subproblem (RSP).
+For each feasible RSP, violated RSP optimality cuts are added, whereas an infeasible RSP certifies infeasibility of the corresponding exact operational MIP and yields a valid scenario-level feasibility cut before exact separation.
+When the RSPs are feasible, the algorithm proceeds to exact scenario separation.
+
+If the exact operational MIP is feasible and solved to optimality for every scenario at a restricted-master candidate $(w,z)$, the corresponding feasible objective value is
+\begin{equation}
+    UB^{\mathrm{cand}}(w,z)
+    =
+    C^{\mathrm{fac}}(w)
+    +
+    \sum_{\omega \in \Omega} p_\omega
+    C^{\mathrm{bat}}_\omega(z_\omega)
+    +
+    \sum_{\omega \in \Omega} p_\omega
+    Q_\omega(w,z_\omega).
+    \label{eq:upper-bound}
+\end{equation}
+The incumbent is updated as $UB\leftarrow\min\{UB,UB^{\mathrm{cand}}(w,z)\}$, and the optimal value of the current Phase 2 restricted master is a valid lower bound $LB$.
+For a finite incumbent $UB$, define the gap as $g=(UB-LB)/\max\{1,|UB|\}$.
+Set $g=+\infty$ until a finite incumbent is available.
+Algorithm~\ref{alg:full-method} summarizes the complete procedure for a final tolerance $\varepsilon\ge0$.
+
+\begin{algorithm}[!htb]
+\footnotesize
+\caption{Two-phase integer L-shaped method}
+\label{alg:full-method}
+\SetKwInOut{Input}{Input}
+\SetKwInOut{Output}{Output}
+\Input{Scenario data, candidate facilities and batteries, phase-switch tolerance $\varepsilon_1$, final tolerance $\varepsilon$}
+\Output{Facility layout $w$, scenario battery configurations $z$, lower bound $LB$, upper bound $UB$}
+
+\BlankLine
+Initialize cut pools; set $LB^R,LB\leftarrow-\infty$ and $UB^R,UB\leftarrow+\infty$\;
+\BlankLine
+\tcp{Phase 1: route-level lower-bounding separation}
+\Repeat{$g^R\le\varepsilon_1$}{
+    Solve \eqref{eq:phase-one-master} to optimality, set $LB^R$ to its optimal value, and update $LB\leftarrow\max\{LB,LB^R\}$\;
+    Solve route-level LP relaxations for each scenario at the current $(w,z_\omega)$\;
+    Add violated route-level dual optimality cuts for feasible route LPs\;
+    \If{one or more route LPs are infeasible}{
+        Add violated route-level Farkas cuts and continue\;
+    }
+    Set $UB^R\leftarrow\min\{UB^R,\text{evaluated Phase 1 candidate value}\}$\;
+}
+Transfer $LB$, route proxies, and route cut pools; initialize \eqref{eq:phase-two-master}\;
+\BlankLine
+\tcp{Phase 2: exact mixed-integer verification}
+\Repeat{$g\le\varepsilon$}{
+    Solve the restricted master \eqref{eq:phase-two-master} to optimality and set $LB$ to its optimal value\;
+    Solve the relaxed subproblems (RSPs) for all scenarios\;
+    Add violated RSP optimality cuts for feasible RSPs\;
+    \If{one or more RSPs are infeasible}{
+        Add the corresponding RSP feasibility cuts\;
+        continue to the next master solve\;
+    }
+    Solve the exact scenario operational MIPs to proven infeasibility or optimality\;
+    \If{one or more scenarios are proven infeasible}{
+        Add the pointwise or strengthened scenario feasibility cuts defined above\;
+        continue to the next master solve\;
+    }
+    \If{all scenario MIPs are proven optimal}{
+        Compute $UB^{\mathrm{cand}}$ using \eqref{eq:upper-bound}\;
+        Set $UB\leftarrow\min\{UB,UB^{\mathrm{cand}}\}$ and update the incumbent if improved\;
+        \ForEach{scenario whose exact recourse is underestimated by $\theta_\omega$}{
+            Add the pointwise or strengthened scenario optimality cuts defined above\;
+        }
+    }
+}
+\Return{Best incumbent, $LB$, and $UB$}\;
+\end{algorithm}
+
+\begin{theorem}[Finite convergence under exact separation]
+\label{thm:finite-convergence}
+Assume that $p_\omega>0$ for all $\omega\in\Omega$, the lifted formulation has a finite optimum, and the binary facility--battery configuration space is finite.
+Suppose Phase 1 switches after finitely many iterations, all generated cuts are valid and retained, auxiliary RSP separation terminates finitely at each master candidate, and every restricted master and exact Phase 2 scenario MIP is solved to proven infeasibility or optimality.
+With $\varepsilon=0$, Algorithm~\ref{alg:full-method} terminates finitely with an optimal solution to the lifted formulation and hence to the original two-stage formulation.
+\end{theorem}
+The proof is provided in Appendix~\ref{app:proofs}.
+
+For $\varepsilon>0$, the procedure returns the incumbent and valid bounds once $g\le\varepsilon$; if no finite incumbent has been obtained, $g=+\infty$ and gap-based termination is not declared.

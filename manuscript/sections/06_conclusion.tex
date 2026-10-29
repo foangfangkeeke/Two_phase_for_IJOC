@@ -1,0 +1,19 @@
+\FloatBarrier
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper studies wireless charging infrastructure planning for electric-bus systems under uncertain future service plans.
+The two-stage formulation separates here-and-now SWC and DWC deployment from scenario-adaptive route battery configuration and representative-day charging decisions.
+Its recourse combines scenario-dependent discrete configurations, route-level energy feasibility, and shared plug-in charger capacity.
+To exploit this structure, we develop an exact integer L-shaped method that lifts the battery configurations into the decomposition master, uses route-level LP recourse to generate lower bounds before exact scenario verification, and strengthens scenario cuts through a joint facility--battery resource order.
+The resulting procedure preserves the original information structure and converges finitely under exact separation.
+
+The Tower-derived experiments identify the two-phase relaxation--verification scheme as the main computational improvement in the tested method ladder.
+The two-phase variants solve the small, medium, and base three-scenario instances, whereas the standard integer L-shaped variants do not solve even the small instance within the two-hour limit.
+On the base network, the full method solves all cases from 3 to 40 scenarios; the 40-scenario instance terminates in 926.4 seconds with a final gap below 0.004\%.
+The boundary cases also clarify where the method remains expensive: the largest three-scenario network reaches the time limit at a 0.092\% gap, and the tightest plug-in capacity setting fails to complete exact Phase 2 verification.
+Thus, after route-level lower bounding reduces the cost of early separation, exact verification becomes the principal bottleneck when the network is large or shared-capacity coupling is tight.
+
+The study uses constructed service-plan scenarios on a fixed route network, treats existing plug-in charger capacity as exogenous, and assumes that trip energy consumption is independent of the selected battery capacity.
+Future work could develop data-driven service-plan scenarios, jointly optimize wireless and plug-in capacity expansion, and incorporate battery-weight effects and short-term operational uncertainty.
+From an algorithmic perspective, stronger exact-verification procedures for tightly coupled recourse and tests on other stochastic design problems would help establish how broadly the layered decomposition applies.
