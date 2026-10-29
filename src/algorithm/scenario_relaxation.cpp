@@ -73,6 +73,8 @@ ScenarioRelaxation::ScenarioRelaxation(const InstanceData& instance,
     model_->Update();
     SolverConfig relaxationConfig = solverConfig;
     relaxationConfig.threads = threads;
+    // Fast presolve retains Farkas certificates without the costly automatic RSP setup.
+    relaxationConfig.presolve = 1;
     solver::Configure(*model_, relaxationConfig, false);
     model_->SetIntParam(COPT_INTPARAM_LPMETHOD, 1);
     model_->SetIntParam(COPT_INTPARAM_REQFARKASRAY, 1);
