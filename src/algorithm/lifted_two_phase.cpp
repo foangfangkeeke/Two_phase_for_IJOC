@@ -27,6 +27,7 @@ namespace {
 
 constexpr int kMaximumIterations = 5000;
 constexpr double kTolerance = 1e-6;
+constexpr double kRspCertificateTolerance = 1e-8;
 constexpr double kPhaseTwoTargetGap = 0.01;
 
 using BatteryCapacityLimits = std::vector<std::vector<int>>;
@@ -718,6 +719,24 @@ struct RepairResource {
     double cost = 0.0;
 };
 
+bool RepairResourceByCost(const RepairResource& lhs, const RepairResource& rhs)
+{
+    if (std::fabs(lhs.cost - rhs.cost) > 1e-12) return lhs.cost < rhs.cost;
+    return lhs.index < rhs.index;
+}
+
+std::vector<RepairResource> BuildFacilityRepairOrder(const MasterState& master)
+{
+    std::vector<RepairResource> resources;
+    resources.reserve(master.facilities.size());
+    for (size_t facility = 0; facility < master.facilities.size(); ++facility) {
+        resources.push_back({RepairResource::Type::Facility, facility,
+            master.costs.at(facility)});
+    }
+    std::sort(resources.begin(), resources.end(), RepairResourceByCost);
+    return resources;
+}
+
 struct RepairResult {
     std::vector<double> infeasibleAnchor;
     std::vector<double> feasibleDesign;
@@ -729,6 +748,10 @@ struct RepairResult {
     int acceptedBatterySteps = 0;
     int acceptedBatteryLayers = 0;
     int acceptedFacilities = 0;
+    int rspCertificateChecks = 0;
+    int rspCertificateHits = 0;
+    int rspCertifiedFacilities = 0;
+    int rspDeferredFacilities = 0;
 };
 
 struct RepairIncumbent {
@@ -794,12 +817,27 @@ std::vector<double> MaximizePrefix(const MasterState& master, size_t scenario,
 RepairResult RepairInfeasibleScenario(ExactScenario& subproblem,
     const MasterState& master, size_t scenario,
     const std::vector<double>& original, const SolverConfig& config,
-    const std::chrono::steady_clock::time_point& globalStart)
+    const std::chrono::steady_clock::time_point& globalStart,
+    const std::vector<RepairResource>& facilityOrder,
+    const ScenarioRelaxationResult* rspCertificate)
 {
     const auto repairStart = std::chrono::steady_clock::now();
     RepairResult result;
     result.infeasibleAnchor = original;
     double feasibleDesignCost = std::numeric_limits<double>::infinity();
+
+    const auto rspCertificateValue = [&](const std::vector<double>& candidate) {
+        double value = rspCertificate->constant;
+        for (size_t index = 0; index < candidate.size(); ++index) {
+            value += rspCertificate->coefficients.at(index) * candidate.at(index);
+        }
+        return value;
+    };
+    const bool hasRspCertificate = rspCertificate != nullptr &&
+        rspCertificate->status == solver::Status::Infeasible &&
+        rspCertificate->coefficients.size() == original.size() &&
+        std::isfinite(rspCertificateValue(original)) &&
+        rspCertificateValue(original) < -kRspCertificateTolerance;
 
     const auto recordFeasibleDesign = [&](const std::vector<double>& candidate) {
         const double cost = DesignCost(master, candidate);
@@ -807,13 +845,6 @@ RepairResult RepairInfeasibleScenario(ExactScenario& subproblem,
             feasibleDesignCost = cost;
             result.feasibleDesign = candidate;
         }
-    };
-
-    const auto byCost = [](const RepairResource& lhs, const RepairResource& rhs) {
-            if (std::fabs(lhs.cost - rhs.cost) > 1e-12) {
-                return lhs.cost < rhs.cost;
-            }
-            return lhs.index < rhs.index;
     };
 
     const auto batteryResources = [&](const std::vector<double>& anchor) {
@@ -826,18 +857,15 @@ RepairResult RepairInfeasibleScenario(ExactScenario& subproblem,
                 master.costs.at(levels.at(current + 1).index) -
                     master.costs.at(levels.at(current).index)});
         }
-        std::sort(resources.begin(), resources.end(), byCost);
+        std::sort(resources.begin(), resources.end(), RepairResourceByCost);
         return resources;
     };
 
     std::vector<RepairResource> facilityResources;
-    for (size_t facility = 0; facility < master.facilities.size(); ++facility) {
-        if (original.at(facility) < 0.5) {
-            facilityResources.push_back({RepairResource::Type::Facility, facility,
-                master.costs.at(facility)});
-        }
+    facilityResources.reserve(facilityOrder.size());
+    for (const RepairResource& resource : facilityOrder) {
+        if (original.at(resource.index) < 0.5) facilityResources.push_back(resource);
     }
-    std::sort(facilityResources.begin(), facilityResources.end(), byCost);
 
     std::map<std::string, ProbeResult> cache;
     const auto probe = [&](const std::vector<double>& values) {
@@ -922,13 +950,63 @@ RepairResult RepairInfeasibleScenario(ExactScenario& subproblem,
             return true;
         };
 
-        const auto searchFacilitiesCoarse = [&]() {
+        const auto searchFacilities = [&]() {
             if (facilityResources.empty()) return true;
+            std::vector<RepairResource> exactResources = facilityResources;
+
+            // The battery-repaired anchor retains every facility selected by the
+            // current Master candidate. Use the old RSP cut only to certify the
+            // cheapest additional facility prefix that remains infeasible.
+            if (hasRspCertificate) {
+                ++result.rspCertificateChecks;
+                if (rspCertificateValue(result.infeasibleAnchor) <
+                    -kRspCertificateTolerance) {
+                    ++result.rspCertificateHits;
+                    size_t certifiedPrefix = 0;
+                    for (size_t prefix = 1;
+                         prefix <= facilityResources.size(); ++prefix) {
+                        const std::vector<double> candidate = MaximizePrefix(
+                            master, scenario, result.infeasibleAnchor,
+                            facilityResources, 0, prefix);
+                        ++result.rspCertificateChecks;
+                        if (rspCertificateValue(candidate) <
+                            -kRspCertificateTolerance) {
+                            ++result.rspCertificateHits;
+                            certifiedPrefix = prefix;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    if (certifiedPrefix > 0) {
+                        result.infeasibleAnchor = MaximizePrefix(master, scenario,
+                            result.infeasibleAnchor, facilityResources, 0,
+                            certifiedPrefix);
+                        result.acceptedResources += static_cast<int>(certifiedPrefix);
+                        result.acceptedFacilities += static_cast<int>(certifiedPrefix);
+                        result.rspCertifiedFacilities +=
+                            static_cast<int>(certifiedPrefix);
+                    }
+                    if (certifiedPrefix == facilityResources.size()) return true;
+
+                    exactResources.assign(
+                        facilityResources.begin() + certifiedPrefix,
+                        facilityResources.end());
+                    result.rspDeferredFacilities =
+                        static_cast<int>(exactResources.size());
+                } else {
+                    // Battery changes exhausted the old certificate. Preserve the
+                    // original cost-ordered shallow Exact search unchanged.
+                    result.rspDeferredFacilities =
+                        static_cast<int>(exactResources.size());
+                }
+            }
+
             const std::vector<double> facilityBase = result.infeasibleAnchor;
             size_t accepted = 0;
             for (size_t prefix = 1;;) {
                 const std::vector<double> candidate = MaximizePrefix(master, scenario,
-                    facilityBase, facilityResources, 0, prefix);
+                    facilityBase, exactResources, 0, prefix);
                 const ProbeResult prefixResult = facilityProbe(candidate);
                 if (prefixResult.classification == ProbeClassification::Infeasible) {
                     result.infeasibleAnchor = candidate;
@@ -942,16 +1020,16 @@ RepairResult RepairInfeasibleScenario(ExactScenario& subproblem,
                     return false;
                 }
 
-                if (prefix == facilityResources.size()) break;
-                prefix = prefix > facilityResources.size() / 2
-                    ? facilityResources.size() : prefix * 2;
+                if (prefix == exactResources.size()) break;
+                prefix = prefix > exactResources.size() / 2
+                    ? exactResources.size() : prefix * 2;
             }
             result.acceptedResources += static_cast<int>(accepted);
             result.acceptedFacilities += static_cast<int>(accepted);
             return true;
         };
 
-        if (searchBatteryCoarse()) searchFacilitiesCoarse();
+        if (searchBatteryCoarse()) searchFacilities();
     } catch (...) {
         FixExactResources(subproblem, master, scenario, original);
         throw;
@@ -978,7 +1056,9 @@ std::vector<ScenarioRepairResult> RepairScenarios(
     std::vector<ExactScenario>& subproblems, const MasterState& master,
     const std::vector<double>& values, const SolverConfig& config,
     const std::chrono::steady_clock::time_point& start,
-    const std::vector<RepairRequest>& requests, int workerLimit)
+    const std::vector<RepairRequest>& requests, int workerLimit,
+    const std::vector<RepairResource>& facilityOrder,
+    const std::vector<ScenarioRelaxationResult>* rspCertificates)
 {
     std::vector<ScenarioRepairResult> results(requests.size());
     std::atomic<size_t> next{0};
@@ -1000,7 +1080,9 @@ std::vector<ScenarioRepairResult> RepairScenarios(
                     result.failures = request.failures;
                     result.repair = RepairInfeasibleScenario(
                         subproblems.at(request.scenario), master, request.scenario,
-                        values, config, start);
+                        values, config, start, facilityOrder,
+                        rspCertificates == nullptr ? nullptr :
+                            &rspCertificates->at(request.scenario));
                 } catch (...) {
                     std::lock_guard<std::mutex> lock(exceptionMutex);
                     if (!firstException) firstException = std::current_exception();
@@ -1030,6 +1112,9 @@ RepairIncumbent EvaluateCombinedRepair(
 
     result.design = baseDesign;
     for (size_t scenario = 0; scenario < scenarioDesigns.size(); ++scenario) {
+        // Every scenario endpoint is a prefix of the same global cost order.
+        // Their union is therefore the longest shared prefix; validate that one
+        // common facility layout before accepting the repair UB.
         for (size_t facility = 0; facility < master.facilities.size(); ++facility) {
             result.design.at(facility) = std::max(result.design.at(facility),
                 scenarioDesigns.at(scenario).at(facility));
@@ -1123,6 +1208,8 @@ solver::Result SolveFramework(const InstanceData& instance,
         repairEnhancedCuts ? "full_master" : "lifted_two_phase_master");
     MasterState master = BuildMaster(model, instance, candidates, batteryCapacityLimits,
         runConfig.useValidInequality);
+    const std::vector<RepairResource> facilityRepairOrder =
+        BuildFacilityRepairOrder(master);
     solver::Configure(model, solverConfig, solverConfig.phase2MasterLog);
 
     const solver::Result phaseOne = RunPhaseOne(model, master, instance, candidates,
@@ -1317,7 +1404,8 @@ solver::Result SolveFramework(const InstanceData& instance,
                 const auto repairBatchStart = std::chrono::steady_clock::now();
                 const std::vector<ScenarioRepairResult> repairs = RepairScenarios(
                     subproblems, master, values, solverConfig, start,
-                    rspRepairRequests, actualScenarioWorkers);
+                    rspRepairRequests, actualScenarioWorkers,
+                    facilityRepairOrder, &rspResults);
                 repairSeconds += Elapsed(repairBatchStart);
                 for (const ScenarioRepairResult& completed : repairs) {
                     const size_t scenario = completed.scenario;
@@ -1352,6 +1440,14 @@ solver::Result SolveFramework(const InstanceData& instance,
                               << repair.acceptedBatteryLayers
                               << ", accepted_facilities="
                               << repair.acceptedFacilities
+                              << ", rsp_cert_checks="
+                              << repair.rspCertificateChecks
+                              << ", rsp_cert_hits="
+                              << repair.rspCertificateHits
+                              << ", rsp_certified_facilities="
+                              << repair.rspCertifiedFacilities
+                              << ", rsp_deferred_facilities="
+                              << repair.rspDeferredFacilities
                               << '\n';
                 }
             }
@@ -1447,7 +1543,8 @@ solver::Result SolveFramework(const InstanceData& instance,
             const auto repairBatchStart = std::chrono::steady_clock::now();
             exactRepairs = RepairScenarios(
                 subproblems, master, values, solverConfig, start,
-                exactRepairRequests, actualScenarioWorkers);
+                exactRepairRequests, actualScenarioWorkers,
+                facilityRepairOrder, nullptr);
             repairSeconds += Elapsed(repairBatchStart);
             for (size_t index = 0; index < exactRepairs.size(); ++index) {
                 const ScenarioRepairResult& completed = exactRepairs.at(index);
@@ -1477,6 +1574,14 @@ solver::Result SolveFramework(const InstanceData& instance,
                           << repair.acceptedBatteryLayers
                           << ", accepted_facilities="
                           << repair.acceptedFacilities
+                          << ", rsp_cert_checks="
+                          << repair.rspCertificateChecks
+                          << ", rsp_cert_hits="
+                          << repair.rspCertificateHits
+                          << ", rsp_certified_facilities="
+                          << repair.rspCertifiedFacilities
+                          << ", rsp_deferred_facilities="
+                          << repair.rspDeferredFacilities
                           << '\n';
             }
         }
