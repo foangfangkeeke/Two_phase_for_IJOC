@@ -8,6 +8,7 @@
 
 - 基准日期：2026-10-28。
 - repair 触发修复基线提交：`d0a4435 Preserve repair activation after incumbent updates`。
+- 当前成本导向设施修复基线提交：`f1bc115 Use cost-guided facility repair prefixes`。
 - 主要实现：`src/algorithm/lifted_two_phase.cpp`。
 - Full 是 `Lifted Two-Phase + RSP + Repair-Enhanced Monotone Feasibility Cuts`。
 - Repair 与强化 Monotone Cut 作为一个完整组件，不拆开进行主消融。
@@ -60,11 +61,23 @@
 
 | 容量 | 角色 | Full 需要达到的目标 |
 |---:|---|---|
-| C4 | 较容易/弱耦合基准 | 7200 s 内收敛；优先争取 1800 s 内收敛；相对 L2P 不应出现明显退化。repair 不触发或优势不明显可以接受。 |
-| C3 | 核心机制验证 | 7200 s 内收敛；Full 的 LB 必须优于同时间 L2P，最好同时获得有限且较紧的 UB。这是证明 repair-enhanced cut 有效的关键容量。 |
+| C4 | 较容易/弱耦合基准 | Full 应在约 1800 s 内收敛，但不得在 Phase 2 第一轮即结束；实例需要保留可观察的多轮 Phase 2 搜索。随后将 L2P 的时限设为 Full 的实际收敛时间，或允许 L2P 提前收敛。L2P 不应显著早于或明显优于 Full；若出现明显领先，则该场景组不适合作为最终容量基准。repair 不触发或优势不明显可以接受。 |
+| C3 | 核心机制验证 | 仅在同一场景组通过 C4 筛选后运行。Full 必须在 7200 s 内收敛；随后将 L2P 跑到 Full 的实际收敛时间或自身提前收敛。Full 的 LB 必须优于同时间 L2P，最好同时获得有限且较紧的 UB。这是证明 repair-enhanced cut 有效的关键容量。 |
 | C2 | 强耦合压力测试 | 不强制收敛，但在相同墙钟时间下 Full 的 LB 必须优于 L2P；只能在 C4/C3 流程固定后运行。 |
 
 任何“Full 优于 L2P”的结论必须同时满足：相同数据、容量、时间上限、RSP设置、线程设置、电池档位、候选设施数和代码版本。
+
+### 2.4 容量筛选顺序
+
+每个候选场景组必须按以下顺序筛选，不得先看 C3/C2 结果再反向挑选 C4：
+
+1. 先运行 C4 Full，目标时限为 1800 s；若第一轮 Phase 2 即收敛，或 1800 s 内无法收敛，则该场景组不满足当前 C4 筛选目标。
+2. C4 Full 合格后，记录其真实收敛时间 `T_full,C4`，再运行 C4 L2P，截止时间为 `T_full,C4`；若 L2P 更早收敛则记录其真实时间，不继续空跑。
+3. 同时报告两者在 `T_full,C4` 截点的 LB、UB、gap、Phase 2 迭代数和收敛时间。若 L2P 明显更早收敛或在相同时间表现明显更好，则更换场景组，不进入 C3。
+4. 只有通过上述 C4 检查后，才在完全相同的场景组成、顺序、F、电池档位和代码版本下运行 C3 Full；再以 C3 Full 的真实收敛时间作为 C3 L2P 的比较截止点。
+5. C3 满足“Full 收敛且同时间 LB 优于 L2P”后，才运行 C2 压力测试。
+
+“明显更早/更好”的统一数值阈值应在正式批量筛选前一次性确定，并应用于全部候选场景组；不得观察单个实例结果后逐例调整。
 
 ## 3. Phase 2 正常控制流
 
@@ -157,15 +170,19 @@ iter k+3:   failures=4, Repair ...
 - 13 个升档被接受进不可行锚点；
 - `layers=0` 不代表电池没有更新，只表示完整的一层没有作为不可行层被接受。
 
-### 5.3 设施阶段：递增前缀搜索
+### 5.3 设施阶段：成本前缀认证与递增搜索
 
 1. 设施是当前 Master 候选中 `w_f=0` 的全部候选设施。
 2. 当前代码遍历全部 Master 设施，不仅限于当前场景的 relevant facilities。
-3. 按设施建设成本升序排序；同成本按设施索引排序。
-4. 从电池阶段留下的已证不可行锚点出发，依次测试前缀 `1,2,4,8,...,剩余设施总数`。
-5. 每个仍严格不可行的前缀都可被接受；遇到第一个可行前缀后停止。
-6. 若全部剩余设施建成后仍不可行，则全部设施都可接受进不可行锚点。
-7. 设施是跨场景共享资源；单场景 repair 中的临时设施配置不能直接作为全局 UB。
+3. 在 Phase 1 前生成一次全局设施顺序：按建设成本升序，同成本按设施索引排序。每轮只从该顺序中删除当前 Master 已建设设施，各场景使用同一个剩余序列。
+4. 电池阶段结束后，将修复后的场景电池和当前 Master 已建设设施共同代入本轮 RSP Farkas cut。
+5. 若该完整配置仍严格违反 RSP cut，则按全局成本顺序逐座加入设施；仍严格违反 cut 的成本前缀可直接接受进不可行锚点，无需 Exact probe。
+6. 第一座使旧 RSP cut 无法继续严格证明不可行的设施不直接写入锚点，而是作为后续 Exact 搜索的第一个边界设施。
+7. 从最后一个已证不可行锚点出发，对边界及其后的剩余成本序列测试嵌套前缀 `1,2,4,8,...,剩余设施总数`。
+8. Exact 严格证明不可行的前缀可以接受；遇到第一个可行前缀后停止；`UNKNOWN` 安全返回最后一个已证不可行锚点。
+9. 若电池修复后旧 RSP cut 已不再严格违反，或没有有效 Farkas 系数，则不做分析认证，完整执行原成本排序的浅层 Exact 搜索。
+10. 若全部剩余设施仍被严格证明不可行，则全部设施都可接受进不可行锚点。
+11. 设施是跨场景共享资源；单场景 repair 中的临时设施配置不能直接作为全局 UB。
 
 例：F40 的当前候选已选 27 座时，剩余 13 座设施的搜索顺序是 `1,2,4,8,13`。若 `facility_probes=5, accepted_facilities=13`，表示加满这 13 座后该场景在当前电池锚点下仍严格不可行。
 
@@ -175,7 +192,7 @@ iter k+3:   failures=4, Repair ...
 - 锚点逐项不小于原始不可行 Master 设计。
 - 如果没有找到更大的已证不可行锚点，回退到原始 monotone cut。
 - 场景 repair 找到的可行设计可以保存，但全局 UB 必须使用统一的共享设施布局。
-- 组合不同场景 repair 设计时，先取共享设施并集和各自场景电池，再对全部场景执行 Exact 整数可行性/成本验证。
+- 各场景设施端点都是同一全局成本序列的前缀，因此它们的共享设施并集等于最长请求前缀；再结合各自场景电池，对全部场景执行 Exact 整数可行性/成本验证。
 - 只有全部场景都有整数可行依据时，才能报告有限 repair UB。
 - repair UB 更新不得改变连续失败计数。
 
@@ -192,6 +209,10 @@ iter k+3:   failures=4, Repair ...
 | `accepted_battery_layers` | 接受进不可行锚点的完整全线路电池层数；当前最多为 1 |
 | `accepted_facilities` | 接受进不可行锚点的新增设施数量 |
 | `accepted_resources` | `accepted_battery_steps + accepted_facilities` |
+| `rsp_cert_checks` | 设施阶段执行的 RSP 仿射证书检查次数 |
+| `rsp_cert_hits` | 其中仍严格违反 RSP cut、可证明不可行的次数 |
+| `rsp_certified_facilities` | 按成本顺序直接由 RSP cut 认证并接受的设施数 |
+| `rsp_deferred_facilities` | 从第一个未认证边界开始交给浅层 Exact 搜索的设施数 |
 | `repair_ms` | 该场景 repair 的墙钟时间，不等同于串行累加的总求解器 CPU 时间 |
 | `subproblem_ms` | 常规 Exact 或 repair 组合方案的全场景 Exact UB 验证时间；RSP 拒绝当前候选时仍可能非零 |
 | `repair_ub` | repair 组合方案经全场景 Exact 验证后的目标值；`inf` 表示没有有效全局 UB |
@@ -242,6 +263,7 @@ cmd.exe /d /s /c "`"C:\Program Files\Microsoft Visual Studio\2022\Professional\V
 - [ ] 第二次连续不可行时日志出现 `failures=2` 和 repair。
 - [ ] repair 更新 UB 后，若下一轮仍连续不可行，必须出现 `failures=3`，不能跳过 repair。
 - [ ] `battery_probes`、`facility_probes` 与搜索路径一致。
+- [ ] RSP 认证设施前缀严格按全局建设成本顺序；第一个未认证设施是 Exact 前缀的第一个点。
 - [ ] `accepted_resources == accepted_battery_steps + accepted_facilities`。
 - [ ] 不把 `after` 误认为可行 repair 方案。
 - [ ] RSP 拒绝当前候选时若 `subproblem_ms>0`，先检查是否来自 repair UB 的全场景 Exact 验证。
@@ -355,3 +377,17 @@ R28 的正式性能实验开始前，必须先在相同场景、容量、电池�
 因此，该 R28-N5/C4/50-kWh 场景组在完全不建设 DWC 时具有整数可行解。
 该结果是数据可行性 gate，不是 DWC 算法的性能对比结论。若场景顺序、
 电池上限、C、充电窗口或能耗参数变化，必须重新执行本检查。
+
+## 13. 当前 R28-N5 场景筛选（2026-10-29 更新）
+
+- 主表设施规模沿用 R3、R12 的 F10/F20/F50。本轮仅筛选 R28-N5-F50；F10/F20 延后，不新增 F40 主表行。
+- 第 2 节 R26/F40 是历史机制验证记录，不是本轮的运行配置。
+- 本轮起点为 `tower_search4_n5_r28_b50`，五场景按顺序为 `base; charger_tengah_up10; lo10pct; route_984_up20; route_941_down30`，概率均为 0.2。
+- 正式运行前核对五场景均为 28 条线路；电池 50--600 kWh、步长 50，能耗比例 1，最大 plug-in 窗口 10 分钟，VI 开启。
+- Master 12 线程；RSP、Exact 和 repair 场景并行均为 3 workers × 4 threads。外层 gap 1%，求解器 MIP gap 0.0001。
+- 筛选顺序为 C4 Full（1800 s）→ C4 L2P（截止 Full 的实际收敛耗时）→ C3 Full（7200 s）→ C3 L2P（截止 Full 的实际收敛耗时）→ C2 对比。
+- C4 Full 必须多轮 Phase 2 后收敛；L2P 可以提前收敛，但若其收敛时间小于 Full 的 80%，视为超过当前允许的时间退化范围。该阈值在本轮各候选中统一使用，原样报告 LB、UB 和 gap。
+- C3 必须 Full 收敛且同时间 LB 领先；C2 不要求收敛，但要求同时间 Full 的 LB 领先。
+- 场景调整限定在上述五种角色内，base 保留。每次调整必须保留原配置、实际数据指纹和双方原始日志；不得跨场景组比较性能。
+- 每个新场景组必须重新执行 no-DWC C4 gate；第 12 节另一场景组的可行性结果不能直接复用。
+- 当前正式代码为 `f1bc115`：RSP Farkas cut 会直接认证严格违反的成本设施前缀并跳过这些 Exact probes。此前资源排序或证书逻辑不同的 Full/L2P 日志全部失效，不能进入正式比较。
