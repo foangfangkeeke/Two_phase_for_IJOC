@@ -1003,29 +1003,37 @@ RepairResult RepairInfeasibleScenario(ExactScenario& subproblem,
             }
 
             const std::vector<double> facilityBase = result.infeasibleAnchor;
-            size_t accepted = 0;
-            for (size_t prefix = 1;;) {
+            const auto acceptPrefix = [&](size_t prefix) {
+                result.infeasibleAnchor = MaximizePrefix(master, scenario,
+                    facilityBase, exactResources, 0, prefix);
+                result.acceptedResources += static_cast<int>(prefix);
+                result.acceptedFacilities += static_cast<int>(prefix);
+            };
+
+            const std::vector<double> allFacilities = MaximizePrefix(master, scenario,
+                facilityBase, exactResources, 0, exactResources.size());
+            const ProbeResult allResult = facilityProbe(allFacilities);
+            if (allResult.classification == ProbeClassification::Infeasible) {
+                acceptPrefix(exactResources.size());
+                return true;
+            }
+            if (allResult.classification == ProbeClassification::Unknown) return false;
+            recordFeasibleDesign(allFacilities);
+
+            for (size_t prefix = exactResources.size() / 2;
+                 prefix > 0; prefix /= 2) {
                 const std::vector<double> candidate = MaximizePrefix(master, scenario,
                     facilityBase, exactResources, 0, prefix);
                 const ProbeResult prefixResult = facilityProbe(candidate);
                 if (prefixResult.classification == ProbeClassification::Infeasible) {
-                    result.infeasibleAnchor = candidate;
-                    accepted = prefix;
+                    acceptPrefix(prefix);
+                    return true;
                 } else if (prefixResult.classification == ProbeClassification::Feasible) {
                     recordFeasibleDesign(candidate);
-                    break;
                 } else {
-                    result.acceptedResources += static_cast<int>(accepted);
-                    result.acceptedFacilities += static_cast<int>(accepted);
                     return false;
                 }
-
-                if (prefix == exactResources.size()) break;
-                prefix = prefix > exactResources.size() / 2
-                    ? exactResources.size() : prefix * 2;
             }
-            result.acceptedResources += static_cast<int>(accepted);
-            result.acceptedFacilities += static_cast<int>(accepted);
             return true;
         };
 
@@ -1306,8 +1314,23 @@ solver::Result SolveFramework(const InstanceData& instance,
         return std::isfinite(upperBound) && (upperBound - lowerBound) /
             std::max(1.0, std::fabs(upperBound)) <= kPhaseTwoTargetGap;
     };
-    constexpr int kRepairFailureThreshold = 2;
-    std::vector<int> unresolvedFailures(subproblems.size(), 0);
+    struct RepairTriggerState {
+        int rspInfeasibleCount = 0;
+        int nextRspRepair = 2;
+    };
+    constexpr int kMaximumRspRepairInterval = 8;
+    std::vector<RepairTriggerState> repairTriggers(subproblems.size());
+    const auto resetRepairTrigger = [&](size_t scenario) {
+        repairTriggers.at(scenario) = RepairTriggerState{};
+    };
+    const auto triggerRspRepair = [&](size_t scenario) {
+        RepairTriggerState& trigger = repairTriggers.at(scenario);
+        ++trigger.rspInfeasibleCount;
+        if (trigger.rspInfeasibleCount < trigger.nextRspRepair) return false;
+        trigger.nextRspRepair += std::min(
+            trigger.nextRspRepair, kMaximumRspRepairInterval);
+        return true;
+    };
     for (int iteration = 0; iteration < kMaximumIterations; ++iteration) {
         double remaining = solverConfig.timeLimit - Elapsed(start);
         if (remaining <= 0.0) break;
@@ -1344,7 +1367,6 @@ solver::Result SolveFramework(const InstanceData& instance,
         bool allRspInfeasibleRepaired = true;
         if (runConfig.useRsp) {
             bool rspTimedOut = false;
-            std::vector<bool> rspCertifiedInfeasible(subproblems.size(), false);
             std::vector<RepairRequest> rspRepairRequests;
             const auto rspStart = std::chrono::steady_clock::now();
             const std::vector<ScenarioRelaxationResult> rspResults =
@@ -1367,12 +1389,9 @@ solver::Result SolveFramework(const InstanceData& instance,
                     }
                     ++rspFeasibilityCuts;
                     rspInfeasible = true;
-                    rspCertifiedInfeasible.at(scenario) = true;
-                    if (repairEnhancedCuts) ++unresolvedFailures.at(scenario);
-                    if (repairEnhancedCuts &&
-                        unresolvedFailures.at(scenario) >= kRepairFailureThreshold) {
-                        rspRepairRequests.push_back(
-                            {scenario, unresolvedFailures.at(scenario)});
+                    if (repairEnhancedCuts && triggerRspRepair(scenario)) {
+                        rspRepairRequests.push_back({scenario,
+                            repairTriggers.at(scenario).rspInfeasibleCount});
                     } else {
                         allRspInfeasibleRepaired = false;
                     }
@@ -1425,7 +1444,9 @@ solver::Result SolveFramework(const InstanceData& instance,
                     std::cout << "Repair iter=" << iteration
                               << ", scenario=" << scenario
                               << ", trigger=rsp-unresolved"
-                              << ", failures=" << completed.failures
+                              << ", rsp_failures=" << completed.failures
+                              << ", next_rsp_repair="
+                              << repairTriggers.at(scenario).nextRspRepair
                               << ", before=" << BatteryVector(master, scenario, values)
                               << ", after=" << BatteryVector(master, scenario,
                                     repair.infeasibleAnchor)
@@ -1462,8 +1483,6 @@ solver::Result SolveFramework(const InstanceData& instance,
                         subproblems);
                     upperBound = repairUpperBound;
                 }
-                // A repaired incumbent is a different resource design.  It does not
-                // break the infeasibility streak of the current Master candidates.
             }
             model.Update();
             // RSP is only a screening relaxation.  A feasible relaxation does not
@@ -1471,14 +1490,6 @@ solver::Result SolveFramework(const InstanceData& instance,
             // RSP optimality cuts and continue to Exact SP whenever every RSP is
             // feasible.
             if (rspInfeasible) {
-                if (repairEnhancedCuts) {
-                    for (size_t scenario = 0;
-                        scenario < rspCertifiedInfeasible.size(); ++scenario) {
-                        if (!rspCertifiedInfeasible.at(scenario)) {
-                            unresolvedFailures.at(scenario) = 0;
-                        }
-                    }
-                }
                 std::cout << "Phase 2 iter " << iteration
                           << ", RSP feasibility cut x" << rspFeasibilityCuts
                           << ", RSP optimality cut x" << rspOptimalityCuts
@@ -1512,14 +1523,12 @@ solver::Result SolveFramework(const InstanceData& instance,
         for (size_t scenario = 0; scenario < subproblems.size(); ++scenario) {
             const solver::Result& result = exactResults.at(scenario);
             if (result.status == solver::Status::Infeasible) {
-                if (repairEnhancedCuts) ++unresolvedFailures.at(scenario);
-                if (repairEnhancedCuts &&
-                    unresolvedFailures.at(scenario) >= kRepairFailureThreshold) {
-                    exactRepairRequests.push_back(
-                        {scenario, unresolvedFailures.at(scenario)});
+                if (repairEnhancedCuts) {
+                    exactRepairRequests.push_back({scenario,
+                        repairTriggers.at(scenario).rspInfeasibleCount});
                 }
             } else if (result.status == solver::Status::Optimal) {
-                if (repairEnhancedCuts) unresolvedFailures.at(scenario) = 0;
+                if (repairEnhancedCuts) resetRepairTrigger(scenario);
                 repairFeasibleDesigns.at(scenario) = values;
                 recourse += result.objective;
                 const Expr mismatch = Mismatch(master, values,
@@ -1559,7 +1568,9 @@ solver::Result SolveFramework(const InstanceData& instance,
                 std::cout << "Repair iter=" << iteration
                           << ", scenario=" << scenario
                           << ", trigger=exact-unresolved"
-                          << ", failures=" << completed.failures
+                          << ", rsp_failures=" << completed.failures
+                          << ", next_rsp_repair="
+                          << repairTriggers.at(scenario).nextRspRepair
                           << ", before=" << BatteryVector(master, scenario, values)
                           << ", after=" << BatteryVector(master, scenario,
                                 repair.infeasibleAnchor)
@@ -1614,12 +1625,9 @@ solver::Result SolveFramework(const InstanceData& instance,
                     subproblems);
                 upperBound = repairUpperBound;
             }
-            // A repaired incumbent is a different resource design.  It does not
-            // break the infeasibility streak of the current Master candidates.
         }
         model.Update();
         if (!infeasible) {
-            std::fill(unresolvedFailures.begin(), unresolvedFailures.end(), 0);
             const double candidateUpperBound = DesignCost(master, values) + recourse;
             if (candidateUpperBound + kTolerance < upperBound) {
                 PrintCostBreakdown("master", master, values, subproblems);
