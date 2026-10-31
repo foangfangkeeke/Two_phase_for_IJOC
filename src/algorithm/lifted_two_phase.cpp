@@ -1316,13 +1316,10 @@ solver::Result SolveFramework(const InstanceData& instance,
     };
     struct RepairTriggerState {
         int rspInfeasibleCount = 0;
-        int nextRspRepair = 2;
+        int nextRspRepair = 1;
     };
     constexpr int kMaximumRspRepairInterval = 8;
     std::vector<RepairTriggerState> repairTriggers(subproblems.size());
-    const auto resetRepairTrigger = [&](size_t scenario) {
-        repairTriggers.at(scenario) = RepairTriggerState{};
-    };
     const auto triggerRspRepair = [&](size_t scenario) {
         RepairTriggerState& trigger = repairTriggers.at(scenario);
         ++trigger.rspInfeasibleCount;
@@ -1528,7 +1525,6 @@ solver::Result SolveFramework(const InstanceData& instance,
                         repairTriggers.at(scenario).rspInfeasibleCount});
                 }
             } else if (result.status == solver::Status::Optimal) {
-                if (repairEnhancedCuts) resetRepairTrigger(scenario);
                 repairFeasibleDesigns.at(scenario) = values;
                 recourse += result.objective;
                 const Expr mismatch = Mismatch(master, values,
