@@ -5,9 +5,9 @@ sequence,group,instance_id,data,R,N,F,C,battery_step,energy_scale,time_limit_sec
 4,main,R12-N5-F10-C4,tower_medium,12,5,10,4,50,1.0,7200,ef;natural-ils;lifted-ils;lifted-two-phase;full,ef;lifted-ils;lifted-two-phase;full
 5,main,R12-N5-F20-C4,tower_medium,12,5,20,4,50,1.0,7200,ef;natural-ils;lifted-ils;lifted-two-phase;full,lifted-two-phase;full
 6,main,R12-N5-F50-C4,tower_medium,12,5,50,4,50,1.0,7200,ef;natural-ils;lifted-ils;lifted-two-phase;full,lifted-two-phase;full
-7,main,R28-N5-F10-C4,tower_base,28,5,10,4,50,1.0,7200,ef;natural-ils;lifted-ils;lifted-two-phase;full,
-8,main,R28-N5-F20-C4,tower_base,28,5,20,4,50,1.0,7200,ef;natural-ils;lifted-ils;lifted-two-phase;full,
-9,main,R28-N5-F50-C4,tower_base,28,5,50,4,50,1.0,7200,ef;natural-ils;lifted-ils;lifted-two-phase;full,
+7,main,R28-N5-F10-C4,tower_base,28,5,10,4,50,1.0,7200,ef;natural-ils;lifted-ils;lifted-two-phase;full,lifted-two-phase;full
+8,main,R28-N5-F20-C4,tower_base,28,5,20,4,50,1.0,7200,ef;natural-ils;lifted-ils;lifted-two-phase;full,lifted-two-phase;full
+9,main,R28-N5-F50-C4,tower_base,28,5,50,4,50,1.0,7200,ef;natural-ils;lifted-ils;lifted-two-phase;full,lifted-two-phase;full
 10,scenario,R28-N3-F50-C4,tower_base,28,3,50,4,50,1.0,7200,lifted-two-phase;full,
 11,scenario,R28-N10-F50-C4,tower_base,28,10,50,4,50,1.0,7200,lifted-two-phase;full,
 12,scenario,R28-N20-F50-C4,tower_base,28,20,50,4,50,1.0,7200,lifted-two-phase;full,

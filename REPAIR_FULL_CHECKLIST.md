@@ -6,78 +6,68 @@
 
 ## 1. 当前基准状态
 
-- 基准日期：2026-10-28。
-- repair 触发修复基线提交：`d0a4435 Preserve repair activation after incumbent updates`。
-- 当前成本导向设施修复基线提交：`f1bc115 Use cost-guided facility repair prefixes`。
+- 基准日期：2026-10-31。
+- 最终 repair 触发实现提交：`f7648e2 Finalize cumulative repair trigger schedule`。
+- 成本导向设施修复基线提交：`f1bc115 Use cost-guided facility repair prefixes`。
 - 主要实现：`src/algorithm/lifted_two_phase.cpp`。
 - Full 是 `Lifted Two-Phase + RSP + Repair-Enhanced Monotone Feasibility Cuts`。
 - Repair 与强化 Monotone Cut 作为一个完整组件，不拆开进行主消融。
 - Full 和 Lifted Two-Phase 默认都开启 RSP；No-RSP 只能作为明确标注的附加实验。
 
-## 2. 固定机制验证实例
+## 2. 固定最终实例
 
-### 2.1 实例标识
+### 2.1 C3 机制验证实例
 
 | 维度 | 固定值 |
-|---|---:|
-| 数据目录 | `data/tower_search4_n5_r26_b50_data` |
-| 命令行数据名 | `tower_search4_n5_r26_b50` |
-| 线路数 `R` | 26 |
-| 场景数 `N` | 5 |
-| 候选设施数 `F` | 40 |
-| 电池档位步长 | 50 kWh |
-| 电池范围 | 50--600 kWh |
+|---|---|
+| 数据目录 | `data/tower_search4_n5_r28_b50_data` |
+| 命令行数据名 | `tower_search4_n5_r28_b50` |
+| 四维标识 | `R28-N5-F50-C3` |
+| 电池范围/步长 | 50--600 kWh / 50 kWh |
 | energy scale | 1.0 |
 | 场景概率 | 每个场景 0.2 |
-| Phase 2 场景并行 | 3 workers × 4 threads |
-| Master 线程数 | 12 |
 | 总墙钟时限 | 7200 s |
-| Phase 2 外层目标 gap | 1% |
-| `solverCfg.txt` MIP gap | `0.0001`，即 0.01% |
 
-不得将这个实例误写为 R28、20 kWh、其他 `top-N`、其他能耗比例或其他场景组合。
+固定场景顺序为：
 
-### 2.2 场景顺序与角色
+1. `base`；
+2. `charger_tengah_up10`；
+3. `lo10pct`；
+4. `route_984_up20`；
+5. `route_941_down30`。
 
-场景顺序必须保持如下配置，`base` 必须是第一个场景：
+不得替换场景后继续沿用本实例的日志或性能结论。最终 Full 在
+2886.826 s 达到 0.950507% gap，UB/LB 为
+17886.326205/17716.315484。匹配的 L2P 日志覆盖了相同墙钟截点；
+约 2876.602 s 时 UB 仍为无穷，LB 为 17689.064542。
 
-| 索引 | 文件夹 | 角色 | buses | routes | trips |
-|---:|---|---|---:|---:|---:|
-| 0 | `base` | 原始真实路网基准 | 242 | 26 | 2788 |
-| 1 | `charger_tengah_up10` | 单区域上调扰动 | 253 | 26 | 2851 |
-| 2 | `lo10pct` | 整体下调扰动 | 231 | 26 | 2513 |
-| 3 | `route_984_up20` | 单线路上调扰动 | 246 | 26 | 2821 |
-| 4 | `route_941_down30` | 单线路下调扰动 | 241 | 26 | 2757 |
+### 2.2 C4 主表实例
 
-每个场景还应满足：
+主表固定使用 `tower_base` 的前五个场景：
 
-- `stations=493`；
-- `plug_in_stations=5`；
-- `energy_per_km=1.62`；
-- 不含线路 452 和 453；
-- 不允许用其他场景替换后仍沿用本实例的旧日志或结论。
+1. `base`；
+2. `charger_btbatok_up15`；
+3. `global_down10`；
+4. `route_453_up15`；
+5. `route_941_down15`。
 
-### 2.3 容量实验目标
+固定主表行为 `R28-N5-F10-C4`、`R28-N5-F20-C4` 和
+`R28-N5-F50-C4`。共同设置为 50--600 kWh、50 kWh 步长、
+energy scale 1.0、7200 s 时限、3 个场景 worker × 4 个线程；
+Master 使用 12 线程。Phase 2 外层 gap 为 1%，求解器 MIP gap 为
+0.0001（0.01%）。
 
-| 容量 | 角色 | Full 需要达到的目标 |
-|---:|---|---|
-| C4 | 较容易/弱耦合基准 | Full 应在约 1800 s 内收敛，但不得在 Phase 2 第一轮即结束；实例需要保留可观察的多轮 Phase 2 搜索。随后将 L2P 的时限设为 Full 的实际收敛时间，或允许 L2P 提前收敛。L2P 不应显著早于或明显优于 Full；若出现明显领先，则该场景组不适合作为最终容量基准。repair 不触发或优势不明显可以接受。 |
-| C3 | 核心机制验证 | 仅在同一场景组通过 C4 筛选后运行。Full 必须在 7200 s 内收敛；随后将 L2P 跑到 Full 的实际收敛时间或自身提前收敛。Full 的 LB 必须优于同时间 L2P，最好同时获得有限且较紧的 UB。这是证明 repair-enhanced cut 有效的关键容量。 |
-| C2 | 强耦合压力测试 | 不强制收敛，但在相同墙钟时间下 Full 的 LB 必须优于 L2P；只能在 C4/C3 流程固定后运行。 |
+最终 Full/L2P 结果为：
 
-任何“Full 优于 L2P”的结论必须同时满足：相同数据、容量、时间上限、RSP设置、线程设置、电池档位、候选设施数和代码版本。
+| 实例 | Full | Lifted Two-Phase |
+|---|---|---|
+| `R28-N5-F10-C4` | 364.664 s，gap 0.948357% | 300.077 s，gap 0.396994% |
+| `R28-N5-F20-C4` | 547.001 s，gap 0.999663% | 7200.093 s 超时，UB=inf |
+| `R28-N5-F50-C4` | 52.312 s，gap 0.295763% | 52.389 s，gap 0.295763% |
 
-### 2.4 容量筛选顺序
-
-每个候选场景组必须按以下顺序筛选，不得先看 C3/C2 结果再反向挑选 C4：
-
-1. 先运行 C4 Full，目标时限为 1800 s；若第一轮 Phase 2 即收敛，或 1800 s 内无法收敛，则该场景组不满足当前 C4 筛选目标。
-2. C4 Full 合格后，记录其真实收敛时间 `T_full,C4`，再运行 C4 L2P，截止时间为 `T_full,C4`；若 L2P 更早收敛则记录其真实时间，不继续空跑。
-3. 同时报告两者在 `T_full,C4` 截点的 LB、UB、gap、Phase 2 迭代数和收敛时间。若 L2P 明显更早收敛或在相同时间表现明显更好，则更换场景组，不进入 C3。
-4. 只有通过上述 C4 检查后，才在完全相同的场景组成、顺序、F、电池档位和代码版本下运行 C3 Full；再以 C3 Full 的真实收敛时间作为 C3 L2P 的比较截止点。
-5. C3 满足“Full 收敛且同时间 LB 优于 L2P”后，才运行 C2 压力测试。
-
-“明显更早/更好”的统一数值阈值应在正式批量筛选前一次性确定，并应用于全部候选场景组；不得观察单个实例结果后逐例调整。
+F 是候选设施丰富度，不应解释成单调的计算规模指标。F50 新增候选点
+使 Phase 1 设计在 Phase 2 首轮即可整数可行，因此它可以比 F10/F20
+更快；该现象不是配置错误。
 
 ## 3. Phase 2 正常控制流
 
@@ -89,7 +79,7 @@
 2. 对全部场景求解 RSP。
 3. 如果至少一个场景 RSP 被严格证明不可行：
    - 为这些场景添加 RSP 可行性 cut；
-   - 按第 4 节规则更新连续失败计数并可能执行 repair；
+   - 按第 4 节规则更新 RSP 累计失败计数并可能执行 repair；
    - 当前候选已经被拒绝，不再为本候选执行常规 Exact SP；
    - repair 组合方案的全场景 UB 验证属于另一条 Exact 路径，不能与常规 Exact 混淆。
 4. 如果所有场景 RSP 均可行：
@@ -108,31 +98,35 @@
 
 ## 4. Repair 触发时机
 
-### 4.1 连续失败计数
+### 4.1 RSP 累计失败计数与 Exact 立即触发
 
-对每个场景独立维护 `unresolvedFailures[scenario]`：
+对每个场景在整个 Phase 2 中独立维护
+`rspInfeasibleCount[scenario]`，以及下一次 repair 的累计触发点：
 
-1. 同一场景第一次被 RSP 或 Exact 严格证明不可行：`failures=1`，只加常规 cut，不 repair。
-2. 同一场景第二次连续严格不可行：`failures=2`，激活 repair。
-3. 激活后，只要该场景仍连续严格不可行：`failures=3,4,5,...`，每一轮都 repair。
-4. RSP 不可行和 Exact 不可行使用同一个场景计数；同一轮通常只计一次，因为 RSP 不可行后不会再走该候选的常规 Exact。
-5. repair 得到强化 cut、场景可行设计或全局 UB，均不得清零连续失败计数。
-6. repair UB 是另一个资源设计的可行性证据，不能证明当前 Master 搜索路径的连续不可行已经结束。
-7. 只有正常流程中该场景的连续失败被打断，或当前候选的 Exact SP 确认可行时，才清零该场景计数。
-8. `UNKNOWN` 不增加不可行计数，也不能作为 repair 激活证据。
+1. 同一场景第一次被 RSP 严格证明不可行时立即 repair。
+2. 后续 RSP repair 的累计触发点为 `1, 2, 4, 8, 16, 24, 32, ...`；达到 16 后，触发间隔固定为 8 次严格不可行。
+3. repair 得到强化 cut、场景可行设计或全局 UB，均不得清零累计计数。
+4. 如果所有 RSP 均可行但当前候选的 Exact SP 严格不可行，则立即 repair，不等待 RSP 累计触发点，也不增加 RSP 失败计数。
+5. repair UB 是另一个资源设计的可行性证据，不能证明当前 Master 候选已经可行。
+6. Exact SP 可行或不可行都不改变 RSP 累计失败计数；计数在 Phase 2 内不重置。
+7. `UNKNOWN` 不增加不可行计数，也不能作为 repair 激活证据。
 
 ### 4.2 必须出现的日志序列
 
-若同一场景连续失败，正确日志应类似：
+若同一场景持续被 RSP 严格证明不可行，正确日志应类似：
 
 ```text
-iter k:     failures=1, repair_probes=0
-iter k+1:   failures=2, Repair ...
-iter k+2:   failures=3, Repair ...
-iter k+3:   failures=4, Repair ...
+failure 1:  Repair ..., next_rsp_repair=2
+failure 2:  Repair ..., next_rsp_repair=4
+failure 3:  repair_probes=0
+failure 4:  Repair ..., next_rsp_repair=8
+failure 5--7: repair_probes=0
+failure 8:  Repair ..., next_rsp_repair=16
 ```
 
-即使 `iter k+1` 或 `iter k+2` 更新了 `repair_ub`，下一轮连续失败也必须继续显示递增的 `failures`，不能重新从 1 开始。
+即使 repair 更新了 `repair_ub`，后续 RSP 严格不可行仍必须沿用累计计数，
+不能重新从 1 开始。日志出现 `trigger=exact-unresolved` 时则表示所有 RSP
+均可行后 Exact SP 严格不可行；该路径必须立即 repair，与上述触发点无关。
 
 ## 5. 当前实际 Repair 搜索逻辑
 
@@ -163,11 +157,11 @@ iter k+3:   failures=4, Repair ...
    - 这不是完整二分，也不追求极大不可行点。
 7. 如果测试返回 `UNKNOWN`，停止当前强化，保留最后一个已证不可行锚点。
 
-例：`battery_probes=2, accepted_battery_steps=13, accepted_battery_layers=0` 在 R=26 时表示：
+例：`battery_probes=2, accepted_battery_steps=14, accepted_battery_layers=0` 在 R=28 时表示：
 
-- 全部 26 条线路各升一档得到可行设计；
-- 成本最低的前 13 条线路各升一档仍不可行；
-- 13 个升档被接受进不可行锚点；
+- 全部 28 条线路各升一档得到可行设计；
+- 成本最低的前 14 条线路各升一档仍不可行；
+- 14 个升档被接受进不可行锚点；
 - `layers=0` 不代表电池没有更新，只表示完整的一层没有作为不可行层被接受。
 
 ### 5.3 设施阶段：成本前缀认证与递增搜索
@@ -184,7 +178,7 @@ iter k+3:   failures=4, Repair ...
 10. 若全部剩余设施仍被严格证明不可行，则全部设施都可接受进不可行锚点。
 11. 设施是跨场景共享资源；单场景 repair 中的临时设施配置不能直接作为全局 UB。
 
-例：F40 的当前候选已选 27 座时，剩余 13 座设施的搜索顺序是 `1,2,4,8,13`。若 `facility_probes=5, accepted_facilities=13`，表示加满这 13 座后该场景在当前电池锚点下仍严格不可行。
+例：F50 的当前候选已选 37 座时，剩余 13 座设施的搜索顺序是 `1,2,4,8,13`。若 `facility_probes=5, accepted_facilities=13`，表示加满这 13 座后该场景在当前电池锚点下仍严格不可行。
 
 ### 5.4 强化 cut 与 UB
 
@@ -194,13 +188,13 @@ iter k+3:   failures=4, Repair ...
 - 场景 repair 找到的可行设计可以保存，但全局 UB 必须使用统一的共享设施布局。
 - 各场景设施端点都是同一全局成本序列的前缀，因此它们的共享设施并集等于最长请求前缀；再结合各自场景电池，对全部场景执行 Exact 整数可行性/成本验证。
 - 只有全部场景都有整数可行依据时，才能报告有限 repair UB。
-- repair UB 更新不得改变连续失败计数。
+- repair UB 更新不得改变 RSP 累计失败计数。
 
 ## 6. 日志字段解释
 
 | 字段 | 含义 |
 |---|---|
-| `failures` | 该场景当前连续严格不可行次数 |
+| `rsp_failures` | 该场景在 Phase 2 中累计被 RSP 严格证明不可行的次数 |
 | `before` | 原始不可行 Master 候选的场景电池配置 |
 | `after` | 最终已证不可行锚点的场景电池配置；不显示设施，也不是 repair 可行设计 |
 | `battery_probes` | 实际执行的电池候选 Exact feasibility solve 数量；缓存命中不增加 |
@@ -224,9 +218,10 @@ iter k+3:   failures=4, Repair ...
 - [ ] 阅读本文件。
 - [ ] 记录当前分支、HEAD 和 `git status`。
 - [ ] 确认业务代码修改与大量数据工作区修改没有混在同一提交。
-- [ ] 检查 `kRepairFailureThreshold == 2`。
-- [ ] 检查 RSP 和 Exact 不可行都增加同一个场景计数。
-- [ ] 搜索所有 `unresolvedFailures` 清零位置；repair UB 分支不得清零。
+- [ ] 检查 RSP repair 初始触发点为 1，后续为 2、4、8、16、24……。
+- [ ] 检查只有 RSP 严格不可行增加 `rspInfeasibleCount`。
+- [ ] 检查 Phase 2 中不存在 RSP 累计计数清零路径。
+- [ ] 检查 Exact 严格不可行立即 repair，但不增加 RSP 累计计数。
 - [ ] 检查所有 RSP 可行且新增最优性 cut 时仍进入 Exact。
 - [ ] 检查 `UNKNOWN` 没有被归类为不可行。
 - [ ] 使用直接 Ninja Release 命令编译，不默认执行 `run.bat`。
@@ -241,27 +236,30 @@ cmd.exe /d /s /c "`"C:\Program Files\Microsoft Visual Studio\2022\Professional\V
 
 - [ ] 确认没有残留 `wireless.exe` 进程。
 - [ ] 运行 `data-check`，不能只凭目录名判断实例。
-- [ ] 核对五个场景名称、顺序、26条线路、buses/trips、50--600 kWh。
-- [ ] 核对 `scenarioCfg.txt` 中五个概率均为 0.2。
+- [ ] 核对五个场景名称、顺序、28 条线路、buses/trips、50--600 kWh。
+- [ ] C3 机制实例核对 `scenarioCfg.txt` 中五个概率均为 0.2。
+- [ ] C4 主表核对 `tower_base` 前五个场景与第 2.2 节一致。
 - [ ] 若数据内容变化，旧 Full 和 L2P 日志同时失效，必须重新跑双方。
 
 ```powershell
-.\out\wireless.exe --pb wireless_reform --alg data-check --data tower_search4_n5_r26_b50 --scenario-count 5 --scenario-start 0 --cap 3 --battery-step 50 --dwc-top-n 40 --energy-scale 1 --rsp 1 --rsp-workers 3 --rsp-threads 4
+.\out\wireless.exe --pb wireless_reform --alg data-check --data tower_search4_n5_r28_b50 --scenario-count 5 --scenario-start 0 --cap 3 --battery-step 50 --dwc-top-n 50 --energy-scale 1 --rsp 1 --rsp-workers 3 --rsp-threads 4
 ```
 
 ### 7.3 C3 Full 正式命令
 
 ```powershell
-.\out\wireless.exe --pb wireless_reform --alg full --data tower_search4_n5_r26_b50 --scenario-count 5 --scenario-start 0 --cap 3 --battery-step 50 --dwc-top-n 40 --energy-scale 1 --rsp 1 --rsp-workers 3 --rsp-threads 4
+.\out\wireless.exe --pb wireless_reform --alg full --data tower_search4_n5_r28_b50 --scenario-count 5 --scenario-start 0 --cap 3 --battery-step 50 --dwc-top-n 50 --energy-scale 1 --rsp 1 --rsp-workers 3 --rsp-threads 4
 ```
 
 时间、Master 线程和 MIP gap 来自 `solverCfg.txt`，启动前必须核对日志开头实际打印值。
 
 ## 8. 运行中强制检查
 
-- [ ] 第一次连续不可行时 `repair_probes=0`。
-- [ ] 第二次连续不可行时日志出现 `failures=2` 和 repair。
-- [ ] repair 更新 UB 后，若下一轮仍连续不可行，必须出现 `failures=3`，不能跳过 repair。
+- [ ] 第一次 RSP 严格不可行时日志出现 `rsp_failures=1`、repair 和 `next_rsp_repair=2`。
+- [ ] RSP 累计失败次数 2、4、8、16、24……时触发 repair，其他次数不触发。
+- [ ] repair 更新 UB 后不得重置 RSP 累计失败次数。
+- [ ] Exact SP 可行或不可行都不得重置或增加 RSP 累计失败次数。
+- [ ] 所有 RSP 可行但 Exact SP 严格不可行时，立即出现 `trigger=exact-unresolved` repair。
 - [ ] `battery_probes`、`facility_probes` 与搜索路径一致。
 - [ ] RSP 认证设施前缀严格按全局建设成本顺序；第一个未认证设施是 Exact 前缀的第一个点。
 - [ ] `accepted_resources == accepted_battery_steps + accepted_facilities`。
@@ -282,43 +280,20 @@ cmd.exe /d /s /c "`"C:\Program Files\Microsoft Visual Studio\2022\Professional\V
 
 ## 10. 当前日志有效性
 
-### 10.1 旧 C3 Full 日志
+只保留 `results/final/full_l2p/logs` 中的八份最终对比日志：
 
-`logs/search4_n5_r26_b50_5_cap3/search4_n5_r26_b50_5_cap3_full_wireless_reform_2026-10-28_08-23-37.log`
+- `R28-N5-F50-C3_full.log`；
+- `R28-N5-F50-C3_lifted-two-phase.log`；
+- `R28-N5-F10-C4_full.log`；
+- `R28-N5-F10-C4_lifted-two-phase.log`；
+- `R28-N5-F20-C4_full.log`；
+- `R28-N5-F20-C4_lifted-two-phase.log`；
+- `R28-N5-F50-C4_full.log`；
+- `R28-N5-F50-C4_lifted-two-phase.log`。
 
-- 该日志在 repair UB 后错误清空连续失败计数。
-- 可用于定位旧 bug，不得作为最终 Full 结果。
-
-### 10.2 触发修复后的中断日志
-
-`logs/search4_n5_r26_b50_5_cap3/search4_n5_r26_b50_5_cap3_full_wireless_reform_2026-10-28_13-20-22.log`
-
-- 已验证：iter 1 出现 `failures=2` 并更新 repair UB；iter 2 继续出现 `failures=3`。
-- 证明连续触发修复已经生效。
-- 该进程在 iter 2 后按要求人工停止，只能用于流程验证，不能用于性能或最终收敛结论。
-
-### 10.3 C3 有优势但 C4 无优势的诊断实例
-
-实例 `tower_search4_n5_r26_b50` 的固定场景顺序为：
-
-1. `base`；
-2. `charger_tengah_up10`；
-3. `lo10pct`；
-4. `route_984_up20`；
-5. `route_941_down30`。
-
-在相同的 7200 秒限制下，C3 Full 的最终 LB 为 `17113.125081`，
-L2P 的最终 LB 为 `17082.110414`；Full 获得有限 UB，而 L2P 没有。
-但是，C3 Full 的最终状态为 `TIME_LIMIT`，并且 iter 2 的场景 4 RSP
-返回过 `NUMERICAL`，因此该结果只能证明候选方向，不能作为最终主表证据。
-
-C4 中，Full 约 184 秒收敛，L2P 约 142 秒收敛，且 L2P 的最终 LB
-和 gap 略好；因此该实例不满足“C4 Full 不明显退化”的最终筛选要求。
-
-C2 只做过未完成的 Full 诊断。较长的一次运行到 Phase 2 iter 8、
-约 4693 秒时，LB 为 `17377.557348`、UB 为 `18585.373060`、gap 为
-`6.498743%`，随后被人工中止；另一次只完成 Phase 1。没有对应的
-C2 L2P 运行，因此不得把该实例描述为已经完成 C2 对比。
+C4 的六份机器可读摘要保存在
+`results/final/full_l2p/summaries`。其他历史、诊断、中断及旧逻辑日志
+均已清除，不得从外部旧副本恢复后混入当前结果。
 
 ## 11. 修改本文的条件
 
@@ -378,16 +353,14 @@ R28 的正式性能实验开始前，必须先在相同场景、容量、电池�
 该结果是数据可行性 gate，不是 DWC 算法的性能对比结论。若场景顺序、
 电池上限、C、充电窗口或能耗参数变化，必须重新执行本检查。
 
-## 13. 当前 R28-N5 场景筛选（2026-10-29 更新）
+## 13. 当前 R28-N5 固化状态
 
-- 主表设施规模沿用 R3、R12 的 F10/F20/F50。本轮仅筛选 R28-N5-F50；F10/F20 延后，不新增 F40 主表行。
-- 第 2 节 R26/F40 是历史机制验证记录，不是本轮的运行配置。
-- 本轮起点为 `tower_search4_n5_r28_b50`，五场景按顺序为 `base; charger_tengah_up10; lo10pct; route_984_up20; route_941_down30`，概率均为 0.2。
-- 正式运行前核对五场景均为 28 条线路；电池 50--600 kWh、步长 50，能耗比例 1，最大 plug-in 窗口 10 分钟，VI 开启。
-- Master 12 线程；RSP、Exact 和 repair 场景并行均为 3 workers × 4 threads。外层 gap 1%，求解器 MIP gap 0.0001。
-- 筛选顺序为 C4 Full（1800 s）→ C4 L2P（截止 Full 的实际收敛耗时）→ C3 Full（7200 s）→ C3 L2P（截止 Full 的实际收敛耗时）→ C2 对比。
-- C4 Full 必须多轮 Phase 2 后收敛；L2P 可以提前收敛，但若其收敛时间小于 Full 的 80%，视为超过当前允许的时间退化范围。该阈值在本轮各候选中统一使用，原样报告 LB、UB 和 gap。
-- C3 必须 Full 收敛且同时间 LB 领先；C2 不要求收敛，但要求同时间 Full 的 LB 领先。
-- 场景调整限定在上述五种角色内，base 保留。每次调整必须保留原配置、实际数据指纹和双方原始日志；不得跨场景组比较性能。
-- 每个新场景组必须重新执行 no-DWC C4 gate；第 12 节另一场景组的可行性结果不能直接复用。
-- 当前正式代码为 `f1bc115`：RSP Farkas cut 会直接认证严格违反的成本设施前缀并跳过这些 Exact probes。此前资源排序或证书逻辑不同的 Full/L2P 日志全部失效，不能进入正式比较。
+- C3 机制实例固定为 `tower_search4_n5_r28_b50 / F50 / C3`。
+- C4 主表固定为 `tower_base / N5 / C4` 的 F10、F20、F50 三行。
+- `scripts/experiments/benchmark_instances.csv` 已将上述 C4 三行的
+  `lifted-two-phase;full` 标记为完成；EF、Natural ILS 和 Lifted ILS
+  仍保持待运行状态。
+- 正式 Full 代码基线为 `f7648e2`；资源排序和 RSP 设施前缀认证基线为
+  `f1bc115`。
+- 数据、算法逻辑、线程数、gap、时限或候选设施集合一旦变化，八份保留
+  日志必须整体视为失效，不能只重跑 Full 或只重跑 L2P。
