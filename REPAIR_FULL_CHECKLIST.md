@@ -7,7 +7,9 @@
 ## 1. 当前基准状态
 
 - 基准日期：2026-10-31。
-- 最终 repair 触发实现提交：`f7648e2 Finalize cumulative repair trigger schedule`。
+- 旧冻结 repair 触发基线：`f7648e2 Finalize cumulative repair trigger schedule`。
+- 当前实现仅在尚无全局 UB 时启用首次 incumbent 补全；获得首个有限 UB 后，
+  后续 repair 完全恢复旧基线的浅层搜索。
 - 成本导向设施修复基线提交：`f1bc115 Use cost-guided facility repair prefixes`。
 - 主要实现：`src/algorithm/lifted_two_phase.cpp`。
 - Full 是 `Lifted Two-Phase + RSP + Repair-Enhanced Monotone Feasibility Cuts`。
@@ -57,7 +59,8 @@ energy scale 1.0、7200 s 时限、3 个场景 worker × 4 个线程；
 Master 使用 12 线程。Phase 2 外层 gap 为 1%，求解器 MIP gap 为
 0.0001（0.01%）。
 
-最终 Full/L2P 结果为：
+以下 Full/L2P 结果是首次 incumbent 补全加入前的冻结基线。L2P 不执行
+repair，数据不变时仍可作为固定基线；Full 将使用当前实现全部重跑：
 
 | 实例 | Full | Lifted Two-Phase |
 |---|---|---|
@@ -139,23 +142,31 @@ failure 8:  Repair ..., next_rsp_repair=16
 - 始终维护一个已被严格证明不可行的 `infeasibleAnchor`。
 - `accepted_*` 表示“接受进不可行锚点”，不是“可行方案所需资源”。
 
-### 5.2 电池阶段：单档粗粒度搜索
+### 5.2 电池阶段：常规单档搜索与首次 UB 补全
 
 1. 仅考虑当前未达到上限的线路。
 2. 每条线路作为一个资源项，不把多个档位拆成多个排序项。
 3. 按下一档的电池增量成本升序排序；当前成本结构下主要等价于按车辆数升序，同成本按线路索引排序。
 4. 将全部可升级线路各提高一个离散档位，进行第一次零目标 Exact probe。
-5. 如果“全部线路升一档”仍严格不可行：
+5. 常规模式下，如果“全部线路升一档”仍严格不可行：
    - 接受这一整层进入不可行锚点；
    - `accepted_battery_steps=可升级线路数`；
    - `accepted_battery_layers=1`；
-   - 当前版本不继续升第二个完整电池层，转入设施阶段。
+   - 转入设施阶段，不继续升第二个完整电池层。
 6. 如果“全部线路升一档”可行：
    - 保存该场景可行设计；
    - 依次测试成本排序前缀 `R/2, R/4, ...`；
    - 找到第一个仍严格不可行的前缀后，将该前缀的一档升级接受进不可行锚点并结束电池阶段；
    - 这不是完整二分，也不追求极大不可行点。
 7. 如果测试返回 `UNKNOWN`，停止当前强化，保留最后一个已证不可行锚点。
+8. 上述常规电池和设施搜索完成后，若全局 UB 仍为无穷且当前场景仍未
+   找到整数可行设计，则进入首次 UB 补全模式：
+   - 在最后一个已证不可行锚点上，将所有仍可升级线路各提高一档；
+   - 若该完整层仍被严格证明不可行，则接受整层并继续下一档；
+   - 遇到第一个可行完整层后，仍使用原有 `R/2,R/4,...` 前缀搜索，保留
+     一个更大的已证不可行锚点和一个场景可行设计；
+   - `UNKNOWN` 仍安全停止，不能被当作不可行；
+   - 一旦得到首个全局有限 UB，后续所有 repair 永久回到常规单档模式。
 
 例：`battery_probes=2, accepted_battery_steps=14, accepted_battery_layers=0` 在 R=28 时表示：
 
@@ -188,6 +199,12 @@ failure 8:  Repair ..., next_rsp_repair=16
 - 场景 repair 找到的可行设计可以保存，但全局 UB 必须使用统一的共享设施布局。
 - 各场景设施端点都是同一全局成本序列的前缀，因此它们的共享设施并集等于最长请求前缀；再结合各自场景电池，对全部场景执行 Exact 整数可行性/成本验证。
 - 只有全部场景都有整数可行依据时，才能报告有限 repair UB。
+- repair 组合方案的全场景 Exact 验证若发现此前 RSP 可行但 Exact 严格
+  不可行的场景，而全局 UB 仍为无穷，则立即对这些场景执行一次
+  `trigger=initial-ub` repair，再重新验证统一共享设施布局。
+- 单个 Exact 运营成本 MIP 即使尚未证明最优，只要求解器提供整数可行
+  incumbent，其目标值仍是有效的原问题 UB 分量；不得把 incumbent 当作
+  recourse 精确值或用于需要有效下界的最优性 cut。
 - repair UB 更新不得改变 RSP 累计失败计数。
 
 ## 6. 日志字段解释
@@ -200,7 +217,9 @@ failure 8:  Repair ..., next_rsp_repair=16
 | `battery_probes` | 实际执行的电池候选 Exact feasibility solve 数量；缓存命中不增加 |
 | `facility_probes` | 实际执行的设施候选 Exact feasibility solve 数量；缓存命中不增加 |
 | `accepted_battery_steps` | 接受进不可行锚点的线路单档升级数量 |
-| `accepted_battery_layers` | 接受进不可行锚点的完整全线路电池层数；当前最多为 1 |
+| `accepted_battery_layers` | 接受进不可行锚点的完整全线路电池层数；常规模式最多为 1，首次 UB 补全模式可继续增加 |
+| `initial_ub_probes` | 常规浅层 repair 失败后，为获得首个 UB 追加的电池 Exact feasibility probe 数量 |
+| `initial_ub_layers` | 首次 UB 补全中额外接受进不可行锚点的完整电池层数 |
 | `accepted_facilities` | 接受进不可行锚点的新增设施数量 |
 | `accepted_resources` | `accepted_battery_steps + accepted_facilities` |
 | `rsp_cert_checks` | 设施阶段执行的 RSP 仿射证书检查次数 |
@@ -261,6 +280,10 @@ cmd.exe /d /s /c "`"C:\Program Files\Microsoft Visual Studio\2022\Professional\V
 - [ ] Exact SP 可行或不可行都不得重置或增加 RSP 累计失败次数。
 - [ ] 所有 RSP 可行但 Exact SP 严格不可行时，立即出现 `trigger=exact-unresolved` repair。
 - [ ] `battery_probes`、`facility_probes` 与搜索路径一致。
+- [ ] `trigger=initial-ub` 只在全局 `UB=inf` 时出现；获得有限 UB 后，
+  `initial_ub_probes` 和 `initial_ub_layers` 必须保持为 0。
+- [ ] 组合 repair 验证中被 Exact 严格证明不可行的补充场景，必须先完成
+  `initial-ub` repair 和全场景重新验证，才能更新 UB。
 - [ ] RSP 认证设施前缀严格按全局建设成本顺序；第一个未认证设施是 Exact 前缀的第一个点。
 - [ ] `accepted_resources == accepted_battery_steps + accepted_facilities`。
 - [ ] 不把 `after` 误认为可行 repair 方案。
@@ -280,7 +303,7 @@ cmd.exe /d /s /c "`"C:\Program Files\Microsoft Visual Studio\2022\Professional\V
 
 ## 10. 当前日志有效性
 
-只保留 `results/final/full_l2p/logs` 中的八份最终对比日志：
+`results/final/full_l2p/logs` 中的八份日志现作为旧冻结基线保留：
 
 - `R28-N5-F50-C3_full.log`；
 - `R28-N5-F50-C3_lifted-two-phase.log`；
@@ -292,8 +315,10 @@ cmd.exe /d /s /c "`"C:\Program Files\Microsoft Visual Studio\2022\Professional\V
 - `R28-N5-F50-C4_lifted-two-phase.log`。
 
 C4 的六份机器可读摘要保存在
-`results/final/full_l2p/summaries`。其他历史、诊断、中断及旧逻辑日志
-均已清除，不得从外部旧副本恢复后混入当前结果。
+`results/final/full_l2p/summaries`。当前首次 incumbent 补全改变了 Full
+控制流，因此所有 Full 日志必须重跑后才能重新标记为最终；数据不变的
+L2P 日志继续作为固定基线。其他历史、诊断、中断及旧逻辑日志不得混入
+新的最终结果。
 
 ## 11. 修改本文的条件
 
@@ -360,7 +385,8 @@ R28 的正式性能实验开始前，必须先在相同场景、容量、电池�
 - `scripts/experiments/benchmark_instances.csv` 已将上述 C4 三行的
   `lifted-two-phase;full` 标记为完成；EF、Natural ILS 和 Lifted ILS
   仍保持待运行状态。
-- 正式 Full 代码基线为 `f7648e2`；资源排序和 RSP 设施前缀认证基线为
-  `f1bc115`。
-- 数据、算法逻辑、线程数、gap、时限或候选设施集合一旦变化，八份保留
-  日志必须整体视为失效，不能只重跑 Full 或只重跑 L2P。
+- `f7648e2` 现为旧 Full 对照基线；当前正式实现增加了仅用于首个 UB 的
+  incumbent 补全。资源排序和 RSP 设施前缀认证仍以 `f1bc115` 为基线。
+- 数据、两算法共享逻辑、线程数、gap、时限或候选设施集合变化时，匹配的
+  Full/L2P 必须成对重跑。若变化严格局限于 Full 的 repair 分支，则全部
+  Full 重跑，数据相同的 L2P 可继续作为固定基线。

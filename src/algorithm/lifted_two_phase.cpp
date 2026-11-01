@@ -20,6 +20,7 @@
 #include <stdexcept>
 #include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
 namespace wireless::algorithm {
@@ -602,18 +603,19 @@ solver::Result EvaluateExact(ExactScenario& subproblem, const MasterState& maste
     if (result.status == solver::Status::Optimal ||
         result.status == solver::Status::Infeasible) {
         subproblem.resultCache.emplace(cacheKey, result);
-        if (result.status == solver::Status::Optimal) {
-            ExactScenario::OperatingCost operatingCost;
-            for (Var& variable : subproblem.variables.daytimeCharge) {
-                operatingCost.daytime += variable.Get(COPT_DBLINFO_VALUE) *
-                    subproblem.daytimeCostMultiplier;
-            }
-            for (Var& variable : subproblem.variables.overnightCharge) {
-                operatingCost.overnight += variable.Get(COPT_DBLINFO_VALUE) *
-                    subproblem.overnightCostMultiplier;
-            }
-            subproblem.operatingCostCache.emplace(std::move(cacheKey), operatingCost);
+    }
+    if (result.hasSolution) {
+        ExactScenario::OperatingCost operatingCost;
+        for (Var& variable : subproblem.variables.daytimeCharge) {
+            operatingCost.daytime += variable.Get(COPT_DBLINFO_VALUE) *
+                subproblem.daytimeCostMultiplier;
         }
+        for (Var& variable : subproblem.variables.overnightCharge) {
+            operatingCost.overnight += variable.Get(COPT_DBLINFO_VALUE) *
+                subproblem.overnightCostMultiplier;
+        }
+        subproblem.operatingCostCache.insert_or_assign(
+            std::move(cacheKey), operatingCost);
     }
     return result;
 }
@@ -748,6 +750,8 @@ struct RepairResult {
     int acceptedBatterySteps = 0;
     int acceptedBatteryLayers = 0;
     int acceptedFacilities = 0;
+    int initialUbProbes = 0;
+    int initialUbLayers = 0;
     int rspCertificateChecks = 0;
     int rspCertificateHits = 0;
     int rspCertifiedFacilities = 0;
@@ -756,6 +760,7 @@ struct RepairResult {
 
 struct RepairIncumbent {
     std::vector<double> design;
+    std::vector<size_t> infeasibleScenarios;
     double objective = std::numeric_limits<double>::infinity();
 };
 
@@ -776,6 +781,37 @@ std::string BatteryVector(const MasterState& master, size_t scenario,
         out << route << ':' << levels.at(SelectedBatteryLevel(levels, values)).capacity;
     }
     return out.str();
+}
+
+void PrintRepairLog(int iteration, size_t scenario, const char* trigger,
+    int failures, int nextRspRepair, const MasterState& master,
+    const std::vector<double>& before, const RepairResult& repair)
+{
+    std::cout << "Repair iter=" << iteration
+              << ", scenario=" << scenario
+              << ", trigger=" << trigger
+              << ", rsp_failures=" << failures
+              << ", next_rsp_repair=" << nextRspRepair
+              << ", before=" << BatteryVector(master, scenario, before)
+              << ", after=" << BatteryVector(master, scenario,
+                    repair.infeasibleAnchor)
+              << ", probes=" << repair.probes
+              << ", battery_probes=" << repair.batteryProbes
+              << ", facility_probes=" << repair.facilityProbes
+              << ", repair_ms=" << repair.seconds * 1000.0
+              << ", accepted_resources=" << repair.acceptedResources
+              << ", accepted_battery_steps=" << repair.acceptedBatterySteps
+              << ", accepted_battery_layers=" << repair.acceptedBatteryLayers
+              << ", initial_ub_probes=" << repair.initialUbProbes
+              << ", initial_ub_layers=" << repair.initialUbLayers
+              << ", accepted_facilities=" << repair.acceptedFacilities
+              << ", rsp_cert_checks=" << repair.rspCertificateChecks
+              << ", rsp_cert_hits=" << repair.rspCertificateHits
+              << ", rsp_certified_facilities="
+              << repair.rspCertifiedFacilities
+              << ", rsp_deferred_facilities="
+              << repair.rspDeferredFacilities
+              << '\n';
 }
 
 std::string RepairKey(const MasterState& master, const ExactScenario& subproblem,
@@ -818,6 +854,7 @@ RepairResult RepairInfeasibleScenario(ExactScenario& subproblem,
     const MasterState& master, size_t scenario,
     const std::vector<double>& original, const SolverConfig& config,
     const std::chrono::steady_clock::time_point& globalStart,
+    bool initialUbSearch,
     const std::vector<RepairResource>& facilityOrder,
     const ScenarioRelaxationResult* rspCertificate)
 {
@@ -1038,6 +1075,26 @@ RepairResult RepairInfeasibleScenario(ExactScenario& subproblem,
         };
 
         if (searchBatteryCoarse()) searchFacilities();
+
+        // The ordinary repair remains deliberately shallow after an incumbent
+        // exists.  Before the first global UB, however, keep accepting complete
+        // battery layers that are proven infeasible until the next layer becomes
+        // feasible.  searchBatteryCoarse then applies the existing R/2, R/4, ...
+        // prefix refinement inside that first feasible layer.
+        while (initialUbSearch && result.feasibleDesign.empty() &&
+               !batteryResources(result.infeasibleAnchor).empty()) {
+            const int probesBefore = result.probes;
+            const int layersBefore = result.acceptedBatteryLayers;
+            if (!searchBatteryCoarse()) {
+                result.initialUbProbes += result.probes - probesBefore;
+                result.initialUbLayers +=
+                    result.acceptedBatteryLayers - layersBefore;
+                break;
+            }
+            result.initialUbProbes += result.probes - probesBefore;
+            result.initialUbLayers +=
+                result.acceptedBatteryLayers - layersBefore;
+        }
     } catch (...) {
         FixExactResources(subproblem, master, scenario, original);
         throw;
@@ -1065,6 +1122,7 @@ std::vector<ScenarioRepairResult> RepairScenarios(
     const std::vector<double>& values, const SolverConfig& config,
     const std::chrono::steady_clock::time_point& start,
     const std::vector<RepairRequest>& requests, int workerLimit,
+    bool initialUbSearch,
     const std::vector<RepairResource>& facilityOrder,
     const std::vector<ScenarioRelaxationResult>* rspCertificates)
 {
@@ -1088,7 +1146,7 @@ std::vector<ScenarioRepairResult> RepairScenarios(
                     result.failures = request.failures;
                     result.repair = RepairInfeasibleScenario(
                         subproblems.at(request.scenario), master, request.scenario,
-                        values, config, start, facilityOrder,
+                        values, config, start, initialUbSearch, facilityOrder,
                         rspCertificates == nullptr ? nullptr :
                             &rspCertificates->at(request.scenario));
                 } catch (...) {
@@ -1141,10 +1199,19 @@ RepairIncumbent EvaluateCombinedRepair(
         subproblems, master, result.design, config, globalStart, workerLimit);
     subproblemSeconds += Elapsed(exactStart);
     double recourse = 0.0;
-    for (const solver::Result& exact : exactResults) {
-        if (exact.status != solver::Status::Optimal) return RepairIncumbent();
-        recourse += exact.objective;
+    for (size_t scenario = 0; scenario < exactResults.size(); ++scenario) {
+        const solver::Result& exact = exactResults.at(scenario);
+        if (exact.status == solver::Status::Infeasible) {
+            result.infeasibleScenarios.push_back(scenario);
+        } else if (exact.hasSolution) {
+            // Any integer-feasible incumbent gives a valid upper bound even if
+            // the individual operating-cost MIP has not closed its own gap.
+            recourse += exact.objective;
+        } else {
+            return result;
+        }
     }
+    if (!result.infeasibleScenarios.empty()) return result;
     result.objective = DesignCost(master, result.design) + recourse;
     return result;
 }
@@ -1362,6 +1429,56 @@ solver::Result SolveFramework(const InstanceData& instance,
         std::vector<std::vector<double>> rspRepairDesigns(
             subproblems.size(), values);
         bool allRspInfeasibleRepaired = true;
+        const auto completeInitialUpperBound = [&](RepairIncumbent incumbent) {
+            if (!repairEnhancedCuts || std::isfinite(upperBound) ||
+                std::isfinite(incumbent.objective) || incumbent.design.empty() ||
+                incumbent.infeasibleScenarios.empty()) {
+                return incumbent;
+            }
+
+            std::vector<RepairRequest> requests;
+            requests.reserve(incumbent.infeasibleScenarios.size());
+            for (size_t scenario : incumbent.infeasibleScenarios) {
+                requests.push_back({scenario,
+                    repairTriggers.at(scenario).rspInfeasibleCount});
+            }
+
+            const auto repairBatchStart = std::chrono::steady_clock::now();
+            const std::vector<ScenarioRepairResult> repairs = RepairScenarios(
+                subproblems, master, incumbent.design, solverConfig, start,
+                requests, actualScenarioWorkers, true,
+                facilityRepairOrder, nullptr);
+            repairSeconds += Elapsed(repairBatchStart);
+
+            std::vector<std::vector<double>> scenarioDesigns(
+                subproblems.size(), incumbent.design);
+            bool allRepaired = true;
+            for (const ScenarioRepairResult& completed : repairs) {
+                const size_t scenario = completed.scenario;
+                const RepairResult& repair = completed.repair;
+                repairProbes += repair.probes;
+                if (!repair.feasibleDesign.empty()) {
+                    scenarioDesigns.at(scenario) = repair.feasibleDesign;
+                } else {
+                    allRepaired = false;
+                }
+
+                const Expr improvements = MonotoneImprovements(master, scenario,
+                    repair.infeasibleAnchor, subproblems.at(scenario).relevant);
+                model.AddConstr(improvements >= 1.0,
+                    ("p2_initial_ub_repair_" + std::to_string(iteration) + "_" +
+                        std::to_string(scenario)).c_str());
+                if (repair.acceptedResources > 0) ++strengthenedCuts;
+                PrintRepairLog(iteration, scenario, "initial-ub",
+                    completed.failures,
+                    repairTriggers.at(scenario).nextRspRepair, master,
+                    incumbent.design, repair);
+            }
+            if (!allRepaired) return incumbent;
+            return EvaluateCombinedRepair(subproblems, master, incumbent.design,
+                scenarioDesigns, solverConfig, start, subproblemSeconds,
+                actualScenarioWorkers);
+        };
         if (runConfig.useRsp) {
             bool rspTimedOut = false;
             std::vector<RepairRequest> rspRepairRequests;
@@ -1421,6 +1538,7 @@ solver::Result SolveFramework(const InstanceData& instance,
                 const std::vector<ScenarioRepairResult> repairs = RepairScenarios(
                     subproblems, master, values, solverConfig, start,
                     rspRepairRequests, actualScenarioWorkers,
+                    !std::isfinite(upperBound),
                     facilityRepairOrder, &rspResults);
                 repairSeconds += Elapsed(repairBatchStart);
                 for (const ScenarioRepairResult& completed : repairs) {
@@ -1438,42 +1556,18 @@ solver::Result SolveFramework(const InstanceData& instance,
                         ("p2_rsp_repair_" + std::to_string(iteration) + "_" +
                             std::to_string(scenario)).c_str());
                     if (repair.acceptedResources > 0) ++strengthenedCuts;
-                    std::cout << "Repair iter=" << iteration
-                              << ", scenario=" << scenario
-                              << ", trigger=rsp-unresolved"
-                              << ", rsp_failures=" << completed.failures
-                              << ", next_rsp_repair="
-                              << repairTriggers.at(scenario).nextRspRepair
-                              << ", before=" << BatteryVector(master, scenario, values)
-                              << ", after=" << BatteryVector(master, scenario,
-                                    repair.infeasibleAnchor)
-                              << ", probes=" << repair.probes
-                              << ", battery_probes=" << repair.batteryProbes
-                              << ", facility_probes=" << repair.facilityProbes
-                              << ", repair_ms=" << repair.seconds * 1000.0
-                              << ", accepted_resources=" << repair.acceptedResources
-                              << ", accepted_battery_steps="
-                              << repair.acceptedBatterySteps
-                              << ", accepted_battery_layers="
-                              << repair.acceptedBatteryLayers
-                              << ", accepted_facilities="
-                              << repair.acceptedFacilities
-                              << ", rsp_cert_checks="
-                              << repair.rspCertificateChecks
-                              << ", rsp_cert_hits="
-                              << repair.rspCertificateHits
-                              << ", rsp_certified_facilities="
-                              << repair.rspCertifiedFacilities
-                              << ", rsp_deferred_facilities="
-                              << repair.rspDeferredFacilities
-                              << '\n';
+                    PrintRepairLog(iteration, scenario, "rsp-unresolved",
+                        completed.failures,
+                        repairTriggers.at(scenario).nextRspRepair, master,
+                        values, repair);
                 }
             }
             if (repairEnhancedCuts && rspInfeasible && allRspInfeasibleRepaired) {
-                const RepairIncumbent incumbent = EvaluateCombinedRepair(
+                RepairIncumbent incumbent = EvaluateCombinedRepair(
                     subproblems, master, values, rspRepairDesigns,
                     solverConfig, start, subproblemSeconds,
                     actualScenarioWorkers);
+                incumbent = completeInitialUpperBound(std::move(incumbent));
                 repairUpperBound = incumbent.objective;
                 if (repairUpperBound + kTolerance < upperBound) {
                     PrintCostBreakdown("repair-rsp", master, incumbent.design,
@@ -1549,6 +1643,7 @@ solver::Result SolveFramework(const InstanceData& instance,
             exactRepairs = RepairScenarios(
                 subproblems, master, values, solverConfig, start,
                 exactRepairRequests, actualScenarioWorkers,
+                !std::isfinite(upperBound),
                 facilityRepairOrder, nullptr);
             repairSeconds += Elapsed(repairBatchStart);
             for (size_t index = 0; index < exactRepairs.size(); ++index) {
@@ -1561,35 +1656,10 @@ solver::Result SolveFramework(const InstanceData& instance,
                     repairFeasibleDesigns.at(scenario) = repair.feasibleDesign;
                 }
                 if (repair.acceptedResources > 0) ++strengthenedCuts;
-                std::cout << "Repair iter=" << iteration
-                          << ", scenario=" << scenario
-                          << ", trigger=exact-unresolved"
-                          << ", rsp_failures=" << completed.failures
-                          << ", next_rsp_repair="
-                          << repairTriggers.at(scenario).nextRspRepair
-                          << ", before=" << BatteryVector(master, scenario, values)
-                          << ", after=" << BatteryVector(master, scenario,
-                                repair.infeasibleAnchor)
-                          << ", probes=" << repair.probes
-                          << ", battery_probes=" << repair.batteryProbes
-                          << ", facility_probes=" << repair.facilityProbes
-                          << ", repair_ms=" << repair.seconds * 1000.0
-                          << ", accepted_resources=" << repair.acceptedResources
-                          << ", accepted_battery_steps="
-                          << repair.acceptedBatterySteps
-                          << ", accepted_battery_layers="
-                          << repair.acceptedBatteryLayers
-                          << ", accepted_facilities="
-                          << repair.acceptedFacilities
-                          << ", rsp_cert_checks="
-                          << repair.rspCertificateChecks
-                          << ", rsp_cert_hits="
-                          << repair.rspCertificateHits
-                          << ", rsp_certified_facilities="
-                          << repair.rspCertifiedFacilities
-                          << ", rsp_deferred_facilities="
-                          << repair.rspDeferredFacilities
-                          << '\n';
+                PrintRepairLog(iteration, scenario, "exact-unresolved",
+                    completed.failures,
+                    repairTriggers.at(scenario).nextRspRepair, master,
+                    values, repair);
             }
         }
         for (size_t scenario = 0; scenario < subproblems.size(); ++scenario) {
@@ -1611,10 +1681,11 @@ solver::Result SolveFramework(const InstanceData& instance,
         if (infeasible && repairEnhancedCuts &&
             std::all_of(repairFeasibleDesigns.begin(), repairFeasibleDesigns.end(),
                 [](const std::vector<double>& design) { return !design.empty(); })) {
-            const RepairIncumbent incumbent = EvaluateCombinedRepair(
+            RepairIncumbent incumbent = EvaluateCombinedRepair(
                 subproblems, master, values, repairFeasibleDesigns,
                 solverConfig, start, subproblemSeconds,
                 actualScenarioWorkers);
+            incumbent = completeInitialUpperBound(std::move(incumbent));
             repairUpperBound = incumbent.objective;
             if (repairUpperBound + kTolerance < upperBound) {
                 PrintCostBreakdown("repair-exact", master, incumbent.design,
