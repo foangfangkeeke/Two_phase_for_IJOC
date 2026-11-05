@@ -37,7 +37,6 @@
     "CMakeLists.txt": "49ebb95f01fa06d262bc048f95f2303b59a54469cd9269eefa967d74b4ab7b98",
     "solverCfg.txt": "8fdc6169b04e586b0d5ad3465df462023450595d31055222f9b4ce4ae7d93fa5",
     "scripts/experiments/summarize_group.py": "103adb2e18d7d63eb3d226433c13c3706542105a18204f1111a34b75a19a0c14",
-    "experiments/final_2026-11-05/README.md": "b61c5ec42a229c6a2d91de03ebd3d5dc4bb114ee8b920823dd9b5f2d339f7d22",
     "experiments/final_2026-11-05/verify.py": "39bf3944d688454c775df72cba000b49438fca957312d2e5abd183268b2c3c58",
     "experiments/final_2026-11-05/run_serial.py": "04f1e463c83597ba8d1d3489b3cddcd9b9371f5e4a0e30871c83cc7b29d96df4",
     "experiments/final_2026-11-05/report.py": "1cc870ccc3266b31f079e5b5f4052ca56822b163543393203a0df3531d74f1dd",
@@ -59,5 +58,13 @@
   "records": 65,
   "unique_jobs": 58,
   "archived_historical_evidence": "history/records.json",
-  "results_policy": "ALL_NEW_FORMAL_RESULTS_USE_THIS_EXACT_EXECUTABLE_AND_SOURCE_COMMIT"
+  "results_policy": "ALL_NEW_FORMAL_RESULTS_USE_THIS_EXACT_EXECUTABLE_AND_SOURCE_COMMIT",
+  "frozen_packaging_documents": {
+    "experiments/final_2026-11-05/README.md": {
+      "git_commit_at_freeze": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "sha256_at_freeze": "b61c5ec42a229c6a2d91de03ebd3d5dc4bb114ee8b920823dd9b5f2d339f7d22"
+    }
+  },
+  "documentation_policy": "Packaging documentation may be updated for publication; executable and all compilation/runtime source fingerprints are unchanged.",
+  "publication_policy": "experiments/final_2026-11-05/publication_policy.json"
 }

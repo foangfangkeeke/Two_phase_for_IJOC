@@ -35,7 +35,6 @@
     "CMakeLists.txt": "49ebb95f01fa06d262bc048f95f2303b59a54469cd9269eefa967d74b4ab7b98",
     "solverCfg.txt": "8fdc6169b04e586b0d5ad3465df462023450595d31055222f9b4ce4ae7d93fa5",
     "scripts/experiments/summarize_group.py": "103adb2e18d7d63eb3d226433c13c3706542105a18204f1111a34b75a19a0c14",
-    "experiments/final_2026-11-05/README.md": "b61c5ec42a229c6a2d91de03ebd3d5dc4bb114ee8b920823dd9b5f2d339f7d22",
     "experiments/final_2026-11-05/verify.py": "39bf3944d688454c775df72cba000b49438fca957312d2e5abd183268b2c3c58",
     "experiments/final_2026-11-05/run_serial.py": "04f1e463c83597ba8d1d3489b3cddcd9b9371f5e4a0e30871c83cc7b29d96df4",
     "experiments/final_2026-11-05/report.py": "1cc870ccc3266b31f079e5b5f4052ca56822b163543393203a0df3531d74f1dd",
@@ -933,10 +932,6 @@
     },
     "effect": "VI-off alone performs point auditing, signature/set tracking and logging. These branches do not alter models or cuts, or invoke a solver. Their CPU and memory overhead is inside the elapsed-time budget; its magnitude was not measured.",
     "strict_time_ablation_status": "ASYMMETRIC_DIAGNOSTIC_WORK_PRESENT",
-    "proposed_patch": "experiments/final_2026-11-05/analysis/proposed_vi_trace.patch",
-    "patch_sha256": "6c44a6ea23ee30ce757414979e9bd6a9db14a03aa3a7d7ad9b125314efa2309e",
-    "proposed_patch_status": "NOT_APPLIED_CURRENT_IMPLEMENTATION_RETAINED_AFTER_USER_REPLY",
-    "proposed_condition": "runConfig.phaseProgressLog",
     "diagnostic_flag_default": false,
     "user_reply": {
       "received_in_current_turn": true,
@@ -956,11 +951,11 @@
     "main_algorithm_comparison": "Natural/Lifted and L2P are different formulations/frameworks; VI and Full/L2P paired tests are separately controlled."
   },
   "raw_review": {
-    "verified_utc": "2026-11-05T04:55:28.188000+00:00",
+    "verified_utc": "2026-11-05T05:10:21.872666+00:00",
     "independent_inline_review_no_controller_import": true,
-    "unique_raw_logs": 75,
-    "raw_line_references_checked": 6735,
-    "complete_iterations_checked": 2936,
+    "unique_raw_logs": 58,
+    "raw_line_references_checked": 6407,
+    "complete_iterations_checked": 2889,
     "selected_bounds_line_checks": "ALL_MATCH",
     "numeric_summary_mismatches": 0,
     "monotonicity_violations": 0,
@@ -968,9 +963,7 @@
   },
   "version_association": {
     "historical": "Archived source/binary associations; no exact historical Git commit or proof of a byte-identical rebuild.",
-    "current": "Exact source commit and bytes bound to the released executable by release/build records.",
-    "new_completed_runs": 16,
-    "new_user_stopped_runs": 1
+    "current": "Exact source commit and bytes bound to the released executable by release/build records."
   },
   "execution_state": {
     "state": "PAUSED_BY_USER",
@@ -978,5 +971,16 @@
     "automation_resumed": false,
     "solver_code_modified": false
   },
-  "overall_status": "CONTROLS_RECONCILED_DIAGNOSTIC_OVERHEAD_RETAINED"
+  "overall_status": "CONTROLS_RECONCILED_DIAGNOSTIC_OVERHEAD_RETAINED",
+  "frozen_packaging_documents": {
+    "experiments/final_2026-11-05/README.md": {
+      "git_commit_at_freeze": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "sha256_at_freeze": "b61c5ec42a229c6a2d91de03ebd3d5dc4bb114ee8b920823dd9b5f2d339f7d22"
+    }
+  },
+  "publication_scope": {
+    "selected_result_slots": 65,
+    "unique_raw_logs": 58,
+    "rerun_results": "LOCAL_ONLY_UNTIL_USER_APPROVES_PUBLICATION"
+  }
 }

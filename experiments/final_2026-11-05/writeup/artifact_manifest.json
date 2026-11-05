@@ -6,13 +6,14 @@
   "missing_bound_records": 6,
   "version_policy": "Historical results and new frozen-version reruns are separate",
   "files_sha256": {
-    "experiments/final_2026-11-05/writeup/results.md": "d5bfdfc1d46ded65ab23457572c3709dd50d517d6aae3df906c5c847dcdfc264",
-    "experiments/final_2026-11-05/writeup/results.html": "b098ef8772b196d3f90aedd05fefa9f62ac4a3c88906b5d4a54882c2b8785931",
-    "experiments/final_2026-11-05/writeup/results.json": "a52705cdda4da111c13b5a4f95eea41efa6bd5de07db45aa489bb7ad4ca1fb37"
+    "experiments/final_2026-11-05/writeup/results.md": "4cb5c5a4b7a953c47cbeb8925104bf28cb4b6cda0f3b013dbd7336384c030881",
+    "experiments/final_2026-11-05/writeup/results.html": "1ebcb0adbb13a1bf820bdce40cd0f74ac2afa87da299a1f769b82c07d7d4db89",
+    "experiments/final_2026-11-05/writeup/results.json": "238785737400e4e160146528204b53b81d60d0fb4480ebae3fb00aeadc8d1dd3"
   },
   "historical_manifest": "experiments/final_2026-11-05/history/records.json",
   "historical_manifest_sha256": "084499b358bb4077e12069960f68370353c27456dd346b96cfc76edb9e4c1534",
-  "readme_normalized_lf_sha256": "600aa20f02ff1c7cbcdd239e8184b2aa17f910e68b28f1ce1f07036c91da7238",
-  "readme_updated_utc": "2026-11-05T04:57:51.849276+00:00",
-  "analysis_entry": "experiments/final_2026-11-05/analysis/LOG_INDEX.md"
+  "readme_normalized_lf_sha256": "58f9006237f224217de8f2eeb3b558a93769905b51602810f4fae8600c943a09",
+  "readme_updated_utc": "2026-11-05T05:10:21.872666+00:00",
+  "analysis_entry": "experiments/final_2026-11-05/analysis/LOG_INDEX.md",
+  "publication_policy": "experiments/final_2026-11-05/publication_policy.json"
 }
