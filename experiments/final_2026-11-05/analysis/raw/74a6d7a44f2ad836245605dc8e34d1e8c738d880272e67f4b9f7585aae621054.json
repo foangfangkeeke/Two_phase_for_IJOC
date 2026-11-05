@@ -1,0 +1,945 @@
+{
+  "raw_log": "experiments/final_2026-11-05/history/raw/74a6d7a44f2ad836245605dc8e34d1e8c738d880272e67f4b9f7585aae621054.log",
+  "raw_log_sha256": "74a6d7a44f2ad836245605dc8e34d1e8c738d880272e67f4b9f7585aae621054",
+  "bytes": 25247,
+  "line_count": 180,
+  "complete_iterations": 1,
+  "bound_source": "EXPLICIT_ORIGINAL_FINAL",
+  "selected_original_bounds": {
+    "line": 177,
+    "ub": "17478.568951",
+    "lb": "17425.712220"
+  },
+  "has_explicit_algorithm_final_status": true,
+  "headers": [
+    {
+      "line": 1,
+      "raw": "Runtime options: facility_cost_scale=1.000000, energy_scale=1.000000, battery_step=50, scenario_count=5, scenario_start=0, cap=4, dwc_top_n=50, wireless_option=1, rsp=1, rsp_workers=3, rsp_threads=4, preprocess_bounds=0, valid_inequality=1"
+    },
+    {
+      "line": 2,
+      "raw": "Solver options: mip_gap=0.000100, global_gap=0.010000, time_limit=7200.000000, threads=12"
+    },
+    {
+      "line": 3,
+      "raw": "Instance: data=tower_base, scenario_folders=base;charger_tengah_up10;lo10pct;route_984_up20;route_941_down30, battery_range=[50.000000,600.000000]"
+    },
+    {
+      "line": 173,
+      "raw": "Phase 2 initialized: scenarios=5, target_gap=1.000000%, scenario_workers=3, scenario_threads=4, RSP=on"
+    }
+  ],
+  "iterations": [
+    {
+      "line": 175,
+      "raw": "Phase 2 iter 0, theta=11204.546092, Q(z)=11256.228951, optimality cut x5, UB=17478.568951, LB=17425.712220, gap=0.302409%, master_ms=1005.991000, rsp_ms=1632.905800, subproblem_ms=27372.302200, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=242813.387300",
+      "iteration": 0,
+      "ub": "17478.568951",
+      "lb": "17425.712220",
+      "algorithm_seconds": 242.8133873,
+      "gap_percent": 0.3024088021632673
+    }
+  ],
+  "original_final_records": [
+    {
+      "line": 177,
+      "raw": "Full status=OPTIMAL, UB=17478.568951, LB=17425.712220, gap=0.302409%, elapsed_ms=242813.394600",
+      "status": "OPTIMAL",
+      "ub": "17478.568951",
+      "lb": "17425.712220",
+      "algorithm_seconds": 242.8133946
+    }
+  ],
+  "algorithm_terminal_records": [],
+  "native_status_messages": [],
+  "rsp_skips": [],
+  "numerical_skip_count": 0,
+  "numerical_message_count": 0,
+  "repair_event_count": 0,
+  "repair_events": [],
+  "phase_one_records": [
+    {
+      "line": 5,
+      "raw": "Phase 1 initialized: route_subproblems=140",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 6,
+      "raw": "Phase 1 iter 0, feasibility cut x32, UB=inf, LB=5689.320000, gap=1, master_ms=33.240800, subproblem_ms=2732.520600, elapsed_ms=8181.865500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 7,
+      "raw": "Phase 1 iter 1, feasibility cut x8, UB=inf, LB=13247.222420, gap=1, master_ms=51.927300, subproblem_ms=1342.186200, elapsed_ms=9576.890600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 8,
+      "raw": "Phase 1 iter 2, feasibility cut x7, UB=inf, LB=16778.275436, gap=1, master_ms=188.794600, subproblem_ms=864.302400, elapsed_ms=10630.538300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 9,
+      "raw": "Phase 1 iter 3, feasibility cut x8, UB=inf, LB=17347.294202, gap=1, master_ms=179.889900, subproblem_ms=929.776300, elapsed_ms=11740.726000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 10,
+      "raw": "Phase 1 iter 4, feasibility cut x7, UB=inf, LB=17394.190583, gap=1, master_ms=216.208500, subproblem_ms=753.428800, elapsed_ms=12710.602000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 11,
+      "raw": "Phase 1 iter 5, feasibility cut x10, UB=inf, LB=17398.155801, gap=1, master_ms=119.698000, subproblem_ms=893.156900, elapsed_ms=13723.807600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 12,
+      "raw": "Phase 1 iter 6, feasibility cut x6, UB=inf, LB=17401.025856, gap=1, master_ms=262.865200, subproblem_ms=768.498400, elapsed_ms=14755.604200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 13,
+      "raw": "Phase 1 iter 7, feasibility cut x6, UB=inf, LB=17401.244011, gap=1, master_ms=246.639800, subproblem_ms=742.033600, elapsed_ms=15744.682600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 14,
+      "raw": "Phase 1 iter 8, feasibility cut x6, UB=inf, LB=17401.244011, gap=1, master_ms=215.660100, subproblem_ms=918.887100, elapsed_ms=16879.502900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 15,
+      "raw": "Phase 1 iter 9, feasibility cut x6, UB=inf, LB=17401.244011, gap=1, master_ms=224.525500, subproblem_ms=699.091200, elapsed_ms=17803.550500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 16,
+      "raw": "Phase 1 iter 10, feasibility cut x5, UB=inf, LB=17401.244011, gap=1, master_ms=281.237500, subproblem_ms=716.041000, elapsed_ms=18801.081300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 17,
+      "raw": "Phase 1 iter 11, feasibility cut x6, UB=inf, LB=17402.123638, gap=1, master_ms=240.465300, subproblem_ms=919.740100, elapsed_ms=19961.571800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 18,
+      "raw": "Phase 1 iter 12, feasibility cut x6, UB=inf, LB=17403.876038, gap=1, master_ms=276.081900, subproblem_ms=703.370400, elapsed_ms=20941.244400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 19,
+      "raw": "Phase 1 iter 13, feasibility cut x6, UB=inf, LB=17403.876038, gap=1, master_ms=263.213400, subproblem_ms=702.116900, elapsed_ms=21906.877300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 20,
+      "raw": "Phase 1 iter 14, feasibility cut x4, UB=inf, LB=17403.876038, gap=1, master_ms=251.719900, subproblem_ms=940.491100, elapsed_ms=23099.341000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 21,
+      "raw": "Phase 1 iter 15, feasibility cut x4, UB=inf, LB=17403.964395, gap=1, master_ms=273.464000, subproblem_ms=812.362400, elapsed_ms=24185.421500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 22,
+      "raw": "Phase 1 iter 16, feasibility cut x4, UB=inf, LB=17403.964395, gap=1, master_ms=317.763500, subproblem_ms=745.433300, elapsed_ms=25248.874000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 23,
+      "raw": "Phase 1 iter 17, feasibility cut x4, UB=inf, LB=17403.964395, gap=1, master_ms=277.877200, subproblem_ms=796.773100, elapsed_ms=26323.809300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 24,
+      "raw": "Phase 1 iter 18, feasibility cut x4, UB=inf, LB=17403.964395, gap=1, master_ms=240.877700, subproblem_ms=778.078200, elapsed_ms=27343.186300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 25,
+      "raw": "Phase 1 iter 19, feasibility cut x4, UB=inf, LB=17404.674533, gap=1, master_ms=233.240900, subproblem_ms=682.797800, elapsed_ms=28259.477900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 26,
+      "raw": "Phase 1 iter 20, feasibility cut x4, UB=inf, LB=17404.674533, gap=1, master_ms=354.877700, subproblem_ms=832.061500, elapsed_ms=29446.669200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 27,
+      "raw": "Phase 1 iter 21, feasibility cut x4, UB=inf, LB=17405.286092, gap=1, master_ms=317.135700, subproblem_ms=759.965800, elapsed_ms=30524.099600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 28,
+      "raw": "Phase 1 iter 22, feasibility cut x4, UB=inf, LB=17405.286092, gap=1, master_ms=299.140000, subproblem_ms=678.953600, elapsed_ms=31502.498600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 29,
+      "raw": "Phase 1 iter 23, feasibility cut x4, UB=inf, LB=17405.286092, gap=1, master_ms=261.788100, subproblem_ms=728.533300, elapsed_ms=32493.164600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 30,
+      "raw": "Phase 1 iter 24, feasibility cut x4, UB=inf, LB=17405.286092, gap=1, master_ms=278.799900, subproblem_ms=942.843300, elapsed_ms=33715.116800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 31,
+      "raw": "Phase 1 iter 25, feasibility cut x4, UB=inf, LB=17406.633774, gap=1, master_ms=346.453900, subproblem_ms=743.682000, elapsed_ms=34805.658700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 32,
+      "raw": "Phase 1 iter 26, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=359.043100, subproblem_ms=690.018200, elapsed_ms=35854.948500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 33,
+      "raw": "Phase 1 iter 27, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=306.524100, subproblem_ms=883.658100, elapsed_ms=37045.433200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 34,
+      "raw": "Phase 1 iter 28, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=495.621200, subproblem_ms=788.865300, elapsed_ms=38330.199500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 35,
+      "raw": "Phase 1 iter 29, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=321.508400, subproblem_ms=771.952600, elapsed_ms=39423.943700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 36,
+      "raw": "Phase 1 iter 30, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=357.393700, subproblem_ms=686.873200, elapsed_ms=40468.541400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 37,
+      "raw": "Phase 1 iter 31, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=326.856800, subproblem_ms=759.610600, elapsed_ms=41555.662400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 38,
+      "raw": "Phase 1 iter 32, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=329.909700, subproblem_ms=780.821800, elapsed_ms=42666.625000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 39,
+      "raw": "Phase 1 iter 33, feasibility cut x4, UB=inf, LB=17407.971730, gap=1, master_ms=389.186400, subproblem_ms=702.496100, elapsed_ms=43758.555200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 40,
+      "raw": "Phase 1 iter 34, feasibility cut x4, UB=inf, LB=17407.971730, gap=1, master_ms=301.488500, subproblem_ms=771.067400, elapsed_ms=44831.490600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 41,
+      "raw": "Phase 1 iter 35, feasibility cut x4, UB=inf, LB=17407.971730, gap=1, master_ms=350.810000, subproblem_ms=765.138400, elapsed_ms=45947.952100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 42,
+      "raw": "Phase 1 iter 36, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=488.500000, subproblem_ms=826.729200, elapsed_ms=47263.599000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 43,
+      "raw": "Phase 1 iter 37, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=348.773400, subproblem_ms=731.379300, elapsed_ms=48343.970500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 44,
+      "raw": "Phase 1 iter 38, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=348.408700, subproblem_ms=748.804800, elapsed_ms=49441.562300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 45,
+      "raw": "Phase 1 iter 39, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=361.828700, subproblem_ms=664.855000, elapsed_ms=50468.610300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 46,
+      "raw": "Phase 1 iter 40, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=379.297000, subproblem_ms=777.098800, elapsed_ms=51625.232200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 47,
+      "raw": "Phase 1 iter 41, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=341.052300, subproblem_ms=666.840300, elapsed_ms=52633.391800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 48,
+      "raw": "Phase 1 iter 42, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=329.967300, subproblem_ms=828.730000, elapsed_ms=53792.339600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 49,
+      "raw": "Phase 1 iter 43, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=342.807500, subproblem_ms=687.004700, elapsed_ms=54822.413500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 50,
+      "raw": "Phase 1 iter 44, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=317.423000, subproblem_ms=811.666200, elapsed_ms=55951.803200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 51,
+      "raw": "Phase 1 iter 45, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=323.834400, subproblem_ms=705.375500, elapsed_ms=56981.526800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 52,
+      "raw": "Phase 1 iter 46, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=347.297500, subproblem_ms=765.345000, elapsed_ms=58094.443600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 53,
+      "raw": "Phase 1 iter 47, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=338.376700, subproblem_ms=703.626700, elapsed_ms=59136.845400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 54,
+      "raw": "Phase 1 iter 48, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=345.282500, subproblem_ms=851.808800, elapsed_ms=60334.247200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 55,
+      "raw": "Phase 1 iter 49, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=355.275600, subproblem_ms=774.439800, elapsed_ms=61464.183800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 56,
+      "raw": "Phase 1 iter 50, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=410.715800, subproblem_ms=702.250100, elapsed_ms=62577.397500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 57,
+      "raw": "Phase 1 iter 51, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=379.989600, subproblem_ms=816.712700, elapsed_ms=63774.347800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 58,
+      "raw": "Phase 1 iter 52, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=363.624600, subproblem_ms=697.192500, elapsed_ms=64835.670500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 59,
+      "raw": "Phase 1 iter 53, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=412.734200, subproblem_ms=693.789400, elapsed_ms=65942.565500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 60,
+      "raw": "Phase 1 iter 54, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=345.136800, subproblem_ms=761.128500, elapsed_ms=67049.862000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 61,
+      "raw": "Phase 1 iter 55, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=352.938600, subproblem_ms=694.994200, elapsed_ms=68098.189500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 62,
+      "raw": "Phase 1 iter 56, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=396.854700, subproblem_ms=719.790300, elapsed_ms=69215.330600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 63,
+      "raw": "Phase 1 iter 57, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=438.720700, subproblem_ms=701.823800, elapsed_ms=70356.269100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 64,
+      "raw": "Phase 1 iter 58, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=381.466500, subproblem_ms=887.321400, elapsed_ms=71625.323200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 65,
+      "raw": "Phase 1 iter 59, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=415.941300, subproblem_ms=718.927500, elapsed_ms=72760.706800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 66,
+      "raw": "Phase 1 iter 60, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=380.720700, subproblem_ms=679.351300, elapsed_ms=73821.021700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 67,
+      "raw": "Phase 1 iter 61, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=361.259800, subproblem_ms=879.389800, elapsed_ms=75061.932400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 68,
+      "raw": "Phase 1 iter 62, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=390.183200, subproblem_ms=755.808800, elapsed_ms=76208.354200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 69,
+      "raw": "Phase 1 iter 63, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=396.268300, subproblem_ms=788.472600, elapsed_ms=77393.462700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 70,
+      "raw": "Phase 1 iter 64, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=388.381000, subproblem_ms=761.232800, elapsed_ms=78543.379800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 71,
+      "raw": "Phase 1 iter 65, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=445.228900, subproblem_ms=659.314300, elapsed_ms=79648.512500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 72,
+      "raw": "Phase 1 iter 66, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=404.177500, subproblem_ms=832.934500, elapsed_ms=80886.027700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 73,
+      "raw": "Phase 1 iter 67, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=405.916200, subproblem_ms=755.256000, elapsed_ms=82047.758400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 74,
+      "raw": "Phase 1 iter 68, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=407.172900, subproblem_ms=703.200400, elapsed_ms=83158.444300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 75,
+      "raw": "Phase 1 iter 69, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=406.396500, subproblem_ms=711.413300, elapsed_ms=84276.548700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 76,
+      "raw": "Phase 1 iter 70, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=377.463800, subproblem_ms=912.397300, elapsed_ms=85566.636900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 77,
+      "raw": "Phase 1 iter 71, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=397.190700, subproblem_ms=690.330300, elapsed_ms=86654.388400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 78,
+      "raw": "Phase 1 iter 72, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=422.394500, subproblem_ms=672.199800, elapsed_ms=87749.778900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 79,
+      "raw": "Phase 1 iter 73, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=399.349800, subproblem_ms=696.495800, elapsed_ms=88846.073400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 80,
+      "raw": "Phase 1 iter 74, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=390.006200, subproblem_ms=720.271800, elapsed_ms=89956.620100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 81,
+      "raw": "Phase 1 iter 75, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=421.538200, subproblem_ms=775.761300, elapsed_ms=91154.519300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 82,
+      "raw": "Phase 1 iter 76, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=447.008800, subproblem_ms=749.740400, elapsed_ms=92351.510900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 83,
+      "raw": "Phase 1 iter 77, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=356.225000, subproblem_ms=874.199300, elapsed_ms=93582.192900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 84,
+      "raw": "Phase 1 iter 78, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=410.783000, subproblem_ms=682.682600, elapsed_ms=94675.930900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 85,
+      "raw": "Phase 1 iter 79, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=413.791100, subproblem_ms=725.254500, elapsed_ms=95815.463900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 86,
+      "raw": "Phase 1 iter 80, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=403.213400, subproblem_ms=747.212500, elapsed_ms=96966.341100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 87,
+      "raw": "Phase 1 iter 81, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=388.780100, subproblem_ms=870.420200, elapsed_ms=98225.806200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 88,
+      "raw": "Phase 1 iter 82, feasibility cut x4, UB=inf, LB=17414.564395, gap=1, master_ms=427.869300, subproblem_ms=787.793900, elapsed_ms=99441.865700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 89,
+      "raw": "Phase 1 iter 83, feasibility cut x4, UB=inf, LB=17414.564395, gap=1, master_ms=359.995400, subproblem_ms=676.891700, elapsed_ms=100479.018200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 90,
+      "raw": "Phase 1 iter 84, feasibility cut x4, UB=inf, LB=17414.564395, gap=1, master_ms=386.112200, subproblem_ms=742.245900, elapsed_ms=101607.666700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 91,
+      "raw": "Phase 1 iter 85, feasibility cut x4, UB=inf, LB=17414.564395, gap=1, master_ms=439.063400, subproblem_ms=649.442700, elapsed_ms=102696.394000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 92,
+      "raw": "Phase 1 iter 86, feasibility cut x4, UB=inf, LB=17414.564395, gap=1, master_ms=449.679900, subproblem_ms=697.914900, elapsed_ms=103844.273500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 93,
+      "raw": "Phase 1 iter 87, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=420.488200, subproblem_ms=948.953700, elapsed_ms=105213.953800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 94,
+      "raw": "Phase 1 iter 88, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=426.497900, subproblem_ms=754.498300, elapsed_ms=106395.179000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 95,
+      "raw": "Phase 1 iter 89, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=405.259900, subproblem_ms=658.267400, elapsed_ms=107458.988000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 96,
+      "raw": "Phase 1 iter 90, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=446.873800, subproblem_ms=774.455100, elapsed_ms=108680.573400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 97,
+      "raw": "Phase 1 iter 91, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=453.627200, subproblem_ms=737.391800, elapsed_ms=109871.841100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 98,
+      "raw": "Phase 1 iter 92, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=368.492100, subproblem_ms=847.806100, elapsed_ms=111088.399500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 99,
+      "raw": "Phase 1 iter 93, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=445.332600, subproblem_ms=797.322800, elapsed_ms=112331.279300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 100,
+      "raw": "Phase 1 iter 94, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=412.646800, subproblem_ms=700.423600, elapsed_ms=113444.652400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 101,
+      "raw": "Phase 1 iter 95, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=426.309400, subproblem_ms=724.945400, elapsed_ms=114596.208900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 102,
+      "raw": "Phase 1 iter 96, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=407.096000, subproblem_ms=923.265900, elapsed_ms=115927.009800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 103,
+      "raw": "Phase 1 iter 97, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=438.946100, subproblem_ms=750.694900, elapsed_ms=117116.998900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 104,
+      "raw": "Phase 1 iter 98, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=400.120400, subproblem_ms=666.443500, elapsed_ms=118183.798000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 105,
+      "raw": "Phase 1 iter 99, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=381.392100, subproblem_ms=867.524800, elapsed_ms=119433.013200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 106,
+      "raw": "Phase 1 iter 100, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=410.716200, subproblem_ms=683.181600, elapsed_ms=120527.180800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 107,
+      "raw": "Phase 1 iter 101, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=433.761200, subproblem_ms=693.184700, elapsed_ms=121654.535300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 108,
+      "raw": "Phase 1 iter 102, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=432.959600, subproblem_ms=801.457300, elapsed_ms=122889.246600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 109,
+      "raw": "Phase 1 iter 103, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=433.277400, subproblem_ms=659.125500, elapsed_ms=123981.997400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 110,
+      "raw": "Phase 1 iter 104, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=484.334300, subproblem_ms=705.194100, elapsed_ms=125171.890200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 111,
+      "raw": "Phase 1 iter 105, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=450.013900, subproblem_ms=706.935800, elapsed_ms=126329.285200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 112,
+      "raw": "Phase 1 iter 106, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=457.074600, subproblem_ms=654.158700, elapsed_ms=127440.791600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 113,
+      "raw": "Phase 1 iter 107, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=423.855700, subproblem_ms=929.364900, elapsed_ms=128794.316000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 114,
+      "raw": "Phase 1 iter 108, feasibility cut x4, UB=inf, LB=17418.188744, gap=1, master_ms=502.123800, subproblem_ms=727.218300, elapsed_ms=130023.905900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 115,
+      "raw": "Phase 1 iter 109, feasibility cut x4, UB=inf, LB=17418.188744, gap=1, master_ms=455.274700, subproblem_ms=782.459500, elapsed_ms=131261.906700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 116,
+      "raw": "Phase 1 iter 110, feasibility cut x4, UB=inf, LB=17418.472883, gap=1, master_ms=514.412300, subproblem_ms=713.726800, elapsed_ms=132490.351900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 117,
+      "raw": "Phase 1 iter 111, feasibility cut x4, UB=inf, LB=17418.472883, gap=1, master_ms=544.504300, subproblem_ms=663.595700, elapsed_ms=133698.751500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 118,
+      "raw": "Phase 1 iter 112, feasibility cut x4, UB=inf, LB=17418.663259, gap=1, master_ms=448.595800, subproblem_ms=883.098800, elapsed_ms=135030.720200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 119,
+      "raw": "Phase 1 iter 113, feasibility cut x4, UB=inf, LB=17418.663259, gap=1, master_ms=409.271100, subproblem_ms=751.402700, elapsed_ms=136191.641400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 120,
+      "raw": "Phase 1 iter 114, feasibility cut x4, UB=inf, LB=17418.663259, gap=1, master_ms=421.525600, subproblem_ms=771.171200, elapsed_ms=137384.570500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 121,
+      "raw": "Phase 1 iter 115, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=390.532600, subproblem_ms=767.766900, elapsed_ms=138543.273800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 122,
+      "raw": "Phase 1 iter 116, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=382.988600, subproblem_ms=680.103800, elapsed_ms=139606.592300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 123,
+      "raw": "Phase 1 iter 117, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=420.646600, subproblem_ms=835.637800, elapsed_ms=140863.159000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 124,
+      "raw": "Phase 1 iter 118, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=379.737300, subproblem_ms=701.480000, elapsed_ms=141944.631700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 125,
+      "raw": "Phase 1 iter 119, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=503.589100, subproblem_ms=675.837000, elapsed_ms=143124.447700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 126,
+      "raw": "Phase 1 iter 120, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=402.334900, subproblem_ms=879.294300, elapsed_ms=144406.311900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 127,
+      "raw": "Phase 1 iter 121, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=452.866600, subproblem_ms=706.482800, elapsed_ms=145565.960800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 128,
+      "raw": "Phase 1 iter 122, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=411.934900, subproblem_ms=676.962200, elapsed_ms=146655.359800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 129,
+      "raw": "Phase 1 iter 123, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=422.878200, subproblem_ms=795.152200, elapsed_ms=147873.997300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 130,
+      "raw": "Phase 1 iter 124, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=370.883500, subproblem_ms=677.013200, elapsed_ms=148922.332300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 131,
+      "raw": "Phase 1 iter 125, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=360.833700, subproblem_ms=871.379400, elapsed_ms=150154.872400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 132,
+      "raw": "Phase 1 iter 126, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=391.753700, subproblem_ms=802.666800, elapsed_ms=151349.655100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 133,
+      "raw": "Phase 1 iter 127, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=433.456200, subproblem_ms=690.889700, elapsed_ms=152474.270800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 134,
+      "raw": "Phase 1 iter 128, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=442.696000, subproblem_ms=704.380900, elapsed_ms=153621.599600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 135,
+      "raw": "Phase 1 iter 129, feasibility cut x4, UB=inf, LB=17419.964395, gap=1, master_ms=364.656000, subproblem_ms=822.027500, elapsed_ms=154808.653500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 136,
+      "raw": "Phase 1 iter 130, feasibility cut x4, UB=inf, LB=17419.964395, gap=1, master_ms=392.202800, subproblem_ms=692.330000, elapsed_ms=155893.473100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 137,
+      "raw": "Phase 1 iter 131, feasibility cut x4, UB=inf, LB=17420.136092, gap=1, master_ms=375.138600, subproblem_ms=718.002200, elapsed_ms=156986.897600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 138,
+      "raw": "Phase 1 iter 132, feasibility cut x4, UB=inf, LB=17420.558969, gap=1, master_ms=434.074400, subproblem_ms=779.632100, elapsed_ms=158200.909400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 139,
+      "raw": "Phase 1 iter 133, feasibility cut x4, UB=inf, LB=17420.558969, gap=1, master_ms=477.296600, subproblem_ms=696.627600, elapsed_ms=159375.220000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 140,
+      "raw": "Phase 1 iter 134, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=457.875300, subproblem_ms=792.765600, elapsed_ms=160626.202200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 141,
+      "raw": "Phase 1 iter 135, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=422.510200, subproblem_ms=702.671300, elapsed_ms=161751.708100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 142,
+      "raw": "Phase 1 iter 136, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=438.516500, subproblem_ms=923.478800, elapsed_ms=163113.998600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 143,
+      "raw": "Phase 1 iter 137, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=472.689200, subproblem_ms=739.895100, elapsed_ms=164326.887600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 144,
+      "raw": "Phase 1 iter 138, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=436.118100, subproblem_ms=703.542200, elapsed_ms=165466.807500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 145,
+      "raw": "Phase 1 iter 139, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=373.811800, subproblem_ms=825.985000, elapsed_ms=166666.861800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 146,
+      "raw": "Phase 1 iter 140, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=485.028600, subproblem_ms=711.325800, elapsed_ms=167863.627200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 147,
+      "raw": "Phase 1 iter 141, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=423.305600, subproblem_ms=879.606900, elapsed_ms=169166.932500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 148,
+      "raw": "Phase 1 iter 142, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=538.531000, subproblem_ms=688.175200, elapsed_ms=170393.943600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 149,
+      "raw": "Phase 1 iter 143, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=382.366200, subproblem_ms=706.976900, elapsed_ms=171483.588900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 150,
+      "raw": "Phase 1 iter 144, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=469.725700, subproblem_ms=925.015300, elapsed_ms=172878.630200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 151,
+      "raw": "Phase 1 iter 145, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=480.808700, subproblem_ms=798.290500, elapsed_ms=174158.004500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 152,
+      "raw": "Phase 1 iter 146, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=427.035200, subproblem_ms=704.889800, elapsed_ms=175290.247000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 153,
+      "raw": "Phase 1 iter 147, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=444.215900, subproblem_ms=858.692400, elapsed_ms=176593.454700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 154,
+      "raw": "Phase 1 iter 148, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=529.520800, subproblem_ms=666.757000, elapsed_ms=177790.054700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 155,
+      "raw": "Phase 1 iter 149, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=437.691800, subproblem_ms=714.841000, elapsed_ms=178942.872800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 156,
+      "raw": "Phase 1 iter 150, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=514.476300, subproblem_ms=742.242600, elapsed_ms=180200.039400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 157,
+      "raw": "Phase 1 iter 151, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=433.682200, subproblem_ms=847.761700, elapsed_ms=181481.757900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 158,
+      "raw": "Phase 1 iter 152, feasibility cut x4, UB=inf, LB=17422.509383, gap=1, master_ms=378.718200, subproblem_ms=677.080000, elapsed_ms=182537.873600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 159,
+      "raw": "Phase 1 iter 153, feasibility cut x4, UB=inf, LB=17423.285489, gap=1, master_ms=502.463700, subproblem_ms=723.018000, elapsed_ms=183763.592200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 160,
+      "raw": "Phase 1 iter 154, feasibility cut x4, UB=inf, LB=17423.285489, gap=1, master_ms=474.510500, subproblem_ms=777.113700, elapsed_ms=185015.594800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 161,
+      "raw": "Phase 1 iter 155, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=471.754100, subproblem_ms=739.005300, elapsed_ms=186226.660400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 162,
+      "raw": "Phase 1 iter 156, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=538.781700, subproblem_ms=669.612300, elapsed_ms=187435.319600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 163,
+      "raw": "Phase 1 iter 157, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=379.478400, subproblem_ms=703.961300, elapsed_ms=188519.277500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 164,
+      "raw": "Phase 1 iter 158, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=503.381000, subproblem_ms=906.658900, elapsed_ms=189929.618800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 165,
+      "raw": "Phase 1 iter 159, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=470.358600, subproblem_ms=678.591500, elapsed_ms=191078.911900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 166,
+      "raw": "Phase 1 iter 160, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=455.787100, subproblem_ms=673.255300, elapsed_ms=192208.252400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 167,
+      "raw": "Phase 1 iter 161, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=467.987200, subproblem_ms=935.514300, elapsed_ms=193612.030800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 168,
+      "raw": "Phase 1 iter 162, feasibility cut x4, UB=inf, LB=17424.186092, gap=1, master_ms=443.526000, subproblem_ms=672.497800, elapsed_ms=194728.603200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 169,
+      "raw": "Phase 1 iter 163, feasibility cut x4, UB=inf, LB=17425.364395, gap=1, master_ms=544.262900, subproblem_ms=754.316800, elapsed_ms=196027.491000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 170,
+      "raw": "Phase 1 iter 164, feasibility cut x4, UB=inf, LB=17425.364395, gap=1, master_ms=478.110200, subproblem_ms=739.908400, elapsed_ms=197245.850800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 171,
+      "raw": "Phase 1 iter 165, theta=11204.546092, Q(z)=11204.546092, optimality cut x0, UB=17426.886092, LB=17425.712220, gap=0.006736%, master_ms=576.781900, subproblem_ms=745.140000, elapsed_ms=198568.008800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 172,
+      "raw": "Phase 1 completed: UB=17426.886092, LB=17425.712220, elapsed_ms=199911.359200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    }
+  ],
+  "convergence_records": [
+    {
+      "line": 176,
+      "raw": "Full converged."
+    }
+  ],
+  "last_complete_iteration_line": 175,
+  "log_ends_in_newline": true,
+  "last_lines": [
+    {
+      "line": 173,
+      "raw": "Phase 2 initialized: scenarios=5, target_gap=1.000000%, scenario_workers=3, scenario_threads=4, RSP=on"
+    },
+    {
+      "line": 174,
+      "raw": "Incumbent cost distribution: source=master, facility=364.500000 (2.085411%), battery=5857.840000 (33.514414%), daytime_energy=8031.245591 (45.949103%), overnight_energy=3224.983359 (18.451072%), total=17478.568951"
+    },
+    {
+      "line": 175,
+      "raw": "Phase 2 iter 0, theta=11204.546092, Q(z)=11256.228951, optimality cut x5, UB=17478.568951, LB=17425.712220, gap=0.302409%, master_ms=1005.991000, rsp_ms=1632.905800, subproblem_ms=27372.302200, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=242813.387300"
+    },
+    {
+      "line": 176,
+      "raw": "Full converged."
+    },
+    {
+      "line": 177,
+      "raw": "Full status=OPTIMAL, UB=17478.568951, LB=17425.712220, gap=0.302409%, elapsed_ms=242813.394600"
+    },
+    {
+      "line": 178,
+      "raw": "Cardinal Optimizer v8.0.7. Build date Sep 20 2026"
+    },
+    {
+      "line": 179,
+      "raw": "Copyright Cardinal Operations 2026. All Rights Reserved"
+    },
+    {
+      "line": 180,
+      "raw": ""
+    }
+  ],
+  "monotonicity": "NO_LB_DECREASE_OR_INCUMBENT_INCREASE"
+}

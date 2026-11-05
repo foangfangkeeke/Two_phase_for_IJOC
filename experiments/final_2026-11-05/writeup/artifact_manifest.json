@@ -12,5 +12,7 @@
   },
   "historical_manifest": "experiments/final_2026-11-05/history/records.json",
   "historical_manifest_sha256": "084499b358bb4077e12069960f68370353c27456dd346b96cfc76edb9e4c1534",
-  "readme_normalized_lf_sha256": "a7f6759eba781cddc7204a627c7a0ba017285e657b3f7ffb0fac79134d03a4c1"
+  "readme_normalized_lf_sha256": "600aa20f02ff1c7cbcdd239e8184b2aa17f910e68b28f1ce1f07036c91da7238",
+  "readme_updated_utc": "2026-11-05T04:57:51.849276+00:00",
+  "analysis_entry": "experiments/final_2026-11-05/analysis/LOG_INDEX.md"
 }

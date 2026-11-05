@@ -1,0 +1,140 @@
+{
+  "raw_log": "experiments/final_2026-11-05/runs/R3-N5-F20-C4_full/solver.log",
+  "raw_log_sha256": "7278324f04a740af18a94951cbfdbb4767e6e822cc2216f949344258d6da30d9",
+  "bytes": 2096,
+  "line_count": 18,
+  "complete_iterations": 1,
+  "bound_source": "EXPLICIT_ORIGINAL_FINAL",
+  "selected_original_bounds": {
+    "line": 15,
+    "ub": "1469.848225",
+    "lb": "1469.848225"
+  },
+  "has_explicit_algorithm_final_status": true,
+  "headers": [
+    {
+      "line": 1,
+      "raw": "Execution policy: version=final-rsp-skip-2026-11-05, rsp_numerical=skip_screening, original_subproblem=required"
+    },
+    {
+      "line": 2,
+      "raw": "Runtime options: facility_cost_scale=1.000000, energy_scale=1.000000, battery_step=50, scenario_count=5, scenario_start=0, cap=4, dwc_top_n=20, wireless_option=1, rsp=1, rsp_workers=3, rsp_threads=4, preprocess_bounds=0, valid_inequality=1"
+    },
+    {
+      "line": 3,
+      "raw": "Solver options: mip_gap=0.000100, global_gap=0.010000, time_limit=7200.000000, threads=12"
+    },
+    {
+      "line": 4,
+      "raw": "Instance: data=R3_N5, scenario_folders=base;charger_tengah_up10;global_down10;route_945_up20;route_992_down20, battery_range=[50.000000,600.000000]"
+    },
+    {
+      "line": 10,
+      "raw": "Phase 2 initialized: scenarios=5, target_gap=1.000000%, scenario_workers=3, scenario_threads=4, RSP=on"
+    }
+  ],
+  "iterations": [
+    {
+      "line": 12,
+      "raw": "Phase 2 iter 0, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=-0.000000%, master_ms=1.375300, rsp_ms=114.715900, subproblem_ms=222.205500, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2753.129400",
+      "iteration": 0,
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "algorithm_seconds": 2.7531293999999997,
+      "gap_percent": 0.0
+    }
+  ],
+  "original_final_records": [
+    {
+      "line": 14,
+      "raw": "Full status=OPTIMAL, UB=1469.848225, LB=1469.848225, gap=-0.000000%, elapsed_ms=2753.137000",
+      "status": "OPTIMAL",
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "algorithm_seconds": 2.753137
+    }
+  ],
+  "algorithm_terminal_records": [
+    {
+      "line": 15,
+      "raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=2.753137",
+      "algorithm": "full",
+      "status": "OPTIMAL",
+      "has_solution": true,
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "reported_seconds": 2.753137
+    }
+  ],
+  "native_status_messages": [],
+  "rsp_skips": [],
+  "numerical_skip_count": 0,
+  "numerical_message_count": 0,
+  "repair_event_count": 0,
+  "repair_events": [],
+  "phase_one_records": [
+    {
+      "line": 6,
+      "raw": "Phase 1 initialized: route_subproblems=15",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 7,
+      "raw": "Phase 1 iter 0, theta=0.000000, Q(z)=1098.368225, optimality cut x15, UB=1469.848225, LB=371.480000, gap=74.726642%, master_ms=2.302400, subproblem_ms=101.335900, elapsed_ms=773.177300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 8,
+      "raw": "Phase 1 iter 1, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=0.000000%, master_ms=0.509400, subproblem_ms=97.399800, elapsed_ms=871.285800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 9,
+      "raw": "Phase 1 completed: UB=1469.848225, LB=1469.848225, elapsed_ms=949.338300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    }
+  ],
+  "convergence_records": [
+    {
+      "line": 13,
+      "raw": "Full converged."
+    }
+  ],
+  "last_complete_iteration_line": 12,
+  "log_ends_in_newline": true,
+  "last_lines": [
+    {
+      "line": 11,
+      "raw": "Incumbent cost distribution: source=master, facility=0.000000 (0.000000%), battery=371.480000 (25.273358%), daytime_energy=892.046225 (60.689683%), overnight_energy=206.322000 (14.036959%), total=1469.848225"
+    },
+    {
+      "line": 12,
+      "raw": "Phase 2 iter 0, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=-0.000000%, master_ms=1.375300, rsp_ms=114.715900, subproblem_ms=222.205500, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2753.129400"
+    },
+    {
+      "line": 13,
+      "raw": "Full converged."
+    },
+    {
+      "line": 14,
+      "raw": "Full status=OPTIMAL, UB=1469.848225, LB=1469.848225, gap=-0.000000%, elapsed_ms=2753.137000"
+    },
+    {
+      "line": 15,
+      "raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=2.753137"
+    },
+    {
+      "line": 16,
+      "raw": "Cardinal Optimizer v8.0.7. Build date Sep 20 2026"
+    },
+    {
+      "line": 17,
+      "raw": "Copyright Cardinal Operations 2026. All Rights Reserved"
+    },
+    {
+      "line": 18,
+      "raw": ""
+    }
+  ],
+  "monotonicity": "NO_LB_DECREASE_OR_INCUMBENT_INCREASE"
+}

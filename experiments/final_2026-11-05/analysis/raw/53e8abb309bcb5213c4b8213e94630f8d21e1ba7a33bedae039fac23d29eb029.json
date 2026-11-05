@@ -1,0 +1,1004 @@
+{
+  "raw_log": "experiments/final_2026-11-05/history/raw/53e8abb309bcb5213c4b8213e94630f8d21e1ba7a33bedae039fac23d29eb029.log",
+  "raw_log_sha256": "53e8abb309bcb5213c4b8213e94630f8d21e1ba7a33bedae039fac23d29eb029",
+  "bytes": 21128,
+  "line_count": 110,
+  "complete_iterations": 102,
+  "bound_source": "LAST_COMPLETE_ITERATION",
+  "selected_original_bounds": {
+    "line": 106,
+    "ub": "8198.534757",
+    "lb": "8193.164801"
+  },
+  "has_explicit_algorithm_final_status": false,
+  "headers": [
+    {
+      "line": 1,
+      "raw": "Runtime options: facility_cost_scale=1.000000, energy_scale=1.000000, battery_step=50, scenario_count=5, scenario_start=0, cap=4, dwc_top_n=50, wireless_option=1, rsp=1, rsp_workers=3, rsp_threads=4, preprocess_bounds=0, valid_inequality=1"
+    },
+    {
+      "line": 2,
+      "raw": "Solver options: mip_gap=0.000100, global_gap=0.010000, time_limit=7200.000000, threads=12"
+    },
+    {
+      "line": 3,
+      "raw": "Instance: data=tower_medium, scenario_folders=base;charger_btbatok_up10;global_down10;route_453_up10;route_941_down20, battery_range=[50.000000,600.000000]"
+    },
+    {
+      "line": 4,
+      "raw": "Lifted ILS initialized: master_vars=770, scenarios=5, RSP=on, valid_inequality=on, rsp_workers=3, rsp_threads=4"
+    }
+  ],
+  "iterations": [
+    {
+      "line": 5,
+      "raw": "Lifted ILS iter 0, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2679.466302, gap=1, master_ms=73.330300, rsp_ms=41846.741300, elapsed_ms=47296.192900",
+      "iteration": 0,
+      "ub": "inf",
+      "lb": "2679.466302",
+      "algorithm_seconds": 47.2961929,
+      "gap_percent": null
+    },
+    {
+      "line": 6,
+      "raw": "Lifted ILS iter 1, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2707.600000, gap=1, master_ms=82.324400, rsp_ms=40384.329900, elapsed_ms=87764.096600",
+      "iteration": 1,
+      "ub": "inf",
+      "lb": "2707.600000",
+      "algorithm_seconds": 87.7640966,
+      "gap_percent": null
+    },
+    {
+      "line": 7,
+      "raw": "Lifted ILS iter 2, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2724.080000, gap=1, master_ms=189.720500, rsp_ms=39970.003100, elapsed_ms=127924.635600",
+      "iteration": 2,
+      "ub": "inf",
+      "lb": "2724.080000",
+      "algorithm_seconds": 127.92463559999999,
+      "gap_percent": null
+    },
+    {
+      "line": 8,
+      "raw": "Lifted ILS iter 3, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2741.820000, gap=1, master_ms=203.009900, rsp_ms=41445.598000, elapsed_ms=169573.820100",
+      "iteration": 3,
+      "ub": "inf",
+      "lb": "2741.820000",
+      "algorithm_seconds": 169.5738201,
+      "gap_percent": null
+    },
+    {
+      "line": 9,
+      "raw": "Lifted ILS iter 4, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2752.000000, gap=1, master_ms=183.789200, rsp_ms=41718.270600, elapsed_ms=211476.480500",
+      "iteration": 4,
+      "ub": "inf",
+      "lb": "2752.000000",
+      "algorithm_seconds": 211.4764805,
+      "gap_percent": null
+    },
+    {
+      "line": 10,
+      "raw": "Lifted ILS iter 5, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2767.040000, gap=1, master_ms=283.345100, rsp_ms=39614.901600, elapsed_ms=251375.366500",
+      "iteration": 5,
+      "ub": "inf",
+      "lb": "2767.040000",
+      "algorithm_seconds": 251.3753665,
+      "gap_percent": null
+    },
+    {
+      "line": 11,
+      "raw": "Lifted ILS iter 6, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2768.680000, gap=1, master_ms=322.336000, rsp_ms=39332.880700, elapsed_ms=291031.053000",
+      "iteration": 6,
+      "ub": "inf",
+      "lb": "2768.680000",
+      "algorithm_seconds": 291.03105300000004,
+      "gap_percent": null
+    },
+    {
+      "line": 12,
+      "raw": "Lifted ILS iter 7, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2782.300000, gap=1, master_ms=274.409000, rsp_ms=40607.545000, elapsed_ms=331913.635000",
+      "iteration": 7,
+      "ub": "inf",
+      "lb": "2782.300000",
+      "algorithm_seconds": 331.913635,
+      "gap_percent": null
+    },
+    {
+      "line": 13,
+      "raw": "Lifted ILS iter 8, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2795.620000, gap=1, master_ms=418.529900, rsp_ms=39847.777800, elapsed_ms=372180.427000",
+      "iteration": 8,
+      "ub": "inf",
+      "lb": "2795.620000",
+      "algorithm_seconds": 372.180427,
+      "gap_percent": null
+    },
+    {
+      "line": 14,
+      "raw": "Lifted ILS iter 9, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2800.240000, gap=1, master_ms=357.730700, rsp_ms=43515.514400, elapsed_ms=416054.605600",
+      "iteration": 9,
+      "ub": "inf",
+      "lb": "2800.240000",
+      "algorithm_seconds": 416.0546056,
+      "gap_percent": null
+    },
+    {
+      "line": 15,
+      "raw": "Lifted ILS iter 10, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2802.740000, gap=1, master_ms=358.403700, rsp_ms=41364.133100, elapsed_ms=457778.049000",
+      "iteration": 10,
+      "ub": "inf",
+      "lb": "2802.740000",
+      "algorithm_seconds": 457.778049,
+      "gap_percent": null
+    },
+    {
+      "line": 16,
+      "raw": "Lifted ILS iter 11, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2807.520000, gap=1, master_ms=265.209500, rsp_ms=42433.084400, elapsed_ms=500477.200100",
+      "iteration": 11,
+      "ub": "inf",
+      "lb": "2807.520000",
+      "algorithm_seconds": 500.4772001,
+      "gap_percent": null
+    },
+    {
+      "line": 17,
+      "raw": "Lifted ILS iter 12, RSP feasibility cut x4, RSP optimality cut x1, RSP Q(z)=975.915903, UB=inf, LB=2819.040000, gap=1, master_ms=321.658800, rsp_ms=36759.163400, elapsed_ms=537558.692200",
+      "iteration": 12,
+      "ub": "inf",
+      "lb": "2819.040000",
+      "algorithm_seconds": 537.5586922,
+      "gap_percent": null
+    },
+    {
+      "line": 18,
+      "raw": "Lifted ILS iter 13, RSP feasibility cut x4, RSP optimality cut x1, RSP Q(z)=951.417690, UB=inf, LB=3725.212237, gap=1, master_ms=471.003500, rsp_ms=37064.066600, elapsed_ms=575094.268100",
+      "iteration": 13,
+      "ub": "inf",
+      "lb": "3725.212237",
+      "algorithm_seconds": 575.0942681,
+      "gap_percent": null
+    },
+    {
+      "line": 19,
+      "raw": "Lifted ILS iter 14, RSP feasibility cut x4, RSP optimality cut x1, RSP Q(z)=978.347830, UB=inf, LB=3797.264690, gap=1, master_ms=366.189400, rsp_ms=38444.666100, elapsed_ms=613906.127900",
+      "iteration": 14,
+      "ub": "inf",
+      "lb": "3797.264690",
+      "algorithm_seconds": 613.9061279,
+      "gap_percent": null
+    },
+    {
+      "line": 20,
+      "raw": "Lifted ILS iter 15, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=975.915903, UB=inf, LB=3806.242197, gap=1, master_ms=411.605300, rsp_ms=37745.020000, elapsed_ms=652063.245200",
+      "iteration": 15,
+      "ub": "inf",
+      "lb": "3806.242197",
+      "algorithm_seconds": 652.0632452,
+      "gap_percent": null
+    },
+    {
+      "line": 21,
+      "raw": "Lifted ILS iter 16, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=975.915903, UB=inf, LB=3809.295903, gap=1, master_ms=440.996600, rsp_ms=36447.711700, elapsed_ms=688952.414700",
+      "iteration": 16,
+      "ub": "inf",
+      "lb": "3809.295903",
+      "algorithm_seconds": 688.9524147,
+      "gap_percent": null
+    },
+    {
+      "line": 22,
+      "raw": "Lifted ILS iter 17, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=975.915903, UB=inf, LB=3810.315903, gap=1, master_ms=359.415000, rsp_ms=38288.619700, elapsed_ms=727600.942700",
+      "iteration": 17,
+      "ub": "inf",
+      "lb": "3810.315903",
+      "algorithm_seconds": 727.6009427,
+      "gap_percent": null
+    },
+    {
+      "line": 23,
+      "raw": "Lifted ILS iter 18, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=978.347830, UB=inf, LB=3814.227830, gap=1, master_ms=292.860500, rsp_ms=37934.340400, elapsed_ms=765828.699800",
+      "iteration": 18,
+      "ub": "inf",
+      "lb": "3814.227830",
+      "algorithm_seconds": 765.8286998,
+      "gap_percent": null
+    },
+    {
+      "line": 24,
+      "raw": "Lifted ILS iter 19, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=975.915903, UB=inf, LB=3821.615903, gap=1, master_ms=296.130700, rsp_ms=37028.489700, elapsed_ms=803153.962100",
+      "iteration": 19,
+      "ub": "inf",
+      "lb": "3821.615903",
+      "algorithm_seconds": 803.1539621000001,
+      "gap_percent": null
+    },
+    {
+      "line": 25,
+      "raw": "Lifted ILS iter 20, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=975.915903, UB=inf, LB=3823.735903, gap=1, master_ms=275.031100, rsp_ms=38549.759300, elapsed_ms=841979.325300",
+      "iteration": 20,
+      "ub": "inf",
+      "lb": "3823.735903",
+      "algorithm_seconds": 841.9793253,
+      "gap_percent": null
+    },
+    {
+      "line": 26,
+      "raw": "Lifted ILS iter 21, RSP feasibility cut x1, RSP optimality cut x3, RSP Q(z)=4187.312161, UB=inf, LB=3832.595903, gap=1, master_ms=227.900600, rsp_ms=17499.762900, elapsed_ms=859707.506000",
+      "iteration": 21,
+      "ub": "inf",
+      "lb": "3832.595903",
+      "algorithm_seconds": 859.7075060000001,
+      "gap_percent": null
+    },
+    {
+      "line": 27,
+      "raw": "Lifted ILS iter 22, RSP feasibility cut x1, RSP optimality cut x4, RSP Q(z)=4033.975422, UB=inf, LB=6642.616229, gap=1, master_ms=221.897600, rsp_ms=18322.950600, elapsed_ms=878252.913100",
+      "iteration": 22,
+      "ub": "inf",
+      "lb": "6642.616229",
+      "algorithm_seconds": 878.2529131,
+      "gap_percent": null
+    },
+    {
+      "line": 28,
+      "raw": "Lifted ILS iter 23, RSP feasibility cut x1, RSP optimality cut x4, RSP Q(z)=4158.195661, UB=inf, LB=7028.544553, gap=1, master_ms=257.182300, rsp_ms=17638.258300, elapsed_ms=896148.838200",
+      "iteration": 23,
+      "ub": "inf",
+      "lb": "7028.544553",
+      "algorithm_seconds": 896.1488382,
+      "gap_percent": null
+    },
+    {
+      "line": 29,
+      "raw": "Lifted ILS iter 24, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=4187.312161, UB=inf, LB=7045.212161, gap=1, master_ms=214.119500, rsp_ms=18116.185600, elapsed_ms=914479.457100",
+      "iteration": 24,
+      "ub": "inf",
+      "lb": "7045.212161",
+      "algorithm_seconds": 914.4794571,
+      "gap_percent": null
+    },
+    {
+      "line": 30,
+      "raw": "Lifted ILS iter 25, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=4187.312161, UB=inf, LB=7046.772161, gap=1, master_ms=220.639300, rsp_ms=18101.678000, elapsed_ms=932802.105400",
+      "iteration": 25,
+      "ub": "inf",
+      "lb": "7046.772161",
+      "algorithm_seconds": 932.8021054,
+      "gap_percent": null
+    },
+    {
+      "line": 31,
+      "raw": "Lifted ILS iter 26, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=4187.312161, UB=inf, LB=7049.472161, gap=1, master_ms=293.480300, rsp_ms=16463.552400, elapsed_ms=949559.667200",
+      "iteration": 26,
+      "ub": "inf",
+      "lb": "7049.472161",
+      "algorithm_seconds": 949.5596672,
+      "gap_percent": null
+    },
+    {
+      "line": 32,
+      "raw": "Lifted ILS iter 27, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=4187.312161, UB=inf, LB=7051.392161, gap=1, master_ms=307.647000, rsp_ms=17696.422000, elapsed_ms=967564.069900",
+      "iteration": 27,
+      "ub": "inf",
+      "lb": "7051.392161",
+      "algorithm_seconds": 967.5640699,
+      "gap_percent": null
+    },
+    {
+      "line": 33,
+      "raw": "Lifted ILS iter 28, theta=4187.312161, Q(z)=5330.194757, optimality cut x4, UB=8198.534757, LB=7055.652161, gap=13.940084%, master_ms=316.017300, rsp_optimality_cut=1, rsp_ms=737.886900, subproblem_ms=4571.821000, elapsed_ms=973207.977200",
+      "iteration": 28,
+      "ub": "8198.534757",
+      "lb": "7055.652161",
+      "algorithm_seconds": 973.2079772,
+      "gap_percent": 13.940083562177907
+    },
+    {
+      "line": 34,
+      "raw": "Lifted ILS iter 29, RSP feasibility cut x4, RSP optimality cut x1, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.138792, gap=1.419717%, master_ms=357.511200, rsp_ms=1855.865300, elapsed_ms=975421.794900",
+      "iteration": 29,
+      "ub": "8198.534757",
+      "lb": "8082.138792",
+      "algorithm_seconds": 975.4217949,
+      "gap_percent": 1.4197166743803769
+    },
+    {
+      "line": 35,
+      "raw": "Lifted ILS iter 30, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=430.341400, rsp_ms=1824.494000, elapsed_ms=977677.113600",
+      "iteration": 30,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 977.6771136,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 36,
+      "raw": "Lifted ILS iter 31, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=413.345900, rsp_ms=1849.731000, elapsed_ms=979940.530500",
+      "iteration": 31,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 979.9405305,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 37,
+      "raw": "Lifted ILS iter 32, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=362.581800, rsp_ms=1866.106700, elapsed_ms=982169.785600",
+      "iteration": 32,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 982.1697856,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 38,
+      "raw": "Lifted ILS iter 33, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=432.178300, rsp_ms=1818.287000, elapsed_ms=984420.604400",
+      "iteration": 33,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 984.4206044,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 39,
+      "raw": "Lifted ILS iter 34, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=382.571900, rsp_ms=1821.259000, elapsed_ms=986624.959500",
+      "iteration": 34,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 986.6249595,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 40,
+      "raw": "Lifted ILS iter 35, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=485.344100, rsp_ms=1809.548000, elapsed_ms=988920.221300",
+      "iteration": 35,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 988.9202213,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 41,
+      "raw": "Lifted ILS iter 36, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=431.584500, rsp_ms=1849.337300, elapsed_ms=991201.506900",
+      "iteration": 36,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 991.2015069,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 42,
+      "raw": "Lifted ILS iter 37, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=506.698700, rsp_ms=1877.957100, elapsed_ms=993586.599600",
+      "iteration": 37,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 993.5865996,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 43,
+      "raw": "Lifted ILS iter 38, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=500.064400, rsp_ms=1732.585200, elapsed_ms=995819.644200",
+      "iteration": 38,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 995.8196442,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 44,
+      "raw": "Lifted ILS iter 39, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=495.104600, rsp_ms=1868.815700, elapsed_ms=998184.405800",
+      "iteration": 39,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 998.1844057999999,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 45,
+      "raw": "Lifted ILS iter 40, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=487.242000, rsp_ms=1842.744900, elapsed_ms=1000514.777900",
+      "iteration": 40,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1000.5147779,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 46,
+      "raw": "Lifted ILS iter 41, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=478.742600, rsp_ms=1702.033400, elapsed_ms=1002695.947000",
+      "iteration": 41,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1002.695947,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 47,
+      "raw": "Lifted ILS iter 42, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=486.295500, rsp_ms=1735.688500, elapsed_ms=1004918.334100",
+      "iteration": 42,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1004.9183340999999,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 48,
+      "raw": "Lifted ILS iter 43, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=509.888300, rsp_ms=1689.754000, elapsed_ms=1007118.531300",
+      "iteration": 43,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1007.1185313000001,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 49,
+      "raw": "Lifted ILS iter 44, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=435.504700, rsp_ms=1736.588400, elapsed_ms=1009291.718100",
+      "iteration": 44,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1009.2917181,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 50,
+      "raw": "Lifted ILS iter 45, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=480.533900, rsp_ms=1698.568500, elapsed_ms=1011471.337000",
+      "iteration": 45,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1011.4713370000001,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 51,
+      "raw": "Lifted ILS iter 46, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=404.112100, rsp_ms=1729.112600, elapsed_ms=1013605.205700",
+      "iteration": 46,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1013.6052057,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 52,
+      "raw": "Lifted ILS iter 47, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=505.502100, rsp_ms=1698.383600, elapsed_ms=1015809.488900",
+      "iteration": 47,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1015.8094889,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 53,
+      "raw": "Lifted ILS iter 48, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=412.803700, rsp_ms=1824.438600, elapsed_ms=1018047.197500",
+      "iteration": 48,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1018.0471975,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 54,
+      "raw": "Lifted ILS iter 49, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=424.302200, rsp_ms=1698.616600, elapsed_ms=1020170.518200",
+      "iteration": 49,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1020.1705182000001,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 55,
+      "raw": "Lifted ILS iter 50, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=415.922700, rsp_ms=1654.434700, elapsed_ms=1022241.426100",
+      "iteration": 50,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1022.2414261,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 56,
+      "raw": "Lifted ILS iter 51, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=465.308600, rsp_ms=1794.218200, elapsed_ms=1024501.337200",
+      "iteration": 51,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1024.5013371999999,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 57,
+      "raw": "Lifted ILS iter 52, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=465.845300, rsp_ms=1780.813400, elapsed_ms=1026748.398100",
+      "iteration": 52,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1026.7483981,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 58,
+      "raw": "Lifted ILS iter 53, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=592.199700, rsp_ms=1700.631700, elapsed_ms=1029041.716000",
+      "iteration": 53,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1029.041716,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 59,
+      "raw": "Lifted ILS iter 54, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=482.407700, rsp_ms=1627.452900, elapsed_ms=1031151.971700",
+      "iteration": 54,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1031.1519717,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 60,
+      "raw": "Lifted ILS iter 55, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=502.977900, rsp_ms=1794.281300, elapsed_ms=1033449.641200",
+      "iteration": 55,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1033.4496411999999,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 61,
+      "raw": "Lifted ILS iter 56, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=478.743900, rsp_ms=1655.018500, elapsed_ms=1035584.021900",
+      "iteration": 56,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1035.5840219000002,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 62,
+      "raw": "Lifted ILS iter 57, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=455.848100, rsp_ms=1765.515500, elapsed_ms=1037805.797300",
+      "iteration": 57,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1037.8057973,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 63,
+      "raw": "Lifted ILS iter 58, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=499.464900, rsp_ms=1741.475500, elapsed_ms=1040047.141300",
+      "iteration": 58,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1040.0471413,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 64,
+      "raw": "Lifted ILS iter 59, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=439.355300, rsp_ms=1719.188400, elapsed_ms=1042206.175300",
+      "iteration": 59,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1042.2061753,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 65,
+      "raw": "Lifted ILS iter 60, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=471.133100, rsp_ms=1714.598500, elapsed_ms=1044392.391900",
+      "iteration": 60,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1044.3923919000001,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 66,
+      "raw": "Lifted ILS iter 61, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=580.037800, rsp_ms=1702.388100, elapsed_ms=1046675.350700",
+      "iteration": 61,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1046.6753506999999,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 67,
+      "raw": "Lifted ILS iter 62, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=486.947000, rsp_ms=1703.767800, elapsed_ms=1048866.614400",
+      "iteration": 62,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1048.8666144000001,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 68,
+      "raw": "Lifted ILS iter 63, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=595.807100, rsp_ms=1680.756400, elapsed_ms=1051144.117300",
+      "iteration": 63,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1051.1441173,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 69,
+      "raw": "Lifted ILS iter 64, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=500.218400, rsp_ms=1753.979600, elapsed_ms=1053398.750400",
+      "iteration": 64,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1053.3987504,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 70,
+      "raw": "Lifted ILS iter 65, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=652.741000, rsp_ms=1731.877100, elapsed_ms=1055783.865400",
+      "iteration": 65,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1055.7838654,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 71,
+      "raw": "Lifted ILS iter 66, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=559.132600, rsp_ms=1746.163000, elapsed_ms=1058089.601500",
+      "iteration": 66,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1058.0896015,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 72,
+      "raw": "Lifted ILS iter 67, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=579.634800, rsp_ms=1770.795000, elapsed_ms=1060440.960400",
+      "iteration": 67,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1060.4409604,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 73,
+      "raw": "Lifted ILS iter 68, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=649.394600, rsp_ms=1738.705500, elapsed_ms=1062829.596600",
+      "iteration": 68,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1062.8295966,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 74,
+      "raw": "Lifted ILS iter 69, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=652.694000, rsp_ms=1735.396400, elapsed_ms=1065218.991500",
+      "iteration": 69,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1065.2189915,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 75,
+      "raw": "Lifted ILS iter 70, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=620.035500, rsp_ms=1698.642700, elapsed_ms=1067538.449900",
+      "iteration": 70,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1067.5384499,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 76,
+      "raw": "Lifted ILS iter 71, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=770.284800, rsp_ms=1671.138500, elapsed_ms=1069980.342400",
+      "iteration": 71,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1069.9803424,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 77,
+      "raw": "Lifted ILS iter 72, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=694.240600, rsp_ms=1691.442200, elapsed_ms=1072366.905700",
+      "iteration": 72,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1072.3669057,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 78,
+      "raw": "Lifted ILS iter 73, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=682.474700, rsp_ms=1718.611700, elapsed_ms=1074768.544900",
+      "iteration": 73,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1074.7685449,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 79,
+      "raw": "Lifted ILS iter 74, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=766.142900, rsp_ms=1751.378300, elapsed_ms=1077286.604800",
+      "iteration": 74,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1077.2866048,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 80,
+      "raw": "Lifted ILS iter 75, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=558.609200, rsp_ms=1695.457500, elapsed_ms=1079541.124400",
+      "iteration": 75,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1079.5411244000002,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 81,
+      "raw": "Lifted ILS iter 76, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=507.259000, rsp_ms=1721.215700, elapsed_ms=1081770.095200",
+      "iteration": 76,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1081.7700952,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 82,
+      "raw": "Lifted ILS iter 77, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=652.800800, rsp_ms=1730.580500, elapsed_ms=1084153.914900",
+      "iteration": 77,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1084.1539149,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 83,
+      "raw": "Lifted ILS iter 78, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=521.812000, rsp_ms=1744.125800, elapsed_ms=1086420.306000",
+      "iteration": 78,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1086.4203060000002,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 84,
+      "raw": "Lifted ILS iter 79, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=605.521100, rsp_ms=1675.973800, elapsed_ms=1088702.315000",
+      "iteration": 79,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1088.702315,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 85,
+      "raw": "Lifted ILS iter 80, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=774.017700, rsp_ms=1688.186800, elapsed_ms=1091165.418800",
+      "iteration": 80,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1091.1654188,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 86,
+      "raw": "Lifted ILS iter 81, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=637.531700, rsp_ms=1736.312900, elapsed_ms=1093539.922400",
+      "iteration": 81,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1093.5399224,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 87,
+      "raw": "Lifted ILS iter 82, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=678.821500, rsp_ms=1679.700900, elapsed_ms=1095899.092100",
+      "iteration": 82,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1095.8990921,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 88,
+      "raw": "Lifted ILS iter 83, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=638.022000, rsp_ms=1690.495700, elapsed_ms=1098228.093300",
+      "iteration": 83,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1098.2280933,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 89,
+      "raw": "Lifted ILS iter 84, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=686.306600, rsp_ms=1710.408300, elapsed_ms=1100625.405700",
+      "iteration": 84,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1100.6254057,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 90,
+      "raw": "Lifted ILS iter 85, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=690.254000, rsp_ms=1672.846200, elapsed_ms=1102989.126800",
+      "iteration": 85,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1102.9891268,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 91,
+      "raw": "Lifted ILS iter 86, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=578.689600, rsp_ms=1651.189500, elapsed_ms=1105219.481800",
+      "iteration": 86,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1105.2194818,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 92,
+      "raw": "Lifted ILS iter 87, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=675.064000, rsp_ms=1644.076900, elapsed_ms=1107539.355700",
+      "iteration": 87,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1107.5393557,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 93,
+      "raw": "Lifted ILS iter 88, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=607.414800, rsp_ms=1682.615700, elapsed_ms=1109829.992600",
+      "iteration": 88,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1109.8299926,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 94,
+      "raw": "Lifted ILS iter 89, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=708.549500, rsp_ms=1700.612600, elapsed_ms=1112239.736000",
+      "iteration": 89,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1112.239736,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 95,
+      "raw": "Lifted ILS iter 90, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=751.070500, rsp_ms=1673.283700, elapsed_ms=1114664.872000",
+      "iteration": 90,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1114.664872,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 96,
+      "raw": "Lifted ILS iter 91, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=746.990500, rsp_ms=1693.074100, elapsed_ms=1117105.535500",
+      "iteration": 91,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1117.1055355,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 97,
+      "raw": "Lifted ILS iter 92, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=628.392300, rsp_ms=1705.524800, elapsed_ms=1119440.060000",
+      "iteration": 92,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1119.4400600000001,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 98,
+      "raw": "Lifted ILS iter 93, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=776.141800, rsp_ms=1689.971500, elapsed_ms=1121906.894700",
+      "iteration": 93,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1121.9068947,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 99,
+      "raw": "Lifted ILS iter 94, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=637.862800, rsp_ms=1682.858600, elapsed_ms=1124228.237600",
+      "iteration": 94,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1124.2282376,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 100,
+      "raw": "Lifted ILS iter 95, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=744.449800, rsp_ms=1679.020200, elapsed_ms=1126652.215800",
+      "iteration": 95,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1126.6522157999998,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 101,
+      "raw": "Lifted ILS iter 96, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=688.574000, rsp_ms=1654.691000, elapsed_ms=1128996.666400",
+      "iteration": 96,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1128.9966664,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 102,
+      "raw": "Lifted ILS iter 97, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=615.915900, rsp_ms=1751.391200, elapsed_ms=1131364.532700",
+      "iteration": 97,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1131.3645327000002,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 103,
+      "raw": "Lifted ILS iter 98, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=715.121400, rsp_ms=1675.833800, elapsed_ms=1133757.432400",
+      "iteration": 98,
+      "ub": "8198.534757",
+      "lb": "8082.778092",
+      "algorithm_seconds": 1133.7574324,
+      "gap_percent": 1.4119189395539924
+    },
+    {
+      "line": 104,
+      "raw": "Lifted ILS iter 99, RSP feasibility cut x3, RSP optimality cut x1, RSP Q(z)=2052.600245, UB=8198.534757, LB=8083.645590, gap=1.401338%, master_ms=711.056800, rsp_ms=1476.042300, elapsed_ms=1135945.110500",
+      "iteration": 99,
+      "ub": "8198.534757",
+      "lb": "8083.645590",
+      "algorithm_seconds": 1135.9451105,
+      "gap_percent": 1.4013378049279566
+    },
+    {
+      "line": 105,
+      "raw": "Lifted ILS iter 100, RSP feasibility cut x4, RSP optimality cut x1, RSP Q(z)=949.113747, UB=8198.534757, LB=8193.164801, gap=0.065499%, master_ms=874.202700, rsp_ms=1816.491100, elapsed_ms=1138636.453500",
+      "iteration": 100,
+      "ub": "8198.534757",
+      "lb": "8193.164801",
+      "algorithm_seconds": 1138.6364535,
+      "gap_percent": 0.0654989721841907
+    },
+    {
+      "line": 106,
+      "raw": "Lifted ILS iter 101, theta=5243.170373, Q(z)=5249.093239, optimality cut x5, UB=8198.534757, LB=8193.164801, gap=0.065499%, master_ms=945.158100, rsp_optimality_cut=5, rsp_ms=855.541900, subproblem_ms=5069.614500, elapsed_ms=1145520.215900",
+      "iteration": 101,
+      "ub": "8198.534757",
+      "lb": "8193.164801",
+      "algorithm_seconds": 1145.5202159,
+      "gap_percent": 0.0654989721841907
+    }
+  ],
+  "original_final_records": [],
+  "algorithm_terminal_records": [],
+  "native_status_messages": [],
+  "rsp_skips": [],
+  "numerical_skip_count": 0,
+  "numerical_message_count": 0,
+  "repair_event_count": 0,
+  "repair_events": [],
+  "phase_one_records": [],
+  "convergence_records": [
+    {
+      "line": 107,
+      "raw": "Lifted ILS converged."
+    }
+  ],
+  "last_complete_iteration_line": 106,
+  "log_ends_in_newline": true,
+  "last_lines": [
+    {
+      "line": 103,
+      "raw": "Lifted ILS iter 98, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=715.121400, rsp_ms=1675.833800, elapsed_ms=1133757.432400"
+    },
+    {
+      "line": 104,
+      "raw": "Lifted ILS iter 99, RSP feasibility cut x3, RSP optimality cut x1, RSP Q(z)=2052.600245, UB=8198.534757, LB=8083.645590, gap=1.401338%, master_ms=711.056800, rsp_ms=1476.042300, elapsed_ms=1135945.110500"
+    },
+    {
+      "line": 105,
+      "raw": "Lifted ILS iter 100, RSP feasibility cut x4, RSP optimality cut x1, RSP Q(z)=949.113747, UB=8198.534757, LB=8193.164801, gap=0.065499%, master_ms=874.202700, rsp_ms=1816.491100, elapsed_ms=1138636.453500"
+    },
+    {
+      "line": 106,
+      "raw": "Lifted ILS iter 101, theta=5243.170373, Q(z)=5249.093239, optimality cut x5, UB=8198.534757, LB=8193.164801, gap=0.065499%, master_ms=945.158100, rsp_optimality_cut=5, rsp_ms=855.541900, subproblem_ms=5069.614500, elapsed_ms=1145520.215900"
+    },
+    {
+      "line": 107,
+      "raw": "Lifted ILS converged."
+    },
+    {
+      "line": 108,
+      "raw": "Cardinal Optimizer v8.0.7. Build date Sep 20 2026"
+    },
+    {
+      "line": 109,
+      "raw": "Copyright Cardinal Operations 2026. All Rights Reserved"
+    },
+    {
+      "line": 110,
+      "raw": ""
+    }
+  ],
+  "monotonicity": "NO_LB_DECREASE_OR_INCUMBENT_INCREASE"
+}

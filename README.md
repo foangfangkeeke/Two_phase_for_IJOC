@@ -15,10 +15,12 @@
 - 本地用浏览器打开 `experiments/final_2026-11-05/writeup/results.html`，表头有用例、指标两层，主表按 R3/R12/R28 合并分组。
 - [结构化数值](experiments/final_2026-11-05/writeup/results.json)包含完整精度、状态、缺失字段和逐条日志路径。
 - 页面中的数值链接到随仓库保存的原始日志；输入快照也已随仓库保存。查看结果只需浏览器。
+- [逐项日志索引](experiments/final_2026-11-05/analysis/LOG_INDEX.md)列出三组全部选用位置及新冻结版本的已发生尝试，可查原始行号、完整迭代和版本对应。
+- [代码消融核查](experiments/final_2026-11-05/analysis/ABLATION_AUDIT.md)列出 VI、Full/L2P 配对控制及实际代码差异。
 
 ## 当前代码及重跑状态
 
-最终求解代码固定在提交 `7d932b99a8fe03e2b4df796e94071b5730dd5ae6`；执行文件和源码字节绑定见 [release.json](experiments/final_2026-11-05/release.json)。
+当前冻结求解代码固定在提交 `7d932b99a8fe03e2b4df796e94071b5730dd5ae6`；执行文件和源码字节绑定见 [release.json](experiments/final_2026-11-05/release.json)。
 
 已有结果来自历史归档版本，版本对应见 [history/records.json](experiments/final_2026-11-05/history/records.json)。这些历史数值不能标注为全部由新冻结 exe 产生。
 

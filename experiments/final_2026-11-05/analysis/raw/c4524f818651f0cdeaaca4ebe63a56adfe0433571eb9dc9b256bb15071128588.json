@@ -1,0 +1,811 @@
+{
+  "raw_log": "experiments/final_2026-11-05/history/raw/c4524f818651f0cdeaaca4ebe63a56adfe0433571eb9dc9b256bb15071128588.log",
+  "raw_log_sha256": "c4524f818651f0cdeaaca4ebe63a56adfe0433571eb9dc9b256bb15071128588",
+  "bytes": 23397,
+  "line_count": 93,
+  "complete_iterations": 75,
+  "bound_source": "EXPLICIT_ORIGINAL_FINAL",
+  "selected_original_bounds": {
+    "line": 90,
+    "ub": "inf",
+    "lb": "17633.872359"
+  },
+  "has_explicit_algorithm_final_status": true,
+  "headers": [
+    {
+      "line": 1,
+      "raw": "Runtime options: facility_cost_scale=1.000000, energy_scale=1.000000, battery_step=50, scenario_count=10, scenario_start=0, cap=4, dwc_top_n=50, wireless_option=1, rsp=1, rsp_workers=3, rsp_threads=4, preprocess_bounds=0, valid_inequality=1"
+    },
+    {
+      "line": 2,
+      "raw": "Solver options: mip_gap=0.000100, global_gap=0.010000, time_limit=7200.000000, threads=12"
+    },
+    {
+      "line": 3,
+      "raw": "Instance: data=r28_nested_c4_n10_t002, scenario_folders=base;charger_tengah_up10;lo10pct;route_984_up20;route_941_down30;route_285_up10;route_334_down10;route_452_down20;route_96_up20;charger_clementi_up20, battery_range=[50.000000,600.000000]"
+    },
+    {
+      "line": 14,
+      "raw": "Phase 2 initialized: scenarios=10, target_gap=1.000000%, scenario_workers=3, scenario_threads=4, RSP=on"
+    }
+  ],
+  "iterations": [
+    {
+      "line": 15,
+      "raw": "Phase 2 iter 0, RSP feasibility cut x9, RSP optimality cut x1, RSP Q(z)=1038.112991, UB=inf, LB=17575.863123, gap=1, master_ms=871.115000, rsp_ms=307481.299700, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=367314.569400",
+      "iteration": 0,
+      "ub": "inf",
+      "lb": "17575.863123",
+      "algorithm_seconds": 367.3145694,
+      "gap_percent": null
+    },
+    {
+      "line": 16,
+      "raw": "Phase 2 iter 1, RSP feasibility cut x5, RSP optimality cut x5, RSP Q(z)=5698.629868, UB=inf, LB=17580.290787, gap=1, master_ms=1114.339100, rsp_ms=144023.424300, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=512455.130000",
+      "iteration": 1,
+      "ub": "inf",
+      "lb": "17580.290787",
+      "algorithm_seconds": 512.45513,
+      "gap_percent": null
+    },
+    {
+      "line": 17,
+      "raw": "Phase 2 iter 2, feasibility cut x8, UB=inf, LB=17583.671091, gap=1, master_ms=1752.549200, rsp_ms=11142.449200, subproblem_ms=35916.530700, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=561270.832300",
+      "iteration": 2,
+      "ub": "inf",
+      "lb": "17583.671091",
+      "algorithm_seconds": 561.2708323,
+      "gap_percent": null
+    },
+    {
+      "line": 18,
+      "raw": "Phase 2 iter 3, feasibility cut x8, UB=inf, LB=17586.685313, gap=1, master_ms=2814.954200, rsp_ms=3491.472300, subproblem_ms=31119.226200, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=598702.136200",
+      "iteration": 3,
+      "ub": "inf",
+      "lb": "17586.685313",
+      "algorithm_seconds": 598.7021361999999,
+      "gap_percent": null
+    },
+    {
+      "line": 19,
+      "raw": "Phase 2 iter 4, feasibility cut x8, UB=inf, LB=17588.408860, gap=1, master_ms=1747.149200, rsp_ms=14125.168200, subproblem_ms=23639.110900, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=638218.039400",
+      "iteration": 4,
+      "ub": "inf",
+      "lb": "17588.408860",
+      "algorithm_seconds": 638.2180394,
+      "gap_percent": null
+    },
+    {
+      "line": 20,
+      "raw": "Phase 2 iter 5, RSP feasibility cut x1, RSP optimality cut x9, RSP Q(z)=10307.805533, UB=inf, LB=17597.804469, gap=1, master_ms=6194.650300, rsp_ms=7260.946800, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=651676.566800",
+      "iteration": 5,
+      "ub": "inf",
+      "lb": "17597.804469",
+      "algorithm_seconds": 651.6765668,
+      "gap_percent": null
+    },
+    {
+      "line": 21,
+      "raw": "Phase 2 iter 6, feasibility cut x8, UB=inf, LB=17613.785245, gap=1, master_ms=35165.954000, rsp_ms=7954.082100, subproblem_ms=38772.865400, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=733572.522200",
+      "iteration": 6,
+      "ub": "inf",
+      "lb": "17613.785245",
+      "algorithm_seconds": 733.5725222,
+      "gap_percent": null
+    },
+    {
+      "line": 22,
+      "raw": "Phase 2 iter 7, RSP feasibility cut x1, RSP optimality cut x9, RSP Q(z)=10290.297567, UB=inf, LB=17616.690365, gap=1, master_ms=19655.041200, rsp_ms=8071.214200, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=761302.309400",
+      "iteration": 7,
+      "ub": "inf",
+      "lb": "17616.690365",
+      "algorithm_seconds": 761.3023094,
+      "gap_percent": null
+    },
+    {
+      "line": 23,
+      "raw": "Phase 2 iter 8, RSP feasibility cut x9, RSP optimality cut x1, RSP Q(z)=1130.448265, UB=inf, LB=17621.128134, gap=1, master_ms=52419.312700, rsp_ms=10996.618200, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=824720.503300",
+      "iteration": 8,
+      "ub": "inf",
+      "lb": "17621.128134",
+      "algorithm_seconds": 824.7205033,
+      "gap_percent": null
+    },
+    {
+      "line": 24,
+      "raw": "Phase 2 iter 9, feasibility cut x8, UB=inf, LB=17621.595161, gap=1, master_ms=44065.038800, rsp_ms=7018.214900, subproblem_ms=36590.316600, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=912398.260800",
+      "iteration": 9,
+      "ub": "inf",
+      "lb": "17621.595161",
+      "algorithm_seconds": 912.3982608,
+      "gap_percent": null
+    },
+    {
+      "line": 25,
+      "raw": "Phase 2 iter 10, RSP feasibility cut x2, RSP optimality cut x8, RSP Q(z)=9148.868830, UB=inf, LB=17631.352460, gap=1, master_ms=123019.749500, rsp_ms=7087.565300, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1042507.229000",
+      "iteration": 10,
+      "ub": "inf",
+      "lb": "17631.352460",
+      "algorithm_seconds": 1042.507229,
+      "gap_percent": null
+    },
+    {
+      "line": 26,
+      "raw": "Phase 2 iter 11, RSP feasibility cut x1, RSP optimality cut x1, RSP Q(z)=10342.076277, UB=inf, LB=17632.729370, gap=1, master_ms=118317.835600, rsp_ms=7024.976900, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1167850.886300",
+      "iteration": 11,
+      "ub": "inf",
+      "lb": "17632.729370",
+      "algorithm_seconds": 1167.8508863,
+      "gap_percent": null
+    },
+    {
+      "line": 27,
+      "raw": "Phase 2 iter 12, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17632.812320, gap=1, master_ms=111432.171300, rsp_ms=3476.504900, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1282760.760200",
+      "iteration": 12,
+      "ub": "inf",
+      "lb": "17632.812320",
+      "algorithm_seconds": 1282.7607601999998,
+      "gap_percent": null
+    },
+    {
+      "line": 28,
+      "raw": "Phase 2 iter 13, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17632.882653, gap=1, master_ms=46202.442700, rsp_ms=3302.051900, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1332266.061700",
+      "iteration": 13,
+      "ub": "inf",
+      "lb": "17632.882653",
+      "algorithm_seconds": 1332.2660617,
+      "gap_percent": null
+    },
+    {
+      "line": 29,
+      "raw": "Phase 2 iter 14, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17632.882653, gap=1, master_ms=92477.182200, rsp_ms=3470.254600, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1428214.521900",
+      "iteration": 14,
+      "ub": "inf",
+      "lb": "17632.882653",
+      "algorithm_seconds": 1428.2145219000001,
+      "gap_percent": null
+    },
+    {
+      "line": 30,
+      "raw": "Phase 2 iter 15, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=20711.745300, rsp_ms=3362.855700, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1452289.986600",
+      "iteration": 15,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 1452.2899866,
+      "gap_percent": null
+    },
+    {
+      "line": 31,
+      "raw": "Phase 2 iter 16, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=79894.520200, rsp_ms=3238.155000, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1535423.563500",
+      "iteration": 16,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 1535.4235635,
+      "gap_percent": null
+    },
+    {
+      "line": 32,
+      "raw": "Phase 2 iter 17, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=83979.917000, rsp_ms=3448.819100, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1622853.147500",
+      "iteration": 17,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 1622.8531475,
+      "gap_percent": null
+    },
+    {
+      "line": 33,
+      "raw": "Phase 2 iter 18, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=62845.229500, rsp_ms=3206.357600, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1688905.563200",
+      "iteration": 18,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 1688.9055632,
+      "gap_percent": null
+    },
+    {
+      "line": 34,
+      "raw": "Phase 2 iter 19, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=126676.485300, rsp_ms=3184.018900, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1818766.879800",
+      "iteration": 19,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 1818.7668798,
+      "gap_percent": null
+    },
+    {
+      "line": 35,
+      "raw": "Phase 2 iter 20, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=49221.998100, rsp_ms=3289.820000, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1871279.693800",
+      "iteration": 20,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 1871.2796938,
+      "gap_percent": null
+    },
+    {
+      "line": 36,
+      "raw": "Phase 2 iter 21, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=33431.121400, rsp_ms=3327.468600, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1908039.303900",
+      "iteration": 21,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 1908.0393039,
+      "gap_percent": null
+    },
+    {
+      "line": 37,
+      "raw": "Phase 2 iter 22, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=43825.309300, rsp_ms=3336.766000, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1955202.280900",
+      "iteration": 22,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 1955.2022809,
+      "gap_percent": null
+    },
+    {
+      "line": 38,
+      "raw": "Phase 2 iter 23, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=110025.311200, rsp_ms=3498.261200, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2068726.889600",
+      "iteration": 23,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 2068.7268896,
+      "gap_percent": null
+    },
+    {
+      "line": 39,
+      "raw": "Phase 2 iter 24, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=39671.107200, rsp_ms=3264.098500, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2111662.930600",
+      "iteration": 24,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 2111.6629306,
+      "gap_percent": null
+    },
+    {
+      "line": 40,
+      "raw": "Phase 2 iter 25, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=34167.615000, rsp_ms=3233.588100, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2149065.260700",
+      "iteration": 25,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 2149.0652607,
+      "gap_percent": null
+    },
+    {
+      "line": 41,
+      "raw": "Phase 2 iter 26, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=142268.640800, rsp_ms=3330.990700, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2294665.761500",
+      "iteration": 26,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 2294.6657615,
+      "gap_percent": null
+    },
+    {
+      "line": 42,
+      "raw": "Phase 2 iter 27, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=52106.007600, rsp_ms=3242.403000, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2350014.971700",
+      "iteration": 27,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 2350.0149717,
+      "gap_percent": null
+    },
+    {
+      "line": 43,
+      "raw": "Phase 2 iter 28, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=82845.418500, rsp_ms=3380.686000, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2436241.924800",
+      "iteration": 28,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 2436.2419248,
+      "gap_percent": null
+    },
+    {
+      "line": 44,
+      "raw": "Phase 2 iter 29, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=77004.000800, rsp_ms=3289.015900, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2516535.877600",
+      "iteration": 29,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 2516.5358776,
+      "gap_percent": null
+    },
+    {
+      "line": 45,
+      "raw": "Phase 2 iter 30, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=37703.528500, rsp_ms=3313.574200, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2557553.854600",
+      "iteration": 30,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 2557.5538546000002,
+      "gap_percent": null
+    },
+    {
+      "line": 46,
+      "raw": "Phase 2 iter 31, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=81373.097900, rsp_ms=3135.457000, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2642063.380300",
+      "iteration": 31,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 2642.0633803,
+      "gap_percent": null
+    },
+    {
+      "line": 47,
+      "raw": "Phase 2 iter 32, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=84838.871600, rsp_ms=3290.532300, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2730195.202100",
+      "iteration": 32,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 2730.1952020999997,
+      "gap_percent": null
+    },
+    {
+      "line": 48,
+      "raw": "Phase 2 iter 33, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=46287.806600, rsp_ms=3226.822300, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2779710.850400",
+      "iteration": 33,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 2779.7108504,
+      "gap_percent": null
+    },
+    {
+      "line": 49,
+      "raw": "Phase 2 iter 34, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=86892.806000, rsp_ms=3184.366900, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2869789.196500",
+      "iteration": 34,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 2869.7891965,
+      "gap_percent": null
+    },
+    {
+      "line": 50,
+      "raw": "Phase 2 iter 35, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=151615.773300, rsp_ms=3314.231800, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=3024720.296800",
+      "iteration": 35,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 3024.7202968,
+      "gap_percent": null
+    },
+    {
+      "line": 51,
+      "raw": "Phase 2 iter 36, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=170241.925500, rsp_ms=3211.654300, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=3198175.445900",
+      "iteration": 36,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 3198.1754459000003,
+      "gap_percent": null
+    },
+    {
+      "line": 52,
+      "raw": "Phase 2 iter 37, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=30162.757100, rsp_ms=3202.338900, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=3231541.723500",
+      "iteration": 37,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 3231.5417235,
+      "gap_percent": null
+    },
+    {
+      "line": 53,
+      "raw": "Phase 2 iter 38, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=169921.274800, rsp_ms=3294.277600, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=3404758.213900",
+      "iteration": 38,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 3404.7582138999996,
+      "gap_percent": null
+    },
+    {
+      "line": 54,
+      "raw": "Phase 2 iter 39, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=44835.211400, rsp_ms=3344.284500, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=3452938.670400",
+      "iteration": 39,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 3452.9386704000003,
+      "gap_percent": null
+    },
+    {
+      "line": 55,
+      "raw": "Phase 2 iter 40, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=84270.400600, rsp_ms=3319.959300, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=3540530.007400",
+      "iteration": 40,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 3540.5300074,
+      "gap_percent": null
+    },
+    {
+      "line": 56,
+      "raw": "Phase 2 iter 41, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=61267.135900, rsp_ms=3256.780500, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=3605054.843200",
+      "iteration": 41,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 3605.0548432,
+      "gap_percent": null
+    },
+    {
+      "line": 57,
+      "raw": "Phase 2 iter 42, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=44220.035100, rsp_ms=3216.104200, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=3652491.796500",
+      "iteration": 42,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 3652.4917965,
+      "gap_percent": null
+    },
+    {
+      "line": 58,
+      "raw": "Phase 2 iter 43, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=138222.529200, rsp_ms=4013.598100, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=3794729.554700",
+      "iteration": 43,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 3794.7295547000003,
+      "gap_percent": null
+    },
+    {
+      "line": 59,
+      "raw": "Phase 2 iter 44, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=74434.798400, rsp_ms=4039.267800, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=3873204.580300",
+      "iteration": 44,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 3873.2045803,
+      "gap_percent": null
+    },
+    {
+      "line": 60,
+      "raw": "Phase 2 iter 45, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=27778.318900, rsp_ms=3288.803100, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=3904272.701000",
+      "iteration": 45,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 3904.272701,
+      "gap_percent": null
+    },
+    {
+      "line": 61,
+      "raw": "Phase 2 iter 46, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=62789.282400, rsp_ms=3282.830400, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=3970345.714800",
+      "iteration": 46,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 3970.3457148,
+      "gap_percent": null
+    },
+    {
+      "line": 62,
+      "raw": "Phase 2 iter 47, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=78209.797400, rsp_ms=3152.454300, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=4051709.113300",
+      "iteration": 47,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 4051.7091133,
+      "gap_percent": null
+    },
+    {
+      "line": 63,
+      "raw": "Phase 2 iter 48, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=187361.386700, rsp_ms=3384.579800, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=4242456.084500",
+      "iteration": 48,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 4242.4560845,
+      "gap_percent": null
+    },
+    {
+      "line": 64,
+      "raw": "Phase 2 iter 49, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=209336.650000, rsp_ms=3214.576200, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=4455008.898800",
+      "iteration": 49,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 4455.0088988,
+      "gap_percent": null
+    },
+    {
+      "line": 65,
+      "raw": "Phase 2 iter 50, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=158959.703500, rsp_ms=3335.589200, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=4617305.527100",
+      "iteration": 50,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 4617.305527099999,
+      "gap_percent": null
+    },
+    {
+      "line": 66,
+      "raw": "Phase 2 iter 51, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=47362.897500, rsp_ms=3268.368200, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=4667937.717700",
+      "iteration": 51,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 4667.9377177,
+      "gap_percent": null
+    },
+    {
+      "line": 67,
+      "raw": "Phase 2 iter 52, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=76941.122300, rsp_ms=3272.294200, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=4748152.121300",
+      "iteration": 52,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 4748.1521213,
+      "gap_percent": null
+    },
+    {
+      "line": 68,
+      "raw": "Phase 2 iter 53, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=181326.499300, rsp_ms=3341.242200, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=4932820.737500",
+      "iteration": 53,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 4932.8207375,
+      "gap_percent": null
+    },
+    {
+      "line": 69,
+      "raw": "Phase 2 iter 54, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=161252.477900, rsp_ms=3302.594900, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=5097376.835800",
+      "iteration": 54,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 5097.3768358,
+      "gap_percent": null
+    },
+    {
+      "line": 70,
+      "raw": "Phase 2 iter 55, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=34123.596400, rsp_ms=3256.910700, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=5134758.620700",
+      "iteration": 55,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 5134.7586206999995,
+      "gap_percent": null
+    },
+    {
+      "line": 71,
+      "raw": "Phase 2 iter 56, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=142872.132600, rsp_ms=3304.952300, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=5280936.557200",
+      "iteration": 56,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 5280.9365572,
+      "gap_percent": null
+    },
+    {
+      "line": 72,
+      "raw": "Phase 2 iter 57, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=56761.736200, rsp_ms=3239.795600, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=5340939.086800",
+      "iteration": 57,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 5340.9390868,
+      "gap_percent": null
+    },
+    {
+      "line": 73,
+      "raw": "Phase 2 iter 58, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=110813.304200, rsp_ms=3279.975300, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=5455033.331800",
+      "iteration": 58,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 5455.033331799999,
+      "gap_percent": null
+    },
+    {
+      "line": 74,
+      "raw": "Phase 2 iter 59, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=107925.395800, rsp_ms=3279.747400, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=5566239.413400",
+      "iteration": 59,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 5566.2394134,
+      "gap_percent": null
+    },
+    {
+      "line": 75,
+      "raw": "Phase 2 iter 60, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=69020.896400, rsp_ms=3350.066800, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=5638611.256000",
+      "iteration": 60,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 5638.611256,
+      "gap_percent": null
+    },
+    {
+      "line": 76,
+      "raw": "Phase 2 iter 61, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=158219.793000, rsp_ms=3341.273600, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=5800173.294100",
+      "iteration": 61,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 5800.1732941,
+      "gap_percent": null
+    },
+    {
+      "line": 77,
+      "raw": "Phase 2 iter 62, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=52848.661800, rsp_ms=3218.618100, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=5856241.687200",
+      "iteration": 62,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 5856.241687199999,
+      "gap_percent": null
+    },
+    {
+      "line": 78,
+      "raw": "Phase 2 iter 63, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=71601.866300, rsp_ms=3153.669300, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=5930998.193600",
+      "iteration": 63,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 5930.9981935999995,
+      "gap_percent": null
+    },
+    {
+      "line": 79,
+      "raw": "Phase 2 iter 64, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=76252.147800, rsp_ms=3290.554700, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=6010541.782000",
+      "iteration": 64,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 6010.541781999999,
+      "gap_percent": null
+    },
+    {
+      "line": 80,
+      "raw": "Phase 2 iter 65, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=110044.962100, rsp_ms=3251.049600, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=6123838.687800",
+      "iteration": 65,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 6123.8386878,
+      "gap_percent": null
+    },
+    {
+      "line": 81,
+      "raw": "Phase 2 iter 66, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=50726.612300, rsp_ms=3224.527800, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=6177790.768700",
+      "iteration": 66,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 6177.7907687,
+      "gap_percent": null
+    },
+    {
+      "line": 82,
+      "raw": "Phase 2 iter 67, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=95075.240600, rsp_ms=3226.962700, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=6276094.081900",
+      "iteration": 67,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 6276.0940819,
+      "gap_percent": null
+    },
+    {
+      "line": 83,
+      "raw": "Phase 2 iter 68, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.483419, gap=1, master_ms=55708.608500, rsp_ms=3309.443500, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=6335113.376700",
+      "iteration": 68,
+      "ub": "inf",
+      "lb": "17633.483419",
+      "algorithm_seconds": 6335.1133767,
+      "gap_percent": null
+    },
+    {
+      "line": 84,
+      "raw": "Phase 2 iter 69, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.872359, gap=1, master_ms=96774.705400, rsp_ms=3289.846700, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=6435178.966200",
+      "iteration": 69,
+      "ub": "inf",
+      "lb": "17633.872359",
+      "algorithm_seconds": 6435.1789662,
+      "gap_percent": null
+    },
+    {
+      "line": 85,
+      "raw": "Phase 2 iter 70, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.872359, gap=1, master_ms=199355.593700, rsp_ms=3303.321000, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=6637838.804200",
+      "iteration": 70,
+      "ub": "inf",
+      "lb": "17633.872359",
+      "algorithm_seconds": 6637.8388042,
+      "gap_percent": null
+    },
+    {
+      "line": 86,
+      "raw": "Phase 2 iter 71, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.872359, gap=1, master_ms=165458.878700, rsp_ms=3245.694300, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=6806544.882400",
+      "iteration": 71,
+      "ub": "inf",
+      "lb": "17633.872359",
+      "algorithm_seconds": 6806.5448824,
+      "gap_percent": null
+    },
+    {
+      "line": 87,
+      "raw": "Phase 2 iter 72, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.872359, gap=1, master_ms=58396.216600, rsp_ms=3108.912600, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=6868050.984600",
+      "iteration": 72,
+      "ub": "inf",
+      "lb": "17633.872359",
+      "algorithm_seconds": 6868.0509846,
+      "gap_percent": null
+    },
+    {
+      "line": 88,
+      "raw": "Phase 2 iter 73, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.872359, gap=1, master_ms=106478.142400, rsp_ms=3174.232600, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=6977704.392600",
+      "iteration": 73,
+      "ub": "inf",
+      "lb": "17633.872359",
+      "algorithm_seconds": 6977.7043926,
+      "gap_percent": null
+    },
+    {
+      "line": 89,
+      "raw": "Phase 2 iter 74, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.872359, gap=1, master_ms=75981.304000, rsp_ms=3334.148700, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=7057021.998500",
+      "iteration": 74,
+      "ub": "inf",
+      "lb": "17633.872359",
+      "algorithm_seconds": 7057.021998499999,
+      "gap_percent": null
+    }
+  ],
+  "original_final_records": [
+    {
+      "line": 90,
+      "raw": "Lifted Two-Phase status=TIME_LIMIT, UB=inf, LB=17633.872359, gap=1, elapsed_ms=7200230.728800",
+      "status": "TIME_LIMIT",
+      "ub": "inf",
+      "lb": "17633.872359",
+      "algorithm_seconds": 7200.230728799999
+    }
+  ],
+  "algorithm_terminal_records": [],
+  "native_status_messages": [],
+  "rsp_skips": [],
+  "numerical_skip_count": 0,
+  "numerical_message_count": 0,
+  "repair_event_count": 0,
+  "repair_events": [],
+  "phase_one_records": [
+    {
+      "line": 5,
+      "raw": "Phase 1 initialized: route_subproblems=280",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 6,
+      "raw": "Phase 1 iter 0, feasibility cut x76, UB=inf, LB=5713.740000, gap=1, master_ms=51.063600, subproblem_ms=5988.295000, elapsed_ms=16799.450000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 7,
+      "raw": "Phase 1 iter 1, feasibility cut x4, UB=inf, LB=12776.687515, gap=1, master_ms=62.031000, subproblem_ms=2042.437500, elapsed_ms=18907.143400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 8,
+      "raw": "Phase 1 iter 2, feasibility cut x14, UB=inf, LB=16952.891531, gap=1, master_ms=289.991500, subproblem_ms=1852.212300, elapsed_ms=21050.802700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 9,
+      "raw": "Phase 1 iter 3, feasibility cut x2, UB=inf, LB=17549.655438, gap=1, master_ms=175.504900, subproblem_ms=1699.937500, elapsed_ms=22926.950300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 10,
+      "raw": "Phase 1 iter 4, feasibility cut x12, UB=inf, LB=17564.961883, gap=1, master_ms=148.537900, subproblem_ms=1555.593500, elapsed_ms=24631.704600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 11,
+      "raw": "Phase 1 iter 5, feasibility cut x1, UB=inf, LB=17574.325896, gap=1, master_ms=199.500500, subproblem_ms=1529.651700, elapsed_ms=26361.450100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 12,
+      "raw": "Phase 1 iter 6, theta=11305.371713, Q(z)=11305.371713, optimality cut x0, UB=17576.631713, LB=17575.863123, gap=0.004373%, master_ms=252.110500, subproblem_ms=1414.320300, elapsed_ms=28028.403000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 13,
+      "raw": "Phase 1 completed: UB=17576.631713, LB=17575.863123, elapsed_ms=31420.950700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    }
+  ],
+  "convergence_records": [],
+  "last_complete_iteration_line": 89,
+  "log_ends_in_newline": true,
+  "last_lines": [
+    {
+      "line": 86,
+      "raw": "Phase 2 iter 71, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.872359, gap=1, master_ms=165458.878700, rsp_ms=3245.694300, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=6806544.882400"
+    },
+    {
+      "line": 87,
+      "raw": "Phase 2 iter 72, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.872359, gap=1, master_ms=58396.216600, rsp_ms=3108.912600, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=6868050.984600"
+    },
+    {
+      "line": 88,
+      "raw": "Phase 2 iter 73, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.872359, gap=1, master_ms=106478.142400, rsp_ms=3174.232600, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=6977704.392600"
+    },
+    {
+      "line": 89,
+      "raw": "Phase 2 iter 74, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.872359, gap=1, master_ms=75981.304000, rsp_ms=3334.148700, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=7057021.998500"
+    },
+    {
+      "line": 90,
+      "raw": "Lifted Two-Phase status=TIME_LIMIT, UB=inf, LB=17633.872359, gap=1, elapsed_ms=7200230.728800"
+    },
+    {
+      "line": 91,
+      "raw": "Cardinal Optimizer v8.0.7. Build date Sep 20 2026"
+    },
+    {
+      "line": 92,
+      "raw": "Copyright Cardinal Operations 2026. All Rights Reserved"
+    },
+    {
+      "line": 93,
+      "raw": ""
+    }
+  ],
+  "monotonicity": "NO_LB_DECREASE_OR_INCUMBENT_INCREASE"
+}

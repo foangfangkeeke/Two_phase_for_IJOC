@@ -1,0 +1,1274 @@
+{
+  "raw_log": "experiments/final_2026-11-05/history/raw/18391c5baf2b761f619f45979705119fd052e5a512f212c62b90427d2df1e367.log",
+  "raw_log_sha256": "18391c5baf2b761f619f45979705119fd052e5a512f212c62b90427d2df1e367",
+  "bytes": 65220,
+  "line_count": 244,
+  "complete_iterations": 18,
+  "bound_source": "EXPLICIT_ORIGINAL_FINAL",
+  "selected_original_bounds": {
+    "line": 241,
+    "ub": "17886.326205",
+    "lb": "17716.315484"
+  },
+  "has_explicit_algorithm_final_status": true,
+  "headers": [
+    {
+      "line": 1,
+      "raw": "Runtime options: facility_cost_scale=1.000000, energy_scale=1.000000, battery_step=50, scenario_count=5, scenario_start=0, cap=3, dwc_top_n=50, wireless_option=1, rsp=1, rsp_workers=3, rsp_threads=4, preprocess_bounds=0, valid_inequality=1"
+    },
+    {
+      "line": 2,
+      "raw": "Solver options: mip_gap=0.000100, global_gap=0.010000, time_limit=7200.000000, threads=12"
+    },
+    {
+      "line": 3,
+      "raw": "Instance: data=tower_base, scenario_folders=base;charger_tengah_up10;lo10pct;route_984_up20;route_941_down30, battery_range=[50.000000,600.000000]"
+    },
+    {
+      "line": 173,
+      "raw": "Phase 2 initialized: scenarios=5, target_gap=1.000000%, scenario_workers=3, scenario_threads=4, RSP=on"
+    }
+  ],
+  "iterations": [
+    {
+      "line": 180,
+      "raw": "Phase 2 iter 0, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=18905.150542, LB=17425.712220, gap=7.825583%, master_ms=995.317100, rsp_ms=249694.745700, subproblem_ms=22699.851200, repair_probes=16, repair_ms=58505.225700, strengthened_cuts=5, repair_ub=18905.150542, elapsed_ms=545150.611600",
+      "iteration": 0,
+      "ub": "18905.150542",
+      "lb": "17425.712220",
+      "algorithm_seconds": 545.1506115999999,
+      "gap_percent": 7.825583397039093
+    },
+    {
+      "line": 187,
+      "raw": "Phase 2 iter 1, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=18716.341396, LB=17474.775301, gap=6.633594%, master_ms=904.530700, rsp_ms=240316.397800, subproblem_ms=21299.294200, repair_probes=20, repair_ms=77344.299200, strengthened_cuts=5, repair_ub=18716.341396, elapsed_ms=885017.463000",
+      "iteration": 1,
+      "ub": "18716.341396",
+      "lb": "17474.775301",
+      "algorithm_seconds": 885.017463,
+      "gap_percent": 6.6335939740089485
+    },
+    {
+      "line": 188,
+      "raw": "Phase 2 iter 2, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=18716.341396, LB=17487.272395, gap=6.566823%, master_ms=982.616900, rsp_ms=234855.346700, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1120856.255600",
+      "iteration": 2,
+      "ub": "18716.341396",
+      "lb": "17487.272395",
+      "algorithm_seconds": 1120.8562556,
+      "gap_percent": 6.56682294362654
+    },
+    {
+      "line": 195,
+      "raw": "Phase 2 iter 3, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=18259.034869, LB=17557.958589, gap=3.839613%, master_ms=1070.466700, rsp_ms=216697.570800, subproblem_ms=21902.566400, repair_probes=27, repair_ms=110142.916500, strengthened_cuts=5, repair_ub=18259.034869, elapsed_ms=1470672.069100",
+      "iteration": 3,
+      "ub": "18259.034869",
+      "lb": "17557.958589",
+      "algorithm_seconds": 1470.6720691,
+      "gap_percent": 3.839613019143074
+    },
+    {
+      "line": 196,
+      "raw": "Phase 2 iter 4, RSP feasibility cut x2, RSP optimality cut x3, RSP Q(z)=6635.358932, UB=18259.034869, LB=17587.220846, gap=3.679351%, master_ms=1254.546200, rsp_ms=97602.686500, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1569530.123900",
+      "iteration": 4,
+      "ub": "18259.034869",
+      "lb": "17587.220846",
+      "algorithm_seconds": 1569.5301239,
+      "gap_percent": 3.6793512243114113
+    },
+    {
+      "line": 197,
+      "raw": "Phase 2 iter 5, RSP feasibility cut x1, RSP optimality cut x4, RSP Q(z)=8948.290946, UB=18259.034869, LB=17594.556677, gap=3.639175%, master_ms=3064.006700, rsp_ms=76104.878600, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1648699.761400",
+      "iteration": 5,
+      "ub": "18259.034869",
+      "lb": "17594.556677",
+      "algorithm_seconds": 1648.6997614,
+      "gap_percent": 3.6391747798682554
+    },
+    {
+      "line": 198,
+      "raw": "Phase 2 iter 6, RSP feasibility cut x2, RSP optimality cut x3, RSP Q(z)=6788.232630, UB=18259.034869, LB=17597.568646, gap=3.622679%, master_ms=2955.626900, rsp_ms=7917.821300, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1659574.782200",
+      "iteration": 6,
+      "ub": "18259.034869",
+      "lb": "17597.568646",
+      "algorithm_seconds": 1659.5747822,
+      "gap_percent": 3.6226790065614587
+    },
+    {
+      "line": 205,
+      "raw": "Phase 2 iter 7, feasibility cut x5, UB=17886.326205, LB=17599.789405, gap=1.601988%, master_ms=7840.279500, rsp_ms=9612.409900, subproblem_ms=48259.122100, repair_probes=30, repair_ms=124751.570000, strengthened_cuts=5, repair_ub=17886.326205, elapsed_ms=1850040.472900",
+      "iteration": 7,
+      "ub": "17886.326205",
+      "lb": "17599.789405",
+      "algorithm_seconds": 1850.0404729,
+      "gap_percent": 1.6019880031031875
+    },
+    {
+      "line": 211,
+      "raw": "Phase 2 iter 8, feasibility cut x5, UB=17886.326205, LB=17607.061822, gap=1.561329%, master_ms=11101.533100, rsp_ms=5816.696000, subproblem_ms=49674.520300, repair_probes=30, repair_ms=123889.088400, strengthened_cuts=5, repair_ub=17888.340197, elapsed_ms=2040524.874400",
+      "iteration": 8,
+      "ub": "17886.326205",
+      "lb": "17607.061822",
+      "algorithm_seconds": 2040.5248744,
+      "gap_percent": 1.5613289157274515
+    },
+    {
+      "line": 217,
+      "raw": "Phase 2 iter 9, feasibility cut x5, UB=17886.326205, LB=17612.351744, gap=1.531754%, master_ms=15225.174400, rsp_ms=5750.321300, subproblem_ms=50101.748600, repair_probes=30, repair_ms=124550.990700, strengthened_cuts=5, repair_ub=17892.290820, elapsed_ms=2236155.935800",
+      "iteration": 9,
+      "ub": "17886.326205",
+      "lb": "17612.351744",
+      "algorithm_seconds": 2236.1559358,
+      "gap_percent": 1.5317536863630157
+    },
+    {
+      "line": 218,
+      "raw": "Phase 2 iter 10, RSP feasibility cut x1, RSP optimality cut x4, RSP Q(z)=9146.746103, UB=17886.326205, LB=17615.114563, gap=1.516307%, master_ms=7782.350600, rsp_ms=6216.638400, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2250155.750800",
+      "iteration": 10,
+      "ub": "17886.326205",
+      "lb": "17615.114563",
+      "algorithm_seconds": 2250.1557508,
+      "gap_percent": 1.5163071437452966
+    },
+    {
+      "line": 219,
+      "raw": "Phase 2 iter 11, RSP feasibility cut x4, RSP optimality cut x1, RSP Q(z)=2275.373425, UB=17886.326205, LB=17629.289872, gap=1.437055%, master_ms=3345.540700, rsp_ms=7313.752500, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2260816.065100",
+      "iteration": 11,
+      "ub": "17886.326205",
+      "lb": "17629.289872",
+      "algorithm_seconds": 2260.8160651,
+      "gap_percent": 1.4370549326565858
+    },
+    {
+      "line": 225,
+      "raw": "Phase 2 iter 12, feasibility cut x5, UB=17886.326205, LB=17634.442843, gap=1.408245%, master_ms=4756.336100, rsp_ms=4436.687900, subproblem_ms=49731.974000, repair_probes=30, repair_ms=125228.577900, strengthened_cuts=5, repair_ub=17920.505692, elapsed_ms=2444972.391200",
+      "iteration": 12,
+      "ub": "17886.326205",
+      "lb": "17634.442843",
+      "algorithm_seconds": 2444.9723912,
+      "gap_percent": 1.4082453775755706
+    },
+    {
+      "line": 231,
+      "raw": "Phase 2 iter 13, feasibility cut x5, UB=17886.326205, LB=17663.437104, gap=1.246142%, master_ms=8206.109800, rsp_ms=3612.154800, subproblem_ms=51221.524800, repair_probes=31, repair_ms=124274.383200, strengthened_cuts=5, repair_ub=17952.293193, elapsed_ms=2632289.217700",
+      "iteration": 13,
+      "ub": "17886.326205",
+      "lb": "17663.437104",
+      "algorithm_seconds": 2632.2892177,
+      "gap_percent": 1.246142435542149
+    },
+    {
+      "line": 232,
+      "raw": "Phase 2 iter 14, RSP feasibility cut x2, RSP optimality cut x3, RSP Q(z)=6623.968663, UB=17886.326205, LB=17690.301767, gap=1.095946%, master_ms=10597.468900, rsp_ms=4411.944800, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2647299.647000",
+      "iteration": 14,
+      "ub": "17886.326205",
+      "lb": "17690.301767",
+      "algorithm_seconds": 2647.299647,
+      "gap_percent": 1.0959457842449674
+    },
+    {
+      "line": 236,
+      "raw": "Phase 2 iter 15, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=17886.326205, LB=17701.309071, gap=1.034405%, master_ms=22134.310000, rsp_ms=6245.993500, subproblem_ms=0.000000, repair_probes=21, repair_ms=66039.648800, strengthened_cuts=3, repair_ub=inf, elapsed_ms=2741721.136400",
+      "iteration": 15,
+      "ub": "17886.326205",
+      "lb": "17701.309071",
+      "algorithm_seconds": 2741.7211364,
+      "gap_percent": 1.034405455203435
+    },
+    {
+      "line": 238,
+      "raw": "Phase 2 iter 16, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=17886.326205, LB=17701.309071, gap=1.034405%, master_ms=17194.896700, rsp_ms=5497.975200, subproblem_ms=0.000000, repair_probes=6, repair_ms=46576.112900, strengthened_cuts=1, repair_ub=inf, elapsed_ms=2810991.985700",
+      "iteration": 16,
+      "ub": "17886.326205",
+      "lb": "17701.309071",
+      "algorithm_seconds": 2810.9919857,
+      "gap_percent": 1.034405455203435
+    },
+    {
+      "line": 240,
+      "raw": "Phase 2 iter 17, RSP feasibility cut x4, RSP optimality cut x1, RSP Q(z)=2070.293611, UB=17886.326205, LB=17701.309071, gap=1.034405%, master_ms=24353.764500, rsp_ms=5771.622000, subproblem_ms=0.000000, repair_probes=6, repair_ms=47910.681600, strengthened_cuts=1, repair_ub=inf, elapsed_ms=2889029.735400",
+      "iteration": 17,
+      "ub": "17886.326205",
+      "lb": "17701.309071",
+      "algorithm_seconds": 2889.0297354,
+      "gap_percent": 1.034405455203435
+    }
+  ],
+  "original_final_records": [
+    {
+      "line": 241,
+      "raw": "Full status=OPTIMAL, UB=17886.326205, LB=17716.315484, gap=0.950507%, elapsed_ms=2892771.794700",
+      "status": "OPTIMAL",
+      "ub": "17886.326205",
+      "lb": "17716.315484",
+      "algorithm_seconds": 2892.7717947
+    }
+  ],
+  "algorithm_terminal_records": [],
+  "native_status_messages": [],
+  "rsp_skips": [],
+  "numerical_skip_count": 0,
+  "numerical_message_count": 0,
+  "repair_event_count": 45,
+  "repair_events": [
+    {
+      "line": 174,
+      "raw": "Repair iter=0, scenario=0, trigger=rsp-unresolved, rsp_failures=1, next_rsp_repair=2, before=0:50;1:100;2:50;3:200;4:100;5:100;6:200;7:250;8:50;9:500;10:50;11:50;12:50;13:50;14:50;15:200;16:150;17:300;18:50;19:250;20:50;21:100;22:50;23:50;24:300;25:50;26:150;27:300, after=0:100;1:150;2:100;3:200;4:150;5:100;6:200;7:250;8:100;9:550;10:100;11:50;12:100;13:100;14:100;15:200;16:150;17:300;18:50;19:300;20:50;21:100;22:50;23:100;24:300;25:100;26:150;27:300, probes=3, battery_probes=2, facility_probes=1, repair_ms=30907.454400, accepted_resources=37, accepted_battery_steps=13, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=24, rsp_cert_checks=15, rsp_cert_hits=14, rsp_certified_facilities=13, rsp_deferred_facilities=11"
+    },
+    {
+      "line": 175,
+      "raw": "Repair iter=0, scenario=1, trigger=rsp-unresolved, rsp_failures=1, next_rsp_repair=2, before=0:50;1:100;2:50;3:200;4:50;5:100;6:200;7:250;8:50;9:500;10:50;11:50;12:50;13:50;14:50;15:200;16:150;17:300;18:50;19:250;20:50;21:100;22:50;23:50;24:300;25:50;26:150;27:300, after=0:100;1:150;2:100;3:200;4:50;5:100;6:200;7:250;8:100;9:550;10:100;11:50;12:100;13:100;14:100;15:200;16:150;17:300;18:100;19:300;20:50;21:100;22:50;23:100;24:300;25:100;26:150;27:300, probes=3, battery_probes=2, facility_probes=1, repair_ms=33711.291300, accepted_resources=37, accepted_battery_steps=13, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=24, rsp_cert_checks=11, rsp_cert_hits=10, rsp_certified_facilities=9, rsp_deferred_facilities=15"
+    },
+    {
+      "line": 176,
+      "raw": "Repair iter=0, scenario=2, trigger=rsp-unresolved, rsp_failures=1, next_rsp_repair=2, before=0:50;1:100;2:50;3:200;4:50;5:100;6:200;7:250;8:50;9:200;10:50;11:50;12:100;13:50;14:50;15:200;16:150;17:250;18:50;19:200;20:50;21:100;22:50;23:50;24:250;25:50;26:100;27:300, after=0:100;1:150;2:50;3:200;4:100;5:100;6:200;7:250;8:100;9:250;10:100;11:50;12:150;13:100;14:100;15:200;16:150;17:250;18:100;19:250;20:50;21:100;22:50;23:100;24:250;25:100;26:100;27:300, probes=5, battery_probes=2, facility_probes=3, repair_ms=42135.928900, accepted_resources=27, accepted_battery_steps=13, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=14, rsp_cert_checks=13, rsp_cert_hits=12, rsp_certified_facilities=11, rsp_deferred_facilities=13"
+    },
+    {
+      "line": 177,
+      "raw": "Repair iter=0, scenario=3, trigger=rsp-unresolved, rsp_failures=1, next_rsp_repair=2, before=0:50;1:100;2:50;3:250;4:100;5:100;6:200;7:250;8:50;9:500;10:50;11:50;12:50;13:50;14:50;15:200;16:150;17:300;18:50;19:250;20:50;21:100;22:50;23:50;24:300;25:50;26:150;27:300, after=0:100;1:150;2:100;3:250;4:150;5:100;6:200;7:250;8:100;9:550;10:100;11:50;12:100;13:100;14:100;15:200;16:150;17:300;18:50;19:300;20:50;21:100;22:50;23:100;24:300;25:100;26:150;27:300, probes=2, battery_probes=2, facility_probes=0, repair_ms=17947.392700, accepted_resources=37, accepted_battery_steps=13, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=24, rsp_cert_checks=25, rsp_cert_hits=25, rsp_certified_facilities=24, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 178,
+      "raw": "Repair iter=0, scenario=4, trigger=rsp-unresolved, rsp_failures=1, next_rsp_repair=2, before=0:50;1:100;2:50;3:200;4:100;5:100;6:200;7:250;8:50;9:500;10:50;11:50;12:50;13:50;14:50;15:200;16:150;17:300;18:50;19:250;20:50;21:100;22:50;23:50;24:300;25:50;26:150;27:300, after=0:100;1:150;2:100;3:200;4:150;5:100;6:200;7:250;8:100;9:550;10:100;11:50;12:100;13:100;14:100;15:200;16:150;17:300;18:50;19:300;20:50;21:100;22:50;23:100;24:300;25:100;26:150;27:300, probes=3, battery_probes=2, facility_probes=1, repair_ms=24793.222200, accepted_resources=37, accepted_battery_steps=13, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=24, rsp_cert_checks=15, rsp_cert_hits=14, rsp_certified_facilities=13, rsp_deferred_facilities=11"
+    },
+    {
+      "line": 181,
+      "raw": "Repair iter=1, scenario=0, trigger=rsp-unresolved, rsp_failures=2, next_rsp_repair=4, before=0:50;1:100;2:50;3:200;4:100;5:100;6:200;7:250;8:50;9:500;10:50;11:50;12:50;13:50;14:50;15:200;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:50;26:150;27:300, after=0:100;1:150;2:100;3:200;4:150;5:100;6:200;7:250;8:100;9:550;10:100;11:50;12:100;13:100;14:100;15:200;16:150;17:300;18:100;19:300;20:50;21:100;22:50;23:100;24:300;25:100;26:150;27:300, probes=3, battery_probes=2, facility_probes=1, repair_ms=24059.827300, accepted_resources=37, accepted_battery_steps=13, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=24, rsp_cert_checks=15, rsp_cert_hits=14, rsp_certified_facilities=13, rsp_deferred_facilities=11"
+    },
+    {
+      "line": 182,
+      "raw": "Repair iter=1, scenario=1, trigger=rsp-unresolved, rsp_failures=2, next_rsp_repair=4, before=0:50;1:100;2:50;3:200;4:50;5:100;6:200;7:250;8:50;9:500;10:50;11:50;12:50;13:50;14:150;15:200;16:150;17:300;18:50;19:250;20:50;21:100;22:50;23:50;24:300;25:50;26:150;27:300, after=0:100;1:150;2:100;3:200;4:50;5:100;6:200;7:250;8:100;9:550;10:100;11:50;12:100;13:100;14:200;15:200;16:150;17:300;18:100;19:300;20:50;21:100;22:50;23:100;24:300;25:100;26:150;27:300, probes=3, battery_probes=2, facility_probes=1, repair_ms=23774.964900, accepted_resources=37, accepted_battery_steps=13, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=24, rsp_cert_checks=12, rsp_cert_hits=11, rsp_certified_facilities=10, rsp_deferred_facilities=14"
+    },
+    {
+      "line": 183,
+      "raw": "Repair iter=1, scenario=2, trigger=rsp-unresolved, rsp_failures=2, next_rsp_repair=4, before=0:50;1:100;2:50;3:200;4:50;5:100;6:200;7:250;8:50;9:200;10:50;11:50;12:50;13:50;14:50;15:200;16:150;17:250;18:50;19:200;20:50;21:100;22:50;23:50;24:250;25:50;26:100;27:300, after=0:100;1:150;2:50;3:200;4:100;5:100;6:200;7:250;8:100;9:250;10:100;11:50;12:100;13:100;14:100;15:200;16:150;17:250;18:100;19:250;20:50;21:100;22:50;23:100;24:250;25:100;26:100;27:300, probes=5, battery_probes=2, facility_probes=3, repair_ms=34292.666600, accepted_resources=29, accepted_battery_steps=13, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=16, rsp_cert_checks=16, rsp_cert_hits=15, rsp_certified_facilities=14, rsp_deferred_facilities=10"
+    },
+    {
+      "line": 184,
+      "raw": "Repair iter=1, scenario=3, trigger=rsp-unresolved, rsp_failures=2, next_rsp_repair=4, before=0:50;1:100;2:50;3:250;4:100;5:100;6:200;7:250;8:100;9:500;10:50;11:50;12:250;13:50;14:50;15:200;16:150;17:300;18:100;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:250;4:100;5:100;6:200;7:250;8:100;9:550;10:100;11:50;12:250;13:100;14:100;15:200;16:150;17:300;18:100;19:250;20:50;21:150;22:50;23:50;24:300;25:150;26:150;27:300, probes=6, battery_probes=3, facility_probes=3, repair_ms=53568.424800, accepted_resources=12, accepted_battery_steps=6, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=6, rsp_cert_checks=1, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=24"
+    },
+    {
+      "line": 185,
+      "raw": "Repair iter=1, scenario=4, trigger=rsp-unresolved, rsp_failures=2, next_rsp_repair=4, before=0:50;1:100;2:50;3:200;4:100;5:100;6:200;7:250;8:50;9:500;10:50;11:50;12:50;13:50;14:50;15:200;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:50;26:150;27:300, after=0:100;1:150;2:100;3:200;4:150;5:100;6:200;7:250;8:100;9:550;10:100;11:50;12:100;13:100;14:100;15:200;16:150;17:300;18:100;19:300;20:50;21:100;22:50;23:100;24:300;25:100;26:150;27:300, probes=3, battery_probes=2, facility_probes=1, repair_ms=21639.521200, accepted_resources=37, accepted_battery_steps=13, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=24, rsp_cert_checks=19, rsp_cert_hits=18, rsp_certified_facilities=17, rsp_deferred_facilities=7"
+    },
+    {
+      "line": 189,
+      "raw": "Repair iter=3, scenario=0, trigger=rsp-unresolved, rsp_failures=4, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:100;5:100;6:200;7:250;8:150;9:500;10:50;11:50;12:150;13:50;14:50;15:200;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:200;4:100;5:100;6:200;7:250;8:150;9:550;10:100;11:50;12:150;13:100;14:100;15:200;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:150;26:150;27:300, probes=7, battery_probes=3, facility_probes=4, repair_ms=73450.675200, accepted_resources=21, accepted_battery_steps=6, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=15, rsp_cert_checks=17, rsp_cert_hits=16, rsp_certified_facilities=15, rsp_deferred_facilities=8"
+    },
+    {
+      "line": 190,
+      "raw": "Repair iter=3, scenario=1, trigger=rsp-unresolved, rsp_failures=4, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:50;5:100;6:200;7:250;8:100;9:500;10:50;11:50;12:150;13:50;14:50;15:200;16:150;17:300;18:150;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:200;4:50;5:100;6:200;7:250;8:100;9:550;10:100;11:50;12:150;13:100;14:100;15:200;16:150;17:300;18:150;19:250;20:50;21:100;22:50;23:50;24:300;25:150;26:150;27:300, probes=5, battery_probes=3, facility_probes=2, repair_ms=51536.166800, accepted_resources=20, accepted_battery_steps=6, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=14, rsp_cert_checks=7, rsp_cert_hits=6, rsp_certified_facilities=5, rsp_deferred_facilities=18"
+    },
+    {
+      "line": 191,
+      "raw": "Repair iter=3, scenario=2, trigger=rsp-unresolved, rsp_failures=4, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:50;5:100;6:200;7:250;8:100;9:200;10:50;11:50;12:100;13:50;14:50;15:200;16:150;17:250;18:100;19:200;20:50;21:100;22:50;23:50;24:250;25:150;26:100;27:300, after=0:50;1:150;2:50;3:200;4:50;5:100;6:200;7:250;8:100;9:250;10:100;11:50;12:100;13:100;14:100;15:200;16:150;17:250;18:100;19:200;20:50;21:100;22:50;23:50;24:250;25:200;26:100;27:300, probes=6, battery_probes=3, facility_probes=3, repair_ms=63653.938000, accepted_resources=11, accepted_battery_steps=6, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=5, rsp_cert_checks=1, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=23"
+    },
+    {
+      "line": 192,
+      "raw": "Repair iter=3, scenario=3, trigger=rsp-unresolved, rsp_failures=4, next_rsp_repair=8, before=0:50;1:100;2:50;3:250;4:100;5:100;6:200;7:250;8:150;9:500;10:50;11:50;12:100;13:50;14:50;15:200;16:150;17:300;18:100;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:250;4:100;5:100;6:200;7:250;8:150;9:550;10:100;11:50;12:100;13:100;14:100;15:200;16:150;17:300;18:100;19:250;20:50;21:150;22:50;23:50;24:300;25:150;26:150;27:300, probes=6, battery_probes=3, facility_probes=3, repair_ms=58605.875000, accepted_resources=11, accepted_battery_steps=6, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=5, rsp_cert_checks=1, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=23"
+    },
+    {
+      "line": 193,
+      "raw": "Repair iter=3, scenario=4, trigger=rsp-unresolved, rsp_failures=4, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:100;5:100;6:200;7:250;8:50;9:500;10:50;11:50;12:50;13:50;14:150;15:200;16:150;17:300;18:50;19:250;20:50;21:100;22:50;23:50;24:300;25:50;26:150;27:300, after=0:100;1:150;2:100;3:200;4:150;5:100;6:200;7:250;8:100;9:550;10:100;11:50;12:100;13:100;14:200;15:200;16:150;17:300;18:50;19:300;20:50;21:100;22:50;23:100;24:300;25:100;26:150;27:300, probes=3, battery_probes=2, facility_probes=1, repair_ms=25015.758400, accepted_resources=36, accepted_battery_steps=13, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=23, rsp_cert_checks=23, rsp_cert_hits=22, rsp_certified_facilities=21, rsp_deferred_facilities=2"
+    },
+    {
+      "line": 199,
+      "raw": "Repair iter=7, scenario=0, trigger=exact-unresolved, rsp_failures=4, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:100;5:100;6:200;7:250;8:100;9:500;10:50;11:50;12:150;13:50;14:50;15:150;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:350, after=0:50;1:150;2:50;3:200;4:100;5:100;6:200;7:250;8:100;9:550;10:50;11:50;12:150;13:50;14:100;15:150;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:350, probes=6, battery_probes=4, facility_probes=2, repair_ms=69898.526900, accepted_resources=12, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=9, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 200,
+      "raw": "Repair iter=7, scenario=1, trigger=exact-unresolved, rsp_failures=6, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:50;5:100;6:200;7:250;8:100;9:500;10:50;11:50;12:250;13:50;14:50;15:150;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:200;4:50;5:100;6:200;7:250;8:100;9:550;10:50;11:50;12:250;13:50;14:100;15:150;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=70547.989300, accepted_resources=12, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=9, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 201,
+      "raw": "Repair iter=7, scenario=2, trigger=exact-unresolved, rsp_failures=5, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:50;5:100;6:250;7:250;8:100;9:200;10:50;11:50;12:50;13:50;14:50;15:150;16:150;17:250;18:100;19:200;20:50;21:100;22:50;23:50;24:250;25:100;26:100;27:300, after=0:50;1:150;2:50;3:200;4:50;5:100;6:250;7:250;8:100;9:250;10:50;11:50;12:50;13:50;14:100;15:150;16:150;17:250;18:100;19:200;20:50;21:100;22:50;23:50;24:250;25:100;26:100;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=58570.724900, accepted_resources=12, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=9, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 202,
+      "raw": "Repair iter=7, scenario=3, trigger=exact-unresolved, rsp_failures=4, next_rsp_repair=8, before=0:50;1:100;2:50;3:250;4:100;5:100;6:200;7:250;8:100;9:500;10:50;11:50;12:150;13:50;14:50;15:150;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:350, after=0:50;1:150;2:50;3:250;4:100;5:100;6:200;7:250;8:100;9:550;10:50;11:50;12:150;13:50;14:100;15:150;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:350, probes=6, battery_probes=4, facility_probes=2, repair_ms=58318.726200, accepted_resources=12, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=9, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 203,
+      "raw": "Repair iter=7, scenario=4, trigger=exact-unresolved, rsp_failures=6, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:100;5:100;6:200;7:250;8:100;9:500;10:50;11:50;12:250;13:50;14:50;15:150;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:200;4:100;5:100;6:200;7:250;8:100;9:550;10:50;11:50;12:250;13:50;14:100;15:150;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=54852.462100, accepted_resources=12, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=9, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 206,
+      "raw": "Repair iter=8, scenario=0, trigger=exact-unresolved, rsp_failures=4, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:100;5:100;6:200;7:250;8:100;9:500;10:50;11:50;12:200;13:50;14:50;15:200;16:150;17:350;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:200;4:100;5:100;6:200;7:250;8:100;9:550;10:50;11:50;12:200;13:50;14:100;15:200;16:150;17:350;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=71882.667100, accepted_resources=14, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=11, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 207,
+      "raw": "Repair iter=8, scenario=1, trigger=exact-unresolved, rsp_failures=6, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:50;5:100;6:200;7:250;8:100;9:500;10:50;11:50;12:200;13:50;14:50;15:200;16:150;17:350;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:200;4:50;5:100;6:200;7:250;8:100;9:550;10:50;11:50;12:200;13:50;14:100;15:200;16:150;17:350;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=67490.460700, accepted_resources=14, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=11, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 208,
+      "raw": "Repair iter=8, scenario=2, trigger=exact-unresolved, rsp_failures=5, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:50;5:100;6:200;7:250;8:100;9:200;10:50;11:50;12:50;13:50;14:50;15:200;16:150;17:250;18:100;19:200;20:50;21:150;22:50;23:50;24:250;25:100;26:100;27:350, after=0:50;1:150;2:50;3:200;4:50;5:100;6:200;7:250;8:100;9:250;10:50;11:50;12:50;13:50;14:100;15:200;16:150;17:250;18:100;19:200;20:50;21:150;22:50;23:50;24:250;25:100;26:100;27:350, probes=6, battery_probes=4, facility_probes=2, repair_ms=57773.833000, accepted_resources=14, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=11, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 209,
+      "raw": "Repair iter=8, scenario=3, trigger=exact-unresolved, rsp_failures=4, next_rsp_repair=8, before=0:50;1:100;2:50;3:250;4:100;5:100;6:200;7:250;8:100;9:500;10:50;11:50;12:200;13:50;14:50;15:200;16:150;17:350;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:250;4:100;5:100;6:200;7:250;8:100;9:550;10:50;11:50;12:200;13:50;14:100;15:200;16:150;17:350;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=59718.241200, accepted_resources=14, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=11, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 210,
+      "raw": "Repair iter=8, scenario=4, trigger=exact-unresolved, rsp_failures=6, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:100;5:100;6:250;7:250;8:150;9:500;10:50;11:50;12:100;13:50;14:50;15:200;16:150;17:300;18:150;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:200;4:100;5:100;6:250;7:250;8:150;9:550;10:50;11:50;12:100;13:50;14:100;15:200;16:150;17:300;18:150;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:150;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=56398.052600, accepted_resources=14, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=11, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 212,
+      "raw": "Repair iter=9, scenario=0, trigger=exact-unresolved, rsp_failures=4, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:100;5:100;6:200;7:250;8:100;9:550;10:50;11:50;12:150;13:50;14:50;15:150;16:150;17:300;18:150;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:200;4:100;5:100;6:200;7:250;8:100;9:600;10:50;11:50;12:150;13:50;14:100;15:150;16:150;17:300;18:150;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=69410.897500, accepted_resources=13, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=10, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 213,
+      "raw": "Repair iter=9, scenario=1, trigger=exact-unresolved, rsp_failures=6, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:50;5:100;6:200;7:250;8:100;9:500;10:50;11:50;12:150;13:50;14:50;15:150;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:150;26:150;27:350, after=0:50;1:150;2:50;3:200;4:50;5:100;6:200;7:250;8:100;9:550;10:50;11:50;12:150;13:50;14:100;15:150;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:150;26:150;27:350, probes=6, battery_probes=4, facility_probes=2, repair_ms=71733.078300, accepted_resources=13, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=10, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 214,
+      "raw": "Repair iter=9, scenario=2, trigger=exact-unresolved, rsp_failures=5, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:50;5:100;6:200;7:250;8:50;9:200;10:50;11:50;12:50;13:50;14:50;15:150;16:150;17:300;18:100;19:200;20:50;21:150;22:50;23:50;24:250;25:100;26:100;27:300, after=0:50;1:150;2:50;3:200;4:50;5:100;6:200;7:250;8:50;9:250;10:50;11:50;12:50;13:50;14:100;15:150;16:150;17:300;18:100;19:200;20:50;21:150;22:50;23:50;24:250;25:100;26:100;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=64205.863400, accepted_resources=13, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=10, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 215,
+      "raw": "Repair iter=9, scenario=3, trigger=exact-unresolved, rsp_failures=4, next_rsp_repair=8, before=0:50;1:100;2:50;3:250;4:100;5:100;6:200;7:250;8:100;9:550;10:50;11:50;12:150;13:50;14:50;15:150;16:150;17:300;18:150;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:250;4:100;5:100;6:200;7:250;8:100;9:600;10:50;11:50;12:150;13:50;14:100;15:150;16:150;17:300;18:150;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=57257.151200, accepted_resources=13, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=10, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 216,
+      "raw": "Repair iter=9, scenario=4, trigger=exact-unresolved, rsp_failures=6, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:100;5:100;6:200;7:250;8:100;9:500;10:50;11:50;12:150;13:50;14:50;15:150;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:150;26:150;27:350, after=0:50;1:150;2:50;3:200;4:100;5:100;6:200;7:250;8:100;9:550;10:50;11:50;12:150;13:50;14:100;15:150;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:150;26:150;27:350, probes=6, battery_probes=4, facility_probes=2, repair_ms=55139.472500, accepted_resources=13, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=10, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 220,
+      "raw": "Repair iter=12, scenario=0, trigger=exact-unresolved, rsp_failures=5, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:100;5:100;6:200;7:300;8:150;9:500;10:50;11:50;12:150;13:50;14:50;15:150;16:150;17:300;18:100;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:200;4:100;5:100;6:200;7:300;8:150;9:550;10:50;11:50;12:150;13:50;14:100;15:150;16:150;17:300;18:100;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=67934.052200, accepted_resources=13, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=10, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 221,
+      "raw": "Repair iter=12, scenario=1, trigger=exact-unresolved, rsp_failures=7, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:50;5:100;6:200;7:250;8:100;9:550;10:50;11:50;12:150;13:50;14:50;15:150;16:150;17:300;18:150;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:200;4:50;5:100;6:200;7:250;8:100;9:600;10:50;11:50;12:150;13:50;14:100;15:150;16:150;17:300;18:150;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=70780.684400, accepted_resources=13, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=10, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 222,
+      "raw": "Repair iter=12, scenario=2, trigger=exact-unresolved, rsp_failures=7, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:50;5:100;6:200;7:250;8:100;9:200;10:50;11:50;12:50;13:50;14:50;15:150;16:150;17:250;18:50;19:250;20:50;21:200;22:50;23:50;24:250;25:100;26:100;27:300, after=0:50;1:150;2:50;3:200;4:50;5:100;6:200;7:250;8:100;9:250;10:50;11:50;12:50;13:50;14:100;15:150;16:150;17:250;18:50;19:250;20:50;21:200;22:50;23:50;24:250;25:100;26:100;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=57823.998700, accepted_resources=13, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=10, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 223,
+      "raw": "Repair iter=12, scenario=3, trigger=exact-unresolved, rsp_failures=4, next_rsp_repair=8, before=0:50;1:100;2:50;3:250;4:100;5:100;6:200;7:300;8:150;9:500;10:50;11:50;12:150;13:50;14:50;15:150;16:150;17:300;18:100;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:250;4:100;5:100;6:200;7:300;8:150;9:550;10:50;11:50;12:150;13:50;14:100;15:150;16:150;17:300;18:100;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=57429.115500, accepted_resources=13, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=10, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 224,
+      "raw": "Repair iter=12, scenario=4, trigger=exact-unresolved, rsp_failures=7, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:100;5:100;6:200;7:250;8:150;9:550;10:50;11:50;12:100;13:50;14:50;15:150;16:150;17:300;18:100;19:300;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:200;4:100;5:100;6:200;7:250;8:150;9:600;10:50;11:50;12:100;13:50;14:100;15:150;16:150;17:300;18:100;19:300;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=57293.775800, accepted_resources=13, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=10, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 226,
+      "raw": "Repair iter=13, scenario=0, trigger=exact-unresolved, rsp_failures=5, next_rsp_repair=8, before=0:50;1:100;2:50;3:250;4:100;5:100;6:200;7:250;8:100;9:500;10:50;11:50;12:250;13:50;14:50;15:150;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:150;26:150;27:300, after=0:50;1:150;2:50;3:250;4:100;5:100;6:200;7:250;8:100;9:550;10:50;11:50;12:250;13:50;14:100;15:150;16:150;17:300;18:100;19:250;20:50;21:100;22:50;23:50;24:300;25:150;26:150;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=69216.138900, accepted_resources=13, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=10, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 227,
+      "raw": "Repair iter=13, scenario=1, trigger=exact-unresolved, rsp_failures=7, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:50;5:100;6:200;7:300;8:150;9:500;10:50;11:50;12:150;13:50;14:50;15:150;16:150;17:300;18:100;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:200;4:50;5:100;6:200;7:300;8:150;9:550;10:50;11:50;12:150;13:50;14:100;15:150;16:150;17:300;18:100;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=67655.104600, accepted_resources=13, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=10, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 228,
+      "raw": "Repair iter=13, scenario=2, trigger=exact-unresolved, rsp_failures=7, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:50;5:100;6:200;7:300;8:100;9:200;10:50;11:50;12:50;13:50;14:50;15:150;16:150;17:250;18:100;19:200;20:50;21:200;22:50;23:50;24:250;25:100;26:100;27:300, after=0:50;1:150;2:50;3:200;4:50;5:100;6:200;7:300;8:100;9:250;10:50;11:50;12:50;13:50;14:100;15:150;16:150;17:250;18:100;19:200;20:50;21:200;22:50;23:50;24:250;25:100;26:100;27:300, probes=7, battery_probes=4, facility_probes=3, repair_ms=69371.885400, accepted_resources=8, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=5, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 229,
+      "raw": "Repair iter=13, scenario=3, trigger=exact-unresolved, rsp_failures=4, next_rsp_repair=8, before=0:50;1:100;2:50;3:300;4:100;5:100;6:200;7:250;8:150;9:500;10:50;11:50;12:150;13:50;14:50;15:150;16:150;17:300;18:100;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:300;4:100;5:100;6:200;7:250;8:150;9:550;10:50;11:50;12:150;13:50;14:100;15:150;16:150;17:300;18:100;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=56618.500800, accepted_resources=13, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=10, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 230,
+      "raw": "Repair iter=13, scenario=4, trigger=exact-unresolved, rsp_failures=7, next_rsp_repair=8, before=0:50;1:100;2:50;3:200;4:100;5:100;6:200;7:300;8:150;9:500;10:50;11:50;12:150;13:50;14:50;15:150;16:150;17:300;18:100;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, after=0:50;1:150;2:50;3:200;4:100;5:100;6:200;7:300;8:150;9:550;10:50;11:50;12:150;13:50;14:100;15:150;16:150;17:300;18:100;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:150;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=54855.329600, accepted_resources=13, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=10, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 233,
+      "raw": "Repair iter=15, scenario=1, trigger=rsp-unresolved, rsp_failures=8, next_rsp_repair=16, before=0:50;1:100;2:50;3:200;4:50;5:100;6:300;7:250;8:150;9:500;10:50;11:50;12:100;13:50;14:50;15:200;16:150;17:300;18:50;19:250;20:50;21:100;22:50;23:50;24:300;25:150;26:200;27:300, after=0:100;1:150;2:100;3:200;4:50;5:100;6:300;7:250;8:200;9:550;10:100;11:50;12:150;13:100;14:100;15:200;16:150;17:300;18:100;19:300;20:50;21:100;22:50;23:100;24:300;25:200;26:200;27:300, probes=7, battery_probes=2, facility_probes=5, repair_ms=57584.245200, accepted_resources=13, accepted_battery_steps=13, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=0, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 234,
+      "raw": "Repair iter=15, scenario=2, trigger=rsp-unresolved, rsp_failures=8, next_rsp_repair=16, before=0:50;1:100;2:50;3:200;4:50;5:100;6:250;7:250;8:100;9:250;10:50;11:50;12:150;13:50;14:50;15:200;16:150;17:250;18:100;19:200;20:50;21:100;22:50;23:50;24:250;25:100;26:150;27:300, after=0:50;1:150;2:50;3:200;4:50;5:100;6:250;7:250;8:100;9:300;10:100;11:50;12:150;13:100;14:100;15:200;16:150;17:250;18:100;19:200;20:50;21:100;22:50;23:50;24:250;25:150;26:150;27:300, probes=8, battery_probes=3, facility_probes=5, repair_ms=61371.689400, accepted_resources=6, accepted_battery_steps=6, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=0, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 235,
+      "raw": "Repair iter=15, scenario=4, trigger=rsp-unresolved, rsp_failures=8, next_rsp_repair=16, before=0:50;1:100;2:50;3:200;4:100;5:100;6:250;7:250;8:100;9:500;10:50;11:50;12:100;13:50;14:50;15:200;16:150;17:350;18:50;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:200;27:300, after=0:50;1:150;2:50;3:200;4:100;5:100;6:250;7:250;8:100;9:550;10:50;11:50;12:100;13:50;14:100;15:200;16:150;17:350;18:50;19:250;20:50;21:150;22:50;23:50;24:300;25:100;26:200;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=66038.908400, accepted_resources=16, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=13, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 237,
+      "raw": "Repair iter=16, scenario=0, trigger=rsp-unresolved, rsp_failures=8, next_rsp_repair=16, before=0:50;1:100;2:50;3:200;4:100;5:100;6:300;7:250;8:100;9:500;10:50;11:50;12:200;13:50;14:50;15:200;16:150;17:300;18:50;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:200;27:300, after=0:50;1:150;2:50;3:200;4:100;5:100;6:300;7:250;8:100;9:550;10:50;11:50;12:200;13:50;14:100;15:200;16:150;17:300;18:50;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:200;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=46575.427200, accepted_resources=16, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=13, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 239,
+      "raw": "Repair iter=17, scenario=3, trigger=rsp-unresolved, rsp_failures=8, next_rsp_repair=16, before=0:50;1:100;2:50;3:250;4:100;5:100;6:300;7:250;8:100;9:500;10:50;11:50;12:100;13:50;14:50;15:150;16:150;17:300;18:50;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:200;27:350, after=0:50;1:150;2:50;3:250;4:100;5:100;6:300;7:250;8:100;9:550;10:50;11:50;12:100;13:50;14:100;15:150;16:150;17:300;18:50;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:200;27:350, probes=6, battery_probes=4, facility_probes=2, repair_ms=47909.834600, accepted_resources=14, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=11, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    }
+  ],
+  "phase_one_records": [
+    {
+      "line": 5,
+      "raw": "Phase 1 initialized: route_subproblems=140",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 6,
+      "raw": "Phase 1 iter 0, feasibility cut x32, UB=inf, LB=5689.320000, gap=1, master_ms=34.039500, subproblem_ms=2918.693200, elapsed_ms=8215.397600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 7,
+      "raw": "Phase 1 iter 1, feasibility cut x8, UB=inf, LB=13247.222420, gap=1, master_ms=59.421800, subproblem_ms=1402.927800, elapsed_ms=9678.755200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 8,
+      "raw": "Phase 1 iter 2, feasibility cut x7, UB=inf, LB=16778.275436, gap=1, master_ms=197.088200, subproblem_ms=981.460900, elapsed_ms=10857.830400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 9,
+      "raw": "Phase 1 iter 3, feasibility cut x8, UB=inf, LB=17347.294202, gap=1, master_ms=176.800500, subproblem_ms=828.596500, elapsed_ms=11863.583500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 10,
+      "raw": "Phase 1 iter 4, feasibility cut x7, UB=inf, LB=17394.190583, gap=1, master_ms=210.944700, subproblem_ms=898.262000, elapsed_ms=12973.048400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 11,
+      "raw": "Phase 1 iter 5, feasibility cut x10, UB=inf, LB=17398.155801, gap=1, master_ms=130.524900, subproblem_ms=909.710500, elapsed_ms=14013.696500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 12,
+      "raw": "Phase 1 iter 6, feasibility cut x6, UB=inf, LB=17401.025856, gap=1, master_ms=237.559400, subproblem_ms=836.961500, elapsed_ms=15088.475700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 13,
+      "raw": "Phase 1 iter 7, feasibility cut x6, UB=inf, LB=17401.244011, gap=1, master_ms=303.615900, subproblem_ms=870.643700, elapsed_ms=16263.128800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 14,
+      "raw": "Phase 1 iter 8, feasibility cut x6, UB=inf, LB=17401.244011, gap=1, master_ms=226.215600, subproblem_ms=760.436000, elapsed_ms=17250.234400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 15,
+      "raw": "Phase 1 iter 9, feasibility cut x6, UB=inf, LB=17401.244011, gap=1, master_ms=238.374100, subproblem_ms=760.763400, elapsed_ms=18249.658400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 16,
+      "raw": "Phase 1 iter 10, feasibility cut x5, UB=inf, LB=17401.244011, gap=1, master_ms=284.131400, subproblem_ms=929.687700, elapsed_ms=19463.728100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 17,
+      "raw": "Phase 1 iter 11, feasibility cut x6, UB=inf, LB=17402.123638, gap=1, master_ms=235.499300, subproblem_ms=747.365900, elapsed_ms=20446.811500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 18,
+      "raw": "Phase 1 iter 12, feasibility cut x6, UB=inf, LB=17403.876038, gap=1, master_ms=291.037000, subproblem_ms=757.775400, elapsed_ms=21495.984900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 19,
+      "raw": "Phase 1 iter 13, feasibility cut x6, UB=inf, LB=17403.876038, gap=1, master_ms=251.916900, subproblem_ms=861.907800, elapsed_ms=22610.047900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 20,
+      "raw": "Phase 1 iter 14, feasibility cut x4, UB=inf, LB=17403.876038, gap=1, master_ms=271.257800, subproblem_ms=916.069900, elapsed_ms=23797.607100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 21,
+      "raw": "Phase 1 iter 15, feasibility cut x4, UB=inf, LB=17403.964395, gap=1, master_ms=282.888600, subproblem_ms=774.718600, elapsed_ms=24855.556400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 22,
+      "raw": "Phase 1 iter 16, feasibility cut x4, UB=inf, LB=17403.964395, gap=1, master_ms=330.671800, subproblem_ms=799.245700, elapsed_ms=25986.035300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 23,
+      "raw": "Phase 1 iter 17, feasibility cut x4, UB=inf, LB=17403.964395, gap=1, master_ms=272.965800, subproblem_ms=750.815500, elapsed_ms=27010.117200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 24,
+      "raw": "Phase 1 iter 18, feasibility cut x4, UB=inf, LB=17403.964395, gap=1, master_ms=241.172900, subproblem_ms=762.740500, elapsed_ms=28014.427600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 25,
+      "raw": "Phase 1 iter 19, feasibility cut x4, UB=inf, LB=17404.674533, gap=1, master_ms=244.502300, subproblem_ms=755.819100, elapsed_ms=29015.001600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 26,
+      "raw": "Phase 1 iter 20, feasibility cut x4, UB=inf, LB=17404.674533, gap=1, master_ms=372.694500, subproblem_ms=673.076400, elapsed_ms=30061.010800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 27,
+      "raw": "Phase 1 iter 21, feasibility cut x4, UB=inf, LB=17405.286092, gap=1, master_ms=321.263900, subproblem_ms=889.972400, elapsed_ms=31272.541200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 28,
+      "raw": "Phase 1 iter 22, feasibility cut x4, UB=inf, LB=17405.286092, gap=1, master_ms=343.743200, subproblem_ms=694.451200, elapsed_ms=32311.261300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 29,
+      "raw": "Phase 1 iter 23, feasibility cut x4, UB=inf, LB=17405.286092, gap=1, master_ms=286.365900, subproblem_ms=712.498800, elapsed_ms=33310.353400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 30,
+      "raw": "Phase 1 iter 24, feasibility cut x4, UB=inf, LB=17405.286092, gap=1, master_ms=258.967000, subproblem_ms=693.565300, elapsed_ms=34263.118500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 31,
+      "raw": "Phase 1 iter 25, feasibility cut x4, UB=inf, LB=17406.633774, gap=1, master_ms=329.618400, subproblem_ms=905.554200, elapsed_ms=35498.550900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 32,
+      "raw": "Phase 1 iter 26, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=389.060700, subproblem_ms=681.396800, elapsed_ms=36569.320900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 33,
+      "raw": "Phase 1 iter 27, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=299.351700, subproblem_ms=860.357200, elapsed_ms=37729.629600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 34,
+      "raw": "Phase 1 iter 28, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=423.719200, subproblem_ms=822.215000, elapsed_ms=38975.820200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 35,
+      "raw": "Phase 1 iter 29, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=330.204700, subproblem_ms=739.829100, elapsed_ms=40046.095700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 36,
+      "raw": "Phase 1 iter 30, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=368.649500, subproblem_ms=677.219200, elapsed_ms=41092.226600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 37,
+      "raw": "Phase 1 iter 31, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=348.385300, subproblem_ms=878.068600, elapsed_ms=42319.272600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 38,
+      "raw": "Phase 1 iter 32, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=341.490500, subproblem_ms=680.425300, elapsed_ms=43341.426600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 39,
+      "raw": "Phase 1 iter 33, feasibility cut x4, UB=inf, LB=17407.971730, gap=1, master_ms=384.073000, subproblem_ms=759.002600, elapsed_ms=44484.747500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 40,
+      "raw": "Phase 1 iter 34, feasibility cut x4, UB=inf, LB=17407.971730, gap=1, master_ms=321.831200, subproblem_ms=814.092200, elapsed_ms=45620.960500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 41,
+      "raw": "Phase 1 iter 35, feasibility cut x4, UB=inf, LB=17407.971730, gap=1, master_ms=329.494600, subproblem_ms=813.912300, elapsed_ms=46764.725600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 42,
+      "raw": "Phase 1 iter 36, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=443.917200, subproblem_ms=659.008400, elapsed_ms=47867.938800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 43,
+      "raw": "Phase 1 iter 37, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=332.319300, subproblem_ms=828.876900, elapsed_ms=49029.396700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 44,
+      "raw": "Phase 1 iter 38, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=357.611200, subproblem_ms=683.363400, elapsed_ms=50070.653800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 45,
+      "raw": "Phase 1 iter 39, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=346.159600, subproblem_ms=801.071400, elapsed_ms=51218.160000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 46,
+      "raw": "Phase 1 iter 40, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=390.106300, subproblem_ms=660.873000, elapsed_ms=52269.368300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 47,
+      "raw": "Phase 1 iter 41, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=346.295100, subproblem_ms=711.867600, elapsed_ms=53327.877900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 48,
+      "raw": "Phase 1 iter 42, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=330.287900, subproblem_ms=839.909100, elapsed_ms=54498.392900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 49,
+      "raw": "Phase 1 iter 43, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=339.494700, subproblem_ms=730.943800, elapsed_ms=55569.100600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 50,
+      "raw": "Phase 1 iter 44, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=313.420900, subproblem_ms=743.317500, elapsed_ms=56626.100500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 51,
+      "raw": "Phase 1 iter 45, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=292.872200, subproblem_ms=753.634800, elapsed_ms=57672.888900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 52,
+      "raw": "Phase 1 iter 46, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=331.762100, subproblem_ms=695.260900, elapsed_ms=58700.367500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 53,
+      "raw": "Phase 1 iter 47, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=333.185800, subproblem_ms=737.045600, elapsed_ms=59770.874000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 54,
+      "raw": "Phase 1 iter 48, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=397.631800, subproblem_ms=706.317400, elapsed_ms=60875.271100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 55,
+      "raw": "Phase 1 iter 49, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=359.669000, subproblem_ms=810.364300, elapsed_ms=62045.595700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 56,
+      "raw": "Phase 1 iter 50, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=336.803800, subproblem_ms=671.433800, elapsed_ms=63054.085100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 57,
+      "raw": "Phase 1 iter 51, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=389.009600, subproblem_ms=846.414500, elapsed_ms=64289.752800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 58,
+      "raw": "Phase 1 iter 52, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=345.656600, subproblem_ms=678.992900, elapsed_ms=65314.806200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 59,
+      "raw": "Phase 1 iter 53, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=470.620700, subproblem_ms=755.416400, elapsed_ms=66541.238500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 60,
+      "raw": "Phase 1 iter 54, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=358.518100, subproblem_ms=774.002500, elapsed_ms=67674.044200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 61,
+      "raw": "Phase 1 iter 55, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=350.118100, subproblem_ms=807.040900, elapsed_ms=68831.725900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 62,
+      "raw": "Phase 1 iter 56, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=385.383800, subproblem_ms=750.830700, elapsed_ms=69968.221600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 63,
+      "raw": "Phase 1 iter 57, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=410.791400, subproblem_ms=672.198900, elapsed_ms=71051.432100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 64,
+      "raw": "Phase 1 iter 58, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=353.464200, subproblem_ms=848.175300, elapsed_ms=72253.288200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 65,
+      "raw": "Phase 1 iter 59, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=370.001800, subproblem_ms=679.276800, elapsed_ms=73302.967800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 66,
+      "raw": "Phase 1 iter 60, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=367.677900, subproblem_ms=710.342400, elapsed_ms=74381.282700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 67,
+      "raw": "Phase 1 iter 61, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=360.186200, subproblem_ms=790.505600, elapsed_ms=75532.242700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 68,
+      "raw": "Phase 1 iter 62, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=387.169400, subproblem_ms=737.608300, elapsed_ms=76657.371100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 69,
+      "raw": "Phase 1 iter 63, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=414.704600, subproblem_ms=715.314100, elapsed_ms=77787.893900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 70,
+      "raw": "Phase 1 iter 64, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=430.345400, subproblem_ms=873.202700, elapsed_ms=79091.843400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 71,
+      "raw": "Phase 1 iter 65, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=442.924700, subproblem_ms=677.195600, elapsed_ms=80212.188300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 72,
+      "raw": "Phase 1 iter 66, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=386.844300, subproblem_ms=886.995200, elapsed_ms=81486.534500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 73,
+      "raw": "Phase 1 iter 67, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=407.378300, subproblem_ms=725.748700, elapsed_ms=82620.015900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 74,
+      "raw": "Phase 1 iter 68, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=425.038300, subproblem_ms=761.926000, elapsed_ms=83807.274300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 75,
+      "raw": "Phase 1 iter 69, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=384.836700, subproblem_ms=789.112000, elapsed_ms=84981.477300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 76,
+      "raw": "Phase 1 iter 70, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=370.983500, subproblem_ms=661.524700, elapsed_ms=86014.246300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 77,
+      "raw": "Phase 1 iter 71, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=390.554000, subproblem_ms=847.817900, elapsed_ms=87252.833600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 78,
+      "raw": "Phase 1 iter 72, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=455.066100, subproblem_ms=662.438000, elapsed_ms=88370.613700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 79,
+      "raw": "Phase 1 iter 73, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=369.447700, subproblem_ms=692.456200, elapsed_ms=89432.997600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 80,
+      "raw": "Phase 1 iter 74, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=376.339400, subproblem_ms=769.680500, elapsed_ms=90579.276900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 81,
+      "raw": "Phase 1 iter 75, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=418.952400, subproblem_ms=819.793600, elapsed_ms=91818.488900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 82,
+      "raw": "Phase 1 iter 76, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=407.022300, subproblem_ms=681.107300, elapsed_ms=92906.899800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 83,
+      "raw": "Phase 1 iter 77, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=379.343700, subproblem_ms=746.311500, elapsed_ms=94032.922000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 84,
+      "raw": "Phase 1 iter 78, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=403.910800, subproblem_ms=681.982600, elapsed_ms=95119.097600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 85,
+      "raw": "Phase 1 iter 79, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=426.003100, subproblem_ms=755.076200, elapsed_ms=96300.568800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 86,
+      "raw": "Phase 1 iter 80, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=421.570500, subproblem_ms=793.616300, elapsed_ms=97516.150400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 87,
+      "raw": "Phase 1 iter 81, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=386.392900, subproblem_ms=696.317800, elapsed_ms=98599.129300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 88,
+      "raw": "Phase 1 iter 82, feasibility cut x4, UB=inf, LB=17414.564395, gap=1, master_ms=416.888000, subproblem_ms=887.992600, elapsed_ms=99904.240300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 89,
+      "raw": "Phase 1 iter 83, feasibility cut x4, UB=inf, LB=17414.564395, gap=1, master_ms=365.650000, subproblem_ms=791.633500, elapsed_ms=101061.807300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 90,
+      "raw": "Phase 1 iter 84, feasibility cut x4, UB=inf, LB=17414.564395, gap=1, master_ms=387.843600, subproblem_ms=669.868200, elapsed_ms=102119.773800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 91,
+      "raw": "Phase 1 iter 85, feasibility cut x4, UB=inf, LB=17414.564395, gap=1, master_ms=437.708000, subproblem_ms=884.277500, elapsed_ms=103442.070200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 92,
+      "raw": "Phase 1 iter 86, feasibility cut x4, UB=inf, LB=17414.564395, gap=1, master_ms=468.507000, subproblem_ms=776.215400, elapsed_ms=104687.041800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 93,
+      "raw": "Phase 1 iter 87, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=426.412900, subproblem_ms=792.124300, elapsed_ms=105905.845700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 94,
+      "raw": "Phase 1 iter 88, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=450.010600, subproblem_ms=677.447200, elapsed_ms=107033.562000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 95,
+      "raw": "Phase 1 iter 89, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=400.410100, subproblem_ms=864.807700, elapsed_ms=108299.032200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 96,
+      "raw": "Phase 1 iter 90, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=463.826600, subproblem_ms=727.962900, elapsed_ms=109491.089000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 97,
+      "raw": "Phase 1 iter 91, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=474.935800, subproblem_ms=699.376900, elapsed_ms=110665.711200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 98,
+      "raw": "Phase 1 iter 92, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=381.643200, subproblem_ms=804.614400, elapsed_ms=111852.525900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 99,
+      "raw": "Phase 1 iter 93, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=473.842600, subproblem_ms=713.136500, elapsed_ms=113039.860500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 100,
+      "raw": "Phase 1 iter 94, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=420.405000, subproblem_ms=891.635000, elapsed_ms=114352.136900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 101,
+      "raw": "Phase 1 iter 95, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=425.515900, subproblem_ms=704.188900, elapsed_ms=115482.134900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 102,
+      "raw": "Phase 1 iter 96, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=402.757700, subproblem_ms=785.475400, elapsed_ms=116670.656700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 103,
+      "raw": "Phase 1 iter 97, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=432.497200, subproblem_ms=677.643400, elapsed_ms=117781.067800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 104,
+      "raw": "Phase 1 iter 98, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=418.313200, subproblem_ms=802.125000, elapsed_ms=119001.727100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 105,
+      "raw": "Phase 1 iter 99, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=384.666200, subproblem_ms=688.290300, elapsed_ms=120074.894600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 106,
+      "raw": "Phase 1 iter 100, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=425.602200, subproblem_ms=836.612000, elapsed_ms=121337.556800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 107,
+      "raw": "Phase 1 iter 101, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=452.130900, subproblem_ms=681.946300, elapsed_ms=122471.920300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 108,
+      "raw": "Phase 1 iter 102, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=444.344400, subproblem_ms=748.896400, elapsed_ms=123665.584700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 109,
+      "raw": "Phase 1 iter 103, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=430.498400, subproblem_ms=849.076300, elapsed_ms=124945.424400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 110,
+      "raw": "Phase 1 iter 104, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=475.136400, subproblem_ms=666.244700, elapsed_ms=126087.058000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 111,
+      "raw": "Phase 1 iter 105, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=427.170400, subproblem_ms=769.784600, elapsed_ms=127284.257300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 112,
+      "raw": "Phase 1 iter 106, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=480.108900, subproblem_ms=736.354900, elapsed_ms=128500.973400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 113,
+      "raw": "Phase 1 iter 107, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=457.682500, subproblem_ms=712.648200, elapsed_ms=129671.814500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 114,
+      "raw": "Phase 1 iter 108, feasibility cut x4, UB=inf, LB=17418.188744, gap=1, master_ms=497.383500, subproblem_ms=813.456400, elapsed_ms=130983.000100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 115,
+      "raw": "Phase 1 iter 109, feasibility cut x4, UB=inf, LB=17418.188744, gap=1, master_ms=440.449900, subproblem_ms=716.244700, elapsed_ms=132139.954100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 116,
+      "raw": "Phase 1 iter 110, feasibility cut x4, UB=inf, LB=17418.472883, gap=1, master_ms=492.725200, subproblem_ms=812.980000, elapsed_ms=133445.893400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 117,
+      "raw": "Phase 1 iter 111, feasibility cut x4, UB=inf, LB=17418.472883, gap=1, master_ms=547.844900, subproblem_ms=725.845900, elapsed_ms=134719.927600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 118,
+      "raw": "Phase 1 iter 112, feasibility cut x4, UB=inf, LB=17418.663259, gap=1, master_ms=444.499700, subproblem_ms=691.751500, elapsed_ms=135856.571900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 119,
+      "raw": "Phase 1 iter 113, feasibility cut x4, UB=inf, LB=17418.663259, gap=1, master_ms=401.655800, subproblem_ms=864.536600, elapsed_ms=137123.009100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 120,
+      "raw": "Phase 1 iter 114, feasibility cut x4, UB=inf, LB=17418.663259, gap=1, master_ms=434.787900, subproblem_ms=682.747800, elapsed_ms=138240.774400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 121,
+      "raw": "Phase 1 iter 115, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=383.275100, subproblem_ms=819.420600, elapsed_ms=139443.988800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 122,
+      "raw": "Phase 1 iter 116, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=376.055000, subproblem_ms=703.175500, elapsed_ms=140523.554200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 123,
+      "raw": "Phase 1 iter 117, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=399.680300, subproblem_ms=668.792900, elapsed_ms=141592.406800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 124,
+      "raw": "Phase 1 iter 118, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=386.499000, subproblem_ms=866.677200, elapsed_ms=142845.886000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 125,
+      "raw": "Phase 1 iter 119, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=483.120100, subproblem_ms=667.409100, elapsed_ms=143996.687700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 126,
+      "raw": "Phase 1 iter 120, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=380.014300, subproblem_ms=788.997100, elapsed_ms=145165.987300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 127,
+      "raw": "Phase 1 iter 121, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=444.871000, subproblem_ms=676.010700, elapsed_ms=146287.322400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 128,
+      "raw": "Phase 1 iter 122, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=381.448300, subproblem_ms=881.780100, elapsed_ms=147550.846700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 129,
+      "raw": "Phase 1 iter 123, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=428.929100, subproblem_ms=801.596200, elapsed_ms=148781.735300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 130,
+      "raw": "Phase 1 iter 124, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=364.888400, subproblem_ms=722.602000, elapsed_ms=149869.807000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 131,
+      "raw": "Phase 1 iter 125, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=366.582700, subproblem_ms=791.811700, elapsed_ms=151028.870100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 132,
+      "raw": "Phase 1 iter 126, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=396.046700, subproblem_ms=677.154800, elapsed_ms=152102.351900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 133,
+      "raw": "Phase 1 iter 127, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=425.186300, subproblem_ms=889.263300, elapsed_ms=153417.074700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 134,
+      "raw": "Phase 1 iter 128, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=431.129600, subproblem_ms=682.795700, elapsed_ms=154531.223800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 135,
+      "raw": "Phase 1 iter 129, feasibility cut x4, UB=inf, LB=17419.964395, gap=1, master_ms=369.190000, subproblem_ms=812.280600, elapsed_ms=155712.949300",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 136,
+      "raw": "Phase 1 iter 130, feasibility cut x4, UB=inf, LB=17419.964395, gap=1, master_ms=393.608300, subproblem_ms=671.534800, elapsed_ms=156778.332200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 137,
+      "raw": "Phase 1 iter 131, feasibility cut x4, UB=inf, LB=17420.136092, gap=1, master_ms=363.509400, subproblem_ms=913.447000, elapsed_ms=158055.553900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 138,
+      "raw": "Phase 1 iter 132, feasibility cut x4, UB=inf, LB=17420.558969, gap=1, master_ms=457.981800, subproblem_ms=678.742600, elapsed_ms=159192.697500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 139,
+      "raw": "Phase 1 iter 133, feasibility cut x4, UB=inf, LB=17420.558969, gap=1, master_ms=486.617900, subproblem_ms=737.588900, elapsed_ms=160417.254500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 140,
+      "raw": "Phase 1 iter 134, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=470.876000, subproblem_ms=650.351400, elapsed_ms=161538.725800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 141,
+      "raw": "Phase 1 iter 135, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=442.368200, subproblem_ms=829.790600, elapsed_ms=162811.163100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 142,
+      "raw": "Phase 1 iter 136, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=421.053600, subproblem_ms=650.084300, elapsed_ms=163882.572200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 143,
+      "raw": "Phase 1 iter 137, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=476.177900, subproblem_ms=853.376800, elapsed_ms=165212.482200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 144,
+      "raw": "Phase 1 iter 138, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=419.569400, subproblem_ms=691.097200, elapsed_ms=166323.435900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 145,
+      "raw": "Phase 1 iter 139, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=375.564400, subproblem_ms=779.796500, elapsed_ms=167479.143200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 146,
+      "raw": "Phase 1 iter 140, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=465.951200, subproblem_ms=761.703800, elapsed_ms=168707.261400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 147,
+      "raw": "Phase 1 iter 141, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=420.986000, subproblem_ms=731.148000, elapsed_ms=169859.701000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 148,
+      "raw": "Phase 1 iter 142, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=551.155200, subproblem_ms=659.137700, elapsed_ms=171070.350000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 149,
+      "raw": "Phase 1 iter 143, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=381.105100, subproblem_ms=876.710700, elapsed_ms=172328.578800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 150,
+      "raw": "Phase 1 iter 144, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=481.014800, subproblem_ms=691.720900, elapsed_ms=173501.620400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 151,
+      "raw": "Phase 1 iter 145, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=466.328000, subproblem_ms=805.158900, elapsed_ms=174773.371900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 152,
+      "raw": "Phase 1 iter 146, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=419.903400, subproblem_ms=666.472400, elapsed_ms=175860.047100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 153,
+      "raw": "Phase 1 iter 147, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=439.123700, subproblem_ms=836.621100, elapsed_ms=177136.066900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 154,
+      "raw": "Phase 1 iter 148, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=522.881600, subproblem_ms=686.239200, elapsed_ms=178345.481800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 155,
+      "raw": "Phase 1 iter 149, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=439.724300, subproblem_ms=851.585600, elapsed_ms=179637.037100",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 156,
+      "raw": "Phase 1 iter 150, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=495.207300, subproblem_ms=785.093400, elapsed_ms=180917.640500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 157,
+      "raw": "Phase 1 iter 151, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=415.275100, subproblem_ms=685.208800, elapsed_ms=182018.390900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 158,
+      "raw": "Phase 1 iter 152, feasibility cut x4, UB=inf, LB=17422.509383, gap=1, master_ms=381.010000, subproblem_ms=877.758400, elapsed_ms=183277.444900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 159,
+      "raw": "Phase 1 iter 153, feasibility cut x4, UB=inf, LB=17423.285489, gap=1, master_ms=508.581800, subproblem_ms=702.649900, elapsed_ms=184489.002000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 160,
+      "raw": "Phase 1 iter 154, feasibility cut x4, UB=inf, LB=17423.285489, gap=1, master_ms=488.726100, subproblem_ms=763.391500, elapsed_ms=185741.510200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 161,
+      "raw": "Phase 1 iter 155, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=454.047500, subproblem_ms=673.377800, elapsed_ms=186869.238200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 162,
+      "raw": "Phase 1 iter 156, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=560.464900, subproblem_ms=718.220300, elapsed_ms=188148.186600",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 163,
+      "raw": "Phase 1 iter 157, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=375.532200, subproblem_ms=719.322900, elapsed_ms=189243.336400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 164,
+      "raw": "Phase 1 iter 158, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=495.696500, subproblem_ms=769.424500, elapsed_ms=190508.862400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 165,
+      "raw": "Phase 1 iter 159, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=444.128800, subproblem_ms=665.360500, elapsed_ms=191618.888000",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 166,
+      "raw": "Phase 1 iter 160, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=448.134400, subproblem_ms=869.925200, elapsed_ms=192937.270400",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 167,
+      "raw": "Phase 1 iter 161, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=452.676100, subproblem_ms=698.335100, elapsed_ms=194088.758800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 168,
+      "raw": "Phase 1 iter 162, feasibility cut x4, UB=inf, LB=17424.186092, gap=1, master_ms=426.500800, subproblem_ms=787.887500, elapsed_ms=195303.471200",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 169,
+      "raw": "Phase 1 iter 163, feasibility cut x4, UB=inf, LB=17425.364395, gap=1, master_ms=491.177500, subproblem_ms=756.388000, elapsed_ms=196551.334700",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 170,
+      "raw": "Phase 1 iter 164, feasibility cut x4, UB=inf, LB=17425.364395, gap=1, master_ms=460.434500, subproblem_ms=781.634800, elapsed_ms=197793.787500",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 171,
+      "raw": "Phase 1 iter 165, theta=11204.546092, Q(z)=11204.546092, optimality cut x0, UB=17426.886092, LB=17425.712220, gap=0.006736%, master_ms=578.281400, subproblem_ms=654.489100, elapsed_ms=199026.762800",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    },
+    {
+      "line": 172,
+      "raw": "Phase 1 completed: UB=17426.886092, LB=17425.712220, elapsed_ms=200361.374900",
+      "bound_scope": "PHASE_ONE_RELAXATION_NOT_ORIGINAL_UB"
+    }
+  ],
+  "convergence_records": [],
+  "last_complete_iteration_line": 240,
+  "log_ends_in_newline": true,
+  "last_lines": [
+    {
+      "line": 237,
+      "raw": "Repair iter=16, scenario=0, trigger=rsp-unresolved, rsp_failures=8, next_rsp_repair=16, before=0:50;1:100;2:50;3:200;4:100;5:100;6:300;7:250;8:100;9:500;10:50;11:50;12:200;13:50;14:50;15:200;16:150;17:300;18:50;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:200;27:300, after=0:50;1:150;2:50;3:200;4:100;5:100;6:300;7:250;8:100;9:550;10:50;11:50;12:200;13:50;14:100;15:200;16:150;17:300;18:50;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:200;27:300, probes=6, battery_probes=4, facility_probes=2, repair_ms=46575.427200, accepted_resources=16, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=13, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 238,
+      "raw": "Phase 2 iter 16, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=17886.326205, LB=17701.309071, gap=1.034405%, master_ms=17194.896700, rsp_ms=5497.975200, subproblem_ms=0.000000, repair_probes=6, repair_ms=46576.112900, strengthened_cuts=1, repair_ub=inf, elapsed_ms=2810991.985700"
+    },
+    {
+      "line": 239,
+      "raw": "Repair iter=17, scenario=3, trigger=rsp-unresolved, rsp_failures=8, next_rsp_repair=16, before=0:50;1:100;2:50;3:250;4:100;5:100;6:300;7:250;8:100;9:500;10:50;11:50;12:100;13:50;14:50;15:150;16:150;17:300;18:50;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:200;27:350, after=0:50;1:150;2:50;3:250;4:100;5:100;6:300;7:250;8:100;9:550;10:50;11:50;12:100;13:50;14:100;15:150;16:150;17:300;18:50;19:250;20:50;21:100;22:50;23:50;24:300;25:100;26:200;27:350, probes=6, battery_probes=4, facility_probes=2, repair_ms=47909.834600, accepted_resources=14, accepted_battery_steps=3, accepted_battery_layers=0, initial_ub_probes=0, initial_ub_layers=0, accepted_facilities=11, rsp_cert_checks=0, rsp_cert_hits=0, rsp_certified_facilities=0, rsp_deferred_facilities=0"
+    },
+    {
+      "line": 240,
+      "raw": "Phase 2 iter 17, RSP feasibility cut x4, RSP optimality cut x1, RSP Q(z)=2070.293611, UB=17886.326205, LB=17701.309071, gap=1.034405%, master_ms=24353.764500, rsp_ms=5771.622000, subproblem_ms=0.000000, repair_probes=6, repair_ms=47910.681600, strengthened_cuts=1, repair_ub=inf, elapsed_ms=2889029.735400"
+    },
+    {
+      "line": 241,
+      "raw": "Full status=OPTIMAL, UB=17886.326205, LB=17716.315484, gap=0.950507%, elapsed_ms=2892771.794700"
+    },
+    {
+      "line": 242,
+      "raw": "Cardinal Optimizer v8.0.7. Build date Sep 20 2026"
+    },
+    {
+      "line": 243,
+      "raw": "Copyright Cardinal Operations 2026. All Rights Reserved"
+    },
+    {
+      "line": 244,
+      "raw": ""
+    }
+  ],
+  "monotonicity": "NO_LB_DECREASE_OR_INCUMBENT_INCREASE"
+}

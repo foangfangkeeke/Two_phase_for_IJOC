@@ -1,0 +1,60 @@
+{
+  "raw_log": "experiments/final_2026-11-05/history/raw/75da3e42c4fb91a869b97f8c54c97a89ba2724bd731311374118dcd0e8553d6e.log",
+  "raw_log_sha256": "75da3e42c4fb91a869b97f8c54c97a89ba2724bd731311374118dcd0e8553d6e",
+  "bytes": 603,
+  "line_count": 5,
+  "complete_iterations": 0,
+  "bound_source": "UNRECORDED",
+  "selected_original_bounds": null,
+  "has_explicit_algorithm_final_status": false,
+  "headers": [
+    {
+      "line": 1,
+      "raw": "Runtime options: facility_cost_scale=1.000000, energy_scale=1.000000, battery_step=50, scenario_count=5, scenario_start=0, cap=4, dwc_top_n=20, wireless_option=1, rsp=0, rsp_workers=auto, rsp_threads=auto, preprocess_bounds=0, valid_inequality=1"
+    },
+    {
+      "line": 2,
+      "raw": "Solver options: mip_gap=0.000100, global_gap=0.010000, time_limit=7200.000000, threads=12"
+    },
+    {
+      "line": 3,
+      "raw": "Instance: data=tower_base, scenario_folders=base;charger_tengah_up10;lo10pct;route_984_up20;route_941_down30, battery_range=[50.000000,600.000000]"
+    }
+  ],
+  "iterations": [],
+  "original_final_records": [],
+  "algorithm_terminal_records": [],
+  "native_status_messages": [],
+  "rsp_skips": [],
+  "numerical_skip_count": 0,
+  "numerical_message_count": 0,
+  "repair_event_count": 0,
+  "repair_events": [],
+  "phase_one_records": [],
+  "convergence_records": [],
+  "last_complete_iteration_line": null,
+  "log_ends_in_newline": true,
+  "last_lines": [
+    {
+      "line": 1,
+      "raw": "Runtime options: facility_cost_scale=1.000000, energy_scale=1.000000, battery_step=50, scenario_count=5, scenario_start=0, cap=4, dwc_top_n=20, wireless_option=1, rsp=0, rsp_workers=auto, rsp_threads=auto, preprocess_bounds=0, valid_inequality=1"
+    },
+    {
+      "line": 2,
+      "raw": "Solver options: mip_gap=0.000100, global_gap=0.010000, time_limit=7200.000000, threads=12"
+    },
+    {
+      "line": 3,
+      "raw": "Instance: data=tower_base, scenario_folders=base;charger_tengah_up10;lo10pct;route_984_up20;route_941_down30, battery_range=[50.000000,600.000000]"
+    },
+    {
+      "line": 4,
+      "raw": "DWC candidate screening: selected=20"
+    },
+    {
+      "line": 5,
+      "raw": "scenario_count=5, facility_vars=20, model_vars=1350283, model_constrs=2486914"
+    }
+  ],
+  "monotonicity": "NO_LB_DECREASE_OR_INCUMBENT_INCREASE"
+}
