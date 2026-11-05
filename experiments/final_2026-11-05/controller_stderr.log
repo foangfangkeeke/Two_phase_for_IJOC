@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "C:\faq_work\Papers\Two_phase_wireless_charging_and_integer_lshape\experiments\final_2026-11-05\run_serial.py", line 258, in <module>
+    main()
+  File "C:\faq_work\Papers\Two_phase_wireless_charging_and_integer_lshape\experiments\final_2026-11-05\run_serial.py", line 245, in main
+    execute(args.resume)
+  File "C:\faq_work\Papers\Two_phase_wireless_charging_and_integer_lshape\experiments\final_2026-11-05\run_serial.py", line 225, in execute
+    require(result["status"] != "UNKNOWN_EXIT_UNRECORDED",
+  File "C:\faq_work\Papers\Two_phase_wireless_charging_and_integer_lshape\experiments\final_2026-11-05\verify.py", line 25, in require
+    raise ValueError(message)
+ValueError: Unknown exit retained; review before continuing

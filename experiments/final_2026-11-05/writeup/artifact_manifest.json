@@ -1,0 +1,16 @@
+{
+  "generated_utc": "2026-11-05T04:22:44.617650+00:00",
+  "record_slots": 65,
+  "recorded_outcomes": 64,
+  "interrupted_partial_attempts": 1,
+  "missing_bound_records": 6,
+  "version_policy": "Historical results and new frozen-version reruns are separate",
+  "files_sha256": {
+    "experiments/final_2026-11-05/writeup/results.md": "d5bfdfc1d46ded65ab23457572c3709dd50d517d6aae3df906c5c847dcdfc264",
+    "experiments/final_2026-11-05/writeup/results.html": "b098ef8772b196d3f90aedd05fefa9f62ac4a3c88906b5d4a54882c2b8785931",
+    "experiments/final_2026-11-05/writeup/results.json": "a52705cdda4da111c13b5a4f95eea41efa6bd5de07db45aa489bb7ad4ca1fb37"
+  },
+  "historical_manifest": "experiments/final_2026-11-05/history/records.json",
+  "historical_manifest_sha256": "084499b358bb4077e12069960f68370353c27456dd346b96cfc76edb9e4c1534",
+  "readme_normalized_lf_sha256": "a7f6759eba781cddc7204a627c7a0ba017285e657b3f7ffb0fac79134d03a4c1"
+}

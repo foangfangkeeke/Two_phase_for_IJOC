@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-11-05T04:02:35.920541+00:00",
+  "generated_utc": "2026-11-05T04:18:35.510143+00:00",
   "records": [
     {
       "record_id": "main_table/R12-N5-F50-C4/lifted-ils",
@@ -42,7 +42,7 @@
       "run_id": "R12-N5-F10-C4_natural-ils",
       "algorithm": "natural-ils",
       "vi": 1,
-      "status": "RUNNING",
+      "status": "INTERRUPTED_BY_USER_REQUEST",
       "historical_input_sha256": "3bf7f9e90ee05efebf34b641c344f1445135d8864729dcedd96a259d6fc73f4c",
       "ub": "",
       "lb": "",

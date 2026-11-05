@@ -1,0 +1,73 @@
+{
+  "requested_utc": "2026-11-05T04:17:30.862353+00:00",
+  "human_request": "重跑等一会，先确认另一边能拉下结果开始写",
+  "purpose": "Pause reruns while delivering and checking the remotely downloadable results package",
+  "run_id": "R12-N5-F10-C4_natural-ils",
+  "solver": {
+    "pid": 36168,
+    "create_time": 1793851355.9064093,
+    "executable": "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\experiments\\final_2026-11-05\\bin\\wireless.exe",
+    "command": [
+      "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\experiments\\final_2026-11-05\\bin\\wireless.exe",
+      "--pb",
+      "wireless_reform",
+      "--alg",
+      "natural-ils",
+      "--data",
+      "R12_N5",
+      "--scenario-count",
+      "5",
+      "--scenario-start",
+      "0",
+      "--cap",
+      "4",
+      "--battery-step",
+      "50",
+      "--dwc-top-n",
+      "10",
+      "--energy-scale",
+      "1.0",
+      "--facility-cost-scale",
+      "1.0",
+      "--wireless-option",
+      "1",
+      "--rsp",
+      "1",
+      "--valid-inequality",
+      "1",
+      "--rsp-workers",
+      "3",
+      "--rsp-threads",
+      "4",
+      "--preprocess-bounds",
+      "0"
+    ]
+  },
+  "controller": {
+    "pid": 36840,
+    "create_time": 1793851158.6040473,
+    "executable": "C:\\ProgramData\\anaconda3\\python.exe",
+    "command": [
+      "C:\\ProgramData\\anaconda3\\python.exe",
+      "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\experiments\\final_2026-11-05\\run_serial.py",
+      "run"
+    ]
+  },
+  "backup_archive": "experiments/final_2026-11-05/provenance/user_pause_2026-11-05_04-17-30_UTC/before_requested_stop.zip",
+  "backup_archive_sha256": "c368fa406edcb36d772c3076d788ee0fbbdcbb7425e56282efc9648436e3d880",
+  "backup_members_sha256": {
+    "experiments/final_2026-11-05/status.json": "a3d1dc4bf5872c98a10ce95de5e9e90a51c34caf9427c238728eb3458bc7fdf9",
+    "experiments/final_2026-11-05/release.json": "43709d5fce4c658b604044662976fac4890678e52c55216154d39813a194ff1a",
+    "experiments/final_2026-11-05/results.json": "f4f928c57759a8299e8470b470c85c3625e5afd76c85af84da3ca0f99928c7d7",
+    "experiments/final_2026-11-05/results.html": "250c6d89e98891c28ecb445ce41e4d0126284b407fbe109cd03698786501d926",
+    "experiments/final_2026-11-05/controller_stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "experiments/final_2026-11-05/controller_stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "results/final_experiments_current.json": "a0190e8c2f764e93c1813d376b63e35416c125ef3b6880cb31b7879fd9b37c6e",
+    "experiments/final_2026-11-05/runs/R12-N5-F10-C4_natural-ils/launch.json": "2187379afd4d832f413d4bcf1159342e1f19766de4d9ffb014129b94095ea5b1",
+    "experiments/final_2026-11-05/runs/R12-N5-F10-C4_natural-ils/resources.jsonl": "1a2a930e58fbd8fd572f190b46423f342c0cd969ee4d642673cf72c6c0958b73",
+    "experiments/final_2026-11-05/runs/R12-N5-F10-C4_natural-ils/stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "experiments/final_2026-11-05/runs/R12-N5-F10-C4_natural-ils/stdout.log": "812fe9b287a30643b95595159b60b83523d2024bb2a29d253d791e93e9e3ae68"
+  },
+  "classification": "USER_REQUESTED_STOP_NOT_A_SOLVER_TIME_OR_MEMORY_LIMIT",
+  "original_termination_status": "UNRECORDED_UNLESS_RAW_LOG_RECORDS_IT"
+}

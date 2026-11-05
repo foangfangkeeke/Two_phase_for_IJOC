@@ -1,0 +1,10 @@
+{
+  "verified_utc": "2026-11-05T04:18:35.500032+00:00",
+  "controller_and_solver_absent": true,
+  "state": "PAUSED_BY_USER",
+  "completed_new_result_records": 16,
+  "interrupted_run": "R12-N5-F10-C4_natural-ils",
+  "interrupted_result_sha256": "175cf6a97c2fcf769933094d073a9855b7806119432955ef996650dc568343b5",
+  "classification": "USER_REQUESTED_STOP",
+  "raw_result_unchanged": true
+}
