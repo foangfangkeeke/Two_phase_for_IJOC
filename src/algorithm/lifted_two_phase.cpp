@@ -10,6 +10,7 @@
 #include <chrono>
 #include <cmath>
 #include <exception>
+#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <map>
@@ -162,6 +163,94 @@ std::vector<double> Values(std::vector<Var>& variables)
         result.push_back(std::round(variable.Get(COPT_DBLINFO_VALUE)));
     }
     return result;
+}
+
+void WriteSearchNumber(std::ostream& out, double value)
+{
+    if (std::isfinite(value)) out << value;
+    else if (std::isnan(value)) out << "\"nan\"";
+    else out << (value > 0.0 ? "\"inf\"" : "\"-inf\"");
+}
+
+void WriteSearchDesign(std::ostream& out, const MasterState& master,
+    const std::vector<double>& values)
+{
+    out << "{\"facilities\":[";
+    bool first = true;
+    for (size_t index = 0; index < master.facilities.size(); ++index) {
+        if (values.at(index) <= 0.5) continue;
+        if (!first) out << ',';
+        Var variable = master.facilities.at(index);
+        out << std::quoted(variable.GetName());
+        first = false;
+    }
+    out << "],\"batteries\":[";
+    for (size_t scenario = 0; scenario < master.batteries.size(); ++scenario) {
+        if (scenario != 0) out << ',';
+        out << '[';
+        for (size_t route = 0; route < master.batteries.at(scenario).size(); ++route) {
+            if (route != 0) out << ',';
+            int selectedCapacity = 0;
+            for (const BatteryLevel& level : master.batteries.at(scenario).at(route)) {
+                if (values.at(level.index) > 0.5) selectedCapacity = level.capacity;
+            }
+            if (selectedCapacity != 0) out << selectedCapacity;
+            else out << "null";
+        }
+        out << ']';
+    }
+    out << "]}";
+}
+
+void PrintMasterSearch(int phase, int iteration, MasterState& master,
+    const solver::Result& result)
+{
+    std::ostringstream out;
+    out << std::setprecision(std::numeric_limits<double>::max_digits10)
+        << "Search master: {\"phase\":" << phase << ",\"iter\":" << iteration
+        << ",\"status\":" << std::quoted(solver::ToString(result.status))
+        << ",\"has_solution\":" << (result.hasSolution ? "true" : "false")
+        << ",\"objective\":";
+    WriteSearchNumber(out, result.objective);
+    out << ",\"bound\":";
+    WriteSearchNumber(out, result.bound);
+    out << ",\"solve_seconds\":" << result.seconds;
+    if (result.hasSolution) {
+        out << ",\"design\":";
+        WriteSearchDesign(out, master, Values(master.design));
+        out << ",\"theta\":";
+        WriteSearchNumber(out, master.theta.Get(COPT_DBLINFO_VALUE));
+        out << ",\"route_theta\":[";
+        for (size_t scenario = 0; scenario < master.routeTheta.size(); ++scenario) {
+            if (scenario != 0) out << ',';
+            out << '[';
+            for (size_t route = 0; route < master.routeTheta.at(scenario).size(); ++route) {
+                if (route != 0) out << ',';
+                WriteSearchNumber(out,
+                    master.routeTheta.at(scenario).at(route).Get(COPT_DBLINFO_VALUE));
+            }
+            out << ']';
+        }
+        out << "],\"scenario_theta\":[";
+        for (size_t scenario = 0; scenario < master.scenarioTheta.size(); ++scenario) {
+            if (scenario != 0) out << ',';
+            WriteSearchNumber(out, master.scenarioTheta.at(scenario).Get(COPT_DBLINFO_VALUE));
+        }
+        out << ']';
+    }
+    out << "}\n";
+    std::cout << out.str() << std::flush;
+}
+
+void PrintRepairIncumbentSearch(int iteration, const char* source,
+    const MasterState& master, const std::vector<double>& values)
+{
+    std::ostringstream out;
+    out << "Search incumbent: {\"phase\":2,\"iter\":" << iteration
+        << ",\"source\":" << std::quoted(source) << ",\"design\":";
+    WriteSearchDesign(out, master, values);
+    out << "}\n";
+    std::cout << out.str() << std::flush;
 }
 
 double DesignCost(const MasterState& state, const std::vector<double>& values)
@@ -385,7 +474,8 @@ Expr RouteNoGood(const MasterState& master, const RouteRelaxation& route,
 
 solver::Result RunPhaseOne(Model& model, MasterState& master,
     const InstanceData& instance, const std::vector<model::DwcLink>& candidates,
-    const SolverConfig& config, const std::chrono::steady_clock::time_point& start)
+    const SolverConfig& config, const std::chrono::steady_clock::time_point& start,
+    bool logSearch)
 {
     std::vector<RouteRelaxation> routes;
     for (size_t scenario = 0; scenario < master.batteries.size(); ++scenario) {
@@ -415,6 +505,7 @@ solver::Result RunPhaseOne(Model& model, MasterState& master,
             lowerBound, 0.0, Elapsed(start)};
         model.SetDblParam(COPT_DBLPARAM_TIMELIMIT, remaining);
         const solver::Result masterResult = solver::Solve(model);
+        if (logSearch) PrintMasterSearch(1, iteration, master, masterResult);
         lowerBound = std::max(lowerBound, masterResult.bound);
         if (!masterResult.hasSolution ||
             (masterResult.status != solver::Status::Optimal &&
@@ -791,7 +882,7 @@ std::string BatteryVector(const MasterState& master, size_t scenario,
 
 void PrintRepairLog(int iteration, size_t scenario, const char* trigger,
     int failures, int nextRspRepair, const MasterState& master,
-    const std::vector<double>& before, const RepairResult& repair)
+    const std::vector<double>& before, const RepairResult& repair, bool logSearch)
 {
     std::cout << "Repair iter=" << iteration
               << ", scenario=" << scenario
@@ -818,6 +909,22 @@ void PrintRepairLog(int iteration, size_t scenario, const char* trigger,
               << ", rsp_deferred_facilities="
               << repair.rspDeferredFacilities
               << '\n';
+    if (logSearch) {
+        std::ostringstream out;
+        out << "Search repair: {\"phase\":2,\"iter\":" << iteration
+            << ",\"scenario\":" << scenario << ",\"trigger\":" << std::quoted(trigger)
+            << ",\"battery_probes\":" << repair.batteryProbes
+            << ",\"facility_probes\":" << repair.facilityProbes
+            << ",\"accepted_battery_layers\":" << repair.acceptedBatteryLayers
+            << ",\"accepted_facilities\":" << repair.acceptedFacilities
+            << ",\"cut_anchor\":";
+        WriteSearchDesign(out, master, repair.infeasibleAnchor);
+        out << ",\"feasible_design\":";
+        if (repair.feasibleDesign.empty()) out << "null";
+        else WriteSearchDesign(out, master, repair.feasibleDesign);
+        out << "}\n";
+        std::cout << out.str() << std::flush;
+    }
 }
 
 std::string RepairKey(const MasterState& master, const ExactScenario& subproblem,
@@ -1273,6 +1380,7 @@ solver::Result SolveFramework(const InstanceData& instance,
     const RunConfig& runConfig, const SolverConfig& solverConfig,
     bool repairEnhancedCuts)
 {
+    const bool logSearch = runConfig.dataName.rfind("R28_", 0) == 0;
     const auto start = std::chrono::steady_clock::now();
     const auto preprocessStart = std::chrono::steady_clock::now();
     const BatteryCapacityLimits batteryCapacityLimits =
@@ -1294,7 +1402,7 @@ solver::Result SolveFramework(const InstanceData& instance,
     solver::Configure(model, solverConfig, solverConfig.phase2MasterLog);
 
     const solver::Result phaseOne = RunPhaseOne(model, master, instance, candidates,
-        solverConfig, start);
+        solverConfig, start, logSearch);
     if (phaseOne.status != solver::Status::Optimal) {
         solver::Result result = phaseOne;
         result.hasSolution = false;
@@ -1406,6 +1514,7 @@ solver::Result SolveFramework(const InstanceData& instance,
         if (remaining <= 0.0) break;
         model.SetDblParam(COPT_DBLPARAM_TIMELIMIT, remaining);
         const solver::Result masterResult = solver::Solve(model);
+        if (logSearch) PrintMasterSearch(2, iteration, master, masterResult);
         lowerBound = std::max(lowerBound, masterResult.bound);
         if (masterResult.status == solver::Status::TimeLimit) {
             break;
@@ -1479,7 +1588,7 @@ solver::Result SolveFramework(const InstanceData& instance,
                 PrintRepairLog(iteration, scenario, "initial-ub",
                     completed.failures,
                     repairTriggers.at(scenario).nextRspRepair, master,
-                    incumbent.design, repair);
+                    incumbent.design, repair, logSearch);
             }
             if (!allRepaired) return incumbent;
             return EvaluateCombinedRepair(subproblems, master, incumbent.design,
@@ -1566,7 +1675,7 @@ solver::Result SolveFramework(const InstanceData& instance,
                     PrintRepairLog(iteration, scenario, "rsp-unresolved",
                         completed.failures,
                         repairTriggers.at(scenario).nextRspRepair, master,
-                        values, repair);
+                        values, repair, logSearch);
                 }
             }
             if (repairEnhancedCuts && rspInfeasible && allRspInfeasibleRepaired) {
@@ -1577,6 +1686,8 @@ solver::Result SolveFramework(const InstanceData& instance,
                 incumbent = completeInitialUpperBound(std::move(incumbent));
                 repairUpperBound = incumbent.objective;
                 if (repairUpperBound + kTolerance < upperBound) {
+                    if (logSearch) PrintRepairIncumbentSearch(
+                        iteration, "repair-rsp", master, incumbent.design);
                     PrintCostBreakdown("repair-rsp", master, incumbent.design,
                         subproblems);
                     upperBound = repairUpperBound;
@@ -1666,7 +1777,7 @@ solver::Result SolveFramework(const InstanceData& instance,
                 PrintRepairLog(iteration, scenario, "exact-unresolved",
                     completed.failures,
                     repairTriggers.at(scenario).nextRspRepair, master,
-                    values, repair);
+                    values, repair, logSearch);
             }
         }
         for (size_t scenario = 0; scenario < subproblems.size(); ++scenario) {
@@ -1695,6 +1806,8 @@ solver::Result SolveFramework(const InstanceData& instance,
             incumbent = completeInitialUpperBound(std::move(incumbent));
             repairUpperBound = incumbent.objective;
             if (repairUpperBound + kTolerance < upperBound) {
+                if (logSearch) PrintRepairIncumbentSearch(
+                    iteration, "repair-exact", master, incumbent.design);
                 PrintCostBreakdown("repair-exact", master, incumbent.design,
                     subproblems);
                 upperBound = repairUpperBound;
