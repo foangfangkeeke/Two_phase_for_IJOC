@@ -1,0 +1,14 @@
+{
+  "reviewed_utc": "2026-11-05T04:03:57.037555+00:00",
+  "independent_of_controller_and_parser": true,
+  "solver_calls": 0,
+  "review_script_sha256": "648b9cd5cc65d5f7b5661f7468ec910e1b58a34b17565379f2064360570953cb",
+  "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+  "exe_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+  "reviewed_runs": 16,
+  "reviewed_result_records": 16,
+  "pending_runs": 42,
+  "mismatches": 0,
+  "all_frozen_runs_reviewed": false,
+  "review": "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\experiments\\final_2026-11-05\\provenance\\raw_review_2026-11-05_04-03-57_037555_UTC\\review.json"
+}

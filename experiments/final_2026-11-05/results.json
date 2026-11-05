@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-11-05T03:57:45.899110+00:00",
+  "generated_utc": "2026-11-05T04:02:35.920541+00:00",
   "records": [
     {
       "record_id": "main_table/R12-N5-F50-C4/lifted-ils",
@@ -26,12 +26,12 @@
       "run_id": "R12-N5-F10-C4_ef",
       "algorithm": "ef",
       "vi": 1,
-      "status": "PENDING",
+      "status": "OPTIMAL",
       "historical_input_sha256": "3bf7f9e90ee05efebf34b641c344f1445135d8864729dcedd96a259d6fc73f4c",
-      "ub": "",
-      "lb": "",
-      "actual_wall_seconds": null,
-      "bound_source": "UNRECORDED"
+      "ub": "8365.950455",
+      "lb": "8358.566687",
+      "actual_wall_seconds": 57.937000000150874,
+      "bound_source": "FINAL"
     },
     {
       "record_id": "main_table/R12-N5-F10-C4/natural-ils",
@@ -42,7 +42,7 @@
       "run_id": "R12-N5-F10-C4_natural-ils",
       "algorithm": "natural-ils",
       "vi": 1,
-      "status": "PENDING",
+      "status": "RUNNING",
       "historical_input_sha256": "3bf7f9e90ee05efebf34b641c344f1445135d8864729dcedd96a259d6fc73f4c",
       "ub": "",
       "lb": "",
@@ -378,12 +378,12 @@
       "run_id": "R3-N5-F10-C4_ef",
       "algorithm": "ef",
       "vi": 1,
-      "status": "PENDING",
+      "status": "OPTIMAL",
       "historical_input_sha256": "268c7c55485cd83e7e2e27d5ce0683a7b657712b3674c645b6eea8904f1a12af",
-      "ub": "",
-      "lb": "",
-      "actual_wall_seconds": null,
-      "bound_source": "UNRECORDED"
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "actual_wall_seconds": 5.891000000061467,
+      "bound_source": "FINAL"
     },
     {
       "record_id": "main_table/R3-N5-F10-C4/natural-ils",
@@ -394,12 +394,12 @@
       "run_id": "R3-N5-F10-C4_natural-ils",
       "algorithm": "natural-ils",
       "vi": 1,
-      "status": "PENDING",
+      "status": "OPTIMAL",
       "historical_input_sha256": "268c7c55485cd83e7e2e27d5ce0683a7b657712b3674c645b6eea8904f1a12af",
-      "ub": "",
-      "lb": "",
-      "actual_wall_seconds": null,
-      "bound_source": "UNRECORDED"
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "actual_wall_seconds": 8.094000000040978,
+      "bound_source": "FINAL"
     },
     {
       "record_id": "main_table/R3-N5-F10-C4/lifted-ils",
@@ -410,12 +410,12 @@
       "run_id": "R3-N5-F10-C4_lifted-ils",
       "algorithm": "lifted-ils",
       "vi": 1,
-      "status": "PENDING",
+      "status": "OPTIMAL",
       "historical_input_sha256": "268c7c55485cd83e7e2e27d5ce0683a7b657712b3674c645b6eea8904f1a12af",
-      "ub": "",
-      "lb": "",
-      "actual_wall_seconds": null,
-      "bound_source": "UNRECORDED"
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "actual_wall_seconds": 2.9689999998081475,
+      "bound_source": "FINAL"
     },
     {
       "record_id": "main_table/R3-N5-F10-C4/lifted-two-phase",
@@ -426,12 +426,12 @@
       "run_id": "R3-N5-F10-C4_lifted-two-phase",
       "algorithm": "lifted-two-phase",
       "vi": 1,
-      "status": "PENDING",
+      "status": "OPTIMAL",
       "historical_input_sha256": "268c7c55485cd83e7e2e27d5ce0683a7b657712b3674c645b6eea8904f1a12af",
-      "ub": "",
-      "lb": "",
-      "actual_wall_seconds": null,
-      "bound_source": "UNRECORDED"
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "actual_wall_seconds": 2.656999999890104,
+      "bound_source": "FINAL"
     },
     {
       "record_id": "main_table/R3-N5-F10-C4/full",
@@ -442,12 +442,12 @@
       "run_id": "R3-N5-F10-C4_full",
       "algorithm": "full",
       "vi": 1,
-      "status": "PENDING",
+      "status": "OPTIMAL",
       "historical_input_sha256": "268c7c55485cd83e7e2e27d5ce0683a7b657712b3674c645b6eea8904f1a12af",
-      "ub": "",
-      "lb": "",
-      "actual_wall_seconds": null,
-      "bound_source": "UNRECORDED"
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "actual_wall_seconds": 2.6870000001508743,
+      "bound_source": "FINAL"
     },
     {
       "record_id": "main_table/R3-N5-F20-C4/ef",
@@ -458,12 +458,12 @@
       "run_id": "R3-N5-F20-C4_ef",
       "algorithm": "ef",
       "vi": 1,
-      "status": "PENDING",
+      "status": "OPTIMAL",
       "historical_input_sha256": "905b495b277e9427ebbc18169f944ec7fc480e6cb6c27f5169636e0eb1dd7f0a",
-      "ub": "",
-      "lb": "",
-      "actual_wall_seconds": null,
-      "bound_source": "UNRECORDED"
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "actual_wall_seconds": 8.719000000040978,
+      "bound_source": "FINAL"
     },
     {
       "record_id": "main_table/R3-N5-F20-C4/natural-ils",
@@ -474,12 +474,12 @@
       "run_id": "R3-N5-F20-C4_natural-ils",
       "algorithm": "natural-ils",
       "vi": 1,
-      "status": "PENDING",
+      "status": "OPTIMAL",
       "historical_input_sha256": "905b495b277e9427ebbc18169f944ec7fc480e6cb6c27f5169636e0eb1dd7f0a",
-      "ub": "",
-      "lb": "",
-      "actual_wall_seconds": null,
-      "bound_source": "UNRECORDED"
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "actual_wall_seconds": 8.452999999979511,
+      "bound_source": "FINAL"
     },
     {
       "record_id": "main_table/R3-N5-F20-C4/lifted-ils",
@@ -490,12 +490,12 @@
       "run_id": "R3-N5-F20-C4_lifted-ils",
       "algorithm": "lifted-ils",
       "vi": 1,
-      "status": "PENDING",
+      "status": "OPTIMAL",
       "historical_input_sha256": "905b495b277e9427ebbc18169f944ec7fc480e6cb6c27f5169636e0eb1dd7f0a",
-      "ub": "",
-      "lb": "",
-      "actual_wall_seconds": null,
-      "bound_source": "UNRECORDED"
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "actual_wall_seconds": 3.219000000040978,
+      "bound_source": "FINAL"
     },
     {
       "record_id": "main_table/R3-N5-F20-C4/lifted-two-phase",
@@ -506,12 +506,12 @@
       "run_id": "R3-N5-F20-C4_lifted-two-phase",
       "algorithm": "lifted-two-phase",
       "vi": 1,
-      "status": "PENDING",
+      "status": "OPTIMAL",
       "historical_input_sha256": "905b495b277e9427ebbc18169f944ec7fc480e6cb6c27f5169636e0eb1dd7f0a",
-      "ub": "",
-      "lb": "",
-      "actual_wall_seconds": null,
-      "bound_source": "UNRECORDED"
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "actual_wall_seconds": 2.952999999979511,
+      "bound_source": "FINAL"
     },
     {
       "record_id": "main_table/R3-N5-F20-C4/full",
@@ -522,12 +522,12 @@
       "run_id": "R3-N5-F20-C4_full",
       "algorithm": "full",
       "vi": 1,
-      "status": "PENDING",
+      "status": "OPTIMAL",
       "historical_input_sha256": "905b495b277e9427ebbc18169f944ec7fc480e6cb6c27f5169636e0eb1dd7f0a",
-      "ub": "",
-      "lb": "",
-      "actual_wall_seconds": null,
-      "bound_source": "UNRECORDED"
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "actual_wall_seconds": 2.9370000001508743,
+      "bound_source": "FINAL"
     },
     {
       "record_id": "main_table/R3-N5-F50-C4/ef",
@@ -538,12 +538,12 @@
       "run_id": "R3-N5-F50-C4_ef",
       "algorithm": "ef",
       "vi": 1,
-      "status": "PENDING",
+      "status": "OPTIMAL",
       "historical_input_sha256": "11435ab262cef5f18961590f6c930cf99daef62f119ce3e59eea0fbea29b83e9",
-      "ub": "",
-      "lb": "",
-      "actual_wall_seconds": null,
-      "bound_source": "UNRECORDED"
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "actual_wall_seconds": 14.655999999959022,
+      "bound_source": "FINAL"
     },
     {
       "record_id": "main_table/R3-N5-F50-C4/natural-ils",
@@ -554,12 +554,12 @@
       "run_id": "R3-N5-F50-C4_natural-ils",
       "algorithm": "natural-ils",
       "vi": 1,
-      "status": "PENDING",
+      "status": "OPTIMAL",
       "historical_input_sha256": "11435ab262cef5f18961590f6c930cf99daef62f119ce3e59eea0fbea29b83e9",
-      "ub": "",
-      "lb": "",
-      "actual_wall_seconds": null,
-      "bound_source": "UNRECORDED"
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "actual_wall_seconds": 8.858999999938533,
+      "bound_source": "FINAL"
     },
     {
       "record_id": "main_table/R3-N5-F50-C4/lifted-ils",
@@ -570,12 +570,12 @@
       "run_id": "R3-N5-F50-C4_lifted-ils",
       "algorithm": "lifted-ils",
       "vi": 1,
-      "status": "PENDING",
+      "status": "OPTIMAL",
       "historical_input_sha256": "11435ab262cef5f18961590f6c930cf99daef62f119ce3e59eea0fbea29b83e9",
-      "ub": "",
-      "lb": "",
-      "actual_wall_seconds": null,
-      "bound_source": "UNRECORDED"
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "actual_wall_seconds": 3.515000000130385,
+      "bound_source": "FINAL"
     },
     {
       "record_id": "main_table/R3-N5-F50-C4/lifted-two-phase",
@@ -586,12 +586,12 @@
       "run_id": "R3-N5-F50-C4_lifted-two-phase",
       "algorithm": "lifted-two-phase",
       "vi": 1,
-      "status": "PENDING",
+      "status": "OPTIMAL",
       "historical_input_sha256": "11435ab262cef5f18961590f6c930cf99daef62f119ce3e59eea0fbea29b83e9",
-      "ub": "",
-      "lb": "",
-      "actual_wall_seconds": null,
-      "bound_source": "UNRECORDED"
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "actual_wall_seconds": 3.297000000020489,
+      "bound_source": "FINAL"
     },
     {
       "record_id": "main_table/R3-N5-F50-C4/full",
@@ -602,12 +602,12 @@
       "run_id": "R3-N5-F50-C4_full",
       "algorithm": "full",
       "vi": 1,
-      "status": "PENDING",
+      "status": "OPTIMAL",
       "historical_input_sha256": "11435ab262cef5f18961590f6c930cf99daef62f119ce3e59eea0fbea29b83e9",
-      "ub": "",
-      "lb": "",
-      "actual_wall_seconds": null,
-      "bound_source": "UNRECORDED"
+      "ub": "1469.848225",
+      "lb": "1469.848225",
+      "actual_wall_seconds": 3.172000000020489,
+      "bound_source": "FINAL"
     },
     {
       "record_id": "main_table/R28-N5-F10-C4/lifted-ils",
