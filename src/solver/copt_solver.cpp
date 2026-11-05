@@ -5,6 +5,8 @@
 #include <chrono>
 #include <cmath>
 #include <iostream>
+#include <mutex>
+#include <sstream>
 
 namespace solver {
 
@@ -47,13 +49,29 @@ Result Solve(Model& model)
     } else if (nativeStatus == COPT_STATUS_NUMERICAL) result.status = Status::Numerical;
     else if (nativeStatus == COPT_STATUS_TIMEOUT) result.status = Status::TimeLimit;
     else if (nativeStatus == COPT_STATUS_INTERRUPTED) result.status = Status::Interrupted;
-    else std::cerr << "COPT returned unmapped status=" << nativeStatus << '\n';
+    else if (nativeStatus == COPT_STATUS_MEMLIMIT) result.status = Status::MemoryLimit;
 
     result.hasSolution = model.GetIntAttr(COPT_INTATTR_HASSOL) != 0;
+    const std::string modelName = model.GetName();
+    if ((result.status != Status::Optimal && result.status != Status::Infeasible) ||
+        (!result.hasSolution && modelName.find("master") != std::string::npos)) {
+        std::ostringstream message;
+        message << "COPT solve status: model=" << modelName
+                << ", native_status=" << nativeStatus
+                << ", status=" << ToString(result.status)
+                << ", has_solution=" << result.hasSolution
+                << ", seconds=" << result.seconds << '\n';
+        static std::mutex statusMutex;
+        const std::lock_guard<std::mutex> lock(statusMutex);
+        std::cerr << message.str();
+    }
     if (result.hasSolution) result.objective = model.GetDblAttr(COPT_DBLATTR_OBJVAL);
     if (result.status == Status::Optimal || result.status == Status::TimeLimit ||
-        result.status == Status::Interrupted) {
-        result.bound = model.GetDblAttr(COPT_DBLATTR_BESTBND);
+        result.status == Status::Interrupted || result.status == Status::MemoryLimit) {
+        const double bound = model.GetDblAttr(COPT_DBLATTR_OBJBOUND);
+        if (std::isfinite(bound) && std::fabs(bound) < COPT_INFINITY * 0.5) {
+            result.bound = bound;
+        }
     }
     if (result.hasSolution) {
         result.relativeGap = (result.objective - result.bound) /
@@ -71,6 +89,7 @@ std::string ToString(Status status)
     case Status::Numerical: return "NUMERICAL";
     case Status::TimeLimit: return "TIME_LIMIT";
     case Status::Interrupted: return "INTERRUPTED";
+    case Status::MemoryLimit: return "MEMORY_LIMIT_NATIVE";
     case Status::Unknown: return "UNKNOWN";
     }
     return "UNKNOWN";

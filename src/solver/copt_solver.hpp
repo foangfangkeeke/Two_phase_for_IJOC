@@ -4,6 +4,7 @@
 
 #include "coptcpp_inc/coptcpp_pch.h"
 
+#include <limits>
 #include <string>
 
 namespace solver {
@@ -15,15 +16,16 @@ enum class Status {
     Numerical,
     TimeLimit,
     Interrupted,
+    MemoryLimit,
     Unknown
 };
 
 struct Result {
     Status status = Status::Unknown;
     bool hasSolution = false;
-    double objective = 0.0;
-    double bound = 0.0;
-    double relativeGap = 0.0;
+    double objective = std::numeric_limits<double>::infinity();
+    double bound = -std::numeric_limits<double>::infinity();
+    double relativeGap = std::numeric_limits<double>::infinity();
     double seconds = 0.0;
 };
 

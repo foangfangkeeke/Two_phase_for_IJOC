@@ -1,0 +1,9 @@
+{
+  "verified_utc": "2026-11-05T03:54:07.143600+00:00",
+  "solver_calls": 0,
+  "controller_fixture_wall_seconds": 0.34399999980814755,
+  "result_status": "OPTIMAL",
+  "three_group_report_records": 65,
+  "two_row_case_headers": "PASS",
+  "fixture": "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\results\\final_runner_check_2206lq34"
+}

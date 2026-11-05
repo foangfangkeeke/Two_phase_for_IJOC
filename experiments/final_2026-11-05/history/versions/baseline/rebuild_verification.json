@@ -1,0 +1,119 @@
+{
+  "verified_utc": "2026-11-05T03:06:21.632655+00:00",
+  "status": "UNRESOLVED_REBUILD_DIFFERENCES",
+  "original_executable_sha256": "7e2b7195f4ccce2a3f0aa89eaf530090648d81d61adf86e51cbfc800df6a1653",
+  "rebuilt_executable_sha256": "47226ef2732a726fd10d7d8d93bf9a30960df96223a5c849aef1b20813b63068",
+  "file_bytes": {
+    "original": 487424,
+    "rebuilt": 487424
+  },
+  "normalized_original_sha256": "0fc94e827d978c7219c6c8640a09c62b337c627ae91f7085588ffd8ed33e7bee",
+  "normalized_rebuilt_sha256": "a3ba49f3f0785970fe9a6f621b43ea9805cc4a5698469b7f61946acc9ea92152",
+  "remaining_different_bytes": 13698,
+  "normalized_fields": [
+    {
+      "field": "COFF.TimeDateStamp",
+      "offset": 264,
+      "length": 4,
+      "original": "4cdde76a",
+      "rebuilt": "8df2eb6a"
+    },
+    {
+      "field": "DebugDirectory[0].TimeDateStamp",
+      "offset": 415268,
+      "length": 4,
+      "original": "4cdde76a",
+      "rebuilt": "8df2eb6a"
+    }
+  ],
+  "sections": [
+    {
+      "name": ".text",
+      "original_sha256": "2065ca307c742384a67a9048072c83abd9b3bc7a4808352371c2245b3baf9db7",
+      "rebuilt_sha256": "99e0d8dcd5d7515c40fb0d3c4dca3c0cbb482efc943101fd8f9a7f4715749033",
+      "bytes_identical": false
+    },
+    {
+      "name": ".rdata",
+      "original_sha256": "50e36d15a0dfa6b8a1423513d01a3151b9d58271d6e56c088cb91a5d6b23b00e",
+      "rebuilt_sha256": "efe7f1b034e80f4c3ef812dbaa7b721c756aa170083f45eb31e2cfa1ddc6c228",
+      "bytes_identical": false
+    },
+    {
+      "name": ".data",
+      "original_sha256": "80b81f85e49ede80a9a17f3ac18f17dc92ab5d1ff5b2e022fe6805bd2f8d2fb1",
+      "rebuilt_sha256": "80b81f85e49ede80a9a17f3ac18f17dc92ab5d1ff5b2e022fe6805bd2f8d2fb1",
+      "bytes_identical": true
+    },
+    {
+      "name": ".pdata",
+      "original_sha256": "ccb66915ee6eef06f8f8ce8e8faa4bccb8e96be743b52b3acef23c05b9a6cdb8",
+      "rebuilt_sha256": "b371827a719f00b349a75f1e950d27aa29c218ddb89f9b2a8df2f99db079fd32",
+      "bytes_identical": false
+    },
+    {
+      "name": ".rsrc",
+      "original_sha256": "61cb3eb8b8b993be41ca74ddd007a019e03158c99064f97a3b654826abe3625b",
+      "rebuilt_sha256": "61cb3eb8b8b993be41ca74ddd007a019e03158c99064f97a3b654826abe3625b",
+      "bytes_identical": true
+    },
+    {
+      "name": ".reloc",
+      "original_sha256": "e0cbac81fe8474df929d0fc087ed29988381da5e2f5e483553917af7186dd225",
+      "rebuilt_sha256": "e0cbac81fe8474df929d0fc087ed29988381da5e2f5e483553917af7186dd225",
+      "bytes_identical": true
+    }
+  ],
+  "source_path_alignment": {
+    "status": "FIRST_REBUILD_SOURCE_PATH_RELOCATION_IDENTIFIED",
+    "unmapped_executable_sha256": "1f299b16936505aca7ee510436e654e8d50e87b30407312347ca308c87ae3b25",
+    "source_file": "src/domain/wireless_data.cpp",
+    "reason": "This source uses __FILE__ to locate data; relocation embeds another absolute path.",
+    "remedy": "Compile this byte-identical source using its original absolute path; all other source inputs remain verified archive copies. No source or compiler flags changed.",
+    "original_compile_command": "C:\\PROGRA~1\\MIB055~1\\2022\\PROFES~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -IC:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\results\\baseline_rebuild_verification_2026-11-05_02-55-28_UTC\\source\\src -I\"C:\\Program Files\\copt80\\include\" /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++17 -MD /utf-8 /W4 /showIncludes /FoCMakeFiles\\wireless.dir\\src\\domain\\wireless_data.cpp.obj /FdCMakeFiles\\wireless.dir\\ /FS -c C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\results\\baseline_rebuild_verification_2026-11-05_02-55-28_UTC\\source\\src\\domain\\wireless_data.cpp",
+    "path_aligned_compile_command": "C:\\PROGRA~1\\MIB055~1\\2022\\PROFES~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP  -IC:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\results\\baseline_rebuild_verification_2026-11-05_02-55-28_UTC\\source\\src -I\"C:\\Program Files\\copt80\\include\" /DWIN32 /D_WINDOWS /EHsc /O2 /Ob2 /DNDEBUG -std:c++17 -MD /utf-8 /W4 /showIncludes /FoCMakeFiles\\wireless.dir\\src\\domain\\wireless_data.cpp.obj /FdCMakeFiles\\wireless.dir\\ /FS -c C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\src\\domain\\wireless_data.cpp",
+    "source_sha256": "ac628c44a3fda96c20ebc437d1e3da0a3d41a9643870abd1f86ba6f5ccaa73a7",
+    "link_command": "C:\\WINDOWS\\system32\\cmd.exe /C \"cd . && \"C:\\Program Files\\CMake\\bin\\cmake.exe\" -E vs_link_exe --msvc-ver=1944 --intdir=CMakeFiles\\wireless.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100261~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MIB055~1\\2022\\PROFES~1\\VC\\Tools\\MSVC\\1444~1.352\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\wireless.dir\\src\\algorithm\\feasibility_diagnostics.cpp.obj CMakeFiles\\wireless.dir\\src\\algorithm\\lifted_ils.cpp.obj CMakeFiles\\wireless.dir\\src\\algorithm\\lifted_two_phase.cpp.obj CMakeFiles\\wireless.dir\\src\\algorithm\\natural_ils.cpp.obj CMakeFiles\\wireless.dir\\src\\algorithm\\route_relaxation.cpp.obj CMakeFiles\\wireless.dir\\src\\algorithm\\scenario_relaxation.cpp.obj CMakeFiles\\wireless.dir\\src\\app\\main.cpp.obj CMakeFiles\\wireless.dir\\src\\config\\run_config.cpp.obj CMakeFiles\\wireless.dir\\src\\config\\solver_config.cpp.obj CMakeFiles\\wireless.dir\\src\\domain\\wireless_data.cpp.obj CMakeFiles\\wireless.dir\\src\\model\\extensive_form.cpp.obj CMakeFiles\\wireless.dir\\src\\model\\model_helpers.cpp.obj CMakeFiles\\wireless.dir\\src\\model\\scenario_model.cpp.obj CMakeFiles\\wireless.dir\\src\\solver\\copt_solver.cpp.obj  /out:C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\results\\baseline_rebuild_verification_2026-11-05_02-55-28_UTC\\source\\out\\wireless.exe /implib:wireless.lib /pdb:C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\results\\baseline_rebuild_verification_2026-11-05_02-55-28_UTC\\source\\out\\wireless.pdb /version:0.0 /machine:x64 /INCREMENTAL:NO /subsystem:console  \"C:\\Program Files\\copt80\\lib\\copt_cpp.lib\"  \"C:\\Program Files\\copt80\\lib\\copt.lib\"  ws2_32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && C:\\WINDOWS\\system32\\cmd.exe /C \"cd /D C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\results\\baseline_rebuild_verification_2026-11-05_02-55-28_UTC\\source\\out\\build\\x64-ninja && \"C:\\Program Files\\CMake\\bin\\cmake.exe\" -E copy_if_different \"C:/Program Files/copt80/bin/copt.dll\" \"C:/Program Files/copt80/bin/copt_cpp.dll\" C:/faq_work/Papers/Two_phase_wireless_charging_and_integer_lshape/results/baseline_rebuild_verification_2026-11-05_02-55-28_UTC/source/out\"\"",
+    "link_method": "Execute the exact generated Ninja link command after the path-aligned compile; avoid Ninja recompiling this one source with the isolated path."
+  },
+  "source_sha256": {
+    "src/algorithm/feasibility_diagnostics.cpp": "25afd2815c6bf356490d93874e58a7a96138cd6850a63ac4b5777884eea55986",
+    "src/algorithm/feasibility_diagnostics.hpp": "6194439d0353387b04cb4e75aaaf40b5c4220eeaa7c181519d2b30faf97c6198",
+    "src/algorithm/lifted_ils.cpp": "3416d4c0c67e27e9370be15ac996cce2be78d3b4a1b5045e6118ee460977d65f",
+    "src/algorithm/lifted_ils.hpp": "107aa4d78a0c0a47151da030ad517d8de7ed402598449327a57b22056ab0cb66",
+    "src/algorithm/lifted_two_phase.cpp": "59f7962bb637857e0ed3da9b581164f52f3895f446974bbcc4e6f619ad1b4ee9",
+    "src/algorithm/lifted_two_phase.hpp": "448d217cbfa6b31886d4e663765083009055e6bca93628f41a62c23a016f2893",
+    "src/algorithm/natural_ils.cpp": "70ebc7cb49f2e3a3f521c3fe748ed2577d8b220a18786c27d5a6f6f59b4bd194",
+    "src/algorithm/natural_ils.hpp": "2272c718c154dd47d4a84d47c435498860b4f8c4d9add3094abdf43fd059e3c4",
+    "src/algorithm/route_relaxation.cpp": "223898e6b83a277eb4cdb3e42ebdfa4483ce978df08ad9135ecb82f31150ac85",
+    "src/algorithm/route_relaxation.hpp": "a0bfd5451df1eda653f28a53ae7da8c88b26909548cbb2bc6aa48e41654b6952",
+    "src/algorithm/scenario_relaxation.cpp": "172ee17d87134d140b741007e6de5394a33c97b59d1bd76672924aac9a401bb4",
+    "src/algorithm/scenario_relaxation.hpp": "ae2ecbbb6a848132bb6282cddfb9e6b3a18a9b6b663f5872fdd7c56801600275",
+    "src/app/main.cpp": "e3df884736bea628d5dd88bc949a3c6ed7482588b76d3e58d5c62ab7967651e3",
+    "src/config/run_config.cpp": "ff0640b9e94367003d886df7012e125542ac19123e9c9913fee4ecaaccc56353",
+    "src/config/run_config.hpp": "2ba2c104350f1bfaa2fd06bbceca6a73b6d79ad8306009a1bc9f6dc1c0c0b6fd",
+    "src/config/solver_config.cpp": "f029c7a4ef5627705fdfef98c8add56ea4a5968777548a6407428afd7384aada",
+    "src/config/solver_config.hpp": "eb81c99df7fa54056a51cf88f7c3c05dd9b78995e71ea86dee1c330c5bc89d81",
+    "src/domain/wireless_data.cpp": "ac628c44a3fda96c20ebc437d1e3da0a3d41a9643870abd1f86ba6f5ccaa73a7",
+    "src/domain/wireless_data.hpp": "c7b283c8b3f0fdd9b1386f07607fac982133aca2dd57fc334212c4777efcb520",
+    "src/model/extensive_form.cpp": "9ec058e2dd98e7f730168834aba72bd817a2f16b213603b74ae29c6d511078fd",
+    "src/model/extensive_form.hpp": "8886668edf388598bfee5cb0ec8a617a279e646f33da68803ad0e2204cc571ab",
+    "src/model/model_helpers.cpp": "e02a4b1e56171a0009cef9cbff8cd0d1bb9c4a9fc3d06af4345572a347ab3a36",
+    "src/model/model_helpers.hpp": "23e90cb33381369ca1aef3d397f6e705308c991af5b037cf5a668e47ef902cf1",
+    "src/model/scenario_model.cpp": "038d00e6798d08198a07fb0e7a3962c1c75cd048b160b4b2cfa926e0554d7e09",
+    "src/model/scenario_model.hpp": "ff0fedafd21a9276a12ed0eb0b4d64a813a6b4915eb23eecb57deef9138b62a9",
+    "src/solver/copt_solver.cpp": "473330f89864437aea8d94923ce108807bdb67b80d1b71c85138b2998ec52504",
+    "src/solver/copt_solver.hpp": "e2ccb3c4bbd2d0c548a06fd4ac262e8cf33d30a7d4a896a5b293d8f65b1fbe3e",
+    "CMakeLists.txt": "49ebb95f01fa06d262bc048f95f2303b59a54469cd9269eefa967d74b4ab7b98",
+    "solverCfg.txt": "8fdc6169b04e586b0d5ad3465df462023450595d31055222f9b4ce4ae7d93fa5"
+  },
+  "state_verification": {
+    "active_sources_and_exe_unchanged": true,
+    "head_unchanged": true,
+    "index_unchanged": true,
+    "git_status_unchanged": true,
+    "archive_copy_bytes_unchanged": true,
+    "no_solver_executed": true,
+    "no_commits_created": true
+  }
+}

@@ -1,0 +1,8 @@
+# Freeze the exact bytes used to compile and run the final experiments.
+.gitattributes -text
+src/** -text
+CMakeLists.txt -text
+solverCfg.txt -text
+scripts/experiments/summarize_group.py -text
+data/R*_data/** -text
+experiments/final_2026-11-05/** -text

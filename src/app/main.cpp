@@ -1,3 +1,5 @@
+#define NOMINMAX
+
 #include "algorithm/feasibility_diagnostics.hpp"
 #include "algorithm/lifted_ils.hpp"
 #include "algorithm/lifted_two_phase.hpp"
@@ -8,7 +10,9 @@
 #include "model/extensive_form.hpp"
 #include "solver/copt_solver.hpp"
 
+#include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <ctime>
 #include <filesystem>
@@ -26,10 +30,16 @@ namespace {
 std::string BuildCaseLabel(const RunConfig& config)
 {
     std::string scale = config.dataName;
-    if (scale == "tower" || scale == "tower_base") scale = "tower_base";
-    else if (scale.rfind("tower_", 0) == 0) scale = scale.substr(6);
-    return scale + "_" + std::to_string(config.scenarioCount) +
-        "_cap" + std::to_string(config.chargerCapacity);
+    if (scale == "tower" || scale == "tower_base") scale = "R28";
+    else if (scale == "tower_medium") scale = "R12";
+    else if (scale == "tower_small") scale = "R3";
+    const size_t separator = scale.find('_');
+    if (scale.front() == 'R' && separator != std::string::npos) {
+        scale = scale.substr(0, separator);
+    }
+    return scale + "-N" + std::to_string(config.scenarioCount) +
+        "-F" + std::to_string(config.dwcTopN) +
+        "-C" + std::to_string(config.chargerCapacity);
 }
 
 void RedirectOutput(const std::filesystem::path& path)
@@ -114,6 +124,24 @@ void PrintInstanceSummary(const wireless::InstanceData& instance)
               << ',' << instance.operation.maximumBatteryCapacity << "]\n";
 }
 
+void PrintAlgorithmStatus(const RunConfig& config, const solver::Result& result)
+{
+    std::cout << "Algorithm termination: algorithm=" << config.algorithm
+              << ", status=" << solver::ToString(result.status)
+              << ", has_solution=" << result.hasSolution
+              << ", UB=" << result.objective
+              << ", LB=" << result.bound
+              << ", gap_percent=";
+    if (result.hasSolution && std::isfinite(result.objective) &&
+        std::isfinite(result.bound)) {
+        std::cout << (result.objective - result.bound) /
+            std::max(1.0, std::fabs(result.objective)) * 100.0;
+    } else {
+        std::cout << "inf";
+    }
+    std::cout << ", reported_seconds=" << result.seconds << '\n';
+}
+
 } // namespace
 
 int main(int argc, char* argv[])
@@ -140,8 +168,11 @@ int main(int argc, char* argv[])
         const std::filesystem::path logPath = StartLog(commandLine.config);
         std::cout << "Log file: " << logPath.string() << std::endl;
         RedirectOutput(logPath);
+        std::cout << "Execution policy: version=final-rsp-skip-2026-11-05, "
+                  << "rsp_numerical=skip_screening, original_subproblem=required\n";
         PrintRuntimeOptions(commandLine.config);
         std::cout << "Solver options: mip_gap=" << solver.mipGap
+                  << ", global_gap=" << solver.globalGap
                   << ", time_limit=" << solver.timeLimit
                   << ", threads=" << solver.threads << '\n';
         const wireless::InstanceData instance = wireless::LoadInstance(commandLine.config);
@@ -155,11 +186,10 @@ int main(int argc, char* argv[])
         if (commandLine.config.algorithm == "ef") {
             const solver::Result result = wireless::model::SolveExtensiveForm(
                 instance, commandLine.config, solver);
+            PrintAlgorithmStatus(commandLine.config, result);
             std::cout << "EF status: " << solver::ToString(result.status) << '\n';
-            if (result.hasSolution) {
-                std::cout << "UB: " << result.objective << ", LB: " << result.bound
-                          << ", gap=" << result.relativeGap * 100.0 << "%\n";
-            }
+            std::cout << "UB: " << result.objective << ", LB: " << result.bound
+                      << ", gap=" << result.relativeGap * 100.0 << "%\n";
             std::cout << "EF solve time: " << result.seconds << " s\n";
             return result.status == solver::Status::Optimal ||
                 (result.status == solver::Status::TimeLimit && result.hasSolution) ? 0 : 1;
@@ -168,18 +198,21 @@ int main(int argc, char* argv[])
         if (commandLine.config.algorithm == "natural-ils") {
             const solver::Result result = wireless::algorithm::SolveNaturalIls(
                 instance, commandLine.config, solver);
+            PrintAlgorithmStatus(commandLine.config, result);
             return result.status == solver::Status::Optimal ? 0 : 1;
         }
 
         if (commandLine.config.algorithm == "lifted-ils") {
             const solver::Result result = wireless::algorithm::SolveLiftedIls(
                 instance, commandLine.config, solver);
+            PrintAlgorithmStatus(commandLine.config, result);
             return result.status == solver::Status::Optimal ? 0 : 1;
         }
 
         if (commandLine.config.algorithm == "lifted-two-phase") {
             const solver::Result result = wireless::algorithm::SolveLiftedTwoPhase(
                 instance, commandLine.config, solver);
+            PrintAlgorithmStatus(commandLine.config, result);
             return result.status == solver::Status::Optimal ||
                 result.status == solver::Status::TimeLimit ? 0 : 1;
         }
@@ -187,6 +220,7 @@ int main(int argc, char* argv[])
         if (commandLine.config.algorithm == "full") {
             const solver::Result result = wireless::algorithm::SolveFull(
                 instance, commandLine.config, solver);
+            PrintAlgorithmStatus(commandLine.config, result);
             return result.status == solver::Status::Optimal ||
                 result.status == solver::Status::TimeLimit ? 0 : 1;
         }

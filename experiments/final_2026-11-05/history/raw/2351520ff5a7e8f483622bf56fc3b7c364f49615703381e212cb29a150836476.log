@@ -1,0 +1,191 @@
+Runtime options: facility_cost_scale=1.000000, energy_scale=1.000000, battery_step=50, scenario_count=5, scenario_start=0, cap=2, dwc_top_n=50, wireless_option=1, rsp=1, rsp_workers=3, rsp_threads=4, preprocess_bounds=0, valid_inequality=1
+Solver options: mip_gap=0.000100, global_gap=0.010000, time_limit=7200.000000, threads=12
+Instance: data=tower_base, scenario_folders=base;charger_tengah_up10;lo10pct;route_984_up20;route_941_down30, battery_range=[50.000000,600.000000]
+Battery upper-bound preprocess_ms=1.580600
+Phase 1 initialized: route_subproblems=140
+Phase 1 iter 0, feasibility cut x32, UB=inf, LB=5689.320000, gap=1, master_ms=36.806900, subproblem_ms=2974.417100, elapsed_ms=8638.513000
+Phase 1 iter 1, feasibility cut x8, UB=inf, LB=13247.222420, gap=1, master_ms=54.813100, subproblem_ms=1531.519100, elapsed_ms=10225.662100
+Phase 1 iter 2, feasibility cut x7, UB=inf, LB=16778.275436, gap=1, master_ms=206.890700, subproblem_ms=1050.204100, elapsed_ms=11483.245600
+Phase 1 iter 3, feasibility cut x8, UB=inf, LB=17347.294202, gap=1, master_ms=167.685300, subproblem_ms=1003.712100, elapsed_ms=12654.996500
+Phase 1 iter 4, feasibility cut x7, UB=inf, LB=17394.190583, gap=1, master_ms=212.828400, subproblem_ms=991.670400, elapsed_ms=13859.775500
+Phase 1 iter 5, feasibility cut x10, UB=inf, LB=17398.155801, gap=1, master_ms=116.677200, subproblem_ms=942.150700, elapsed_ms=14918.958000
+Phase 1 iter 6, feasibility cut x6, UB=inf, LB=17401.025856, gap=1, master_ms=226.292000, subproblem_ms=1035.474200, elapsed_ms=16180.959700
+Phase 1 iter 7, feasibility cut x6, UB=inf, LB=17401.244011, gap=1, master_ms=245.219200, subproblem_ms=880.750200, elapsed_ms=17307.296600
+Phase 1 iter 8, feasibility cut x6, UB=inf, LB=17401.244011, gap=1, master_ms=205.115300, subproblem_ms=788.192600, elapsed_ms=18300.983300
+Phase 1 iter 9, feasibility cut x6, UB=inf, LB=17401.244011, gap=1, master_ms=212.627200, subproblem_ms=912.772300, elapsed_ms=19426.676700
+Phase 1 iter 10, feasibility cut x5, UB=inf, LB=17401.244011, gap=1, master_ms=286.859900, subproblem_ms=898.703900, elapsed_ms=20612.656800
+Phase 1 iter 11, feasibility cut x6, UB=inf, LB=17402.123638, gap=1, master_ms=236.347400, subproblem_ms=933.972500, elapsed_ms=21783.367600
+Phase 1 iter 12, feasibility cut x6, UB=inf, LB=17403.876038, gap=1, master_ms=285.609700, subproblem_ms=847.597500, elapsed_ms=22916.849600
+Phase 1 iter 13, feasibility cut x6, UB=inf, LB=17403.876038, gap=1, master_ms=247.404400, subproblem_ms=897.861000, elapsed_ms=24062.365800
+Phase 1 iter 14, feasibility cut x4, UB=inf, LB=17403.876038, gap=1, master_ms=247.851000, subproblem_ms=986.515700, elapsed_ms=25296.966100
+Phase 1 iter 15, feasibility cut x4, UB=inf, LB=17403.964395, gap=1, master_ms=247.108800, subproblem_ms=808.172200, elapsed_ms=26352.459000
+Phase 1 iter 16, feasibility cut x4, UB=inf, LB=17403.964395, gap=1, master_ms=315.815000, subproblem_ms=838.842100, elapsed_ms=27507.423000
+Phase 1 iter 17, feasibility cut x4, UB=inf, LB=17403.964395, gap=1, master_ms=269.368700, subproblem_ms=853.403400, elapsed_ms=28630.458600
+Phase 1 iter 18, feasibility cut x4, UB=inf, LB=17403.964395, gap=1, master_ms=236.825300, subproblem_ms=836.685700, elapsed_ms=29704.231000
+Phase 1 iter 19, feasibility cut x4, UB=inf, LB=17404.674533, gap=1, master_ms=234.594400, subproblem_ms=849.835700, elapsed_ms=30788.934900
+Phase 1 iter 20, feasibility cut x4, UB=inf, LB=17404.674533, gap=1, master_ms=340.113800, subproblem_ms=837.803900, elapsed_ms=31967.065900
+Phase 1 iter 21, feasibility cut x4, UB=inf, LB=17405.286092, gap=1, master_ms=284.468600, subproblem_ms=869.518100, elapsed_ms=33121.334300
+Phase 1 iter 22, feasibility cut x4, UB=inf, LB=17405.286092, gap=1, master_ms=289.150500, subproblem_ms=866.761800, elapsed_ms=34277.465900
+Phase 1 iter 23, feasibility cut x4, UB=inf, LB=17405.286092, gap=1, master_ms=249.277600, subproblem_ms=751.027000, elapsed_ms=35278.126600
+Phase 1 iter 24, feasibility cut x4, UB=inf, LB=17405.286092, gap=1, master_ms=266.836400, subproblem_ms=773.456500, elapsed_ms=36318.725100
+Phase 1 iter 25, feasibility cut x4, UB=inf, LB=17406.633774, gap=1, master_ms=330.308900, subproblem_ms=802.355200, elapsed_ms=37451.661100
+Phase 1 iter 26, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=358.068800, subproblem_ms=833.321400, elapsed_ms=38643.350200
+Phase 1 iter 27, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=276.204500, subproblem_ms=842.237100, elapsed_ms=39762.054300
+Phase 1 iter 28, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=392.997200, subproblem_ms=857.745400, elapsed_ms=41013.019000
+Phase 1 iter 29, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=296.024500, subproblem_ms=878.237000, elapsed_ms=42187.560700
+Phase 1 iter 30, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=338.725100, subproblem_ms=758.742700, elapsed_ms=43285.335700
+Phase 1 iter 31, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=291.351000, subproblem_ms=925.070900, elapsed_ms=44502.049500
+Phase 1 iter 32, feasibility cut x4, UB=inf, LB=17407.492822, gap=1, master_ms=292.368100, subproblem_ms=851.635500, elapsed_ms=45646.284200
+Phase 1 iter 33, feasibility cut x4, UB=inf, LB=17407.971730, gap=1, master_ms=370.460700, subproblem_ms=852.833900, elapsed_ms=46869.905500
+Phase 1 iter 34, feasibility cut x4, UB=inf, LB=17407.971730, gap=1, master_ms=298.620300, subproblem_ms=835.789300, elapsed_ms=48004.852100
+Phase 1 iter 35, feasibility cut x4, UB=inf, LB=17407.971730, gap=1, master_ms=310.645900, subproblem_ms=910.072500, elapsed_ms=49225.798800
+Phase 1 iter 36, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=391.765000, subproblem_ms=767.211400, elapsed_ms=50385.115000
+Phase 1 iter 37, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=322.027200, subproblem_ms=807.997800, elapsed_ms=51515.378400
+Phase 1 iter 38, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=338.584200, subproblem_ms=909.465700, elapsed_ms=52763.681000
+Phase 1 iter 39, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=334.150000, subproblem_ms=847.421100, elapsed_ms=53945.528900
+Phase 1 iter 40, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=353.728300, subproblem_ms=865.034400, elapsed_ms=55164.559100
+Phase 1 iter 41, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=315.632400, subproblem_ms=774.286800, elapsed_ms=56254.727200
+Phase 1 iter 42, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=319.578700, subproblem_ms=761.616200, elapsed_ms=57336.230300
+Phase 1 iter 43, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=331.082900, subproblem_ms=782.784500, elapsed_ms=58450.375400
+Phase 1 iter 44, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=300.820500, subproblem_ms=790.127600, elapsed_ms=59541.606100
+Phase 1 iter 45, feasibility cut x4, UB=inf, LB=17407.986092, gap=1, master_ms=294.152900, subproblem_ms=865.990200, elapsed_ms=60702.030200
+Phase 1 iter 46, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=312.369300, subproblem_ms=822.145800, elapsed_ms=61836.831700
+Phase 1 iter 47, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=306.467400, subproblem_ms=882.995400, elapsed_ms=63026.578100
+Phase 1 iter 48, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=317.020500, subproblem_ms=821.224500, elapsed_ms=64165.076600
+Phase 1 iter 49, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=324.056400, subproblem_ms=753.003700, elapsed_ms=65242.547200
+Phase 1 iter 50, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=312.230300, subproblem_ms=754.012400, elapsed_ms=66309.320200
+Phase 1 iter 51, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=348.736600, subproblem_ms=789.741600, elapsed_ms=67448.185500
+Phase 1 iter 52, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=318.645900, subproblem_ms=830.886700, elapsed_ms=68597.980600
+Phase 1 iter 53, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=393.699700, subproblem_ms=833.427100, elapsed_ms=69825.437900
+Phase 1 iter 54, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=317.301800, subproblem_ms=860.376900, elapsed_ms=71003.410300
+Phase 1 iter 55, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=323.814900, subproblem_ms=895.561800, elapsed_ms=72223.109100
+Phase 1 iter 56, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=349.875700, subproblem_ms=796.326500, elapsed_ms=73369.611300
+Phase 1 iter 57, feasibility cut x4, UB=inf, LB=17410.332298, gap=1, master_ms=376.211200, subproblem_ms=823.315600, elapsed_ms=74569.453700
+Phase 1 iter 58, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=346.360700, subproblem_ms=814.340900, elapsed_ms=75730.411300
+Phase 1 iter 59, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=343.598000, subproblem_ms=839.898900, elapsed_ms=76914.241000
+Phase 1 iter 60, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=341.615900, subproblem_ms=867.046100, elapsed_ms=78123.139400
+Phase 1 iter 61, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=333.686400, subproblem_ms=751.475200, elapsed_ms=79209.106800
+Phase 1 iter 62, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=365.062300, subproblem_ms=768.149800, elapsed_ms=80342.630000
+Phase 1 iter 63, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=356.303900, subproblem_ms=886.718200, elapsed_ms=81585.996000
+Phase 1 iter 64, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=372.547000, subproblem_ms=851.106700, elapsed_ms=82809.986500
+Phase 1 iter 65, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=414.780500, subproblem_ms=828.201100, elapsed_ms=84053.190800
+Phase 1 iter 66, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=371.968300, subproblem_ms=889.602800, elapsed_ms=85314.996400
+Phase 1 iter 67, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=362.512200, subproblem_ms=863.599000, elapsed_ms=86541.377500
+Phase 1 iter 68, feasibility cut x4, UB=inf, LB=17410.686092, gap=1, master_ms=380.205400, subproblem_ms=841.604200, elapsed_ms=87763.417700
+Phase 1 iter 69, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=369.031300, subproblem_ms=860.917100, elapsed_ms=88993.664400
+Phase 1 iter 70, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=346.399200, subproblem_ms=835.843100, elapsed_ms=90176.168300
+Phase 1 iter 71, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=366.406200, subproblem_ms=759.326000, elapsed_ms=91302.156100
+Phase 1 iter 72, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=387.682500, subproblem_ms=791.684200, elapsed_ms=92481.823800
+Phase 1 iter 73, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=351.032100, subproblem_ms=797.650200, elapsed_ms=93630.802600
+Phase 1 iter 74, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=360.206800, subproblem_ms=868.350800, elapsed_ms=94859.682800
+Phase 1 iter 75, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=374.550100, subproblem_ms=914.364200, elapsed_ms=96149.073500
+Phase 1 iter 76, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=419.177900, subproblem_ms=764.095200, elapsed_ms=97332.728800
+Phase 1 iter 77, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=350.446500, subproblem_ms=806.900000, elapsed_ms=98490.604200
+Phase 1 iter 78, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=364.465200, subproblem_ms=876.194600, elapsed_ms=99731.519500
+Phase 1 iter 79, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=393.289600, subproblem_ms=801.303100, elapsed_ms=100926.383300
+Phase 1 iter 80, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=389.022700, subproblem_ms=799.774100, elapsed_ms=102115.600800
+Phase 1 iter 81, feasibility cut x4, UB=inf, LB=17413.386092, gap=1, master_ms=344.821300, subproblem_ms=911.522200, elapsed_ms=103372.210100
+Phase 1 iter 82, feasibility cut x4, UB=inf, LB=17414.564395, gap=1, master_ms=362.422400, subproblem_ms=895.564100, elapsed_ms=104630.479600
+Phase 1 iter 83, feasibility cut x4, UB=inf, LB=17414.564395, gap=1, master_ms=345.070300, subproblem_ms=824.074100, elapsed_ms=105799.850000
+Phase 1 iter 84, feasibility cut x4, UB=inf, LB=17414.564395, gap=1, master_ms=348.274300, subproblem_ms=852.201800, elapsed_ms=107000.578600
+Phase 1 iter 85, feasibility cut x4, UB=inf, LB=17414.564395, gap=1, master_ms=410.183500, subproblem_ms=881.117600, elapsed_ms=108292.166400
+Phase 1 iter 86, feasibility cut x4, UB=inf, LB=17414.564395, gap=1, master_ms=424.736200, subproblem_ms=845.789500, elapsed_ms=109562.997800
+Phase 1 iter 87, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=392.581200, subproblem_ms=859.909000, elapsed_ms=110815.754900
+Phase 1 iter 88, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=424.098200, subproblem_ms=859.865800, elapsed_ms=112099.967100
+Phase 1 iter 89, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=376.273000, subproblem_ms=860.644500, elapsed_ms=113337.363500
+Phase 1 iter 90, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=407.481000, subproblem_ms=865.121200, elapsed_ms=114610.331200
+Phase 1 iter 91, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=423.727900, subproblem_ms=845.379000, elapsed_ms=115879.670600
+Phase 1 iter 92, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=346.781400, subproblem_ms=839.246300, elapsed_ms=117065.961500
+Phase 1 iter 93, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=412.014800, subproblem_ms=846.001300, elapsed_ms=118324.240300
+Phase 1 iter 94, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=377.553500, subproblem_ms=808.034200, elapsed_ms=119510.171400
+Phase 1 iter 95, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=395.474500, subproblem_ms=831.928500, elapsed_ms=120737.857400
+Phase 1 iter 96, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=383.959100, subproblem_ms=816.795200, elapsed_ms=121938.949700
+Phase 1 iter 97, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=409.120200, subproblem_ms=913.272000, elapsed_ms=123261.666200
+Phase 1 iter 98, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=378.360400, subproblem_ms=788.248400, elapsed_ms=124428.578700
+Phase 1 iter 99, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=372.054900, subproblem_ms=845.031400, elapsed_ms=125645.958500
+Phase 1 iter 100, feasibility cut x4, UB=inf, LB=17416.086092, gap=1, master_ms=383.370300, subproblem_ms=825.094000, elapsed_ms=126854.668000
+Phase 1 iter 101, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=421.309000, subproblem_ms=813.605800, elapsed_ms=128089.866300
+Phase 1 iter 102, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=423.535000, subproblem_ms=885.546200, elapsed_ms=129399.185700
+Phase 1 iter 103, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=396.607200, subproblem_ms=865.166600, elapsed_ms=130661.186800
+Phase 1 iter 104, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=433.284200, subproblem_ms=840.414600, elapsed_ms=131935.166500
+Phase 1 iter 105, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=404.833200, subproblem_ms=874.328000, elapsed_ms=133214.600300
+Phase 1 iter 106, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=422.720100, subproblem_ms=781.611200, elapsed_ms=134419.180800
+Phase 1 iter 107, feasibility cut x4, UB=inf, LB=17417.264395, gap=1, master_ms=409.233900, subproblem_ms=830.246400, elapsed_ms=135658.944500
+Phase 1 iter 108, feasibility cut x4, UB=inf, LB=17418.188744, gap=1, master_ms=471.374600, subproblem_ms=816.360100, elapsed_ms=136946.908800
+Phase 1 iter 109, feasibility cut x4, UB=inf, LB=17418.188744, gap=1, master_ms=418.736300, subproblem_ms=888.135500, elapsed_ms=138254.086100
+Phase 1 iter 110, feasibility cut x4, UB=inf, LB=17418.472883, gap=1, master_ms=472.582700, subproblem_ms=865.669900, elapsed_ms=139592.574400
+Phase 1 iter 111, feasibility cut x4, UB=inf, LB=17418.472883, gap=1, master_ms=496.683700, subproblem_ms=836.007300, elapsed_ms=140925.723800
+Phase 1 iter 112, feasibility cut x4, UB=inf, LB=17418.663259, gap=1, master_ms=413.958600, subproblem_ms=804.829900, elapsed_ms=142144.850700
+Phase 1 iter 113, feasibility cut x4, UB=inf, LB=17418.663259, gap=1, master_ms=392.274200, subproblem_ms=791.459200, elapsed_ms=143329.008500
+Phase 1 iter 114, feasibility cut x4, UB=inf, LB=17418.663259, gap=1, master_ms=407.229600, subproblem_ms=774.297400, elapsed_ms=144510.776900
+Phase 1 iter 115, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=357.222400, subproblem_ms=894.754000, elapsed_ms=145762.988100
+Phase 1 iter 116, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=375.267500, subproblem_ms=846.748400, elapsed_ms=146985.272400
+Phase 1 iter 117, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=405.723500, subproblem_ms=804.181000, elapsed_ms=148195.427600
+Phase 1 iter 118, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=386.156800, subproblem_ms=801.840900, elapsed_ms=149383.742500
+Phase 1 iter 119, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=486.025700, subproblem_ms=901.814000, elapsed_ms=150771.837200
+Phase 1 iter 120, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=365.750400, subproblem_ms=929.197300, elapsed_ms=152067.042300
+Phase 1 iter 121, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=443.854300, subproblem_ms=814.571300, elapsed_ms=153325.899300
+Phase 1 iter 122, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=378.515400, subproblem_ms=813.384900, elapsed_ms=154518.097800
+Phase 1 iter 123, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=381.245300, subproblem_ms=835.638800, elapsed_ms=155735.262000
+Phase 1 iter 124, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=340.356900, subproblem_ms=854.504500, elapsed_ms=156930.396500
+Phase 1 iter 125, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=350.323300, subproblem_ms=884.247400, elapsed_ms=158165.274500
+Phase 1 iter 126, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=366.090800, subproblem_ms=809.868800, elapsed_ms=159341.681200
+Phase 1 iter 127, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=404.365000, subproblem_ms=855.509500, elapsed_ms=160601.923100
+Phase 1 iter 128, feasibility cut x4, UB=inf, LB=17418.786092, gap=1, master_ms=419.362200, subproblem_ms=815.493000, elapsed_ms=161837.011000
+Phase 1 iter 129, feasibility cut x4, UB=inf, LB=17419.964395, gap=1, master_ms=353.803800, subproblem_ms=841.783900, elapsed_ms=163032.834000
+Phase 1 iter 130, feasibility cut x4, UB=inf, LB=17419.964395, gap=1, master_ms=384.807400, subproblem_ms=891.624100, elapsed_ms=164309.571600
+Phase 1 iter 131, feasibility cut x4, UB=inf, LB=17420.136092, gap=1, master_ms=355.938800, subproblem_ms=895.675400, elapsed_ms=165561.424500
+Phase 1 iter 132, feasibility cut x4, UB=inf, LB=17420.558969, gap=1, master_ms=396.187700, subproblem_ms=820.417000, elapsed_ms=166778.291100
+Phase 1 iter 133, feasibility cut x4, UB=inf, LB=17420.558969, gap=1, master_ms=460.567700, subproblem_ms=811.205900, elapsed_ms=168050.332500
+Phase 1 iter 134, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=428.612600, subproblem_ms=889.232400, elapsed_ms=169368.437200
+Phase 1 iter 135, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=401.383000, subproblem_ms=907.314500, elapsed_ms=170677.420400
+Phase 1 iter 136, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=396.364900, subproblem_ms=824.364900, elapsed_ms=171898.450000
+Phase 1 iter 137, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=454.325700, subproblem_ms=981.433300, elapsed_ms=173334.586100
+Phase 1 iter 138, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=402.926700, subproblem_ms=1033.670400, elapsed_ms=174771.564000
+Phase 1 iter 139, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=391.051600, subproblem_ms=930.709900, elapsed_ms=176093.583900
+Phase 1 iter 140, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=429.313300, subproblem_ms=977.704700, elapsed_ms=177500.851000
+Phase 1 iter 141, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=403.821900, subproblem_ms=946.837400, elapsed_ms=178851.810100
+Phase 1 iter 142, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=470.297800, subproblem_ms=820.540500, elapsed_ms=180142.951200
+Phase 1 iter 143, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=362.946800, subproblem_ms=810.453000, elapsed_ms=181316.652600
+Phase 1 iter 144, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=439.454500, subproblem_ms=876.338700, elapsed_ms=182632.774900
+Phase 1 iter 145, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=432.390900, subproblem_ms=846.245700, elapsed_ms=183911.656200
+Phase 1 iter 146, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=406.406400, subproblem_ms=880.469800, elapsed_ms=185198.827800
+Phase 1 iter 147, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=419.814200, subproblem_ms=790.986400, elapsed_ms=186409.986100
+Phase 1 iter 148, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=487.079300, subproblem_ms=894.156300, elapsed_ms=187791.550700
+Phase 1 iter 149, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=443.302300, subproblem_ms=870.886500, elapsed_ms=189105.997100
+Phase 1 iter 150, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=449.789000, subproblem_ms=912.599300, elapsed_ms=190468.802800
+Phase 1 iter 151, feasibility cut x4, UB=inf, LB=17421.486092, gap=1, master_ms=396.788900, subproblem_ms=837.465500, elapsed_ms=191703.357000
+Phase 1 iter 152, feasibility cut x4, UB=inf, LB=17422.509383, gap=1, master_ms=361.073200, subproblem_ms=877.481200, elapsed_ms=192942.150400
+Phase 1 iter 153, feasibility cut x4, UB=inf, LB=17423.285489, gap=1, master_ms=482.605500, subproblem_ms=870.743800, elapsed_ms=194295.778300
+Phase 1 iter 154, feasibility cut x4, UB=inf, LB=17423.285489, gap=1, master_ms=436.390400, subproblem_ms=787.691800, elapsed_ms=195520.147100
+Phase 1 iter 155, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=441.076800, subproblem_ms=831.929000, elapsed_ms=196793.386800
+Phase 1 iter 156, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=506.079000, subproblem_ms=776.364300, elapsed_ms=198076.661600
+Phase 1 iter 157, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=373.294200, subproblem_ms=796.567900, elapsed_ms=199247.055100
+Phase 1 iter 158, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=447.725200, subproblem_ms=836.078200, elapsed_ms=200531.139300
+Phase 1 iter 159, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=422.473700, subproblem_ms=826.062400, elapsed_ms=201779.990000
+Phase 1 iter 160, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=426.004700, subproblem_ms=828.479200, elapsed_ms=203034.794300
+Phase 1 iter 161, feasibility cut x4, UB=inf, LB=17424.006693, gap=1, master_ms=438.263400, subproblem_ms=810.198200, elapsed_ms=204283.663100
+Phase 1 iter 162, feasibility cut x4, UB=inf, LB=17424.186092, gap=1, master_ms=406.930800, subproblem_ms=798.126500, elapsed_ms=205489.051000
+Phase 1 iter 163, feasibility cut x4, UB=inf, LB=17425.364395, gap=1, master_ms=482.538300, subproblem_ms=859.082800, elapsed_ms=206830.990100
+Phase 1 iter 164, feasibility cut x4, UB=inf, LB=17425.364395, gap=1, master_ms=459.216900, subproblem_ms=865.729600, elapsed_ms=208156.182900
+Phase 1 iter 165, theta=11204.546092, Q(z)=11204.546092, optimality cut x0, UB=17426.886092, LB=17425.712220, gap=0.006736%, master_ms=537.905500, subproblem_ms=799.249600, elapsed_ms=209493.590500
+Phase 1 completed: UB=17426.886092, LB=17425.712220, elapsed_ms=210952.007000
+Phase 2 initialized: scenarios=5, target_gap=1.000000%, scenario_workers=3, scenario_threads=4, RSP=on
+Phase 2 iter 0, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=17425.712220, gap=1, master_ms=1039.922300, rsp_ms=507981.926400, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=733695.882600
+Phase 2 iter 1, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=17638.542888, gap=1, master_ms=795.923100, rsp_ms=442310.645100, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1176803.359100
+Phase 2 iter 2, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=17818.852936, gap=1, master_ms=970.869700, rsp_ms=515778.592000, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=1693554.604400
+Phase 2 iter 3, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=17821.869492, gap=1, master_ms=1434.937900, rsp_ms=444611.666600, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2139602.029700
+Phase 2 iter 4, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=17847.053637, gap=1, master_ms=3191.334800, rsp_ms=440412.190100, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2583207.328500
+Phase 2 iter 5, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=17914.516914, gap=1, master_ms=16952.356800, rsp_ms=344622.687800, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2944783.312100
+Phase 2 iter 6, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=17942.807715, gap=1, master_ms=45275.965900, rsp_ms=460791.956200, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=3450852.249800
+Phase 2 iter 7, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=17946.703946, gap=1, master_ms=41584.366500, rsp_ms=322333.865400, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=3814772.153700
+Phase 2 iter 8, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=17964.917841, gap=1, master_ms=149901.860200, rsp_ms=332988.693100, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=4297663.506300
+Phase 2 iter 9, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=17966.969417, gap=1, master_ms=319130.840200, rsp_ms=320589.423800, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=4937384.632200
+Phase 2 iter 10, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=17978.242472, gap=1, master_ms=71848.229200, rsp_ms=330525.157200, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=5339758.976500
+Phase 2 iter 11, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=17986.334856, gap=1, master_ms=187478.412900, rsp_ms=343974.780900, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=5871214.317400
+Phase 2 iter 12, RSP scenario=3 skipped after status=TIME_LIMIT
+Phase 2 iter 12, RSP scenario=4 skipped after status=TIME_LIMIT
+Lifted Two-Phase status=TIME_LIMIT, UB=inf, LB=17995.926269, gap=1, elapsed_ms=7200139.497400
+Cardinal Optimizer v8.0.7. Build date Sep 20 2026
+Copyright Cardinal Operations 2026. All Rights Reserved
+

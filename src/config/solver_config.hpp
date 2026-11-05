@@ -2,6 +2,7 @@
 
 struct SolverConfig {
     double mipGap = 0.0;
+    double globalGap = 0.01;
     double timeLimit = 3600.0;
     int presolve = -1;
     int threads = 12;

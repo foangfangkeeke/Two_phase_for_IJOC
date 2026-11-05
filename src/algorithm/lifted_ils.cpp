@@ -17,6 +17,7 @@
 #include <string>
 #include <thread>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 namespace wireless::algorithm {
@@ -41,6 +42,7 @@ struct LiftedMaster {
     std::vector<double> costs;
     std::vector<Var> facilityVariables;
     std::vector<RouteBatteryLevels> batteryVariables;
+    std::vector<std::vector<model::MaximumTripEnergyChain>> maximumTripEnergyChains;
     std::vector<Var> scenarioTheta;
     Var theta;
 
@@ -162,12 +164,16 @@ LiftedMaster BuildMaster(Model& master, const InstanceData& instance,
 
     std::vector<RouteBatteryLevels> batteryVariables;
     batteryVariables.resize(instance.scenarios.size());
+    std::vector<std::vector<model::MaximumTripEnergyChain>> maximumTripEnergyChains;
+    maximumTripEnergyChains.resize(instance.scenarios.size());
     for (size_t scenario = 0; scenario < instance.scenarios.size(); ++scenario) {
         const ScenarioData& scenarioData = instance.scenarios.at(scenario);
         const ScheduleData& schedule = scenarioData.schedule;
         const std::vector<int> busesByRoute = model::CountBusesByRoute(schedule);
-        const std::vector<model::MaximumTripEnergyChain> energyChains =
+        maximumTripEnergyChains.at(scenario) =
             model::BuildMaximumTripEnergyChains(instance, scenarioData, candidates);
+        const std::vector<model::MaximumTripEnergyChain>& energyChains =
+            maximumTripEnergyChains.at(scenario);
         batteryVariables.at(scenario).resize(schedule.routeNames.size());
         for (size_t route = 0; route < schedule.routeNames.size(); ++route) {
             Expr selectOne(0.0);
@@ -215,6 +221,7 @@ LiftedMaster BuildMaster(Model& master, const InstanceData& instance,
     result.costs = std::move(costs);
     result.facilityVariables = std::move(facilities);
     result.batteryVariables = std::move(batteryVariables);
+    result.maximumTripEnergyChains = std::move(maximumTripEnergyChains);
 
     Expr scenarioThetaSum(0.0);
     for (size_t scenario = 0; scenario < instance.scenarios.size(); ++scenario) {
@@ -304,6 +311,59 @@ double FirstStageCost(const LiftedMaster& master, const std::vector<double>& val
     return cost;
 }
 
+struct ValidInequalityPointAudit {
+    size_t violatedConstraints = 0;
+    double maximumDeficit = 0.0;
+};
+
+ValidInequalityPointAudit AuditValidInequalityPoint(const InstanceData& instance,
+    const LiftedMaster& master, const std::vector<double>& values)
+{
+    ValidInequalityPointAudit audit;
+    const double usableSoc =
+        instance.operation.maximumSoc - instance.operation.minimumSoc;
+    for (size_t scenario = 0; scenario < master.batteryVariables.size(); ++scenario) {
+        for (size_t route = 0;
+             route < master.batteryVariables.at(scenario).size(); ++route) {
+            const model::MaximumTripEnergyChain& chain =
+                master.maximumTripEnergyChains.at(scenario).at(route);
+            double selectedCapacity = 0.0;
+            for (const BatteryMasterLevel& level :
+                 master.batteryVariables.at(scenario).at(route)) {
+                selectedCapacity += level.capacity * values.at(level.flatIndex);
+            }
+            double availableEnergy =
+                chain.plugInOpportunity + usableSoc * selectedCapacity;
+            for (size_t facility = 0;
+                 facility < master.facilityVariables.size(); ++facility) {
+                availableEnergy +=
+                    chain.dwcOpportunities.at(facility) * values.at(facility);
+            }
+            const double deficit = chain.consumption - availableEnergy;
+            if (deficit > kCutTolerance) {
+                ++audit.violatedConstraints;
+                audit.maximumDeficit = std::max(audit.maximumDeficit, deficit);
+            }
+        }
+    }
+    return audit;
+}
+
+std::string PointSignature(const std::vector<double>& values)
+{
+    std::string signature;
+    signature.reserve(values.size());
+    for (double value : values) signature.push_back(value > 0.5 ? '1' : '0');
+    return signature;
+}
+
+void PrintValidInequalityPointAudit(const ValidInequalityPointAudit& audit)
+{
+    std::cout << ", vi_excluded=" << (audit.violatedConstraints > 0 ? 1 : 0)
+              << ", vi_violations=" << audit.violatedConstraints
+              << ", vi_max_deficit=" << audit.maximumDeficit;
+}
+
 void PrintBounds(double upperBound, double lowerBound)
 {
     std::cout << ", UB=";
@@ -379,6 +439,34 @@ solver::Result SolveLiftedIls(const InstanceData& instance,
 
     double upperBound = std::numeric_limits<double>::infinity();
     double lowerBound = -std::numeric_limits<double>::infinity();
+    size_t viVisitedPoints = 0;
+    size_t viExcludedVisits = 0;
+    size_t viViolatedConstraints = 0;
+    double viMaximumDeficit = 0.0;
+    std::unordered_set<std::string> viUniquePoints;
+    std::unordered_set<std::string> viUniqueExcludedPoints;
+    const auto finishResult = [&](solver::Result result) {
+        result.hasSolution = std::isfinite(upperBound);
+        result.objective = upperBound;
+        result.bound = lowerBound;
+        result.seconds = ElapsedSeconds(start);
+        result.relativeGap = result.hasSolution
+            ? (upperBound - lowerBound) / std::max(1.0, std::fabs(upperBound))
+            : std::numeric_limits<double>::infinity();
+        std::cout << "Lifted ILS final: status=" << solver::ToString(result.status);
+        PrintBounds(upperBound, lowerBound);
+        std::cout << ", elapsed_ms=" << result.seconds * 1000.0 << '\n';
+        if (!runConfig.useValidInequality) {
+            std::cout << "Lifted ILS VI audit: visited_points=" << viVisitedPoints
+                      << ", unique_points=" << viUniquePoints.size()
+                      << ", excluded_visits=" << viExcludedVisits
+                      << ", unique_excluded_points="
+                      << viUniqueExcludedPoints.size()
+                      << ", violated_constraints=" << viViolatedConstraints
+                      << ", max_deficit=" << viMaximumDeficit << '\n';
+        }
+        return result;
+    };
     solver::Result finalResult;
     for (int iteration = 0; iteration < kMaximumIterations; ++iteration) {
         double remaining = solverConfig.timeLimit - ElapsedSeconds(start);
@@ -388,12 +476,28 @@ solver::Result SolveLiftedIls(const InstanceData& instance,
         }
         masterModel.SetDblParam(COPT_DBLPARAM_TIMELIMIT, remaining);
         const solver::Result masterResult = solver::Solve(masterModel);
-        if (!masterResult.hasSolution) {
+        lowerBound = std::max(lowerBound, masterResult.bound);
+        if (!masterResult.hasSolution ||
+            (masterResult.status != solver::Status::Optimal &&
+                masterResult.status != solver::Status::TimeLimit)) {
             finalResult.status = masterResult.status;
             break;
         }
-        lowerBound = std::max(lowerBound, masterResult.bound);
         const std::vector<double> values = ReadValues(master.designVariables);
+        ValidInequalityPointAudit viPointAudit;
+        if (!runConfig.useValidInequality) {
+            viPointAudit = AuditValidInequalityPoint(instance, master, values);
+            const std::string signature = PointSignature(values);
+            ++viVisitedPoints;
+            viUniquePoints.insert(signature);
+            viViolatedConstraints += viPointAudit.violatedConstraints;
+            viMaximumDeficit = std::max(
+                viMaximumDeficit, viPointAudit.maximumDeficit);
+            if (viPointAudit.violatedConstraints > 0) {
+                ++viExcludedVisits;
+                viUniqueExcludedPoints.insert(signature);
+            }
+        }
         std::vector<double> thetaValues;
         for (Var& variable : master.scenarioTheta) {
             thetaValues.push_back(variable.Get(COPT_DBLINFO_VALUE));
@@ -435,13 +539,17 @@ solver::Result SolveLiftedIls(const InstanceData& instance,
                                 std::to_string(scenario)).c_str());
                         ++rspOptimalityCuts;
                     }
+                } else if (result.status == solver::Status::Numerical) {
+                    std::cout << "Lifted ILS iter " << iteration
+                              << ", RSP scenario=" << scenario
+                              << " skipped after status=NUMERICAL\n";
                 } else {
                     finalResult.status = result.status;
                     finalResult.hasSolution = std::isfinite(upperBound);
                     finalResult.objective = upperBound;
                     finalResult.bound = lowerBound;
                     finalResult.seconds = ElapsedSeconds(start);
-                    return finalResult;
+                    return finishResult(finalResult);
                 }
             }
             masterModel.Update();
@@ -452,8 +560,12 @@ solver::Result SolveLiftedIls(const InstanceData& instance,
                           << ", RSP Q(z)=" << rspRecourse;
                 PrintBounds(upperBound, lowerBound);
                 std::cout << ", master_ms=" << masterResult.seconds * 1000.0
-                          << ", rsp_ms=" << rspSeconds * 1000.0
-                          << ", elapsed_ms=" << ElapsedSeconds(start) * 1000.0 << '\n';
+                          << ", rsp_ms=" << rspSeconds * 1000.0;
+                if (!runConfig.useValidInequality) {
+                    PrintValidInequalityPointAudit(viPointAudit);
+                }
+                std::cout << ", elapsed_ms=" << ElapsedSeconds(start) * 1000.0
+                          << '\n';
                 continue;
             }
         }
@@ -467,7 +579,7 @@ solver::Result SolveLiftedIls(const InstanceData& instance,
             remaining = solverConfig.timeLimit - ElapsedSeconds(start);
             if (remaining <= 0.0) {
                 finalResult.status = solver::Status::TimeLimit;
-                return finalResult;
+                return finishResult(finalResult);
             }
             solver::Result result = EvaluateSubproblem(
                 subproblems.at(scenario), master, scenario, values, remaining);
@@ -490,7 +602,7 @@ solver::Result SolveLiftedIls(const InstanceData& instance,
                     ++optimalityCuts;
                 }
             } else {
-                return result;
+                return finishResult(result);
             }
         }
         masterModel.Update();
@@ -506,12 +618,15 @@ solver::Result SolveLiftedIls(const InstanceData& instance,
         std::cout << ", master_ms=" << masterResult.seconds * 1000.0
                   << ", rsp_optimality_cut=" << rspOptimalityCuts
                   << ", rsp_ms=" << rspSeconds * 1000.0
-                  << ", subproblem_ms=" << subproblemSeconds * 1000.0
-                  << ", elapsed_ms=" << ElapsedSeconds(start) * 1000.0 << '\n';
+                  << ", subproblem_ms=" << subproblemSeconds * 1000.0;
+        if (!runConfig.useValidInequality) {
+            PrintValidInequalityPointAudit(viPointAudit);
+        }
+        std::cout << ", elapsed_ms=" << ElapsedSeconds(start) * 1000.0 << '\n';
 
         if (std::isfinite(upperBound) &&
             (upperBound - lowerBound) / std::max(1.0, std::fabs(upperBound)) <=
-                solverConfig.mipGap) {
+                solverConfig.globalGap) {
             finalResult.status = solver::Status::Optimal;
             finalResult.hasSolution = true;
             finalResult.objective = upperBound;
@@ -520,7 +635,7 @@ solver::Result SolveLiftedIls(const InstanceData& instance,
                 std::max(1.0, std::fabs(upperBound));
             finalResult.seconds = ElapsedSeconds(start);
             std::cout << "Lifted ILS converged.\n";
-            return finalResult;
+            return finishResult(finalResult);
         }
     }
 
@@ -528,7 +643,7 @@ solver::Result SolveLiftedIls(const InstanceData& instance,
     finalResult.objective = upperBound;
     finalResult.bound = lowerBound;
     finalResult.seconds = ElapsedSeconds(start);
-    return finalResult;
+    return finishResult(finalResult);
 }
 
 } // namespace wireless::algorithm

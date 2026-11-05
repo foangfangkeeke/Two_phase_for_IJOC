@@ -71,8 +71,7 @@ LinkDistances ReadLinkDistances(const std::filesystem::path& path)
 
 std::filesystem::path DataRoot(const std::string& dataName)
 {
-    return std::filesystem::path(__FILE__).parent_path().parent_path().parent_path()
-        / "data" / (dataName + "_data");
+    return std::filesystem::current_path() / "data" / (dataName + "_data");
 }
 
 std::vector<ScenarioDescriptor> ReadScenarioDescriptors(

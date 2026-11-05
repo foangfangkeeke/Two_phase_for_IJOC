@@ -33,7 +33,9 @@ solver::Result SolveExtensiveForm(const InstanceData& instance, const RunConfig&
     }
     model.SetObjective(objective, COPT_MINIMIZE);
     model.Update();
-    solver::Configure(model, solverConfig);
+    SolverConfig extensiveConfig = solverConfig;
+    extensiveConfig.mipGap = solverConfig.globalGap;
+    solver::Configure(model, extensiveConfig);
 
     std::cout << "DWC candidate screening: selected=" << candidates.size() << '\n'
               << "scenario_count=" << instance.scenarios.size()

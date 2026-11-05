@@ -1,0 +1,25 @@
+Execution policy: version=final-rsp-skip-2026-11-05, rsp_numerical=skip_screening, original_subproblem=required
+Runtime options: facility_cost_scale=1.000000, energy_scale=1.000000, battery_step=50, scenario_count=20, scenario_start=0, cap=4, dwc_top_n=50, wireless_option=1, rsp=1, rsp_workers=3, rsp_threads=4, preprocess_bounds=0, valid_inequality=1
+Solver options: mip_gap=0.000100, global_gap=0.010000, time_limit=7200.000000, threads=12
+Instance: data=R28_N20, scenario_folders=base;charger_tengah_up10;lo10pct;route_984_up20;route_941_down30;route_285_up10;route_334_down10;route_452_down20;route_96_up20;charger_clementi_up20;charger_btbatok_up10;route_334_up10;charger_jurongtownhall_up10;route_78_down10;route_984_up10;route_66_up10;route_41_up20;route_333_up10;charger_clementi_up10;global_up20, battery_range=[50.000000,600.000000]
+data=R28_N20, scenarios=20, energy_per_km=1.620000, charger_types=3, time_limit=7200.000000
+scenario=0, folder=base, probability=0.050000, buses=279, routes=28, trips=2862, stations=493, plug_in_stations=5
+scenario=1, folder=charger_tengah_up10, probability=0.050000, buses=294, routes=28, trips=2933, stations=493, plug_in_stations=5
+scenario=2, folder=lo10pct, probability=0.050000, buses=265, routes=28, trips=2581, stations=493, plug_in_stations=5
+scenario=3, folder=route_984_up20, probability=0.050000, buses=283, routes=28, trips=2895, stations=493, plug_in_stations=5
+scenario=4, folder=route_941_down30, probability=0.050000, buses=278, routes=28, trips=2831, stations=493, plug_in_stations=5
+scenario=5, folder=route_285_up10, probability=0.050000, buses=281, routes=28, trips=2871, stations=493, plug_in_stations=5
+scenario=6, folder=route_334_down10, probability=0.050000, buses=279, routes=28, trips=2851, stations=493, plug_in_stations=5
+scenario=7, folder=route_452_down20, probability=0.050000, buses=276, routes=28, trips=2856, stations=493, plug_in_stations=5
+scenario=8, folder=route_96_up20, probability=0.050000, buses=279, routes=28, trips=2882, stations=493, plug_in_stations=5
+scenario=9, folder=charger_clementi_up20, probability=0.050000, buses=283, routes=28, trips=2974, stations=493, plug_in_stations=5
+scenario=10, folder=charger_btbatok_up10, probability=0.050000, buses=287, routes=28, trips=2963, stations=493, plug_in_stations=5
+scenario=11, folder=route_334_up10, probability=0.050000, buses=280, routes=28, trips=2873, stations=493, plug_in_stations=5
+scenario=12, folder=charger_jurongtownhall_up10, probability=0.050000, buses=284, routes=28, trips=2911, stations=493, plug_in_stations=5
+scenario=13, folder=route_78_down10, probability=0.050000, buses=278, routes=28, trips=2853, stations=493, plug_in_stations=5
+scenario=14, folder=route_984_up10, probability=0.050000, buses=283, routes=28, trips=2878, stations=493, plug_in_stations=5
+scenario=15, folder=route_66_up10, probability=0.050000, buses=279, routes=28, trips=2870, stations=493, plug_in_stations=5
+scenario=16, folder=route_41_up20, probability=0.050000, buses=282, routes=28, trips=2876, stations=493, plug_in_stations=5
+scenario=17, folder=route_333_up10, probability=0.050000, buses=281, routes=28, trips=2872, stations=493, plug_in_stations=5
+scenario=18, folder=charger_clementi_up10, probability=0.050000, buses=283, routes=28, trips=2919, stations=493, plug_in_stations=5
+scenario=19, folder=global_up20, probability=0.050000, buses=328, routes=28, trips=3428, stations=493, plug_in_stations=5

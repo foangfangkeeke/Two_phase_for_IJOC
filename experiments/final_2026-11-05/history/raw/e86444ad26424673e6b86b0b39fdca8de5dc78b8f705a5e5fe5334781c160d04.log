@@ -1,0 +1,22 @@
+Runtime options: facility_cost_scale=1.000000, energy_scale=1.000000, battery_step=50, scenario_count=5, scenario_start=0, cap=4, dwc_top_n=10, wireless_option=1, rsp=1, rsp_workers=3, rsp_threads=4, preprocess_bounds=0, valid_inequality=1
+Solver options: mip_gap=0.000100, global_gap=0.010000, time_limit=7200.000000, threads=12
+Instance: data=tower_medium, scenario_folders=base;charger_btbatok_up10;global_down10;route_453_up10;route_941_down20, battery_range=[50.000000,600.000000]
+Lifted ILS initialized: master_vars=730, scenarios=5, RSP=on, valid_inequality=on, rsp_workers=3, rsp_threads=4
+Lifted ILS iter 0, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=3080.340000, gap=1, master_ms=18.749000, rsp_ms=36830.024200, elapsed_ms=42199.523700
+Lifted ILS iter 1, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=3130.640000, gap=1, master_ms=73.855600, rsp_ms=37110.011900, elapsed_ms=79383.910600
+Lifted ILS iter 2, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=3136.580000, gap=1, master_ms=60.640000, rsp_ms=35924.272700, elapsed_ms=115369.480500
+Lifted ILS iter 3, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=3168.940000, gap=1, master_ms=100.386700, rsp_ms=40539.787600, elapsed_ms=156010.269500
+Lifted ILS iter 4, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=3200.040000, gap=1, master_ms=66.988900, rsp_ms=48975.591100, elapsed_ms=205053.442100
+Lifted ILS iter 5, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=3217.420000, gap=1, master_ms=99.032300, rsp_ms=48569.569500, elapsed_ms=253722.575100
+Lifted ILS iter 6, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=3247.400000, gap=1, master_ms=80.802500, rsp_ms=47967.299100, elapsed_ms=301771.732600
+Lifted ILS iter 7, RSP feasibility cut x1, RSP optimality cut x4, RSP Q(z)=3989.453049, UB=inf, LB=3261.820000, gap=1, master_ms=105.215300, rsp_ms=20301.181300, elapsed_ms=322178.656300
+Lifted ILS iter 8, RSP feasibility cut x1, RSP optimality cut x4, RSP Q(z)=3848.711069, UB=inf, LB=6757.235216, gap=1, master_ms=18.993100, rsp_ms=20853.498300, elapsed_ms=343051.716000
+Lifted ILS iter 9, RSP feasibility cut x1, RSP optimality cut x3, RSP Q(z)=3980.365874, UB=inf, LB=7260.057781, gap=1, master_ms=85.971800, rsp_ms=20434.649500, elapsed_ms=363572.741900
+Lifted ILS iter 10, theta=3989.453049, Q(z)=5090.392225, optimality cut x3, UB=8365.712225, LB=7264.053671, gap=13.168736%, master_ms=64.112700, rsp_optimality_cut=1, rsp_ms=950.102000, subproblem_ms=5309.592700, elapsed_ms=369918.047700
+Lifted ILS iter 11, RSP feasibility cut x1, RSP optimality cut x4, RSP Q(z)=4073.566291, UB=8365.712225, LB=8243.939275, gap=1.455620%, master_ms=69.583900, rsp_ms=1241.325900, elapsed_ms=371230.006000
+Lifted ILS iter 12, RSP feasibility cut x1, RSP optimality cut x1, RSP Q(z)=4141.062971, UB=8365.712225, LB=8361.858082, gap=0.046071%, master_ms=101.123900, rsp_ms=1166.076900, elapsed_ms=372497.534200
+Lifted ILS iter 13, theta=5071.080708, Q(z)=5071.098909, optimality cut x1, UB=8363.898909, LB=8363.624883, gap=0.003276%, master_ms=88.165400, rsp_optimality_cut=0, rsp_ms=1020.627900, subproblem_ms=4949.910100, elapsed_ms=378573.875500
+Lifted ILS converged.
+Cardinal Optimizer v8.0.7. Build date Sep 20 2026
+Copyright Cardinal Operations 2026. All Rights Reserved
+

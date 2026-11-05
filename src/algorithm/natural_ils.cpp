@@ -254,6 +254,20 @@ solver::Result SolveNaturalIls(const InstanceData& instance,
     std::vector<double> incumbent;
     double incumbentRecourse = std::numeric_limits<double>::infinity();
     solver::Result finalResult;
+    const auto finishResult = [&](solver::Result result) {
+        result.hasSolution = std::isfinite(upperBound);
+        result.objective = upperBound;
+        result.bound = lowerBound;
+        result.seconds = ElapsedSeconds(start);
+        result.relativeGap = result.hasSolution
+            ? (upperBound - lowerBound) / std::max(1.0, std::fabs(upperBound))
+            : std::numeric_limits<double>::infinity();
+        std::cout << "Natural ILS final: status=" << solver::ToString(result.status)
+                  << ", UB=" << upperBound << ", LB=" << lowerBound
+                  << ", gap=" << result.relativeGap * 100.0
+                  << "%, elapsed_ms=" << result.seconds * 1000.0 << '\n';
+        return result;
+    };
 
     for (int iteration = 0; iteration < kMaximumIterations; ++iteration) {
         const double remaining = solverConfig.timeLimit - ElapsedSeconds(start);
@@ -263,11 +277,13 @@ solver::Result SolveNaturalIls(const InstanceData& instance,
         }
         master.SetDblParam(COPT_DBLPARAM_TIMELIMIT, remaining);
         const solver::Result masterResult = solver::Solve(master);
-        if (!masterResult.hasSolution) {
+        lowerBound = std::max(lowerBound, masterResult.bound);
+        if (!masterResult.hasSolution ||
+            (masterResult.status != solver::Status::Optimal &&
+                masterResult.status != solver::Status::TimeLimit)) {
             finalResult.status = masterResult.status;
             break;
         }
-        lowerBound = std::max(lowerBound, masterResult.bound);
         const std::vector<double> facilityValues = ReadBinaryValues(masterFacilities);
         std::vector<double> thetaValues;
         thetaValues.reserve(scenarioTheta.size());
@@ -310,13 +326,17 @@ solver::Result SolveNaturalIls(const InstanceData& instance,
                                 std::to_string(scenario)).c_str());
                         ++rspOptimalityCuts;
                     }
+                } else if (result.status == solver::Status::Numerical) {
+                    std::cout << "Natural ILS iter " << iteration
+                              << ", RSP scenario=" << scenario
+                              << " skipped after status=NUMERICAL\n";
                 } else {
                     finalResult.status = result.status;
                     finalResult.hasSolution = std::isfinite(upperBound);
                     finalResult.objective = upperBound;
                     finalResult.bound = lowerBound;
                     finalResult.seconds = ElapsedSeconds(start);
-                    return finalResult;
+                    return finishResult(finalResult);
                 }
             }
             master.Update();
@@ -345,7 +365,7 @@ solver::Result SolveNaturalIls(const InstanceData& instance,
             const double subRemaining = solverConfig.timeLimit - ElapsedSeconds(start);
             if (subRemaining <= 0.0) {
                 finalResult.status = solver::Status::TimeLimit;
-                return finalResult;
+                return finishResult(finalResult);
             }
             const ScenarioEvaluation evaluation = EvaluateScenario(
                 subproblems.at(scenario), facilityValues, subRemaining);
@@ -368,7 +388,7 @@ solver::Result SolveNaturalIls(const InstanceData& instance,
                 }
             } else {
                 finalResult.status = evaluation.status;
-                return finalResult;
+                return finishResult(finalResult);
             }
         }
         master.Update();
@@ -388,7 +408,7 @@ solver::Result SolveNaturalIls(const InstanceData& instance,
 
         if (std::isfinite(upperBound) &&
             (upperBound - lowerBound) / std::max(1.0, std::fabs(upperBound))
-                <= solverConfig.mipGap) {
+                <= solverConfig.globalGap) {
             finalResult.status = solver::Status::Optimal;
             finalResult.hasSolution = true;
             finalResult.objective = upperBound;
@@ -404,7 +424,7 @@ solver::Result SolveNaturalIls(const InstanceData& instance,
                 }
             }
             std::cout << "Natural ILS converged.\n";
-            return finalResult;
+            return finishResult(finalResult);
         }
     }
 
@@ -416,7 +436,7 @@ solver::Result SolveNaturalIls(const InstanceData& instance,
         finalResult.relativeGap = (upperBound - lowerBound) /
             std::max(1.0, std::fabs(upperBound));
     }
-    return finalResult;
+    return finishResult(finalResult);
 }
 
 } // namespace wireless::algorithm

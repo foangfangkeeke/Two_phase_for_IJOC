@@ -36,6 +36,7 @@ SolverConfig LoadSolverConfig()
         const std::string key = Trim(line.substr(0, separator));
         const std::string value = Trim(line.substr(separator + 1));
         if (key == "mipGap") config.mipGap = std::stod(value);
+        else if (key == "globalGap") config.globalGap = std::stod(value);
         else if (key == "timeLimit") config.timeLimit = std::stod(value);
         else if (key == "presolve") config.presolve = std::stoi(value);
         else if (key == "threads") config.threads = std::stoi(value);

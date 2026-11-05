@@ -29,7 +29,6 @@ namespace {
 constexpr int kMaximumIterations = 5000;
 constexpr double kTolerance = 1e-6;
 constexpr double kRspCertificateTolerance = 1e-8;
-constexpr double kPhaseTwoTargetGap = 0.01;
 
 using BatteryCapacityLimits = std::vector<std::vector<int>>;
 
@@ -403,14 +402,25 @@ solver::Result RunPhaseOne(Model& model, MasterState& master,
 
     double upperBound = std::numeric_limits<double>::infinity();
     double lowerBound = -std::numeric_limits<double>::infinity();
+    const auto stopped = [&](solver::Status status) {
+        solver::Result result;
+        result.status = status;
+        result.bound = lowerBound;
+        result.seconds = Elapsed(start);
+        return result;
+    };
     for (int iteration = 0; iteration < kMaximumIterations; ++iteration) {
         double remaining = config.timeLimit - Elapsed(start);
         if (remaining <= 0.0) return {solver::Status::TimeLimit, false, upperBound,
             lowerBound, 0.0, Elapsed(start)};
         model.SetDblParam(COPT_DBLPARAM_TIMELIMIT, remaining);
         const solver::Result masterResult = solver::Solve(model);
-        if (!masterResult.hasSolution) return masterResult;
         lowerBound = std::max(lowerBound, masterResult.bound);
+        if (!masterResult.hasSolution ||
+            (masterResult.status != solver::Status::Optimal &&
+                masterResult.status != solver::Status::TimeLimit)) {
+            return stopped(masterResult.status);
+        }
         const std::vector<double> values = Values(master.design);
         std::vector<std::vector<double>> thetaValues(master.routeTheta.size());
         for (size_t scenario = 0; scenario < master.routeTheta.size(); ++scenario) {
@@ -467,9 +477,7 @@ solver::Result RunPhaseOne(Model& model, MasterState& master,
                     ++optimalityCuts;
                 }
             } else {
-                solver::Result failed;
-                failed.status = result.status;
-                return failed;
+                return stopped(result.status);
             }
         }
         model.Update();
@@ -494,9 +502,7 @@ solver::Result RunPhaseOne(Model& model, MasterState& master,
             return result;
         }
     }
-    solver::Result result;
-    result.status = solver::Status::Unknown;
-    return result;
+    return stopped(solver::Status::Unknown);
 }
 
 std::set<model::DwcLink> UsedLinks(const ScenarioData& scenario)
@@ -1353,7 +1359,7 @@ solver::Result SolveFramework(const InstanceData& instance,
         }
     }
     std::cout << "Phase 2 initialized: scenarios=" << subproblems.size()
-              << ", target_gap=" << kPhaseTwoTargetGap * 100.0 << '%'
+              << ", target_gap=" << solverConfig.globalGap * 100.0 << '%'
               << ", scenario_workers=" << actualScenarioWorkers
               << ", scenario_threads=" << actualScenarioThreads
               << ", RSP=" << (runConfig.useRsp ? "on" : "off");
@@ -1379,7 +1385,7 @@ solver::Result SolveFramework(const InstanceData& instance,
     };
     const auto hasConverged = [&]() {
         return std::isfinite(upperBound) && (upperBound - lowerBound) /
-            std::max(1.0, std::fabs(upperBound)) <= kPhaseTwoTargetGap;
+            std::max(1.0, std::fabs(upperBound)) <= solverConfig.globalGap;
     };
     struct RepairTriggerState {
         int rspInfeasibleCount = 0;
@@ -1400,12 +1406,13 @@ solver::Result SolveFramework(const InstanceData& instance,
         if (remaining <= 0.0) break;
         model.SetDblParam(COPT_DBLPARAM_TIMELIMIT, remaining);
         const solver::Result masterResult = solver::Solve(model);
+        lowerBound = std::max(lowerBound, masterResult.bound);
         if (masterResult.status == solver::Status::TimeLimit) {
-            lowerBound = std::max(lowerBound, masterResult.bound);
             break;
         }
-        if (!masterResult.hasSolution) return finalResult(masterResult.status);
-        lowerBound = std::max(lowerBound, masterResult.bound);
+        if (!masterResult.hasSolution || masterResult.status != solver::Status::Optimal) {
+            return finalResult(masterResult.status);
+        }
         if (hasConverged()) return finalResult(solver::Status::Optimal);
         const std::vector<double> values = Values(master.design);
         const double thetaValue = master.theta.Get(COPT_DBLINFO_VALUE);
