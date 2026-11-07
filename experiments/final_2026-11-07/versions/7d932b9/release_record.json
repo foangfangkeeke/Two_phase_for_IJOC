@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "version": "final-rsp-skip-2026-11-05",
+  "created_utc": "2026-11-05T03:57:16.167375+00:00",
+  "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+  "executable": "experiments/final_2026-11-05/bin/wireless.exe",
+  "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+  "source_files_sha256": {
+    "src/algorithm/feasibility_diagnostics.cpp": "25afd2815c6bf356490d93874e58a7a96138cd6850a63ac4b5777884eea55986",
+    "src/algorithm/feasibility_diagnostics.hpp": "6194439d0353387b04cb4e75aaaf40b5c4220eeaa7c181519d2b30faf97c6198",
+    "src/algorithm/lifted_ils.cpp": "387d4fd0fd17a4e901d5e656ab534de81ccf0702d304966b88dc7c902a10261e",
+    "src/algorithm/lifted_ils.hpp": "107aa4d78a0c0a47151da030ad517d8de7ed402598449327a57b22056ab0cb66",
+    "src/algorithm/lifted_two_phase.cpp": "81e3d544cac791f11fb9345d5b2c887ed76c4c7998380df477261570987e9467",
+    "src/algorithm/lifted_two_phase.hpp": "448d217cbfa6b31886d4e663765083009055e6bca93628f41a62c23a016f2893",
+    "src/algorithm/natural_ils.cpp": "494fedcbcaabdc842a8b285701ac05c2680d5bc60d21baffcd4c5913bb8eda75",
+    "src/algorithm/natural_ils.hpp": "2272c718c154dd47d4a84d47c435498860b4f8c4d9add3094abdf43fd059e3c4",
+    "src/algorithm/route_relaxation.cpp": "223898e6b83a277eb4cdb3e42ebdfa4483ce978df08ad9135ecb82f31150ac85",
+    "src/algorithm/route_relaxation.hpp": "a0bfd5451df1eda653f28a53ae7da8c88b26909548cbb2bc6aa48e41654b6952",
+    "src/algorithm/scenario_relaxation.cpp": "172ee17d87134d140b741007e6de5394a33c97b59d1bd76672924aac9a401bb4",
+    "src/algorithm/scenario_relaxation.hpp": "ae2ecbbb6a848132bb6282cddfb9e6b3a18a9b6b663f5872fdd7c56801600275",
+    "src/app/main.cpp": "9053f681d16f43d66c7fdedc47f8e5d847c00e795971cacd4608c8ab3b677c8c",
+    "src/config/run_config.cpp": "ff0640b9e94367003d886df7012e125542ac19123e9c9913fee4ecaaccc56353",
+    "src/config/run_config.hpp": "2ba2c104350f1bfaa2fd06bbceca6a73b6d79ad8306009a1bc9f6dc1c0c0b6fd",
+    "src/config/solver_config.cpp": "f029c7a4ef5627705fdfef98c8add56ea4a5968777548a6407428afd7384aada",
+    "src/config/solver_config.hpp": "eb81c99df7fa54056a51cf88f7c3c05dd9b78995e71ea86dee1c330c5bc89d81",
+    "src/domain/wireless_data.cpp": "1e1787b1c0754e9227dce3737f22072ddea7b3461bb99b67f5bae31c4ca4e0c5",
+    "src/domain/wireless_data.hpp": "c7b283c8b3f0fdd9b1386f07607fac982133aca2dd57fc334212c4777efcb520",
+    "src/model/extensive_form.cpp": "9ec058e2dd98e7f730168834aba72bd817a2f16b213603b74ae29c6d511078fd",
+    "src/model/extensive_form.hpp": "8886668edf388598bfee5cb0ec8a617a279e646f33da68803ad0e2204cc571ab",
+    "src/model/model_helpers.cpp": "e02a4b1e56171a0009cef9cbff8cd0d1bb9c4a9fc3d06af4345572a347ab3a36",
+    "src/model/model_helpers.hpp": "23e90cb33381369ca1aef3d397f6e705308c991af5b037cf5a668e47ef902cf1",
+    "src/model/scenario_model.cpp": "038d00e6798d08198a07fb0e7a3962c1c75cd048b160b4b2cfa926e0554d7e09",
+    "src/model/scenario_model.hpp": "ff0fedafd21a9276a12ed0eb0b4d64a813a6b4915eb23eecb57deef9138b62a9",
+    "src/solver/copt_solver.cpp": "cad76640562fbe7a440df2a5a2e2e4b0af19c24947b4fd9f3d6c9b0fd9327004",
+    "src/solver/copt_solver.hpp": "3a71383dabb27d96a9bdaffbb75665e6d61911279e067d0a2c734a8e2dbd6896",
+    ".gitattributes": "447ae7cd60b3ada56fd0cacf44fcba32fb602b27813e6c9ebc14b7c66db1d5ec",
+    "CMakeLists.txt": "49ebb95f01fa06d262bc048f95f2303b59a54469cd9269eefa967d74b4ab7b98",
+    "solverCfg.txt": "8fdc6169b04e586b0d5ad3465df462023450595d31055222f9b4ce4ae7d93fa5",
+    "scripts/experiments/summarize_group.py": "103adb2e18d7d63eb3d226433c13c3706542105a18204f1111a34b75a19a0c14",
+    "experiments/final_2026-11-05/verify.py": "39bf3944d688454c775df72cba000b49438fca957312d2e5abd183268b2c3c58",
+    "experiments/final_2026-11-05/run_serial.py": "04f1e463c83597ba8d1d3489b3cddcd9b9371f5e4a0e30871c83cc7b29d96df4",
+    "experiments/final_2026-11-05/report.py": "1cc870ccc3266b31f079e5b5f4052ca56822b163543393203a0df3531d74f1dd",
+    "experiments/final_2026-11-05/cases.json": "fda1751aff2abaf9fb5736dc98d605c2c9a0d8fb721b90b9f4c1ba17e8597e09",
+    "experiments/final_2026-11-05/datasets.json": "f9aa905f0587c4ec7f97447c15c421f840ea605f031cb7b2f596a1fb173d54fd",
+    "experiments/final_2026-11-05/runs.json": "b8c9a8a7a5e509cf0bb6f08f51b2d6c57f77e88cbd75cb4f9824f2bec0d99b4c",
+    "experiments/final_2026-11-05/provenance/build_record.json": "52a04dcd329a873d92e5f0fad03f9c17a71e046ecd2c443314195e60c1e19554"
+  },
+  "copt_dll_sha256": {
+    "copt.dll": "94e9bbdc02ad778541666f03c0602a1260532a29229948f07704fa746ffced61",
+    "copt_cpp.dll": "b29d602755d61d0b14f76af6e144310b10ddf29200978f26f619173e5544d1a1"
+  },
+  "build_record": "experiments/final_2026-11-05/provenance/build_record.json",
+  "groups": [
+    "main_table",
+    "vi_validation",
+    "r28_full_l2p_comparison"
+  ],
+  "records": 65,
+  "unique_jobs": 58,
+  "archived_historical_evidence": "history/records.json",
+  "results_policy": "ALL_NEW_FORMAL_RESULTS_USE_THIS_EXACT_EXECUTABLE_AND_SOURCE_COMMIT",
+  "frozen_packaging_documents": {
+    "experiments/final_2026-11-05/README.md": {
+      "git_commit_at_freeze": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "sha256_at_freeze": "b61c5ec42a229c6a2d91de03ebd3d5dc4bb114ee8b920823dd9b5f2d339f7d22"
+    }
+  },
+  "documentation_policy": "Packaging documentation may be updated for publication; executable and all compilation/runtime source fingerprints are unchanged.",
+  "publication_policy": "experiments/final_2026-11-05/publication_policy.json"
+}

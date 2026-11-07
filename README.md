@@ -1,45 +1,37 @@
 # 无线充电实验：代码、用例与结果
 
-## 开始写作
+## 当前结果
 
-**先打开 [已有实验结果](experiments/final_2026-11-05/writeup/results.md)。**
+打开 [当前结果表](experiments/final_2026-11-07/results.md)，或在本地打开 [HTML表](experiments/final_2026-11-07/results.html)。主表按R3/R12/R28分组，算法为行，用例／LB、UB、actualTime(s)为两层表头。
 
-| 组别 | 已有记录 | 缺失 |
-|---|---:|---|
-| 主表 | 44 条已记录结局 + 1 条中断记录 | 6 条记录的 LB/UB 未记录；中断记录缺最终结果和实际总时间 |
-| VI 消融 | 2 条 | 关闭 VI 的界值来自最后完整迭代，最终原生状态未记录 |
-| R28 Full/L2P | 18 条 | 数值及实际墙钟时间已列出，含 N5-F50-C2 |
+| 内容 | 当前记录 | 待补 |
+|---|---:|---:|
+| 主表 | 45 | 0 |
+| Lifted VI开／关 | 2 | 0 |
+| R28 Full／L2P | 10 | N10/N20/N40共6条待替换 |
 
-三组共有 65 个结果位置，已有 64 条实验结果记录及 1 条中断记录。限时、内存限制和未记录字段均保留。
+共50份去重原始日志，对应57个结果位置。主表与消融复用相同运行；F30已移出范围。四条EF内存限制结果没有LB/UB，限时、内存和未记录信息均保留在表中。
 
-- 本地用浏览器打开 `experiments/final_2026-11-05/writeup/results.html`，表头有用例、指标两层，主表按 R3/R12/R28 合并分组。
-- [结构化数值](experiments/final_2026-11-05/writeup/results.json)包含完整精度、状态、缺失字段和逐条日志路径。
-- 页面中的数值链接到随仓库保存的原始日志；输入快照也已随仓库保存。查看结果只需浏览器。
-- [逐项日志索引](experiments/final_2026-11-05/analysis/LOG_INDEX.md)列出三组全部 65 个选用结果位置，对应 58 份去重原始日志，可查原始行号、完整迭代和版本对应。
-- [代码消融核查](experiments/final_2026-11-05/analysis/ABLATION_AUDIT.md)列出 VI、Full/L2P 配对控制及实际代码差异。
+- [逐项日志索引](experiments/final_2026-11-07/analysis/log_index.md)：每个结果可打开原始日志和运行记录。
+- [完整数值](experiments/final_2026-11-07/results.json)、[用例与输入校验值](experiments/final_2026-11-07/cases.json)、[待补列表](experiments/final_2026-11-07/MISSING.md)。
+- [版本对应](experiments/final_2026-11-07/versions.json)：33份日志来自7d932b9／98f7719a，17份来自c29cdc5／a14be609；对应源码快照和exe随包保存。
+- [原始证据复核](experiments/final_2026-11-07/analysis/raw_review.json)、[全部文件校验值](experiments/final_2026-11-07/manifest.json)。
 
-## 代码与日志范围
+## 当前代码和消融
 
-当前冻结求解代码固定在提交 `7d932b99a8fe03e2b4df796e94071b5730dd5ae6`；执行文件和源码字节绑定见 [release.json](experiments/final_2026-11-05/release.json)。
+当前求解器源码固定在c29cdc570e361a3291bd27c265faa45efb324f7b，对应 [wireless.exe](experiments/final_2026-11-07/versions/c29cdc5/wireless.exe)。本次没有修改求解器源码、算法或参数。
 
-已有结果来自历史归档版本，版本对应见 [history/records.json](experiments/final_2026-11-05/history/records.json)。这些历史数值不能标注为全部由新冻结 exe 产生。
+Full/L2P每对运行使用相同exe、输入和配置，只改变算法选项。Lifted ±VI使用相同exe和输入，只改变VI选项。R28 Full/L2P日志包含逐轮master解及repair锚点；现有Lifted ±VI日志没有逐轮master解。
 
-仓库只发布上述三组的 65 个选用结果位置及对应日志。后续重跑的日志、结果、资源记录和进度页面仅保存在本地，待用户确认后再上传。重跑目前暂停。
+正式数据按R/N命名，scenarioCfg.txt给出具体场景集合和顺序，F/C为运行参数。查看结果无需求解器；运行需要COPT 8.0.7及有效许可证。构建使用AGENTS.md记录的直接Ninja命令。
 
-## 用例
-
-正式数据目录为 `data/R3_N5_data`、`data/R12_N5_data`、`data/R28_N5_data`、`data/R28_N10_data`、`data/R28_N20_data`、`data/R28_N40_data`。每个目录的 `scenarioCfg.txt` 明确场景集合与顺序。F/C 为运行参数，例如 `R28-N5-F50-C2`；正式名称不含搜索测试编号。
-
-## 拉取与校验
-
-新目录拉取：
+## 拉取
 
 ```powershell
 git clone --single-branch --branch codex/final-experiments-2026-11-05 git@github.com:foangfangkeeke/Two_phase_for_IJOC.git wireless-results
 cd wireless-results
-python experiments/final_2026-11-05/verify.py --history
 ```
 
-该校验检查全部正式用例及历史日志、输入快照和归档代码/执行文件的哈希，不调用求解器。
+打开experiments/final_2026-11-07/results.html即可逐项分析。已有目录在同一分支执行git pull --ff-only。
 
-代码构建与复现实验计划见 [实验版本说明](experiments/final_2026-11-05/README.md)。重跑保持暂停，等待用户继续指示。
+N10/N20/N40的六条待替换旧结果不在当前结果包。后续补跑使用冻结代码，仅在本地保存，另行确认后发布。旧结果、失败尝试和探索记录保留在本地归档及Git历史中。

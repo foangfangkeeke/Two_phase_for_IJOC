@@ -1,0 +1,26 @@
+{
+  "current_source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+  "current_executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+  "versions": [
+    {
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "executable": "versions/7d932b9/wireless.exe",
+      "source_archive": "versions/7d932b9/source_snapshot.zip",
+      "source_archive_sha256": "5d8878d3f64a9c03e2f94e514e034eede3a4ae6d6a18ebab48c924f9a2390363",
+      "release_record": "versions/7d932b9/release_record.json",
+      "used_unique_runs": 33
+    },
+    {
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "executable": "versions/c29cdc5/wireless.exe",
+      "source_archive": "versions/c29cdc5/source_snapshot.zip",
+      "source_archive_sha256": "97fecf1fffa25eb17bd666a1cb1bb7acb14efde7806be90828dcc1541a7432e4",
+      "release_record": "versions/c29cdc5/release_record.json",
+      "used_unique_runs": 17
+    }
+  ],
+  "difference": "R28 Full/L2P iteration search logging only; model, cuts and solver settings unchanged",
+  "common_executable_gate": "UNMET_MIXED_VERSIONS_EXPLICITLY_DISCLOSED"
+}

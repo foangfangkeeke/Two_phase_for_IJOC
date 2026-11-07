@@ -27,3 +27,12 @@ gurobi*
 /experiments/final_2026-11-05/provenance/previous_final_experiments_pointer.json
 /experiments/final_2026-11-05/analysis/raw/
 /experiments/final_2026-11-05/analysis/proposed_vi_trace.patch
+
+# Retired result publications remain local and in Git history.
+/experiments/final_2026-11-05/history/
+/experiments/final_2026-11-05/analysis/
+/experiments/final_2026-11-05/writeup/
+
+# Exact raw logs selected for the current publication.
+!/experiments/final_2026-11-07/logs/
+!/experiments/final_2026-11-07/logs/*.log

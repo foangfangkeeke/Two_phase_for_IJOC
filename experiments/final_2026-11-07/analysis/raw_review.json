@@ -1,0 +1,1449 @@
+{
+  "reviewed_utc": "2026-11-07T05:21:37.619504+00:00",
+  "independent_of_controller_and_parser": true,
+  "solver_calls": 0,
+  "reviewed_unique_runs": 50,
+  "reviewed_result_slots": 57,
+  "raw_hashes_options_actual_inputs_source_archives_and_versions_verified": true,
+  "mismatches": 0,
+  "LB_decreases": 0,
+  "incumbent_increases": 0,
+  "records": [
+    {
+      "run_id": "R12-N5-F10-C4_ef",
+      "raw_log_sha256": "699a9d50ce4bfc6553b1edb5394b170d8cf71cbb2f30b212b7fbbf388ffd8050",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 7,
+      "terminal_raw": "Algorithm termination: algorithm=ef, status=OPTIMAL, has_solution=1, UB=8365.950455, LB=8358.566687, gap_percent=0.088260, reported_seconds=53.975226",
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 57.937000000150874,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 57.938432,
+      "utc_minus_monotonic_seconds": 0.0014319998491245656
+    },
+    {
+      "run_id": "R12-N5-F10-C4_full",
+      "raw_log_sha256": "50e518916d7506245e808fbf71c0b8602959e1e54d58fca5d916824f62d6a5f6",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 17,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=8363.898909, LB=8363.415464, gap_percent=0.005780, reported_seconds=13.029424",
+      "complete_iterations": {
+        "Phase 1": 4,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 10,
+          "iteration": 3,
+          "lb": 8363.415464,
+          "ub": "8363.880708",
+          "elapsed_seconds": 5.0568272
+        },
+        "Phase 2": {
+          "line": 14,
+          "iteration": 0,
+          "lb": 8363.415464,
+          "ub": "8363.898909",
+          "elapsed_seconds": 13.0294157
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 13.452999999979511,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 13.441145,
+      "utc_minus_monotonic_seconds": -0.011854999979510339
+    },
+    {
+      "run_id": "R12-N5-F10-C4_lifted-ils",
+      "raw_log_sha256": "f555b0789eccbd81ceafeb3b3b140a54ca1766af18b94c6eb26c927abf0b1b64",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 22,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=OPTIMAL, has_solution=1, UB=8363.898909, LB=8363.624883, gap_percent=0.003276, reported_seconds=373.633716",
+      "complete_iterations": {
+        "Lifted ILS": 14
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 19,
+          "iteration": 13,
+          "lb": 8363.624883,
+          "ub": "8363.898909",
+          "elapsed_seconds": 373.6337095
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 374.18699999991804,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 374.173009,
+      "utc_minus_monotonic_seconds": -0.013990999918064517
+    },
+    {
+      "run_id": "R12-N5-F10-C4_lifted-two-phase",
+      "raw_log_sha256": "43c9cbba786a62d91cae27b392ac458a3da568dcbef1a3cc10942569a5f463a0",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 17,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=8363.898909, LB=8363.415464, gap_percent=0.005780, reported_seconds=13.029886",
+      "complete_iterations": {
+        "Phase 1": 4,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 10,
+          "iteration": 3,
+          "lb": 8363.415464,
+          "ub": "8363.880708",
+          "elapsed_seconds": 5.027186800000001
+        },
+        "Phase 2": {
+          "line": 14,
+          "iteration": 0,
+          "lb": 8363.415464,
+          "ub": "8363.898909",
+          "elapsed_seconds": 13.029877899999999
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 13.468000000109896,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 13.457502,
+      "utc_minus_monotonic_seconds": -0.01049800010989621
+    },
+    {
+      "run_id": "R12-N5-F10-C4_natural-ils",
+      "raw_log_sha256": "f900cdb7f16f0f59c1e6463cd75f91521db97c51ae8cbc6e90496799e71648d7",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 271,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=TIME_LIMIT, has_solution=1, UB=8363.880708, LB=8261.553462, gap_percent=1.223442, reported_seconds=7200.765743",
+      "complete_iterations": {
+        "Natural ILS": 263
+      },
+      "last_complete": {
+        "Natural ILS": {
+          "line": 268,
+          "iteration": 262,
+          "lb": 8261.553462,
+          "ub": "8363.880708",
+          "elapsed_seconds": 7175.0104728
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7201.328000000212,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7201.32467,
+      "utc_minus_monotonic_seconds": -0.003330000212372397
+    },
+    {
+      "run_id": "R12-N5-F20-C4_ef",
+      "raw_log_sha256": "bc52e7d3fa4aa83ba5c5f20c730654fabb0e11bc0386ef8984b681f6fa1d3d6d",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 7,
+      "terminal_raw": "Algorithm termination: algorithm=ef, status=OPTIMAL, has_solution=1, UB=8313.146903, LB=8239.552612, gap_percent=0.885276, reported_seconds=259.890751",
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 262.7029999999795,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 262.712793,
+      "utc_minus_monotonic_seconds": 0.00979300002046557
+    },
+    {
+      "run_id": "R12-N5-F20-C4_full",
+      "raw_log_sha256": "bde23345e70da6963cc4b4bb9d4f226ff33aa5808daa6e71686e49f06b5e4e3c",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 19,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=8279.504224, LB=8279.500646, gap_percent=0.000043, reported_seconds=15.292967",
+      "complete_iterations": {
+        "Phase 1": 6,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 12,
+          "iteration": 5,
+          "lb": 8279.500646,
+          "ub": "8279.500646",
+          "elapsed_seconds": 7.0405683
+        },
+        "Phase 2": {
+          "line": 16,
+          "iteration": 0,
+          "lb": 8279.500646,
+          "ub": "8279.504224",
+          "elapsed_seconds": 15.292959199999999
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 15.734999999869615,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 15.739396,
+      "utc_minus_monotonic_seconds": 0.0043960001303844365
+    },
+    {
+      "run_id": "R12-N5-F20-C4_lifted-ils",
+      "raw_log_sha256": "5980a6ad898d921f5f95167dd348fc3bd9a2e6ee8afc58a0981a753aef18a737",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 687,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=OPTIMAL, has_solution=1, UB=8279.522960, LB=8278.239042, gap_percent=0.015507, reported_seconds=1416.823028",
+      "complete_iterations": {
+        "Lifted ILS": 679
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 684,
+          "iteration": 678,
+          "lb": 8278.239042,
+          "ub": "8279.52296",
+          "elapsed_seconds": 1416.823022
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 1417.3910000000615,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 1417.38962,
+      "utc_minus_monotonic_seconds": -0.0013800000615447061
+    },
+    {
+      "run_id": "R12-N5-F20-C4_lifted-two-phase",
+      "raw_log_sha256": "b71fa42d5e9af5043bf26473ac19ec8092231633e5586cf6e9dbe1a7e9d0d2d4",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 19,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=8279.504224, LB=8279.500646, gap_percent=0.000043, reported_seconds=15.389572",
+      "complete_iterations": {
+        "Phase 1": 6,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 12,
+          "iteration": 5,
+          "lb": 8279.500646,
+          "ub": "8279.500646",
+          "elapsed_seconds": 7.0664093
+        },
+        "Phase 2": {
+          "line": 16,
+          "iteration": 0,
+          "lb": 8279.500646,
+          "ub": "8279.504224",
+          "elapsed_seconds": 15.3895644
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 15.844000000040978,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 15.84201,
+      "utc_minus_monotonic_seconds": -0.001990000040978046
+    },
+    {
+      "run_id": "R12-N5-F20-C4_natural-ils",
+      "raw_log_sha256": "9ee59a933a3d8b5dc07f9ac3be4127df632c0e45faa4e202ec43649229424363",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 263,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=TIME_LIMIT, has_solution=1, UB=8298.438277, LB=8154.573648, gap_percent=1.733635, reported_seconds=7200.238443",
+      "complete_iterations": {
+        "Natural ILS": 255
+      },
+      "last_complete": {
+        "Natural ILS": {
+          "line": 260,
+          "iteration": 254,
+          "lb": 8154.573648,
+          "ub": "8298.438277",
+          "elapsed_seconds": 7188.4638024000005
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7200.7029999999795,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7200.714109,
+      "utc_minus_monotonic_seconds": 0.011109000020042004
+    },
+    {
+      "run_id": "R12-N5-F50-C4_ef",
+      "raw_log_sha256": "d96277b9bce76ba6af5e95a33050dcec16edebd237dfb0d546514b2d10d2f24b",
+      "status": "MEMORY_LIMIT_EXTERNAL",
+      "original_bounds_source": "UNRECORDED",
+      "terminal_line": null,
+      "terminal_raw": null,
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 87.20299999997951,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 87.212719,
+      "utc_minus_monotonic_seconds": 0.009719000020496082
+    },
+    {
+      "run_id": "R12-N5-F50-C4_full",
+      "raw_log_sha256": "2ec30fbe793de5eb554c0ec3d935ca4c4e8a4a76a4c3af322fc9810d36295fa9",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 24,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=8197.972066, LB=8197.923779, gap_percent=0.000589, reported_seconds=21.070586",
+      "complete_iterations": {
+        "Phase 1": 11,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 17,
+          "iteration": 10,
+          "lb": 8197.923779,
+          "ub": "8197.923779",
+          "elapsed_seconds": 11.941386399999999
+        },
+        "Phase 2": {
+          "line": 21,
+          "iteration": 0,
+          "lb": 8197.923779,
+          "ub": "8197.972066",
+          "elapsed_seconds": 21.0705788
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 21.54700000002049,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 21.54657,
+      "utc_minus_monotonic_seconds": -0.00043000002048998454
+    },
+    {
+      "run_id": "R12-N5-F50-C4_lifted-ils",
+      "raw_log_sha256": "515bdaf2591ed0e491c35155650d845bb5cbe4e6cd7d70d0d34ee0990f86c9c1",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 110,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=OPTIMAL, has_solution=1, UB=8198.534757, LB=8193.164801, gap_percent=0.065499, reported_seconds=1236.511227",
+      "complete_iterations": {
+        "Lifted ILS": 102
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 107,
+          "iteration": 101,
+          "lb": 8193.164801,
+          "ub": "8198.534757",
+          "elapsed_seconds": 1236.5112205
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 1237.0620000001509,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 1237.061165,
+      "utc_minus_monotonic_seconds": -0.0008350001508006244
+    },
+    {
+      "run_id": "R12-N5-F50-C4_lifted-ils_noVI",
+      "raw_log_sha256": "df0bda05492a9bf3a373220ff4922df6f634440470b146ded3c749638e32d5ba",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 28,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=TIME_LIMIT, has_solution=0, UB=inf, LB=2743.811282, gap_percent=inf, reported_seconds=7200.174581",
+      "complete_iterations": {
+        "Lifted ILS": 19
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 24,
+          "iteration": 18,
+          "lb": 2743.74,
+          "ub": "inf",
+          "elapsed_seconds": 6910.9861139
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7200.828000000212,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7199.394949,
+      "utc_minus_monotonic_seconds": -1.43305100021189
+    },
+    {
+      "run_id": "R12-N5-F50-C4_lifted-two-phase",
+      "raw_log_sha256": "7a7d05f34e8f3c90e088b5d0b0a7bc2ddd204ae90249186b1bd0e1b8a4413c9e",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 24,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=8197.972066, LB=8197.923779, gap_percent=0.000589, reported_seconds=21.097199",
+      "complete_iterations": {
+        "Phase 1": 11,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 17,
+          "iteration": 10,
+          "lb": 8197.923779,
+          "ub": "8197.923779",
+          "elapsed_seconds": 11.885014100000001
+        },
+        "Phase 2": {
+          "line": 21,
+          "iteration": 0,
+          "lb": 8197.923779,
+          "ub": "8197.972066",
+          "elapsed_seconds": 21.0971911
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 21.608999999938533,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 21.594919,
+      "utc_minus_monotonic_seconds": -0.014080999938531846
+    },
+    {
+      "run_id": "R12-N5-F50-C4_natural-ils",
+      "raw_log_sha256": "c1e975a698cc74501a77167d82411c0520d6fe2646401d44ab86f2d15e03f35b",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 287,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=TIME_LIMIT, has_solution=1, UB=8260.380781, LB=8072.076322, gap_percent=2.279610, reported_seconds=7200.097083",
+      "complete_iterations": {
+        "Natural ILS": 279
+      },
+      "last_complete": {
+        "Natural ILS": {
+          "line": 284,
+          "iteration": 278,
+          "lb": 8072.076322,
+          "ub": "8260.380781",
+          "elapsed_seconds": 7194.4187606
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7200.593999999808,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7200.601441,
+      "utc_minus_monotonic_seconds": 0.007441000191647618
+    },
+    {
+      "run_id": "R28-N5-F10-C4_ef",
+      "raw_log_sha256": "518d950d8d78cdc771cdcbe36d726dae582120bb4835f4009fb1b8db93e7ee11",
+      "status": "MEMORY_LIMIT_EXTERNAL",
+      "original_bounds_source": "UNRECORDED",
+      "terminal_line": null,
+      "terminal_raw": null,
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 157.9680000001099,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 157.965129,
+      "utc_minus_monotonic_seconds": -0.002871000109905708
+    },
+    {
+      "run_id": "R28-N5-F10-C4_full",
+      "raw_log_sha256": "b3013dfc9459f120dc1116c98d0f6ae68af3a39a0ad53893602e8531d55828f9",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 45,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=17957.279437, LB=17790.492085, gap_percent=0.928801, reported_seconds=396.396901",
+      "complete_iterations": {
+        "Phase 1": 4,
+        "Phase 2": 2
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 14,
+          "iteration": 3,
+          "lb": 17752.566857,
+          "ub": "17752.566857",
+          "elapsed_seconds": 10.2970589
+        },
+        "Phase 2": {
+          "line": 42,
+          "iteration": 1,
+          "lb": 17777.14971,
+          "ub": "17957.279437",
+          "elapsed_seconds": 395.9297224
+        }
+      },
+      "search_records": {
+        "master": 7,
+        "repair": 9,
+        "incumbent": 2
+      },
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 397.5,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 397.513817,
+      "utc_minus_monotonic_seconds": 0.013817000000017288
+    },
+    {
+      "run_id": "R28-N5-F10-C4_lifted-ils",
+      "raw_log_sha256": "418e76873b84832a245b915edb1a8b5cd0f8d6dadfc9774adb44872a75e60c92",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 201,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=TIME_LIMIT, has_solution=0, UB=inf, LB=16186.007616, gap_percent=inf, reported_seconds=7200.074925",
+      "complete_iterations": {
+        "Lifted ILS": 191
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 198,
+          "iteration": 190,
+          "lb": 16186.007616,
+          "ub": "inf",
+          "elapsed_seconds": 7172.9046458
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7201.4839999999385,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7201.487782,
+      "utc_minus_monotonic_seconds": 0.0037820000616193283
+    },
+    {
+      "run_id": "R28-N5-F10-C4_lifted-two-phase",
+      "raw_log_sha256": "141fc9368a69241b94603f3ede91ccb390adb311f7303c115144997e71499fde",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 28,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=17864.432684, LB=17793.272713, gap_percent=0.398333, reported_seconds=329.223240",
+      "complete_iterations": {
+        "Phase 1": 4,
+        "Phase 2": 4
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 14,
+          "iteration": 3,
+          "lb": 17752.566857,
+          "ub": "17752.566857",
+          "elapsed_seconds": 10.2490204
+        },
+        "Phase 2": {
+          "line": 25,
+          "iteration": 3,
+          "lb": 17793.272713,
+          "ub": "17864.432684",
+          "elapsed_seconds": 329.223233
+        }
+      },
+      "search_records": {
+        "master": 8
+      },
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 330.39099999982864,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 330.382485,
+      "utc_minus_monotonic_seconds": -0.00851499982866244
+    },
+    {
+      "run_id": "R28-N5-F10-C4_natural-ils",
+      "raw_log_sha256": "22b737dfc4062d20e0bd1749d6fa0e1d5ce73f7ded71d7dfa1fefc0769cde61f",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 8,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=TIME_LIMIT, has_solution=0, UB=inf, LB=0.000000, gap_percent=inf, reported_seconds=7202.586540",
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7204.23499999987,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7204.23834,
+      "utc_minus_monotonic_seconds": 0.0033400001302652527
+    },
+    {
+      "run_id": "R28-N5-F20-C4_ef",
+      "raw_log_sha256": "ef8e09c1539ac750e766d3229d3c4f9cb0064cfd9a3c2c59d1a1aa9e5ba8714c",
+      "status": "MEMORY_LIMIT_EXTERNAL",
+      "original_bounds_source": "UNRECORDED",
+      "terminal_line": null,
+      "terminal_raw": null,
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 154.03099999995902,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 154.026901,
+      "utc_minus_monotonic_seconds": -0.004098999959012417
+    },
+    {
+      "run_id": "R28-N5-F20-C4_full",
+      "raw_log_sha256": "7eaf73a056c4f7093e495b839d0425fd649d410f726d1699c4e9042d96fce339",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 57,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=17893.137665, LB=17723.202900, gap_percent=0.949720, reported_seconds=766.450523",
+      "complete_iterations": {
+        "Phase 1": 4,
+        "Phase 2": 4
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 14,
+          "iteration": 3,
+          "lb": 17682.373471,
+          "ub": "17682.373471",
+          "elapsed_seconds": 10.803936400000001
+        },
+        "Phase 2": {
+          "line": 54,
+          "iteration": 3,
+          "lb": 17723.2029,
+          "ub": "17893.137665",
+          "elapsed_seconds": 766.4505159
+        }
+      },
+      "search_records": {
+        "master": 8,
+        "repair": 12,
+        "incumbent": 3
+      },
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 767.6409999998286,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 767.644661,
+      "utc_minus_monotonic_seconds": 0.0036610001714052487
+    },
+    {
+      "run_id": "R28-N5-F20-C4_lifted-ils",
+      "raw_log_sha256": "b01420d15f1401577e7269170aa7a9b0c0e58e248b311b397f771abc3054887a",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 331,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=TIME_LIMIT, has_solution=0, UB=inf, LB=16798.979581, gap_percent=inf, reported_seconds=7200.028213",
+      "complete_iterations": {
+        "Lifted ILS": 323
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 328,
+          "iteration": 322,
+          "lb": 16798.979581,
+          "ub": "inf",
+          "elapsed_seconds": 7197.3890697
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7201.312999999849,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7201.307559,
+      "utc_minus_monotonic_seconds": -0.005440999849270156
+    },
+    {
+      "run_id": "R28-N5-F20-C4_lifted-two-phase",
+      "raw_log_sha256": "4345b304e5148d4f32281f229ba3c9e25d3ebcd33a95bc901bbdbe80918ee9a6",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 704,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=TIME_LIMIT, has_solution=0, UB=inf, LB=17791.814680, gap_percent=inf, reported_seconds=7200.075061",
+      "complete_iterations": {
+        "Phase 1": 4,
+        "Phase 2": 342
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 14,
+          "iteration": 3,
+          "lb": 17682.373471,
+          "ub": "17682.373471",
+          "elapsed_seconds": 10.936074399999999
+        },
+        "Phase 2": {
+          "line": 700,
+          "iteration": 341,
+          "lb": 17791.81468,
+          "ub": "inf",
+          "elapsed_seconds": 7169.0981539
+        }
+      },
+      "search_records": {
+        "master": 347
+      },
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7201.312000000151,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7201.313711,
+      "utc_minus_monotonic_seconds": 0.0017109998489104328
+    },
+    {
+      "run_id": "R28-N5-F20-C4_natural-ils",
+      "raw_log_sha256": "da4eea88c1b5e694a6265b1190803dc562bddfce7acf0709b83127e08fca25b4",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 8,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=TIME_LIMIT, has_solution=0, UB=inf, LB=0.000000, gap_percent=inf, reported_seconds=7201.840951",
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7203.389999999898,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7203.384201,
+      "utc_minus_monotonic_seconds": -0.005798999897706381
+    },
+    {
+      "run_id": "R28-N5-F50-C2_full",
+      "raw_log_sha256": "b0706d8b1944ca9d443835c2068ecf88566d99ad01db7ea707e1af7225bc733a",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 410,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=TIME_LIMIT, has_solution=1, UB=19390.564830, LB=18003.015124, gap_percent=7.155798, reported_seconds=7206.724270",
+      "complete_iterations": {
+        "Phase 1": 166,
+        "Phase 2": 10
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 338,
+          "iteration": 165,
+          "lb": 17425.71222,
+          "ub": "17426.886092",
+          "elapsed_seconds": 203.64819599999998
+        },
+        "Phase 2": {
+          "line": 406,
+          "iteration": 9,
+          "lb": 17987.393018,
+          "ub": "19390.56483",
+          "elapsed_seconds": 4934.6427518
+        }
+      },
+      "search_records": {
+        "master": 177,
+        "repair": 20,
+        "incumbent": 3
+      },
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7209.1410000000615,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7209.131413,
+      "utc_minus_monotonic_seconds": -0.00958700006140134
+    },
+    {
+      "run_id": "R28-N5-F50-C2_lifted-two-phase",
+      "raw_log_sha256": "821e07442d90a115e84485c3460eed0e317d81dd18b80929061bf16f07902025",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 370,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=TIME_LIMIT, has_solution=0, UB=inf, LB=18007.233391, gap_percent=inf, reported_seconds=7200.130289",
+      "complete_iterations": {
+        "Phase 1": 166,
+        "Phase 2": 13
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 338,
+          "iteration": 165,
+          "lb": 17425.71222,
+          "ub": "17426.886092",
+          "elapsed_seconds": 201.4047727
+        },
+        "Phase 2": {
+          "line": 366,
+          "iteration": 12,
+          "lb": 17995.926269,
+          "ub": "inf",
+          "elapsed_seconds": 6949.8682337
+        }
+      },
+      "search_records": {
+        "master": 180
+      },
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7202.25,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7202.252833,
+      "utc_minus_monotonic_seconds": 0.002832999999554886
+    },
+    {
+      "run_id": "R28-N5-F50-C3_full",
+      "raw_log_sha256": "2d3d1e5b89b389c189f0dbbf6259c244022acb92fc99dc806d49873bcdc3f07f",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 477,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=17886.326205, LB=17716.315484, gap_percent=0.950507, reported_seconds=3046.242265",
+      "complete_iterations": {
+        "Phase 1": 166,
+        "Phase 2": 18
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 338,
+          "iteration": 165,
+          "lb": 17425.71222,
+          "ub": "17426.886092",
+          "elapsed_seconds": 208.33582629999998
+        },
+        "Phase 2": {
+          "line": 474,
+          "iteration": 17,
+          "lb": 17701.309071,
+          "ub": "17886.326205",
+          "elapsed_seconds": 3042.3754602
+        }
+      },
+      "search_records": {
+        "master": 185,
+        "repair": 45,
+        "incumbent": 4
+      },
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 3047.5160000000615,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 3047.523632,
+      "utc_minus_monotonic_seconds": 0.007631999938439549
+    },
+    {
+      "run_id": "R28-N5-F50-C3_lifted-two-phase",
+      "raw_log_sha256": "88d47b3f90693e0af3d5f6c901b2653484c1c39e1b0729128f7b07a41f10780a",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 858,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=TIME_LIMIT, has_solution=0, UB=inf, LB=17689.677711, gap_percent=inf, reported_seconds=7200.141186",
+      "complete_iterations": {
+        "Phase 1": 166,
+        "Phase 2": 257
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 338,
+          "iteration": 165,
+          "lb": 17425.71222,
+          "ub": "17426.886092",
+          "elapsed_seconds": 200.072393
+        },
+        "Phase 2": {
+          "line": 854,
+          "iteration": 256,
+          "lb": 17689.677711,
+          "ub": "inf",
+          "elapsed_seconds": 7117.933526600001
+        }
+      },
+      "search_records": {
+        "master": 424
+      },
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7202.030999999959,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7202.036965,
+      "utc_minus_monotonic_seconds": 0.005965000041214807
+    },
+    {
+      "run_id": "R28-N5-F50-C4_ef",
+      "raw_log_sha256": "2404dccbcee3f04c681a78730da918eaab0625156aea368e78c0997eba00f27a",
+      "status": "MEMORY_LIMIT_EXTERNAL",
+      "original_bounds_source": "UNRECORDED",
+      "terminal_line": null,
+      "terminal_raw": null,
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 932.4069999998901,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 932.402677,
+      "utc_minus_monotonic_seconds": -0.004322999890064239
+    },
+    {
+      "run_id": "R28-N5-F50-C4_full",
+      "raw_log_sha256": "929f2772dab37c51bed864e9ccd742249f9ef813ee19fcc18a679d60900d25c8",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 346,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=17478.568951, LB=17425.712220, gap_percent=0.302409, reported_seconds=252.691251",
+      "complete_iterations": {
+        "Phase 1": 166,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 338,
+          "iteration": 165,
+          "lb": 17425.71222,
+          "ub": "17426.886092",
+          "elapsed_seconds": 208.6852027
+        },
+        "Phase 2": {
+          "line": 343,
+          "iteration": 0,
+          "lb": 17425.71222,
+          "ub": "17478.568951",
+          "elapsed_seconds": 252.6912433
+        }
+      },
+      "search_records": {
+        "master": 167
+      },
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 254.0789999999106,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 254.072344,
+      "utc_minus_monotonic_seconds": -0.00665599991060617
+    },
+    {
+      "run_id": "R28-N5-F50-C4_lifted-ils",
+      "raw_log_sha256": "de3617b1f305d6c4c11240e8d7e7ea737bda0f0c587f1660657d58b5c60d1463",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 306,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=TIME_LIMIT, has_solution=0, UB=inf, LB=16934.434787, gap_percent=inf, reported_seconds=7200.676159",
+      "complete_iterations": {
+        "Lifted ILS": 291
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 304,
+          "iteration": 290,
+          "lb": 16934.434787,
+          "ub": "inf",
+          "elapsed_seconds": 7200.676153599999
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7202.031000000192,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7202.044321,
+      "utc_minus_monotonic_seconds": 0.01332099980845669
+    },
+    {
+      "run_id": "R28-N5-F50-C4_lifted-two-phase",
+      "raw_log_sha256": "aaecf64ea8198d15d63c8391ff18d13cae7d016e0e947d65d6af1c022469f9c9",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 346,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=17478.568951, LB=17425.712220, gap_percent=0.302409, reported_seconds=253.534254",
+      "complete_iterations": {
+        "Phase 1": 166,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 338,
+          "iteration": 165,
+          "lb": 17425.71222,
+          "ub": "17426.886092",
+          "elapsed_seconds": 209.20802270000001
+        },
+        "Phase 2": {
+          "line": 343,
+          "iteration": 0,
+          "lb": 17425.71222,
+          "ub": "17478.568951",
+          "elapsed_seconds": 253.53424710000002
+        }
+      },
+      "search_records": {
+        "master": 167
+      },
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 254.7960000000894,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 254.786882,
+      "utc_minus_monotonic_seconds": -0.009118000089415546
+    },
+    {
+      "run_id": "R28-N5-F50-C4_natural-ils",
+      "raw_log_sha256": "38767df933cb2fe03b4fbbf0bd8b1171e10ab1c9725432a85b8e747ce2202736",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 8,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=TIME_LIMIT, has_solution=0, UB=inf, LB=0.000000, gap_percent=inf, reported_seconds=7201.709598",
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7203.2970000000205,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7203.293177,
+      "utc_minus_monotonic_seconds": -0.0038230000209296122
+    },
+    {
+      "run_id": "R3-N5-F10-C4_ef",
+      "raw_log_sha256": "d0350a03f61c5efd11ccc379f9fd99655d6521906152ad975fc12612e0f4e91f",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 7,
+      "terminal_raw": "Algorithm termination: algorithm=ef, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=0.000000, reported_seconds=5.018183",
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 5.891000000061467,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 5.883967,
+      "utc_minus_monotonic_seconds": -0.007033000061467121
+    },
+    {
+      "run_id": "R3-N5-F10-C4_full",
+      "raw_log_sha256": "d136949cad2a506cd941d2eaa897be311e84ac95360b25525783f20730458055",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 15,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=2.525223",
+      "complete_iterations": {
+        "Phase 1": 2,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 8,
+          "iteration": 1,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 0.7656215999999999
+        },
+        "Phase 2": {
+          "line": 12,
+          "iteration": 0,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 2.5251923
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 2.6870000001508743,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 2.683279,
+      "utc_minus_monotonic_seconds": -0.0037210001508740653
+    },
+    {
+      "run_id": "R3-N5-F10-C4_lifted-ils",
+      "raw_log_sha256": "ab8b46157d1336a37edc5cc97687b3208d5a348b18b275d67c264346c76d243d",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 10,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=2.790584",
+      "complete_iterations": {
+        "Lifted ILS": 2
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 7,
+          "iteration": 1,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 2.7905782
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 2.9689999998081475,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 2.971306,
+      "utc_minus_monotonic_seconds": 0.002306000191852231
+    },
+    {
+      "run_id": "R3-N5-F10-C4_lifted-two-phase",
+      "raw_log_sha256": "77cc608bb70e0686f2f04b823d9c501b54a1a3394ecf19d1b1c9df8bace15412",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 15,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=2.498052",
+      "complete_iterations": {
+        "Phase 1": 2,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 8,
+          "iteration": 1,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 0.7794056
+        },
+        "Phase 2": {
+          "line": 12,
+          "iteration": 0,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 2.4980438
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 2.656999999890104,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 2.65365,
+      "utc_minus_monotonic_seconds": -0.003349999890104094
+    },
+    {
+      "run_id": "R3-N5-F10-C4_natural-ils",
+      "raw_log_sha256": "aac8300edaa399e459ee11615fa3179f4a86b8ab7f31d5a0420135e8b885c52c",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 11,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=7.928680",
+      "complete_iterations": {
+        "Natural ILS": 2
+      },
+      "last_complete": {
+        "Natural ILS": {
+          "line": 7,
+          "iteration": 1,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 7.9285792
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 8.094000000040978,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 8.08526,
+      "utc_minus_monotonic_seconds": -0.008740000040978302
+    },
+    {
+      "run_id": "R3-N5-F20-C4_ef",
+      "raw_log_sha256": "16e290b6549b9315c26b4e66830491addcccc3e700c05dbc06ed0f07ff1af24c",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 7,
+      "terminal_raw": "Algorithm termination: algorithm=ef, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=0.000000, reported_seconds=7.855761",
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 8.719000000040978,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 8.717594,
+      "utc_minus_monotonic_seconds": -0.0014060000409781281
+    },
+    {
+      "run_id": "R3-N5-F20-C4_full",
+      "raw_log_sha256": "7278324f04a740af18a94951cbfdbb4767e6e822cc2216f949344258d6da30d9",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 15,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=2.753137",
+      "complete_iterations": {
+        "Phase 1": 2,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 8,
+          "iteration": 1,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 0.8712858
+        },
+        "Phase 2": {
+          "line": 12,
+          "iteration": 0,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 2.7531293999999997
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 2.9370000001508743,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 2.941264,
+      "utc_minus_monotonic_seconds": 0.0042639998491256215
+    },
+    {
+      "run_id": "R3-N5-F20-C4_lifted-ils",
+      "raw_log_sha256": "99d6f1b4f53dcaeb92fbdfb44744c630e6ee2e031199f75bcbdcb4c787cc0f6c",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 10,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=3.033727",
+      "complete_iterations": {
+        "Lifted ILS": 2
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 7,
+          "iteration": 1,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 3.0337181
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 3.219000000040978,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 3.23084,
+      "utc_minus_monotonic_seconds": 0.011839999959021963
+    },
+    {
+      "run_id": "R3-N5-F20-C4_lifted-two-phase",
+      "raw_log_sha256": "37929424abd47d8a11e5ae6ef1646320cec181e33670fc038e96d8d607bc8fe3",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 15,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=2.775139",
+      "complete_iterations": {
+        "Phase 1": 2,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 8,
+          "iteration": 1,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 0.8539694
+        },
+        "Phase 2": {
+          "line": 12,
+          "iteration": 0,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 2.7751313
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 2.952999999979511,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 2.95298,
+      "utc_minus_monotonic_seconds": -1.999997951074306e-05
+    },
+    {
+      "run_id": "R3-N5-F20-C4_natural-ils",
+      "raw_log_sha256": "76979ebaab2359716088728bbd221a9f74c52411505c5d8413b7af4a281ac602",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 11,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=8.272199",
+      "complete_iterations": {
+        "Natural ILS": 2
+      },
+      "last_complete": {
+        "Natural ILS": {
+          "line": 7,
+          "iteration": 1,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 8.2721093
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 8.452999999979511,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 8.446954,
+      "utc_minus_monotonic_seconds": -0.006045999979511052
+    },
+    {
+      "run_id": "R3-N5-F50-C4_ef",
+      "raw_log_sha256": "400d444e474e105391ef6a2258a8d29b607b3055d3ce4981651e277b4bfdaf90",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 7,
+      "terminal_raw": "Algorithm termination: algorithm=ef, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=0.000000, reported_seconds=13.648220",
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 14.655999999959022,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 14.645492,
+      "utc_minus_monotonic_seconds": -0.010507999959020964
+    },
+    {
+      "run_id": "R3-N5-F50-C4_full",
+      "raw_log_sha256": "15fdb9f253f3ba7b2eff39e5fecf853e7b742190be504603d2858ab798bcfd8d",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 15,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=2.984479",
+      "complete_iterations": {
+        "Phase 1": 2,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 8,
+          "iteration": 1,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 0.9346497
+        },
+        "Phase 2": {
+          "line": 12,
+          "iteration": 0,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 2.9844711000000004
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 3.172000000020489,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 3.162159,
+      "utc_minus_monotonic_seconds": -0.009841000020489155
+    },
+    {
+      "run_id": "R3-N5-F50-C4_lifted-ils",
+      "raw_log_sha256": "30bf3da32bdae78960e948850517d97aa8132d46795cf79a00ecce4f9563599e",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 10,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=3.289414",
+      "complete_iterations": {
+        "Lifted ILS": 2
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 7,
+          "iteration": 1,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 3.2893915000000002
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 3.515000000130385,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 3.501185,
+      "utc_minus_monotonic_seconds": -0.013815000130385169
+    },
+    {
+      "run_id": "R3-N5-F50-C4_lifted-two-phase",
+      "raw_log_sha256": "b207bdb688adec6fb760e47036bca8048fbbcafb4537d62f2e287194e382020c",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 15,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=3.114412",
+      "complete_iterations": {
+        "Phase 1": 2,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 8,
+          "iteration": 1,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 0.9290193
+        },
+        "Phase 2": {
+          "line": 12,
+          "iteration": 0,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 3.1144043999999997
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 3.297000000020489,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 3.300416,
+      "utc_minus_monotonic_seconds": 0.0034159999795106977
+    },
+    {
+      "run_id": "R3-N5-F50-C4_natural-ils",
+      "raw_log_sha256": "d022979b23529af2f54098e6c90c75269cc1616ff47e9d7fbb87401110062079",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 11,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=8.630792",
+      "complete_iterations": {
+        "Natural ILS": 2
+      },
+      "last_complete": {
+        "Natural ILS": {
+          "line": 7,
+          "iteration": 1,
+          "lb": 1469.848225,
+          "ub": "1469.848225",
+          "elapsed_seconds": 8.6306744
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 8.858999999938533,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 8.848733,
+      "utc_minus_monotonic_seconds": -0.010266999938533417
+    }
+  ],
+  "version_probe_runs": 0,
+  "actual_wall_policy": "Preserve controller monotonic durations, and report UTC timestamp deltas separately"
+}

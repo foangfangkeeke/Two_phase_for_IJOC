@@ -1,0 +1,20 @@
+Execution policy: version=final-rsp-skip-2026-11-05, rsp_numerical=skip_screening, original_subproblem=required
+Runtime options: facility_cost_scale=1.000000, energy_scale=1.000000, battery_step=50, scenario_count=5, scenario_start=0, cap=4, dwc_top_n=10, wireless_option=1, rsp=1, rsp_workers=3, rsp_threads=4, preprocess_bounds=0, valid_inequality=1
+Solver options: mip_gap=0.000100, global_gap=0.010000, time_limit=7200.000000, threads=12
+Instance: data=R12_N5, scenario_folders=base;charger_btbatok_up10;global_down10;route_453_up10;route_941_down20, battery_range=[50.000000,600.000000]
+Battery upper-bound preprocess_ms=0.647500
+Phase 1 initialized: route_subproblems=60
+Phase 1 iter 0, feasibility cut x16, UB=inf, LB=3080.340000, gap=1, master_ms=15.705300, subproblem_ms=1199.424400, elapsed_ms=3530.023500
+Phase 1 iter 1, theta=2792.846696, Q(z)=4997.396745, optimality cut x35, UB=8525.256745, LB=6320.706696, gap=25.859046%, master_ms=40.710800, subproblem_ms=493.901600, elapsed_ms=4065.077200
+Phase 1 iter 2, theta=4669.714400, Q(z)=5001.593915, optimality cut x15, UB=8421.113915, LB=8089.234400, gap=3.941041%, master_ms=48.192400, subproblem_ms=437.698000, elapsed_ms=4551.252200
+Phase 1 iter 3, theta=5071.080708, Q(z)=5071.080708, optimality cut x0, UB=8363.880708, LB=8363.415464, gap=0.005563%, master_ms=91.950600, subproblem_ms=383.752400, elapsed_ms=5027.186800
+Phase 1 completed: UB=8363.880708, LB=8363.415464, elapsed_ms=5306.672600
+Phase 2 initialized: scenarios=5, target_gap=1.000000%, scenario_workers=3, scenario_threads=4, RSP=on
+Incumbent cost distribution: source=master, facility=140.400000 (1.678643%), battery=3152.400000 (37.690556%), daytime_energy=3337.248309 (39.900629%), overnight_energy=1733.850601 (20.730172%), total=8363.898909
+Phase 2 iter 0, theta=5071.080708, Q(z)=5071.098909, optimality cut x0, UB=8363.898909, LB=8363.415464, gap=0.005780%, master_ms=121.106500, rsp_ms=492.123000, subproblem_ms=2056.328600, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=13029.877900
+Lifted Two-Phase converged.
+Lifted Two-Phase status=OPTIMAL, UB=8363.898909, LB=8363.415464, gap=0.005780%, elapsed_ms=13029.886300
+Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=8363.898909, LB=8363.415464, gap_percent=0.005780, reported_seconds=13.029886
+Cardinal Optimizer v8.0.7. Build date Sep 20 2026
+Copyright Cardinal Operations 2026. All Rights Reserved
+

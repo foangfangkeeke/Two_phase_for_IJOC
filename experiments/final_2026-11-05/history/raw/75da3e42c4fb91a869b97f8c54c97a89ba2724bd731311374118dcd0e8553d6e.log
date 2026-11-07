@@ -1,5 +1,0 @@
-Runtime options: facility_cost_scale=1.000000, energy_scale=1.000000, battery_step=50, scenario_count=5, scenario_start=0, cap=4, dwc_top_n=20, wireless_option=1, rsp=0, rsp_workers=auto, rsp_threads=auto, preprocess_bounds=0, valid_inequality=1
-Solver options: mip_gap=0.000100, global_gap=0.010000, time_limit=7200.000000, threads=12
-Instance: data=tower_base, scenario_folders=base;charger_tengah_up10;lo10pct;route_984_up20;route_941_down30, battery_range=[50.000000,600.000000]
-DWC candidate screening: selected=20
-scenario_count=5, facility_vars=20, model_vars=1350283, model_constrs=2486914
