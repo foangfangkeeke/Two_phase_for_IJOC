@@ -1,6 +1,7 @@
 {
-  "unique_logs": 50,
-  "record_slots": 57,
+  "updated_utc": "2026-11-08T06:16:49.598451+00:00",
+  "unique_logs": 57,
+  "record_slots": 65,
   "index": [
     {
       "run_id": "R12-N5-F10-C4_ef",
@@ -225,6 +226,90 @@
       "status": "TIME_LIMIT",
       "selected_record_ids": [
         "main_table/R12-N5-F50-C4/natural-ils"
+      ]
+    },
+    {
+      "run_id": "R28-N10-F50-C4_full",
+      "case_id": "R28-N10-F50-C4",
+      "algorithm": "full",
+      "log": "logs/R28-N10-F50-C4_full.log",
+      "record": "records/R28-N10-F50-C4_full.json",
+      "raw_log_sha256": "7d85e7a3ba62b39bc9b3dc1cf4dc0c12dcf9f0bad65d6591fd9827ded861344e",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "r28_full_l2p_comparison/R28-N10-F50-C4/full"
+      ]
+    },
+    {
+      "run_id": "R28-N10-F50-C4_lifted-two-phase",
+      "case_id": "R28-N10-F50-C4",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R28-N10-F50-C4_lifted-two-phase.log",
+      "record": "records/R28-N10-F50-C4_lifted-two-phase.json",
+      "raw_log_sha256": "7f989c8ef023134c6d8c24edf2ea57100897bb685104d4d5dfd8f8aee8d7f46c",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "r28_full_l2p_comparison/R28-N10-F50-C4/lifted-two-phase"
+      ]
+    },
+    {
+      "run_id": "R28-N20-F50-C4_full",
+      "case_id": "R28-N20-F50-C4",
+      "algorithm": "full",
+      "log": "logs/R28-N20-F50-C4_full.log",
+      "record": "records/R28-N20-F50-C4_full.json",
+      "raw_log_sha256": "93e297ad8cc2dfbe7edca680cb7276857ac64f4f08e686ab2cd07a73f39134ed",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "r28_full_l2p_comparison/R28-N20-F50-C4/full"
+      ]
+    },
+    {
+      "run_id": "R28-N20-F50-C4_lifted-two-phase",
+      "case_id": "R28-N20-F50-C4",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R28-N20-F50-C4_lifted-two-phase.log",
+      "record": "records/R28-N20-F50-C4_lifted-two-phase.json",
+      "raw_log_sha256": "e503172400dda3264bc15de87fdd3735b37334ae280eb8a02ba55d43de140852",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "r28_full_l2p_comparison/R28-N20-F50-C4/lifted-two-phase"
+      ]
+    },
+    {
+      "run_id": "R28-N40-F50-C4_full",
+      "case_id": "R28-N40-F50-C4",
+      "algorithm": "full",
+      "log": "logs/R28-N40-F50-C4_full.log",
+      "record": "records/R28-N40-F50-C4_full.json",
+      "raw_log_sha256": "60a01909df9df7ceb59a6051f790de1c23e4ce3a5649ac6410634da332a18423",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "r28_full_l2p_comparison/R28-N40-F50-C4/full"
+      ]
+    },
+    {
+      "run_id": "R28-N40-F50-C4_lifted-two-phase",
+      "case_id": "R28-N40-F50-C4",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R28-N40-F50-C4_lifted-two-phase.log",
+      "record": "records/R28-N40-F50-C4_lifted-two-phase.json",
+      "raw_log_sha256": "14ca4008470f0e26a5f9437fee33780b355e5754c81e26624ed7898a7f07291e",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "r28_full_l2p_comparison/R28-N40-F50-C4/lifted-two-phase"
       ]
     },
     {
@@ -467,7 +552,22 @@
       "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
       "status": "TIME_LIMIT",
       "selected_record_ids": [
-        "main_table/R28-N5-F50-C4/lifted-ils"
+        "main_table/R28-N5-F50-C4/lifted-ils",
+        "vi_validation/R28-N5-F50-C4/VI1"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F50-C4_lifted-ils_noVI",
+      "case_id": "R28-N5-F50-C4",
+      "algorithm": "lifted-ils",
+      "log": "logs/R28-N5-F50-C4_lifted-ils_noVI.log",
+      "record": "records/R28-N5-F50-C4_lifted-ils_noVI.json",
+      "raw_log_sha256": "73a09c9da3a41fa11862724eaeb553082bc79e382c55e0721da434f4d8fc261d",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "vi_validation/R28-N5-F50-C4/VI0"
       ]
     },
     {

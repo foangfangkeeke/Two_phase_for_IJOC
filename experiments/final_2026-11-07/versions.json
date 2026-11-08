@@ -18,7 +18,7 @@
       "source_archive": "versions/c29cdc5/source_snapshot.zip",
       "source_archive_sha256": "97fecf1fffa25eb17bd666a1cb1bb7acb14efde7806be90828dcc1541a7432e4",
       "release_record": "versions/c29cdc5/release_record.json",
-      "used_unique_runs": 17
+      "used_unique_runs": 24
     }
   ],
   "difference": "R28 Full/L2P iteration search logging only; model, cuts and solver settings unchanged",
