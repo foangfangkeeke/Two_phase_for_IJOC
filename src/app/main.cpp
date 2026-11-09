@@ -4,6 +4,7 @@
 #include "algorithm/lifted_ils.hpp"
 #include "algorithm/lifted_two_phase.hpp"
 #include "algorithm/natural_ils.hpp"
+#include "algorithm/plan_audit.hpp"
 #include "config/run_config.hpp"
 #include "config/solver_config.hpp"
 #include "domain/wireless_data.hpp"
@@ -159,7 +160,8 @@ int main(int argc, char* argv[])
             commandLine.config.algorithm != "natural-ils" &&
             commandLine.config.algorithm != "lifted-ils" &&
             commandLine.config.algorithm != "lifted-two-phase" &&
-            commandLine.config.algorithm != "full") {
+            commandLine.config.algorithm != "full" &&
+            commandLine.config.algorithm != "plan-audit") {
             throw std::invalid_argument("Algorithm is not implemented on the rewrite branch yet: " +
                 commandLine.config.algorithm);
         }
@@ -168,8 +170,13 @@ int main(int argc, char* argv[])
         const std::filesystem::path logPath = StartLog(commandLine.config);
         std::cout << "Log file: " << logPath.string() << std::endl;
         RedirectOutput(logPath);
-        std::cout << "Execution policy: version=final-rsp-skip-2026-11-05, "
-                  << "rsp_numerical=skip_screening, original_subproblem=required\n";
+        if (commandLine.config.algorithm == "plan-audit") {
+            std::cout << "Execution policy: version=section53-fixed-plan-audit-2026-11-09, "
+                      << "fixed_design=1, original_optimization_bounds=source_log_only\n";
+        } else {
+            std::cout << "Execution policy: version=final-rsp-skip-2026-11-05, "
+                      << "rsp_numerical=skip_screening, original_subproblem=required\n";
+        }
         PrintRuntimeOptions(commandLine.config);
         std::cout << "Solver options: mip_gap=" << solver.mipGap
                   << ", global_gap=" << solver.globalGap
@@ -177,6 +184,10 @@ int main(int argc, char* argv[])
                   << ", threads=" << solver.threads << '\n';
         const wireless::InstanceData instance = wireless::LoadInstance(commandLine.config);
         PrintInstanceSummary(instance);
+        if (commandLine.config.algorithm == "plan-audit") {
+            wireless::algorithm::AuditFixedPlan(instance, commandLine.config, solver);
+            return 0;
+        }
         if (commandLine.config.algorithm == "no-dwc-feasibility") {
             const solver::Result result =
                 wireless::algorithm::DiagnoseNoDwcFeasibility(

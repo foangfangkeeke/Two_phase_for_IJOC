@@ -100,6 +100,11 @@ ScenarioVariables BuildScenarioInternal(Model& model, const InstanceData& instan
                 tripStopCharge.push_back(model.AddVar(0.0, stopUpperBound, 0.0,
                     COPT_CONTINUOUS, (prefix + "c" + suffix).c_str()));
                 variables.daytimeCharge.push_back(tripStopCharge.back());
+                if (options.recordChargeEvents &&
+                    IsPlugInTerminalStop(network, station, stationIndex)) {
+                    variables.plugInEvents.push_back(
+                        {busIndex, trip, stationIndex, station, tripStopCharge.back()});
+                }
 
                 if (stationIndex + 1 < stations.size()) {
                     const std::string facility = DwcVariableName(
@@ -108,6 +113,10 @@ ScenarioVariables BuildScenarioInternal(Model& model, const InstanceData& instan
                         tripLinkCharge.emplace_back(model.AddVar(0.0, COPT_INFINITY, 0.0,
                             COPT_CONTINUOUS, (prefix + "c_link" + suffix).c_str()));
                         variables.daytimeCharge.push_back(*tripLinkCharge.back());
+                        if (options.recordChargeEvents) {
+                            variables.dwcEvents.push_back(
+                                {busIndex, trip, stationIndex, station, *tripLinkCharge.back()});
+                        }
                     } else {
                         tripLinkCharge.emplace_back(std::nullopt);
                     }

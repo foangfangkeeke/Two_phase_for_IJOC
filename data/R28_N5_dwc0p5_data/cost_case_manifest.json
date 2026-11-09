@@ -1,0 +1,12 @@
+{
+  "data_name": "R28_N5_dwc0p5",
+  "kind": "dwc",
+  "factor": "0.5",
+  "base_dataset": "R28_N5",
+  "changed_files": [
+    "globalCfg.txt"
+  ],
+  "base_global_sha256": "006112144a78d7e7b58bfaeeafc59b6363b8778eac753c211a3de4f28641c3b8",
+  "variant_global_sha256": "9fed149dbcea213a41c2ba5c2ea83100ae16fad34de365e2d7f319bf698831d2",
+  "other_file_count_unchanged": 23
+}

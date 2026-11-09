@@ -1,0 +1,12 @@
+{
+  "data_name": "R28_N5_battery0p5",
+  "kind": "battery",
+  "factor": "0.5",
+  "base_dataset": "R28_N5",
+  "changed_files": [
+    "globalCfg.txt"
+  ],
+  "base_global_sha256": "006112144a78d7e7b58bfaeeafc59b6363b8778eac753c211a3de4f28641c3b8",
+  "variant_global_sha256": "9d4fad1704c3de907cae2d3a1698e8154210478c3dfb1c1bbf3f78cc2ee9c017",
+  "other_file_count_unchanged": 23
+}

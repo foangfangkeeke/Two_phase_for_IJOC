@@ -1,0 +1,9 @@
+{
+  "started_utc": "2026-11-09T07:56:34.950261+00:00",
+  "ended_utc": "2026-11-09T07:59:26.041841+00:00",
+  "actual_wall_seconds": 171.09400000000096,
+  "exit_code": 0,
+  "external_memory_guard_triggered": false,
+  "peak_private_bytes": 10704519168,
+  "status": "INSPECT_NATIVE_LOG"
+}

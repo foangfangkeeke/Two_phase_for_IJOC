@@ -87,6 +87,8 @@ ParsedCommandLine ParseCommandLine(int argc, char* argv[])
             result.config.exportSummary = true;
         } else if (option == "--export-dir") {
             result.config.exportDirectory = NextValue(argc, argv, index);
+        } else if (option == "--analysis-plan") {
+            result.config.analysisPlan = NextValue(argc, argv, index);
         } else {
             throw std::invalid_argument("Unknown option: " + option);
         }
@@ -106,6 +108,9 @@ ParsedCommandLine ParseCommandLine(int argc, char* argv[])
         throw std::invalid_argument("Invalid numeric runtime option");
     }
     if (config.problem == "wireless_reform_no_wpt") config.allowWirelessCharging = false;
+    if (config.algorithm == "plan-audit" && config.analysisPlan.empty()) {
+        throw std::invalid_argument("plan-audit requires --analysis-plan");
+    }
     return result;
 }
 
@@ -113,7 +118,7 @@ void PrintUsage()
 {
     std::cout
         << "Usage: wireless.exe --alg <algorithm> --data <name> [options]\n"
-        << "Algorithms currently available: data-check, no-dwc-feasibility, ef, natural-ils, lifted-ils, lifted-two-phase, full\n"
+        << "Algorithms currently available: data-check, no-dwc-feasibility, ef, natural-ils, lifted-ils, lifted-two-phase, full, plan-audit\n"
         << "Options:\n"
         << "  --pb <wireless_reform|wireless_reform_no_wpt>\n"
         << "  --scenario-count <positive integer>\n"
@@ -124,6 +129,7 @@ void PrintUsage()
         << "  --energy-scale <positive number>\n"
         << "  --battery-step <positive integer kWh>\n"
         << "  --wireless-option <0|1>\n"
+        << "  --analysis-plan <fixed-plan file> (required for plan-audit)\n"
         << "  --valid-inequality <0|1> (default: 1)\n"
         << "  --rsp <0|1> (default: 1 for all ILS and two-phase algorithms)\n"
         << "  --rsp-workers <positive integer> (Phase 2 scenario workers; default: up to 3)\n"

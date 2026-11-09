@@ -6,3 +6,5 @@ solverCfg.txt -text
 scripts/experiments/summarize_group.py -text
 data/R*_data/** -text
 experiments/final_2026-11-05/** -text
+experiments/section53_2026-11-09/** -text
+scripts/analysis/** -text

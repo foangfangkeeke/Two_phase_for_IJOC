@@ -25,6 +25,7 @@ struct RunConfig {
     bool exportSolution = false;
     bool exportSummary = false;
     std::filesystem::path exportDirectory;
+    std::filesystem::path analysisPlan;
 };
 
 struct ParsedCommandLine {
