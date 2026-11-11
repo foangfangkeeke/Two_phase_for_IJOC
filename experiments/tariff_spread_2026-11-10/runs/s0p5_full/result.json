@@ -1,0 +1,20 @@
+{
+  "name": "s0p5_full",
+  "algorithm": "full",
+  "data": "R28_N5_tariff_s0p5",
+  "wireless": 1,
+  "raw_log": "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\results\\tariff_spread_2026-11-10_12-28-54_UTC\\runs\\s0p5_full\\raw.log",
+  "native_log": "logs\\R28-N5-F50-C4\\R28-N5-F50-C4_full_wireless_reform_2026-11-10_20-36-35.log",
+  "raw_sha256": "3254671f29c332f5c8d367f8b6d1312ead29e98351e72b5632149d8a14b5ead9",
+  "exit_code": 0,
+  "actual_wall_seconds": 183.14100000000326,
+  "external_memory_guard": false,
+  "peak_private_bytes": 11112804352,
+  "status": "OPTIMAL",
+  "has_solution": true,
+  "lb": 17135.673444,
+  "ub": 17182.242676,
+  "gap_percent": 0.271031,
+  "plan": "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\results\\tariff_spread_2026-11-10_12-28-54_UTC\\runs\\s0p5_full\\final.plan",
+  "selected_links": 34
+}

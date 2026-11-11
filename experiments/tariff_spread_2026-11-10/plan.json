@@ -1,0 +1,88 @@
+{
+  "created_utc": "2026-11-10T12:28:54.343890+00:00",
+  "case": "R28-N5-F50-C4",
+  "variants": {
+    "s0": {
+      "s": "0",
+      "data": "R28_N5_tariff_s0",
+      "day": "0.15775",
+      "night": "0.15775",
+      "global_sha256": "43d32eeab9182a94a05b060835a75fdd0392009235e040641649fe091f0f2d5c"
+    },
+    "s0p5": {
+      "s": "0.5",
+      "data": "R28_N5_tariff_s0p5",
+      "day": "0.174975",
+      "night": "0.140525",
+      "global_sha256": "e65c280a108b206a1c0e428449a5d8f3dcc4ef6d675d414ade6ecd842070cdea"
+    },
+    "s1": {
+      "s": "1",
+      "data": "R28_N5",
+      "day": "0.19220",
+      "night": "0.12330",
+      "global_sha256": "006112144a78d7e7b58bfaeeafc59b6363b8778eac753c211a3de4f28641c3b8"
+    },
+    "s1p5": {
+      "s": "1.5",
+      "data": "R28_N5_tariff_s1p5",
+      "day": "0.209425",
+      "night": "0.106075",
+      "global_sha256": "ffdd121fbcae51a1cb99791e7410a4d2be945cea749bc5d6eaaf472ce1e2e83b"
+    },
+    "s2": {
+      "s": "2",
+      "data": "R28_N5_tariff_s2",
+      "day": "0.22665",
+      "night": "0.08885",
+      "global_sha256": "3386f7e53eec7700275e828fd65c2c33ec96cc460617de7ac2cf97305184cbc6"
+    }
+  },
+  "baseline": {
+    "full": {
+      "log": "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\experiments\\final_2026-11-07\\logs\\R28-N5-F50-C4_full.log",
+      "audit": "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\experiments\\section53_2026-11-09\\logs\\plan_audit\\C4_DWC.log",
+      "plan": "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\experiments\\section53_2026-11-09\\plans\\C4_DWC.plan",
+      "selected_links": 26,
+      "status": "OPTIMAL",
+      "has_solution": true,
+      "lb": 17425.71222,
+      "ub": 17478.568951,
+      "gap_percent": 0.302409
+    },
+    "ef": {
+      "log": "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\experiments\\section53_2026-11-09\\logs\\optimization\\C4_noDWC_EF.log",
+      "audit": "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\experiments\\section53_2026-11-09\\logs\\plan_audit\\C4_noDWC_EF.log",
+      "plan": "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\experiments\\section53_2026-11-09\\plans\\C4_noDWC_EF.plan",
+      "selected_links": 0,
+      "status": "OPTIMAL",
+      "has_solution": true,
+      "lb": 18079.036518,
+      "ub": 18230.863935,
+      "gap_percent": 0.832804
+    }
+  },
+  "full_executable": {
+    "path": "experiments/final_2026-11-07/versions/c29cdc5/wireless.exe",
+    "sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+    "source_archive": "experiments/final_2026-11-07/versions/c29cdc5/source_snapshot.zip"
+  },
+  "full_source_sha256": "97fecf1fffa25eb17bd666a1cb1bb7acb14efde7806be90828dcc1541a7432e4",
+  "ef_audit_executable": {
+    "path": "experiments/section53_2026-11-09/versions/ef_audit/wireless.exe",
+    "sha256": "9c6d95ad9f98935c09d8e4f949881f96d3ac70731d2d00d4cf2428fc81df1561",
+    "source_snapshot": "experiments/section53_2026-11-09/versions/ef_audit/source_snapshot.zip",
+    "source_snapshot_sha256": "ec557f5d781b85cb406568829c351204fc189f3b9fa3f5afc80a8a441dd45211"
+  },
+  "solver_config_sha256": "8fdc6169b04e586b0d5ad3465df462023450595d31055222f9b4ce4ae7d93fa5",
+  "tasks": [
+    "s0_full",
+    "s0_ef",
+    "s0p5_full",
+    "s0p5_ef",
+    "s1p5_full",
+    "s1p5_ef",
+    "s2_full",
+    "s2_ef"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "s0_s2_intervals_disjoint": true,
+  "s2_certified_positive": true,
+  "formula": "[LB_noDWC - UB_DWC, UB_noDWC - LB_DWC]",
+  "bounds": "Original optimization logs; audit differences shown separately"
+}

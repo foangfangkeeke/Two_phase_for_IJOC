@@ -1,0 +1,21 @@
+{
+  "name": "s0_full",
+  "algorithm": "full",
+  "data": "R28_N5_tariff_s0",
+  "wireless": 1,
+  "raw_log": "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\results\\tariff_spread_2026-11-10_12-28-54_UTC\\runs\\s0_full\\raw.log",
+  "native_log": "logs\\R28-N5-F50-C4\\R28-N5-F50-C4_full_wireless_reform_2026-11-10_20-31-22.log",
+  "raw_sha256": "04fc0015e80f885939591ddaad072aa4cdce05afd00ab1c1998af855a3aa2db5",
+  "exit_code": 0,
+  "actual_wall_seconds": 167.29699999999139,
+  "external_memory_guard": false,
+  "peak_private_bytes": 10395213824,
+  "status": "OPTIMAL",
+  "has_solution": true,
+  "lb": 16828.61967,
+  "ub": 16870.592849,
+  "gap_percent": 0.248795,
+  "plan": "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\results\\tariff_spread_2026-11-10_12-28-54_UTC\\runs\\s0_full\\final.plan",
+  "selected_links": 34,
+  "audit": "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\results\\tariff_spread_2026-11-10_12-28-54_UTC\\runs\\s0_full_audit\\raw.log"
+}

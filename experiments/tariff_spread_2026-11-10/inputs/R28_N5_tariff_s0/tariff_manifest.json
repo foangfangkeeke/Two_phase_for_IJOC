@@ -1,0 +1,10 @@
+{
+  "data": "R28_N5_tariff_s0",
+  "factor": "0",
+  "day": "0.15775",
+  "night": "0.15775",
+  "base_global_sha256": "006112144a78d7e7b58bfaeeafc59b6363b8778eac753c211a3de4f28641c3b8",
+  "global_sha256": "43d32eeab9182a94a05b060835a75fdd0392009235e040641649fe091f0f2d5c",
+  "only_changed": "globalCfg.txt",
+  "other_files_unchanged": 23
+}

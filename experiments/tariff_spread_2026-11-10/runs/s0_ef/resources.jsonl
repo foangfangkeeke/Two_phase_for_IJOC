@@ -1,0 +1,10 @@
+{"utc": "2026-11-10T12:34:34.736580+00:00", "elapsed_wall_seconds": 0.01600000000325963, "private_bytes": 471040, "available_bytes": 19642650624}
+{"utc": "2026-11-10T12:34:44.742848+00:00", "elapsed_wall_seconds": 10.01600000000326, "private_bytes": 4733747200, "available_bytes": 15418511360}
+{"utc": "2026-11-10T12:34:54.747345+00:00", "elapsed_wall_seconds": 20.03200000000652, "private_bytes": 4902846464, "available_bytes": 15254343680}
+{"utc": "2026-11-10T12:35:04.752761+00:00", "elapsed_wall_seconds": 30.03200000000652, "private_bytes": 4740956160, "available_bytes": 15492399104}
+{"utc": "2026-11-10T12:35:14.757812+00:00", "elapsed_wall_seconds": 40.03200000000652, "private_bytes": 4740886528, "available_bytes": 15494144000}
+{"utc": "2026-11-10T12:35:24.765701+00:00", "elapsed_wall_seconds": 50.04700000000594, "private_bytes": 4858728448, "available_bytes": 15376564224}
+{"utc": "2026-11-10T12:35:34.770671+00:00", "elapsed_wall_seconds": 60.04700000000594, "private_bytes": 3500064768, "available_bytes": 16466726912}
+{"utc": "2026-11-10T12:35:44.774862+00:00", "elapsed_wall_seconds": 70.04700000000594, "private_bytes": 4136271872, "available_bytes": 15858204672}
+{"utc": "2026-11-10T12:35:54.779323+00:00", "elapsed_wall_seconds": 80.0630000000092, "private_bytes": 5056602112, "available_bytes": 15182069760}
+{"utc": "2026-11-10T12:36:04.784844+00:00", "elapsed_wall_seconds": 90.0630000000092, "private_bytes": 6652510208, "available_bytes": 13865283584}

@@ -1,0 +1,18 @@
+{
+  "name": "s2_ef_audit",
+  "algorithm": "plan-audit",
+  "data": "R28_N5_tariff_s2",
+  "wireless": 0,
+  "raw_log": "C:\\faq_work\\Papers\\Two_phase_wireless_charging_and_integer_lshape\\results\\tariff_spread_2026-11-10_12-28-54_UTC\\runs\\s2_ef_audit\\raw.log",
+  "native_log": "logs\\R28-N5-F50-C4\\R28-N5-F50-C4_plan-audit_wireless_reform_2026-11-10_21-27-06.log",
+  "raw_sha256": "bb06a8d76f7787c3c76c195a564381f16a616b470cd6a36743dd18f4471d46bf",
+  "exit_code": 0,
+  "actual_wall_seconds": 20.014999999999418,
+  "external_memory_guard": false,
+  "peak_private_bytes": 2187018240,
+  "status": "COMPLETE_OPTIMAL_RECOURSE",
+  "has_solution": false,
+  "lb": null,
+  "ub": null,
+  "gap_percent": null
+}
