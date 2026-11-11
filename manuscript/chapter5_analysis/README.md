@@ -12,42 +12,27 @@
 
 ## Reproduce
 
-Run from the writing repository root. The 2026-11-08 cleanup moved the complete experiment export to the adjacent support archive:
+The experiment branch is now `main`. Run from the repository root:
 
 ```powershell
-$paperSupport = Join-Path (Split-Path (Get-Location).Path -Parent) 'Lifted-Two-Phase-support/2026-11-08-cleanup'
-$paperSnapshot = Join-Path $paperSupport 'experiment_snapshot'
-$paperPackage = Join-Path $paperSnapshot 'experiments/final_2026-11-07'
-python manuscript/chapter5_analysis/analyze.py --package "$paperPackage" --source-commit 21969663eb908bb8390fdca29a4bad26af675737
-python manuscript/figures/chapter5_progress.py --l2p-c4 "$paperPackage/logs/R28-N5-F50-C4_lifted-two-phase.log" --l2p-f10 "$paperPackage/logs/R28-N5-F10-C4_lifted-two-phase.log" --full-f10 "$paperPackage/logs/R28-N5-F10-C4_full.log" --l2p-c3 "$paperPackage/logs/R28-N5-F50-C3_lifted-two-phase.log" --full-c3 "$paperPackage/logs/R28-N5-F50-C3_full.log" --output-dir manuscript/figures
-python manuscript/figures/chapter5_vi_progress.py --log-dir "$paperPackage/logs" --output-dir manuscript/figures
-python manuscript/chapter5_analysis/plot_charger_visits_r28_n40.py --data-root "$paperSnapshot/data/R28_N40_data"
+python -m pip install -r manuscript/requirements-figures.txt
+python manuscript/reproduce_figures.py
 ```
 
-The two R28-N40 plotting scripts are retained; their temporary PNG, HTML, and CSV diagnostics are not retained. The charger-visit script also writes the Section 5.1 figure to `manuscript/figures/chapter5_station_visits.png`.
+The entry point uses this checkout's `experiments/final_2026-11-07/`,
+`experiments/section53_2026-11-09/` and `data/R28_N40_data/`.
+It verifies the published evidence, regenerates and compares all 12 planning CSVs,
+and builds the six data-driven Chapter 5 figures plus a supplementary repair plot.
+The geographic map is the retained BusRouter SG screenshot.
 
-`manuscript/figures/chapter5_network_map.png` is the author's 2026-11-09 screenshot of the [28 selected services on BusRouter SG](https://busrouter.sg/#/services/945~282~96~984~872~452~183~79~334~990~941~453~41~285~284~871~189~98~335~98M~992~66~870~947~78~333~173~49). It supplies geographic context only; the 493-station, 624-directed-link network counts come from the processed experimental inputs. The website's "226 INTERSECTING STOP" display is a different measure. The manuscript caption credits BusRouter SG, LTA route data, and the OpenStreetMap/Protomaps basemap.
-
-The complete repository export is needed for the input checks. The archived partial export under `history/chapter5_latest_2026-11-08_partial/` is historical material. To reproduce the previous-publication comparison, define `$paperPrevious = Join-Path $paperSupport 'history/chapter5_latest_2026-11-07/experiments/final_2026-11-07/results.json'` and add `--previous-results "$paperPrevious"` to the analysis command.
-
-If a fresh copy is needed, fetch the source and export it to a new directory beside the writing repository. The following example creates a separate export and fails if its destination already exists:
-
-```powershell
-git -c core.sshCommand="ssh -o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=yes" fetch git@github.com:foangfangkeeke/Two_phase_for_IJOC.git '+refs/heads/*:refs/remotes/origin/*'
-$paperExport = Join-Path (Split-Path (Get-Location).Path -Parent) 'Lifted-Two-Phase-support/fresh-2196966'
-New-Item -ItemType Directory -Path $paperExport -ErrorAction Stop
-$paperSnapshot = Join-Path $paperExport 'experiment_snapshot'
-New-Item -ItemType Directory -Path $paperSnapshot -ErrorAction Stop
-git archive --format=tar "--output=$paperExport/source-2196966.tar" 21969663eb908bb8390fdca29a4bad26af675737
-tar -xf "$paperExport/source-2196966.tar" -C "$paperSnapshot"
-$paperPackage = Join-Path $paperSnapshot 'experiments/final_2026-11-07'
-```
-
-The analysis checks all 137 manifest-listed package files, 365 repository input/configuration hashes, all record/log hashes, explicit terminal bounds, statuses and gaps, eight R-TPILS/TPILS pairs and two final VI pairs. It also checks nested scenario content/probabilities, reconstructs candidate ranking from the archived inputs and independently reproduces the eight published R28 VI checkpoints. It never starts the solver or compiles the manuscript. The resulting numerical evidence and definitions are recorded in this README and `summary.json`.
+Figures are written to `manuscript/figures/`; checks, diagnostic figures, commands
+and hashes are recorded in `outputs/figure_reproduction/report.json`.
+See [the complete reproduction instructions](../REPRODUCE_FIGURES.md) for the
+figure-to-script mapping, dependencies and separate output-directory options.
 
 ## Outputs and manuscript placement
 
-All Chapter 5 and computational-appendix tables are written directly in `manuscript/sections/05_experiments.tex` and `manuscript/appendices/appendix_extra_results.tex`.
+The manuscript text and its current tables are maintained on `paper-writing-dwc`. This branch retains the analysis, data and figure-generation scripts.
 The analysis script writes numerical evidence only; it does not generate LaTeX table fragments.
 Full-precision source records remain in `summary.json`.
 

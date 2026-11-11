@@ -3,6 +3,7 @@
 Usage: python scripts/analysis/export_section53.py
 """
 
+import argparse
 import csv
 import hashlib
 import json
@@ -295,8 +296,8 @@ def load_run(item: dict) -> dict:
             "probabilities": probabilities}
 
 
-def write_csv(name: str, fields: list[str], rows: list[dict]) -> str:
-    path = OUTPUT / name
+def write_csv(output_dir: Path, name: str, fields: list[str], rows: list[dict]) -> str:
+    path = output_dir / name
     with path.open("w", encoding="utf-8", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
@@ -339,7 +340,8 @@ def sensitivity_row(factor: str, dwc: dict, no_dwc: dict) -> dict:
     }
 
 
-def export_all(runs: dict[str, dict], source_manifest_sha: str) -> None:
+def export_all(runs: dict[str, dict], source_manifest_sha: str,
+               output_dir: Path) -> None:
     summaries = []
     reconciliations = []
     facilities = []
@@ -566,7 +568,7 @@ def export_all(runs: dict[str, dict], source_manifest_sha: str) -> None:
     output_records = {}
     for name, (fields, rows) in tables.items():
         output_records[name] = {"rows": len(rows),
-                                "sha256": write_csv(name, fields, rows)}
+                                "sha256": write_csv(output_dir, name, fields, rows)}
     manifest = {
         "created_utc": datetime.now(timezone.utc).isoformat(),
         "source_package_manifest_sha256": source_manifest_sha,
@@ -575,7 +577,7 @@ def export_all(runs: dict[str, dict], source_manifest_sha: str) -> None:
         "energy_tolerance_kwh": ENERGY_TOLERANCE_KWH,
         "tables": output_records,
     }
-    (OUTPUT / "export_manifest.json").write_text(
+    (output_dir / "export_manifest.json").write_text(
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"runs": len(runs), "tables": {
         name: info["rows"] for name, info in output_records.items()},
@@ -583,6 +585,9 @@ def export_all(runs: dict[str, dict], source_manifest_sha: str) -> None:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output-dir", type=Path, default=OUTPUT)
+    args = parser.parse_args()
     manifest_path = PACKAGE / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     records = {item["id"]: item for item in manifest["records"]
@@ -610,8 +615,9 @@ def main() -> None:
                 verify_variant(f"R28_N5_{kind}{factor}",
                                factor.replace("p", "."), kind)
     runs = {name: load_run(item) for name, item in records.items()}
-    OUTPUT.mkdir(exist_ok=True)
-    export_all(runs, digest(manifest_path))
+    output_dir = args.output_dir.resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+    export_all(runs, digest(manifest_path), output_dir)
 
 
 if __name__ == "__main__":

@@ -221,6 +221,10 @@ def main() -> None:
         "--output-dir", type=Path,
         default=Path(__file__).parent / "diagnostics",
     )
+    parser.add_argument(
+        "--paper-output", type=Path,
+        default=Path(__file__).parent.parent / "figures" / "chapter5_station_visits.png",
+    )
     args = parser.parse_args()
     root = args.data_root.resolve(strict=True)
     output = args.output_dir.resolve()
@@ -280,7 +284,8 @@ def main() -> None:
     png_3d = output / "charger_visits_by_station_r28_n40_3d.png"
     png_change = output / "charger_visits_by_station_r28_n40_change.png"
     html = output / "charger_visits_by_station_r28_n40_interactive.html"
-    paper_png = Path(__file__).parent.parent / "figures" / "chapter5_station_visits.png"
+    paper_png = args.paper_output.resolve()
+    paper_png.parent.mkdir(parents=True, exist_ok=True)
     static_station_plot(station_counts, station_names, png_3d)
     shutil.copyfile(png_3d, paper_png)
     static_change_plot(station_counts, station_names, png_change)

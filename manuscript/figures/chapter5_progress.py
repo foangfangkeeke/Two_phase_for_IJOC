@@ -1,7 +1,7 @@
 """Draw Chapter 5 progress figures from the published target-machine logs.
 
 The input logs are the matched records in
-experiments/final_2026-11-07 on origin/codex/final-experiments-2026-11-05.
+experiments/final_2026-11-07 in this repository.
 Pass their local paths explicitly;
 the script never substitutes local-machine timings for those records.
 """

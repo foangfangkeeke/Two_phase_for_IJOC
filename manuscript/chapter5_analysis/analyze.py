@@ -467,7 +467,7 @@ def main():
                             raise ValueError(f"VI checkpoint CSV mismatch: {cutoff}, {expected_key}")
                 vi_csv_verified += 1
     previous_audit = compare_previous(records, args.previous_results) if args.previous_results else None
-    summary = {"source": f"origin/codex/final-experiments-2026-11-05@{args.source_commit}",
+    summary = {"source": f"git:{args.source_commit}",
                "package": "experiments/final_2026-11-07", "results_updated_utc": results["updated_utc"],
                "verified_package_files": len(manifest["package_files_sha256"]),
                "verified_repository_input_files": len(manifest["repository_input_files_sha256"]),

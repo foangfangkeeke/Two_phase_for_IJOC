@@ -1,5 +1,11 @@
 # 无线充电实验
 
+## 论文实验图复现
+
+当前实验与出图分支为 `main`，论文撰写分支为 `paper-writing-dwc`。
+在仓库根目录运行 `python manuscript/reproduce_figures.py`，即可校验归档数据并生成第五章的数据图。
+依赖、图与脚本的对应关系及输出位置见 [复现说明](manuscript/REPRODUCE_FIGURES.md)。
+
 ## 当前结果
 
 [全量结果表](experiments/final_2026-11-07/results.md) | [两行表头 HTML](experiments/final_2026-11-07/results.html) | [逐项日志索引](experiments/final_2026-11-07/analysis/log_index.md)

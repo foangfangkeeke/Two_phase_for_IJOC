@@ -1,7 +1,7 @@
 """Draft Section 5.3 figures from the published plan exports.
 
-The source tables are pinned to commit 1f7cf15a on the final-experiments
-branch.  This script reads them through ``git show`` and launches no solver.
+The source tables are pinned to commit 1f7cf15a.
+This script reads them through ``git show`` and launches no solver.
 """
 
 from __future__ import annotations
