@@ -23,6 +23,8 @@
 
 主表、VI 和 R28 Full／L2P 的日志按 [版本索引](experiments/final_2026-11-07/versions.json) 分别对应 `7d932b9` 或 `c29cdc5` 的归档源码与 exe。Section 5.3 和电价实验的 Full 记录使用 [c29cdc5 exe](experiments/final_2026-11-07/versions/c29cdc5/wireless.exe)。复现具体结果时，以各包的清单、日志和归档版本为准。
 
+逐项记录中的 `original_launch` 路径保留原运行机器的位置；复现时使用版本索引所指的归档 exe。旧冻结包已从当前发布树移出，其版本证据仍保存在上述归档和 Git 历史中。
+
 正式数据按 R/N 命名，scenarioCfg.txt 确定场景组合和顺序，F/C 为运行参数。运行需要 COPT 8.0.7 和有效许可证；构建使用 AGENTS.md 记录的直接 Ninja 命令。
 
 ## 拉取

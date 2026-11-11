@@ -11,27 +11,6 @@ gurobi*
 
 # Reruns and execution diagnostics stay local until publication is authorized.
 /outputs/
-/experiments/final_2026-11-05/runs/
-/experiments/final_2026-11-05/status.json
-/experiments/final_2026-11-05/results.html
-/experiments/final_2026-11-05/results.json
-/experiments/final_2026-11-05/controller*.log
-/experiments/final_2026-11-05/controller.lock
-/experiments/final_2026-11-05/raw_review_current.json
-/experiments/final_2026-11-05/provenance/*.log
-/experiments/final_2026-11-05/provenance/raw_review_*/
-/experiments/final_2026-11-05/provenance/user_pause_*/
-/experiments/final_2026-11-05/provenance/controller_report_validation.json
-/experiments/final_2026-11-05/provenance/data_check.json
-/experiments/final_2026-11-05/provenance/remote_pull_verification.json
-/experiments/final_2026-11-05/provenance/previous_final_experiments_pointer.json
-/experiments/final_2026-11-05/analysis/raw/
-/experiments/final_2026-11-05/analysis/proposed_vi_trace.patch
-
-# Retired result publications remain local and in Git history.
-/experiments/final_2026-11-05/history/
-/experiments/final_2026-11-05/analysis/
-/experiments/final_2026-11-05/writeup/
 
 # Exact raw logs selected for the current publication.
 !/experiments/final_2026-11-07/logs/
