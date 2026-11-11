@@ -19,7 +19,9 @@
 
 ## 代码和用例
 
-当前求解源码为 c29cdc570e361a3291bd27c265faa45efb324f7b；对应 [wireless.exe](experiments/final_2026-11-07/versions/c29cdc5/wireless.exe)。每份日志的实际版本由索引和运行记录标明。
+当前工作区的 `src/` 与提交 `83d3156`、[Section 5.3 源码快照](experiments/section53_2026-11-09/versions/ef_audit/source_snapshot.zip) 一致。该版本的 [EF／固定方案审计 exe](experiments/section53_2026-11-09/versions/ef_audit/wireless.exe) 用于 Section 5.3 的 EF 和审计记录，以及电价实验的 EF 和审计记录。
+
+主表、VI 和 R28 Full／L2P 的日志按 [版本索引](experiments/final_2026-11-07/versions.json) 分别对应 `7d932b9` 或 `c29cdc5` 的归档源码与 exe。Section 5.3 和电价实验的 Full 记录使用 [c29cdc5 exe](experiments/final_2026-11-07/versions/c29cdc5/wireless.exe)。复现具体结果时，以各包的清单、日志和归档版本为准。
 
 正式数据按 R/N 命名，scenarioCfg.txt 确定场景组合和顺序，F/C 为运行参数。运行需要 COPT 8.0.7 和有效许可证；构建使用 AGENTS.md 记录的直接 Ninja 命令。
 
