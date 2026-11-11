@@ -15,7 +15,7 @@ DWC facilities may be installed on candidate links in $\mathcal L^{\mathrm D}\su
 The system operates a set of routes $\mathcal R$.
 For a given service plan, each bus duty consists of an ordered sequence of trips assigned to one bus and any travel between consecutive trips.
 A bus departs from the depot with its battery at the upper state-of-charge limit and then operates its assigned trips in sequence.
-As illustrated in Figure~\ref{fig:daily-duty-operation}, during its duty the bus may use plug-in charging and receive DWC while traversing equipped links.
+As illustrated in Figure~\ref{fig:daily-duty-operation}, during its duty the bus may use plug-in charging at stations and receive energy from DWC while traversing equipped links.
 After completing its last trip, the bus returns to the depot and is recharged overnight to the upper state-of-charge limit before the next operating day.
 Depot charging capacity is sufficient to recharge all buses overnight.
 
@@ -123,7 +123,7 @@ As shown in Figure~\ref{fig:link-event-mapping}, the same physical link may be t
 
 \paragraph{Shared plug-in capacity}
 The station visits on route $r$ in scenario $\omega$ are denoted by $\mathcal V_{\omega,r}$, and $\mathcal V^{\mathrm P}_{\omega,r}$ contains the terminal visits eligible for plug-in charging under the service plan.
-An eligible visit $v$ can charge during its available time slots $\mathcal T_v\subseteq\mathcal T_\omega$, where $\mathcal T_\omega$ contains the relevant time slots in scenario $\omega$.
+During an eligible visit $v$, a bus can charge in the available time slots $\mathcal T_v\subseteq\mathcal T_\omega$, where $\mathcal T_\omega$ contains the relevant time slots in scenario $\omega$.
 The variable $q_v^{\mathrm P}$ denotes the grid-side energy supplied and $x_{v\tau}$ indicates whether a visit occupies a charger in slot $\tau$.
 The plug-in charging constraints are
 \begin{align}

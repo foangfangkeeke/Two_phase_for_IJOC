@@ -25,11 +25,11 @@ Source: \href{https://busrouter.sg/}{BusRouter SG}}
 An instance code has the form R-S-F-C, with the numbers following the four letters giving the route count, scenario count, candidate DWC link count, and chargers per existing plug-in location.
 R3 and R12 are nested subsets of the 28-route network.
 Each scenario specifies a timetable, bus duties, and the active fleet for one service plan on the same physical network.
-The plans include a base case and service-frequency increases or decreases across the network, on routes dwelling at a selected terminal, or on several individual routes.
+The plans include a base case and service-frequency increases or decreases across the network, on routes serving a selected terminal, or on several individual routes.
 Within each fixed route and scenario set, candidate DWC links are ranked by aggregate scheduled traversal time, so the F10, F20, and F50 sets are nested.
 Figure~\ref{fig:station-visits} illustrates the variation in scheduled visits to the five existing plug-in stations across the R28-S40 service plans.
 The total number of visits ranges from 2,491 to 3,309 per scenario, compared with 2,763 in the base plan.
-Bt Batok and Jurong East have the two largest station counts in every plan, while visits vary at all five stations.
+Bt Batok and Jurong East have the two highest visit counts in every plan, and the counts vary across plans at all five stations.
 
 \begin{figure}[!htbp]
 \centering
@@ -129,7 +129,7 @@ TPILS reaches the target on F10 and F50, while R-TPILS does so on all three inst
 \label{subsec:mechanism-analysis}
 
 Following the overall comparison in Table~\ref{tab:main-performance}, we examine the roles of the algorithmic components in more detail.
-The analysis covers the energy-budget inequalities, lower-bound formation in Phase 1, and convergence and repair in Phase 2.
+The analysis covers the energy-budget inequalities, lower-bound progress in Phase 1, and convergence and repair in Phase 2.
 
 \subsubsection{Energy-budget screening}
 \label{subsec:vi-analysis}
@@ -156,7 +156,7 @@ R28-F50 & Off & 5089.15 & -- & TL & 4/4 \\
 
 VI enables Lifted ILS to reach the 1\% target on R12 in 1,237.1 seconds, while its no-VI counterpart times out without a verified UB (Table~\ref{tab:vi-ablation}).
 The lower-bound trajectories in Figure~\ref{fig:vi-progress} show how the difference develops during the search.
-At the first master return, the VI version has a much higher LB, as the inequalities can screen out low-cost master candidates that violate the energy requirements.
+After the first master solve, the VI version has a much higher LB, as the inequalities can screen out low-cost master candidates that violate the energy requirements.
 For the no-VI version, the LB increases slowly over most of the run.
 The final LB (2,743.81) of the no-VI version is slightly higher than the first recorded LB (2,679.47) of the VI version.
 Evaluating the no-VI master candidates against the inequalities shows that all 20 would have been screened out before scenario evaluation.
@@ -170,33 +170,33 @@ Crosses mark no-VI master candidates that violate VI.}
 \label{fig:vi-progress}
 \end{figure}
 
-\subsubsection{Lower-bound formation in Phase 1}
+\subsubsection{Lower-bound progress in Phase 1}
 \label{subsec:phase-one-analysis}
 
 Phase 1 is shared by TPILS and R-TPILS.
-It relaxes the coupling constraints and variables in the lifted formulation to construct a valid lower bound for the original problem.
-We assess the speed of bound formation using the retrospective gap $g_t^{\mathrm{ret}}=100(UB^{\mathrm{ref}}-LB_t^R)/UB^{\mathrm{ref}}$, where $UB^{\mathrm{ref}}$ is the best available UB for the same instance.
+It removes the shared plug-in capacity constraints and eliminates charger-occupancy variables, yielding independent route LPs that provide a valid lower bound for the original problem.
+We assess how quickly the lower bound improves using the retrospective gap $g_t^{\mathrm{ret}}=100(UB^{\mathrm{ref}}-LB_t^R)/UB^{\mathrm{ref}}$, where $UB^{\mathrm{ref}}$ is the best available UB for the same instance.
 
 Figure~\ref{fig:l2p-progress} shows that the early Phase 1 iterations account for most of the lower bound improvement on the R28-S5-C4 instances.
-At the first master return, the retrospective gaps are 64.265\%, 65.518\%, and 67.450\% for F10, F20, and F50, respectively.
-At the fourth master return, they fall to 0.626\%, 1.178\%, and 0.751\% in 9.6, 10.2, and 10.9 seconds.
+After the first master solve, the retrospective gaps are 64.265\%, 65.518\%, and 67.450\% for F10, F20, and F50, respectively.
+After the fourth master solve, they fall to 0.626\%, 1.178\%, and 0.751\% in 9.6, 10.2, and 10.9 seconds.
 F10 and F20 terminate shortly thereafter, whereas F50 requires 162 additional iterations to meet the Phase 1 stopping criterion.
 Even in the latter case, Phase 1 ends after 210.4 seconds, less than 3\% of the 7,200-second time limit.
 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.96\linewidth]{figures/chapter5_l2p_progress.pdf}
-\caption{Phase 1 lower-bound formation on R28-S5-C4.
+\caption{Phase 1 lower-bound progress on R28-S5-C4.
 The curves report $g_t^{\mathrm{ret}}$ for F10, F20, and F50 over the complete Phase 1 trajectories.
-Small filled markers denote master returns in the 15-second inset, open circles mark the first master LB within 1\% of the reference UB, and squares mark Phase 1 termination.}
+Small filled markers denote completed master solves in the 15-second inset, open circles mark the first master LB within 1\% of the reference UB, and squares mark Phase 1 termination.}
 \label{fig:l2p-progress}
 \end{figure}
 
-To isolate the contribution of Phase 1, Table~\ref{tab:phase-one-grid} compares its bound formation with that of Lifted ILS across the complete R--F grid at S5-C4.
+To isolate the contribution of Phase 1, Table~\ref{tab:phase-one-grid} compares its lower-bound progress with that of Lifted ILS across the complete R--F grid at S5-C4.
 Using the same $UB^{\mathrm{ref}}$ for each instance, the table records the first completed iteration satisfying $g_t^{\mathrm{ret}}\le 1\%$ and its elapsed time.
 Phase 1 reaches this threshold on 8 of the 9 instances in at most five completed iterations and 11.9 seconds.
 Lifted ILS reaches it on 6 instances and requires up to 657 iterations and 1,375.7 seconds.
-Phase 1 reaches the threshold substantially faster than Lifted ILS and also reaches it on two R28 instances for which Lifted ILS does not.
+Phase 1 also reaches the threshold on two R28 instances for which Lifted ILS does not.
 
 \begin{table}[!htbp]
 \centering
@@ -230,14 +230,13 @@ R28-F50 & 4  & 11.9 & --  & -- \\
 \label{subsec:phase-two-analysis}
 
 R-TPILS uses repair to strengthen monotone feasibility cuts in Phase 2.
-When an exact scenario subproblem proves a master candidate infeasible, the repair search increases battery capacities and adds DWC facilities to identify a resource-enlarged infeasible anchor.
+When an exact scenario subproblem proves a master candidate infeasible, the repair search increases battery capacities and adds DWC facilities to identify an anchor that remains infeasible after these increases.
 The cut generated from this anchor excludes a larger portion of the infeasible region.
 In this process, the repair search may also find a verified feasible solution and thereby establish a UB.
 
 Table~\ref{tab:repair-comparison} evaluates these effects across the eight R28 instances.
 R-TPILS obtains a verified UB on all eight instances and reaches the target gap on six, whereas TPILS obtains a UB and reaches the target gap on only two.
-Repair enables R-TPILS to establish a verified UB on all six instances for which TPILS finds no feasible solution within the time limit.
-When TPILS also obtains a UB, repair either brings forward the first UB or is not needed.
+When TPILS also obtains a UB, repair either reduces the time to the first UB or is not needed.
 R-TPILS continues to obtain verified UBs as the number of scenarios increases from 10 to 40.
 Over these instances, the share of Phase 2 time spent on repair rises from 27.6\% to 37.6\%, and S40 finishes slightly above the target gap at 1.080\%.
 Thus, one of the main computational contributions of repair is to recover verified feasible solutions early in Phase 2.
@@ -267,7 +266,7 @@ S40-F50-C4 & --    & TL    & 4010.5  & TL (1.080\%)  & 2125.1 & 37.6 \\
 \end{table}
 
 Figure~\ref{fig:repair-phase2} traces this tradeoff in two representative cases.
-On F10 (short for R28-S5-F10-C4), repair brings forward the first incumbent but does not accelerate convergence.
+On F10 (short for R28-S5-F10-C4), repair reduces the time to the first incumbent but does not accelerate convergence.
 R-TPILS obtains an incumbent in its first iteration, yet repair consumes 20.0\% of its Phase 2 time and the method terminates later.
 On C3 (short for R28-S5-F50-C3), the LB trajectories reveal a different role for repair.
 R-TPILS initially trails TPILS, but the strengthened cuts allow it to overtake after 10 iterations.
@@ -280,7 +279,7 @@ The larger moves indicate that the repair-enhanced cuts redirect the master sear
 \includegraphics[width=0.98\linewidth]{figures/chapter5_repair_modes.pdf}
 \caption{Phase 2 progress on R28-S5-F10-C4 and R28-S5-F50-C3.
 Panels (a) and (c) report the bounds against wall-clock time from each method's Phase 2 switch.
-Circles (R-TPILS) and diamonds (TPILS) mark master returns on the LB curves and incumbent updates after scenario evaluation on the UB curves.
+Circles (R-TPILS) and diamonds (TPILS) mark completed master solves on the LB curves and incumbent updates after scenario evaluation on the UB curves.
 The inset in Panel (c) reports the Hamming distance between consecutive master solutions, calculated over facility and route--scenario battery decisions.
 Panels (b) and (d) report the recorded R-TPILS component times for each Phase 2 iteration, including the terminal master-only iteration.
 }
@@ -299,7 +298,7 @@ The resulting plans are evaluated in terms of solution costs, battery capacities
 
 To assess the cost implications of DWC, the no-DWC case prohibits all candidate DWC installations and reoptimizes the remaining decisions.
 Table~\ref{tab:dwc-planning-costs} shows that the DWC-enabled plan is about 4\% less costly, primarily because the reduction in battery expenditure outweighs the added facility and charging costs.
-With smaller batteries, buses rely more heavily on charging during service, when electricity is more expensive than overnight charging.
+With smaller batteries, buses rely more heavily on charging during service, when electricity prices are higher than those for overnight charging.
 Daytime charging expenditure therefore rises substantially and more than offsets the reduction in overnight charging expenditure, so total charging expenditure increases.
 The DWC-enabled plan also costs about 672 less than its no-DWC counterpart under the tighter C3 plug-in capacity.
 Overall, DWC reduces total cost by substituting roadside infrastructure and daytime charging for onboard battery capacity.
@@ -325,7 +324,7 @@ Total cost & 18230.86 & 17478.38 & -752.49 \\
 The same resource substitution is reflected in the battery and charging decisions shown in Figure~\ref{fig:planning-adjustments}.
 Across all vehicles and scenarios, the mean battery capacity decreases by about 23\%.
 Nearly half of the route--scenario pairs select a smaller battery, while none selects a larger one.
-Almost all reductions coincide with direct DWC use, indicating that they are concentrated where en-route charging is actually used.
+Almost all reductions coincide with direct DWC use.
 Route~41 illustrates the strongest route-level shift and uses DWC in every scenario.
 
 \begin{figure}[!htbp]
@@ -340,13 +339,12 @@ Route~41 illustrates the strongest route-level shift and uses DWC in every scena
 Expected plug-in energy increases by about 10\%, with increases at most existing stations.
 The DWC-enabled plan therefore combines wireless and plug-in charging rather than simply replacing the latter.
 Together with the lower overnight-charging expenditure in Table~\ref{tab:dwc-planning-costs}, this pattern indicates a shift toward daytime charging while buses carry smaller batteries.
-Overall, access to en-route charging changes both battery sizing and when and where buses obtain energy.
 
 \subsubsection{Cost sensitivity}
 
 Figure~\ref{fig:planning-cost-sensitivity} and Table~\ref{tab:planning-cost-sensitivity} show that the battery unit cost has a pronounced effect on DWC deployment.
-Across the tested levels, the cost difference increases from 36 to 1,600~USD/day and the number of selected links from 5 to 39, while the mean DWC battery capacity falls from 179 to 133~kWh.
-The battery reduction flattens at the upper levels even as deployment continues to expand, indicating diminishing scope to replace additional onboard storage.
+Across the tested levels, the cost difference increases from 36 to 1,600~USD/day and the number of selected links from 5 to 39, while the mean battery capacity in the DWC-enabled plan falls from 179 to 133~kWh.
+Mean battery capacity decreases more slowly at higher battery cost levels even as DWC deployment continues to expand, indicating diminishing scope to replace additional onboard storage.
 \FloatBarrier
 
 \begin{figure}[!htbp]
@@ -356,9 +354,8 @@ The battery reduction flattens at the upper levels even as deployment continues 
 \label{fig:planning-cost-sensitivity}
 \end{figure}
 
-DWC construction costs move the plans in the opposite direction.
-Across the tested levels, the cost difference falls from 1,014 to 519~USD/day and deployment contracts from 39 to 25 links.
-The two highest levels retain 25 links but select different locations and route-level battery assignments, showing that the plans adjust in discrete steps and cannot be characterized by link count alone.
+As DWC construction costs increase across the tested levels, the cost difference falls from 1,014 to 519~USD/day and the number of selected links falls from 39 to 25.
+At the two highest cost levels, the plans each select 25 links, but the link locations and route-level battery assignments differ.
 
 \begin{table}[!htbp]
 \centering
@@ -368,7 +365,7 @@ The two highest levels retain 25 links but select different locations and route-
 \label{tab:planning-cost-sensitivity}
 \begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}llrrrrr@{}}
 \toprule
-Cost varied & Factor & No DWC & DWC & No DWC $-$ DWC & Links & \shortstack{Mean DWC battery\\(kWh)} \\
+Cost varied & Factor & No DWC & DWC & No DWC $-$ DWC & Links & \shortstack{Mean battery\\capacity with DWC\\(kWh)} \\
 \midrule
 \multicolumn{7}{l}{\textit{Battery unit cost}} \\
 & 50\%  & 14485.99 & 14449.94 & 36.05   & 5  & 178.89 \\

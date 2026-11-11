@@ -14,12 +14,12 @@ The DWC layout is chosen before the service plan is known.
 Once a service-plan scenario is realized, the planner selects a route-level battery configuration for that planning period and a representative-day charging schedule.
 Because routes share the existing plug-in stations, their charging schedules must jointly satisfy station capacity limits.
 The resulting two-stage stochastic DWC planning model is a mixed-integer program.
-With all costs expressed on a representative-day basis, its objective minimizes DWC facility cost and the expected costs of battery and charging.
+With all costs expressed on a representative-day basis, the model minimizes DWC facility cost and expected battery and charging costs.
 
 The two-stage structure suggests an integer L-shaped (ILS) decomposition, with DWC decisions in the master and battery and charging decisions in scenario subproblems.
 A direct application faces two computational difficulties.
 The master represents the feasibility and recourse cost of a DWC layout through cuts.
-A weak approximation can lead to repeated evaluations of layouts whose infeasibility or high recourse cost is revealed only after subproblem solution.
+A weak approximation can lead to repeated evaluations of layouts whose infeasibility or high recourse cost is revealed only after the scenario subproblems are solved.
 At the same time, each scenario subproblem remains a large mixed-integer linear program (MILP) after scenario decomposition.
 Battery and charger-occupancy decisions are discrete, while shared plug-in charging capacity couples the routes within the subproblem.
 Repeated exact solution of integer recourse can be expensive \citep{larsen_learning_2024}, magnifying the cost of a weak master approximation.

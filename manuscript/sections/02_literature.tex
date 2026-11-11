@@ -20,7 +20,7 @@ Additional services are deployed after the ranges are realized to cover schedule
 Under uncertain travel times and energy consumption, \citet{wang_reliable_2024} use a two-stage robust model to determine the locations and lengths of DWC facilities and the battery capacities for each route.
 En-route charging is adjusted after the uncertain conditions are realized.
 The service plan itself may also be uncertain when facilities are deployed.
-Different plans may specify different trips and assign them to buses in different ways, changing which DWC-equipped links buses traverse and when they can charge at stations.
+Service plans may differ in their scheduled trips and in how those trips are assigned to buses, changing which DWC-equipped links buses traverse and when they can charge at stations.
 
 For a given service plan, buses on different routes may need to charge at the same station, where the number of chargers limits how many buses can charge at once.
 Given the trips assigned to each bus, \citet{abdelwahed_opportunity_2020} optimize the timing and duration of charging subject to these limits.
@@ -41,7 +41,7 @@ Nevertheless, limited information from cuts can lead to many iterations, while s
 Reformulations can make recourse information available to the master before cuts are generated.
 Retaining selected scenario subproblems in the master provides an explicit representation of their recourse decisions \citep{crainic_partial_2021,celik_twostep_2025}.
 Moving individual scenario-dependent variables into the master follows the same principle, but can make the master large when there are many scenarios.
-\citet{lai_strengthened_2025} exploits customer choices that coincide across scenarios to reduce this growth.
+\citet{lai_strengthened_2025} exploit customer choices that coincide across scenarios to reduce this growth.
 Even with a stronger master, evaluating recourse across many scenarios can make cut generation expensive.
 Aggregating scenarios or sampling a subset can reduce the work involved \citep{ramirez_adaptive_2023,bertsimas_stochastic_2025}.
 The aggregation can be refined using subproblem dual solutions, whereas sampled evaluations can be combined through dual averaging to construct valid cuts.
@@ -53,14 +53,14 @@ For mixed-integer recourse, lower approximations of recourse costs can also supp
 Monotonicity is another property that can extend the information obtained from a subproblem evaluation to other master solutions.
 Examples include cuts based on monotone route recourse costs and on simulation evaluations of resource allocations \citep{parada_disaggregated_2024,forbes_simulation_2024}.
 
-When subproblems are expensive to solve, relaxations can provide cheap information to the master.
+When subproblems are expensive to solve, relaxations can provide information to the master at lower computational cost.
 LP relaxations of integer recourse, for example, can generate cuts and eliminate some candidate solutions before integer subproblems are solved \citep{angulo_improving_2016,satici_network_2026}.
 \citet{calik_stations_2019} solve a partially relaxed model and check whether its optimal value can be attained by an integer solution with the same first-stage decisions.
 If not, they continue the search and add combinatorial feasibility cuts for integer-infeasible subproblems.
 Relaxing coupling constraints can also simplify the master problem, but a feasible solution must ultimately satisfy those constraints.
 \citet{chen_integrated_2023} relax the nonanticipativity of the initial vehicle allocation, allowing each scenario to choose its own allocation, and also relax vehicle-flow integrality.
 They then restore a common allocation and use a diving heuristic to construct integer operational solutions.
-Thus, relaxed solutions can support both cut generation and feasible-solution search, while the constraints and integrality requirements of the original problem must still be addressed.
+Thus, relaxed solutions can support both cut generation and feasible-solution search.
 
 Existing studies have developed reformulations, valid inequalities, strengthened cuts, and relaxation-based procedures to improve Benders decomposition, as summarized in Table~\ref{tab:lit-method-components}.
 In our problem, fixing the DWC deployment leaves a recourse problem in each scenario that selects battery capacities and charging schedules.

@@ -56,7 +56,7 @@ Set $Q_\omega(w,z_\omega)=+\infty$ if the subproblem is infeasible.
 Together, these problems retain all variables, costs, and constraints of \eqref{eq:two-stage-model}.
 We refer to ILS applied directly to this formulation as Lifted ILS.
 
-\paragraph{Energy-budget valid inequality.}
+\paragraph{Energy-budget valid inequality}
 For each $m\in\mathcal M_{\omega,r}$, let $\mathcal A_m$ contain its traversals, and let $\mathcal V_m^{\mathrm P}$ and $\mathcal A_m^{\mathrm D}$ contain its eligible plug-in visits and DWC traversals, respectively.
 Usable battery energy and maximum charging supply must cover total duty consumption, yielding the following energy-budget valid inequality (VI):
 \begin{equation}
@@ -74,8 +74,8 @@ We add the inequality for the duty with the largest number of trips in each scen
 \subsection{Two-phase relaxation and verification}
 \label{subsec:route-lower-bounding}
 
-As the road network and fleet expand, the operational subproblem \eqref{eq:operational-recourse} grows in both charging decisions and shared-capacity constraints, making it more difficult to solve.
-To address this computational burden, we develop TPILS consisting of two phases.
+As the road network and fleet expand, the operational subproblem \eqref{eq:operational-recourse} has more charging decisions and shared-capacity constraints, making it harder to solve.
+TPILS addresses this computational burden in two phases.
 In Phase 1, removing the shared-capacity coupling allows occupancy variables to be eliminated, decomposing each large scenario MILP into small, independent route LPs.
 Phase 2 restores the exact scenario MILPs while retaining the lower bounds generated in Phase 1.
 Figure~\ref{fig:two-phase-framework} summarizes the two phases.
@@ -87,7 +87,7 @@ Figure~\ref{fig:two-phase-framework} summarizes the two phases.
  \label{fig:two-phase-framework}
 \end{figure}
 
-\paragraph{Phase 1: Coupling relaxation and route decomposition.}
+\paragraph{Phase 1: Coupling relaxation and route decomposition}
 For fixed $(w,z_\omega)$, we drop the shared plug-in capacity constraints \eqref{eq:plugin-capacity} and eliminate occupancy variables, obtaining
 \begin{equation}
  0\le q_v^{\mathrm P}\le\bar q^{\mathrm P}|\mathcal T_v|,
@@ -121,7 +121,7 @@ For any facility layout $w\in\mathcal W$, battery selections satisfying \eqref{e
 Infeasibility of any route LP certifies infeasibility of the exact scenario subproblem.
 \end{proposition}
 \begin{proof}
-Since $x_{v\tau}\le1$, every exact feasible solution satisfies \eqref{eq:phase-one-plugin-aggregate-bound} and retains all other route constraints.
+Since $x_{v\tau}\le1$, every feasible solution of the exact subproblem satisfies \eqref{eq:phase-one-plugin-aggregate-bound} and all other route constraints.
 Its route components are therefore feasible for the route LPs with the same total charging cost, proving the lower bound and, by contraposition, the infeasibility claim.
 If the exact subproblem is infeasible, the bound holds by $Q_\omega=+\infty$.
 \end{proof}
@@ -144,7 +144,7 @@ The bracketed term is the facility and battery cost of $(w,z)$; the remaining te
 Optimal route LP solutions generate dual optimality cuts; infeasible route LPs generate feasibility cuts, using a Farkas certificate when available \citep{benders_partitioning_1962}.
 Each cut involves only its route's battery selection and facilities.
 
-Let $LB^R$ be the best Phase 1 master bound and $UB^R$ the lowest evaluated objective for a design with all route LPs feasible.
+Let $LB^R$ be the best Phase 1 master bound and $UB^R$ the lowest objective value among evaluated designs for which all route LPs are feasible.
 Each evaluation adds facility and battery costs to the expected charging cost obtained from the route LPs.
 The phase transition occurs when
 \begin{equation}
@@ -154,7 +154,7 @@ The phase transition occurs when
 Set $g^R=+\infty$ until $UB^R$ is finite.
 The value $LB^R$ also bounds $V^L$, whereas $UB^R$ bounds only the relaxed problem.
 
-\paragraph{Phase 2: Exact scenario verification.}
+\paragraph{Phase 2: Exact scenario verification}
 Phase 2 extends the Phase 1 master to solve the exact lifted formulation \eqref{eq:exact-lifted-formulation}, carrying forward the lower bound $LB^R$ and route cuts.
 In the objective of \eqref{eq:phase-one-master}, the sum of the route cost proxies $\sum_{r\in\mathcal R}\widehat\theta_{\omega,r}$ for each scenario is replaced by the scenario cost proxy $\theta_\omega$.
 Its restricted master approximates the scenario value constraints $\theta_\omega\ge Q_\omega(w,z_\omega)$ with accumulated feasibility and optimality cuts.
@@ -190,7 +190,7 @@ When the exact subproblem for scenario $\omega$ certifies $(w^*,z_\omega^*)$ as 
 \label{eq:pointwise-feasibility-cut}
 \end{equation}
 On the binary domain, this cut excludes only the evaluated facility and battery configuration.
-\paragraph{Monotone feasibility cuts.}
+\paragraph{Monotone feasibility cuts}
 Operational feasibility is monotone with respect to DWC availability and battery capacity.
 If $(w^*,z_\omega^*)$ is infeasible, any configuration with no additional facilities and no larger batteries is also infeasible.
 A feasible configuration must therefore open an additional DWC facility or increase the battery capacity on at least one route, giving the monotone feasibility cut
@@ -206,7 +206,7 @@ Cut~\eqref{eq:monotone-feasibility-cut} is valid and weakly dominates \eqref{eq:
 \end{proposition}
 \begin{proof}
 First, consider a feasible configuration $(w,z_\omega)$ and another configuration $(\bar w,\bar z_\omega)$ with $\bar w_l\ge w_l$ for every $l\in\mathcal L^{\mathrm D}$ and $B_{\omega,r}(\bar z_{\omega,r})\ge B_{\omega,r}(z_{\omega,r})$ for every $r\in\mathcal R$.
-Keeping the original charging and occupancy decisions, the DWC charging bounds remain satisfied because $\bar w\ge w$, while the plug-in charging and capacity constraints are unaffected.
+With the original charging and occupancy decisions unchanged, the DWC charging bounds remain satisfied because $\bar w\ge w$, while the plug-in charging and capacity constraints are unaffected.
 For each route, write $B_{\omega,r}=B_{\omega,r}(z_{\omega,r})$, $\bar B_{\omega,r}=B_{\omega,r}(\bar z_{\omega,r})$, and $\Delta_r=\bar B_{\omega,r}-B_{\omega,r}\ge0$; increase every arrival and departure energy state by $\overline\rho\Delta_r$.
 The common shift preserves station and traversal energy balances throughout each duty.
 For every original state $e$, its original bounds imply
@@ -221,7 +221,7 @@ For every original state $e$, its original bounds imply
 \end{aligned}
 \]
 The second inequality in the first line follows from $\overline\rho\ge\underline\rho$ and $\Delta_r\ge0$.
-The initial boundary equality is preserved; return energy increases by $\overline\rho\Delta_r$, at least the increase $\underline\rho\Delta_r$ in its lower bound.
+The initial boundary equality is preserved; return energy increases by $\overline\rho\Delta_r$, which is at least the increase $\underline\rho\Delta_r$ in its lower bound.
 In the overnight balance, the increases in the capacity term and terminal energy cancel, so the original overnight charging remains valid.
 The transformed solution is feasible at $(\bar w,\bar z_\omega)$.
 
@@ -232,10 +232,10 @@ By the battery-selection constraint \eqref{eq:one-battery}, the battery terms in
 Thus $I_\omega\le D_\omega$ on the continuous relaxation, so \eqref{eq:monotone-feasibility-cut} weakly dominates \eqref{eq:pointwise-feasibility-cut}.
 \end{proof}
 
-\paragraph{Repair-enhanced monotone cuts.}
-Because the objective minimizes cost, the master may generate infeasible configurations close to previously evaluated anchors.
+\paragraph{Repair-enhanced monotone cuts}
+Because the master minimizes cost, it may generate infeasible configurations close to previously evaluated anchors.
 The resulting monotone cuts may therefore provide only limited additional coverage of the infeasible region.
-Starting from $(w^*,z_\omega^*)$, the repair search first upgrades batteries and then adds facilities, seeking a feasible configuration and identifying resource-enlarged configurations that remain infeasible.
+Starting from $(w^*,z_\omega^*)$, the repair search first upgrades batteries and then adds facilities, seeking a feasible configuration and identifying configurations that remain infeasible after these increases.
 The last such infeasible configuration found, denoted by $(w^+,z_\omega^+)$, is used as the anchor of the strengthened cut:
 \begin{equation}
 \begin{aligned}
