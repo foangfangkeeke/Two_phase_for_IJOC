@@ -1,0 +1,63 @@
+# 逐项日志索引
+
+57 份独立日志，覆盖 65 个结果位置。
+
+| 运行 | LB | UB | actualTime(s) | 状态 | 源码版本 | 结果位置数 | 记录 |
+|---|---:|---:|---:|---|---|---:|---|
+| [R12-N5-F10-C4_ef](../logs/R12-N5-F10-C4_ef.log) | 8358.566687 | 8365.950455 | 57.937 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R12-N5-F10-C4_ef.json) |
+| [R12-N5-F10-C4_full](../logs/R12-N5-F10-C4_full.log) | 8363.415464 | 8363.898909 | 13.453 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R12-N5-F10-C4_full.json) |
+| [R12-N5-F10-C4_lifted-ils](../logs/R12-N5-F10-C4_lifted-ils.log) | 8363.624883 | 8363.898909 | 374.187 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R12-N5-F10-C4_lifted-ils.json) |
+| [R12-N5-F10-C4_lifted-two-phase](../logs/R12-N5-F10-C4_lifted-two-phase.log) | 8363.415464 | 8363.898909 | 13.468 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R12-N5-F10-C4_lifted-two-phase.json) |
+| [R12-N5-F10-C4_natural-ils](../logs/R12-N5-F10-C4_natural-ils.log) | 8261.553462 | 8363.880708 | 7201.328 | TIME_LIMIT | 7d932b9 | 1 | [JSON](../records/R12-N5-F10-C4_natural-ils.json) |
+| [R12-N5-F20-C4_ef](../logs/R12-N5-F20-C4_ef.log) | 8239.552612 | 8313.146903 | 262.703 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R12-N5-F20-C4_ef.json) |
+| [R12-N5-F20-C4_full](../logs/R12-N5-F20-C4_full.log) | 8279.500646 | 8279.504224 | 15.735 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R12-N5-F20-C4_full.json) |
+| [R12-N5-F20-C4_lifted-ils](../logs/R12-N5-F20-C4_lifted-ils.log) | 8278.239042 | 8279.522960 | 1417.391 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R12-N5-F20-C4_lifted-ils.json) |
+| [R12-N5-F20-C4_lifted-two-phase](../logs/R12-N5-F20-C4_lifted-two-phase.log) | 8279.500646 | 8279.504224 | 15.844 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R12-N5-F20-C4_lifted-two-phase.json) |
+| [R12-N5-F20-C4_natural-ils](../logs/R12-N5-F20-C4_natural-ils.log) | 8154.573648 | 8298.438277 | 7200.703 | TIME_LIMIT | 7d932b9 | 1 | [JSON](../records/R12-N5-F20-C4_natural-ils.json) |
+| [R12-N5-F50-C4_ef](../logs/R12-N5-F50-C4_ef.log) | 未记录 | 未记录 | 87.203 | MEMORY_LIMIT_EXTERNAL | 7d932b9 | 1 | [JSON](../records/R12-N5-F50-C4_ef.json) |
+| [R12-N5-F50-C4_full](../logs/R12-N5-F50-C4_full.log) | 8197.923779 | 8197.972066 | 21.547 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R12-N5-F50-C4_full.json) |
+| [R12-N5-F50-C4_lifted-ils](../logs/R12-N5-F50-C4_lifted-ils.log) | 8193.164801 | 8198.534757 | 1237.062 | OPTIMAL | 7d932b9 | 2 | [JSON](../records/R12-N5-F50-C4_lifted-ils.json) |
+| [R12-N5-F50-C4_lifted-ils_noVI](../logs/R12-N5-F50-C4_lifted-ils_noVI.log) | 2743.811282 | ∞ | 7200.828 | TIME_LIMIT | 7d932b9 | 1 | [JSON](../records/R12-N5-F50-C4_lifted-ils_noVI.json) |
+| [R12-N5-F50-C4_lifted-two-phase](../logs/R12-N5-F50-C4_lifted-two-phase.log) | 8197.923779 | 8197.972066 | 21.609 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R12-N5-F50-C4_lifted-two-phase.json) |
+| [R12-N5-F50-C4_natural-ils](../logs/R12-N5-F50-C4_natural-ils.log) | 8072.076322 | 8260.380781 | 7200.594 | TIME_LIMIT | 7d932b9 | 1 | [JSON](../records/R12-N5-F50-C4_natural-ils.json) |
+| [R28-N10-F50-C4_full](../logs/R28-N10-F50-C4_full.log) | 17580.602420 | 17729.451635 | 866.641 | OPTIMAL | c29cdc5 | 1 | [JSON](../records/R28-N10-F50-C4_full.json) |
+| [R28-N10-F50-C4_lifted-two-phase](../logs/R28-N10-F50-C4_lifted-two-phase.log) | 17633.872359 | ∞ | 7203.859 | TIME_LIMIT | c29cdc5 | 1 | [JSON](../records/R28-N10-F50-C4_lifted-two-phase.json) |
+| [R28-N20-F50-C4_full](../logs/R28-N20-F50-C4_full.log) | 17878.050225 | 18057.189789 | 2965.782 | OPTIMAL | c29cdc5 | 1 | [JSON](../records/R28-N20-F50-C4_full.json) |
+| [R28-N20-F50-C4_lifted-two-phase](../logs/R28-N20-F50-C4_lifted-two-phase.log) | 17907.002925 | ∞ | 7231.266 | TIME_LIMIT | c29cdc5 | 1 | [JSON](../records/R28-N20-F50-C4_lifted-two-phase.json) |
+| [R28-N40-F50-C4_full](../logs/R28-N40-F50-C4_full.log) | 17845.587468 | 18040.436983 | 7282.547 | TIME_LIMIT | c29cdc5 | 1 | [JSON](../records/R28-N40-F50-C4_full.json) |
+| [R28-N40-F50-C4_lifted-two-phase](../logs/R28-N40-F50-C4_lifted-two-phase.log) | 17850.015979 | ∞ | 7289.468 | TIME_LIMIT | c29cdc5 | 1 | [JSON](../records/R28-N40-F50-C4_lifted-two-phase.json) |
+| [R28-N5-F10-C4_ef](../logs/R28-N5-F10-C4_ef.log) | 未记录 | 未记录 | 157.968 | MEMORY_LIMIT_EXTERNAL | 7d932b9 | 1 | [JSON](../records/R28-N5-F10-C4_ef.json) |
+| [R28-N5-F10-C4_full](../logs/R28-N5-F10-C4_full.log) | 17790.492085 | 17957.279437 | 397.500 | OPTIMAL | c29cdc5 | 2 | [JSON](../records/R28-N5-F10-C4_full.json) |
+| [R28-N5-F10-C4_lifted-ils](../logs/R28-N5-F10-C4_lifted-ils.log) | 16186.007616 | ∞ | 7201.484 | TIME_LIMIT | c29cdc5 | 1 | [JSON](../records/R28-N5-F10-C4_lifted-ils.json) |
+| [R28-N5-F10-C4_lifted-two-phase](../logs/R28-N5-F10-C4_lifted-two-phase.log) | 17793.272713 | 17864.432684 | 330.391 | OPTIMAL | c29cdc5 | 2 | [JSON](../records/R28-N5-F10-C4_lifted-two-phase.json) |
+| [R28-N5-F10-C4_natural-ils](../logs/R28-N5-F10-C4_natural-ils.log) | 0.000000 | ∞ | 7204.235 | TIME_LIMIT | 7d932b9 | 1 | [JSON](../records/R28-N5-F10-C4_natural-ils.json) |
+| [R28-N5-F20-C4_ef](../logs/R28-N5-F20-C4_ef.log) | 未记录 | 未记录 | 154.031 | MEMORY_LIMIT_EXTERNAL | c29cdc5 | 1 | [JSON](../records/R28-N5-F20-C4_ef.json) |
+| [R28-N5-F20-C4_full](../logs/R28-N5-F20-C4_full.log) | 17723.202900 | 17893.137665 | 767.641 | OPTIMAL | c29cdc5 | 2 | [JSON](../records/R28-N5-F20-C4_full.json) |
+| [R28-N5-F20-C4_lifted-ils](../logs/R28-N5-F20-C4_lifted-ils.log) | 16798.979581 | ∞ | 7201.313 | TIME_LIMIT | c29cdc5 | 1 | [JSON](../records/R28-N5-F20-C4_lifted-ils.json) |
+| [R28-N5-F20-C4_lifted-two-phase](../logs/R28-N5-F20-C4_lifted-two-phase.log) | 17791.814680 | ∞ | 7201.312 | TIME_LIMIT | c29cdc5 | 2 | [JSON](../records/R28-N5-F20-C4_lifted-two-phase.json) |
+| [R28-N5-F20-C4_natural-ils](../logs/R28-N5-F20-C4_natural-ils.log) | 0.000000 | ∞ | 7203.390 | TIME_LIMIT | c29cdc5 | 1 | [JSON](../records/R28-N5-F20-C4_natural-ils.json) |
+| [R28-N5-F50-C2_full](../logs/R28-N5-F50-C2_full.log) | 18003.015124 | 19390.564830 | 7209.141 | TIME_LIMIT | c29cdc5 | 1 | [JSON](../records/R28-N5-F50-C2_full.json) |
+| [R28-N5-F50-C2_lifted-two-phase](../logs/R28-N5-F50-C2_lifted-two-phase.log) | 18007.233391 | ∞ | 7202.250 | TIME_LIMIT | c29cdc5 | 1 | [JSON](../records/R28-N5-F50-C2_lifted-two-phase.json) |
+| [R28-N5-F50-C3_full](../logs/R28-N5-F50-C3_full.log) | 17716.315484 | 17886.326205 | 3047.516 | OPTIMAL | c29cdc5 | 1 | [JSON](../records/R28-N5-F50-C3_full.json) |
+| [R28-N5-F50-C3_lifted-two-phase](../logs/R28-N5-F50-C3_lifted-two-phase.log) | 17689.677711 | ∞ | 7202.031 | TIME_LIMIT | c29cdc5 | 1 | [JSON](../records/R28-N5-F50-C3_lifted-two-phase.json) |
+| [R28-N5-F50-C4_ef](../logs/R28-N5-F50-C4_ef.log) | 未记录 | 未记录 | 932.407 | MEMORY_LIMIT_EXTERNAL | c29cdc5 | 1 | [JSON](../records/R28-N5-F50-C4_ef.json) |
+| [R28-N5-F50-C4_full](../logs/R28-N5-F50-C4_full.log) | 17425.712220 | 17478.568951 | 254.079 | OPTIMAL | c29cdc5 | 2 | [JSON](../records/R28-N5-F50-C4_full.json) |
+| [R28-N5-F50-C4_lifted-ils](../logs/R28-N5-F50-C4_lifted-ils.log) | 16934.434787 | ∞ | 7202.031 | TIME_LIMIT | c29cdc5 | 2 | [JSON](../records/R28-N5-F50-C4_lifted-ils.json) |
+| [R28-N5-F50-C4_lifted-ils_noVI](../logs/R28-N5-F50-C4_lifted-ils_noVI.log) | 5089.153366 | ∞ | 7423.172 | TIME_LIMIT | c29cdc5 | 1 | [JSON](../records/R28-N5-F50-C4_lifted-ils_noVI.json) |
+| [R28-N5-F50-C4_lifted-two-phase](../logs/R28-N5-F50-C4_lifted-two-phase.log) | 17425.712220 | 17478.568951 | 254.796 | OPTIMAL | c29cdc5 | 2 | [JSON](../records/R28-N5-F50-C4_lifted-two-phase.json) |
+| [R28-N5-F50-C4_natural-ils](../logs/R28-N5-F50-C4_natural-ils.log) | 0.000000 | ∞ | 7203.297 | TIME_LIMIT | c29cdc5 | 1 | [JSON](../records/R28-N5-F50-C4_natural-ils.json) |
+| [R3-N5-F10-C4_ef](../logs/R3-N5-F10-C4_ef.log) | 1469.848225 | 1469.848225 | 5.891 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R3-N5-F10-C4_ef.json) |
+| [R3-N5-F10-C4_full](../logs/R3-N5-F10-C4_full.log) | 1469.848225 | 1469.848225 | 2.687 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R3-N5-F10-C4_full.json) |
+| [R3-N5-F10-C4_lifted-ils](../logs/R3-N5-F10-C4_lifted-ils.log) | 1469.848225 | 1469.848225 | 2.969 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R3-N5-F10-C4_lifted-ils.json) |
+| [R3-N5-F10-C4_lifted-two-phase](../logs/R3-N5-F10-C4_lifted-two-phase.log) | 1469.848225 | 1469.848225 | 2.657 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R3-N5-F10-C4_lifted-two-phase.json) |
+| [R3-N5-F10-C4_natural-ils](../logs/R3-N5-F10-C4_natural-ils.log) | 1469.848225 | 1469.848225 | 8.094 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R3-N5-F10-C4_natural-ils.json) |
+| [R3-N5-F20-C4_ef](../logs/R3-N5-F20-C4_ef.log) | 1469.848225 | 1469.848225 | 8.719 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R3-N5-F20-C4_ef.json) |
+| [R3-N5-F20-C4_full](../logs/R3-N5-F20-C4_full.log) | 1469.848225 | 1469.848225 | 2.937 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R3-N5-F20-C4_full.json) |
+| [R3-N5-F20-C4_lifted-ils](../logs/R3-N5-F20-C4_lifted-ils.log) | 1469.848225 | 1469.848225 | 3.219 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R3-N5-F20-C4_lifted-ils.json) |
+| [R3-N5-F20-C4_lifted-two-phase](../logs/R3-N5-F20-C4_lifted-two-phase.log) | 1469.848225 | 1469.848225 | 2.953 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R3-N5-F20-C4_lifted-two-phase.json) |
+| [R3-N5-F20-C4_natural-ils](../logs/R3-N5-F20-C4_natural-ils.log) | 1469.848225 | 1469.848225 | 8.453 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R3-N5-F20-C4_natural-ils.json) |
+| [R3-N5-F50-C4_ef](../logs/R3-N5-F50-C4_ef.log) | 1469.848225 | 1469.848225 | 14.656 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R3-N5-F50-C4_ef.json) |
+| [R3-N5-F50-C4_full](../logs/R3-N5-F50-C4_full.log) | 1469.848225 | 1469.848225 | 3.172 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R3-N5-F50-C4_full.json) |
+| [R3-N5-F50-C4_lifted-ils](../logs/R3-N5-F50-C4_lifted-ils.log) | 1469.848225 | 1469.848225 | 3.515 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R3-N5-F50-C4_lifted-ils.json) |
+| [R3-N5-F50-C4_lifted-two-phase](../logs/R3-N5-F50-C4_lifted-two-phase.log) | 1469.848225 | 1469.848225 | 3.297 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R3-N5-F50-C4_lifted-two-phase.json) |
+| [R3-N5-F50-C4_natural-ils](../logs/R3-N5-F50-C4_natural-ils.log) | 1469.848225 | 1469.848225 | 8.859 | OPTIMAL | 7d932b9 | 1 | [JSON](../records/R3-N5-F50-C4_natural-ils.json) |

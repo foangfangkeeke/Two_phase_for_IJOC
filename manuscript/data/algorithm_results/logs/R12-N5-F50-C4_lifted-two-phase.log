@@ -1,0 +1,27 @@
+Execution policy: version=final-rsp-skip-2026-11-05, rsp_numerical=skip_screening, original_subproblem=required
+Runtime options: facility_cost_scale=1.000000, energy_scale=1.000000, battery_step=50, scenario_count=5, scenario_start=0, cap=4, dwc_top_n=50, wireless_option=1, rsp=1, rsp_workers=3, rsp_threads=4, preprocess_bounds=0, valid_inequality=1
+Solver options: mip_gap=0.000100, global_gap=0.010000, time_limit=7200.000000, threads=12
+Instance: data=R12_N5, scenario_folders=base;charger_btbatok_up10;global_down10;route_453_up10;route_941_down20, battery_range=[50.000000,600.000000]
+Battery upper-bound preprocess_ms=0.680400
+Phase 1 initialized: route_subproblems=60
+Phase 1 iter 0, feasibility cut x21, UB=inf, LB=2679.466302, gap=1, master_ms=65.741000, subproblem_ms=1626.564100, elapsed_ms=4108.904300
+Phase 1 iter 1, feasibility cut x7, UB=inf, LB=5479.822301, gap=1, master_ms=78.767300, subproblem_ms=1066.201500, elapsed_ms=5254.474100
+Phase 1 iter 2, feasibility cut x4, UB=inf, LB=7210.226502, gap=1, master_ms=156.092100, subproblem_ms=554.228500, elapsed_ms=5965.290300
+Phase 1 iter 3, feasibility cut x4, UB=inf, LB=8049.852010, gap=1, master_ms=236.645300, subproblem_ms=512.270100, elapsed_ms=6714.522800
+Phase 1 iter 4, feasibility cut x8, UB=inf, LB=8193.990052, gap=1, master_ms=269.376600, subproblem_ms=440.424400, elapsed_ms=7424.558000
+Phase 1 iter 5, feasibility cut x4, UB=inf, LB=8195.223779, gap=1, master_ms=283.550800, subproblem_ms=455.877800, elapsed_ms=8164.205900
+Phase 1 iter 6, feasibility cut x4, UB=inf, LB=8195.868476, gap=1, master_ms=268.691600, subproblem_ms=496.441000, elapsed_ms=8929.605300
+Phase 1 iter 7, feasibility cut x4, UB=inf, LB=8195.868476, gap=1, master_ms=257.771500, subproblem_ms=445.250300, elapsed_ms=9632.861300
+Phase 1 iter 8, feasibility cut x4, UB=inf, LB=8195.868476, gap=1, master_ms=279.401900, subproblem_ms=421.682500, elapsed_ms=10334.152200
+Phase 1 iter 9, feasibility cut x4, UB=inf, LB=8197.923779, gap=1, master_ms=330.849900, subproblem_ms=477.657700, elapsed_ms=11142.900400
+Phase 1 iter 10, theta=5293.563779, Q(z)=5293.563779, optimality cut x0, UB=8197.923779, LB=8197.923779, gap=-0.000000%, master_ms=351.405300, subproblem_ms=390.432000, elapsed_ms=11885.014100
+Phase 1 completed: UB=8197.923779, LB=8197.923779, elapsed_ms=12220.314100
+Phase 2 initialized: scenarios=5, target_gap=1.000000%, scenario_workers=3, scenario_threads=4, RSP=on
+Incumbent cost distribution: source=master, facility=378.000000 (4.610896%), battery=2526.360000 (30.816890%), daytime_energy=3891.601024 (47.470289%), overnight_energy=1402.011042 (17.101925%), total=8197.972066
+Phase 2 iter 0, theta=5293.563779, Q(z)=5293.612066, optimality cut x4, UB=8197.972066, LB=8197.923779, gap=0.000589%, master_ms=454.748600, rsp_ms=623.704100, subproblem_ms=2347.072900, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=21097.191100
+Lifted Two-Phase converged.
+Lifted Two-Phase status=OPTIMAL, UB=8197.972066, LB=8197.923779, gap=0.000589%, elapsed_ms=21097.198800
+Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=8197.972066, LB=8197.923779, gap_percent=0.000589, reported_seconds=21.097199
+Cardinal Optimizer v8.0.7. Build date Sep 20 2026
+Copyright Cardinal Operations 2026. All Rights Reserved
+

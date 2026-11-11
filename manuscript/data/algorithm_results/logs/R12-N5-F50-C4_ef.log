@@ -1,0 +1,6 @@
+Execution policy: version=final-rsp-skip-2026-11-05, rsp_numerical=skip_screening, original_subproblem=required
+Runtime options: facility_cost_scale=1.000000, energy_scale=1.000000, battery_step=50, scenario_count=5, scenario_start=0, cap=4, dwc_top_n=50, wireless_option=1, rsp=0, rsp_workers=3, rsp_threads=4, preprocess_bounds=0, valid_inequality=1
+Solver options: mip_gap=0.000100, global_gap=0.010000, time_limit=7200.000000, threads=12
+Instance: data=R12_N5, scenario_folders=base;charger_btbatok_up10;global_down10;route_453_up10;route_941_down20, battery_range=[50.000000,600.000000]
+DWC candidate screening: selected=50
+scenario_count=5, facility_vars=50, model_vars=658776, model_constrs=1193940

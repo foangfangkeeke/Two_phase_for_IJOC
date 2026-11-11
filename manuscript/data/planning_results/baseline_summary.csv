@@ -1,0 +1,2 @@
+case,route_scenario_count,battery_decreased,battery_unchanged,battery_increased,battery_decreased_and_uses_dwc,expected_plug_grid_kwh_dwc,expected_plug_grid_kwh_nodwc,plug_change_percent,stations_plug_increased,stations_plug_unchanged,stations_plug_decreased,weighted_battery_dwc_kwh,weighted_battery_nodwc_kwh,dwc_ub_final,nodwc_ub_final,certified_saving_lower,certified_saving_upper
+R28-S5-F50-C4,140,67,73,0,64,36831.074621,33419.916532,10.206962,4,0,1,141.316831,183.788563,17478.376867,18230.863935,600.659651,805.151715

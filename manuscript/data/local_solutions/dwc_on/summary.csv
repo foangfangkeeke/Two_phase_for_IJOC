@@ -1,0 +1,2 @@
+method,implementation_ref,reported_objective,recomputed_total,difference,selected_dwc_links,facility_cost,battery_cost,day_cost,night_cost,expected_plug_in_kwh,expected_dwc_kwh,expected_overnight_kwh,mean_route_capacity_kwh,mean_bus_capacity_kwh
+full,codex/repair-monotone@d030988,8197.972065883,8197.972065883,0.000000000,24,378.000000000,2526.360000000,3891.601024003,1402.011041880,18150.920666667,2096.743350000,11370.730266667,131.666666667,122.805755396

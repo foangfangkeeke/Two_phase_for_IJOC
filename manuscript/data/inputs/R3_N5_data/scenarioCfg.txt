@@ -1,0 +1,8 @@
+# numScenarios
+5
+# scenario_folder,probability
+base,0.2
+charger_tengah_up10,0.2
+global_down10,0.2
+route_945_up20,0.2
+route_992_down20,0.2

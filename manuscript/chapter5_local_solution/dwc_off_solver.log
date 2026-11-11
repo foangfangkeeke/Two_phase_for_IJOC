@@ -1,0 +1,18 @@
+Runtime options: facility_cost_scale=1.000000, energy_scale=1.000000, battery_step=50, scenario_count=5, scenario_start=0, cap=4, dwc_top_n=50, wireless_option=0, rsp=1, rsp_workers=3, rsp_threads=4, preprocess_bounds=0, valid_inequality=1
+Solver options: mip_gap=0.000100, time_limit=7200.000000, threads=12
+Instance: data=R12_N5, scenario_folders=base;charger_btbatok_up10;global_down10;route_453_up10;route_941_down20, battery_range=[50.000000,600.000000]
+Battery upper-bound preprocess_ms=0.830600
+Phase 1 initialized: route_subproblems=60
+Phase 1 iter 0, feasibility cut x7, UB=inf, LB=3332.960000, gap=1, master_ms=4.398900, subproblem_ms=1434.664700, elapsed_ms=4689.632000
+Phase 1 iter 1, theta=3467.262371, Q(z)=4842.463776, optimality cut x32, UB=8718.583776, LB=7343.382371, gap=15.773220%, master_ms=2.349600, subproblem_ms=538.279700, elapsed_ms=5230.964100
+Phase 1 iter 2, theta=4700.529776, Q(z)=4932.538151, optimality cut x6, UB=8528.938151, LB=8296.929776, gap=2.720249%, master_ms=3.843000, subproblem_ms=459.617400, elapsed_ms=5694.717600
+Phase 1 iter 3, theta=4967.402442, Q(z)=4967.402442, optimality cut x0, UB=8438.002442, LB=8438.002442, gap=-0.000000%, master_ms=21.170900, subproblem_ms=437.347500, elapsed_ms=6153.470200
+Phase 1 completed: UB=8438.002442, LB=8438.002442, elapsed_ms=6626.713400
+Phase 2 initialized: scenarios=5, target_gap=1.000000%, scenario_workers=3, scenario_threads=4, RSP=on
+Incumbent cost distribution: source=master, facility=0.000000 (0.000000%), battery=3470.600000 (41.130588%), daytime_energy=3061.753842 (36.285292%), overnight_energy=1905.648601 (22.584120%), total=8438.002442
+Phase 2 iter 0, theta=4967.402442, Q(z)=4967.402442, optimality cut x0, UB=8438.002442, LB=8438.002442, gap=0.000000%, master_ms=30.355000, rsp_ms=652.249600, subproblem_ms=3097.528000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=17489.485500
+Full converged.
+Full status=OPTIMAL, UB=8438.002442, LB=8438.002442, gap=0.000000%, elapsed_ms=17489.524600
+Cardinal Optimizer v8.0.7. Build date Sep 20 2026
+Copyright Cardinal Operations 2026. All Rights Reserved
+

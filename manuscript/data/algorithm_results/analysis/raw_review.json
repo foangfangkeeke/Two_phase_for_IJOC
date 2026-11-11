@@ -1,0 +1,1969 @@
+{
+  "reviewed_utc": "2026-11-08T06:13:40.977010+00:00",
+  "independent_of_controller_and_parser": true,
+  "solver_calls": 0,
+  "reviewed_unique_runs": 57,
+  "reviewed_result_slots": 65,
+  "raw_hashes_options_actual_inputs_source_archives_and_versions_verified": true,
+  "mismatches": 0,
+  "LB_decreases": 0,
+  "incumbent_increases": 0,
+  "records": [
+    {
+      "run_id": "R12-N5-F10-C4_ef",
+      "raw_log_sha256": "699a9d50ce4bfc6553b1edb5394b170d8cf71cbb2f30b212b7fbbf388ffd8050",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 7,
+      "terminal_raw": "Algorithm termination: algorithm=ef, status=OPTIMAL, has_solution=1, UB=8365.950455, LB=8358.566687, gap_percent=0.088260, reported_seconds=53.975226",
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 57.937000000150874,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 57.938432,
+      "utc_minus_monotonic_seconds": 0.0014319998491245656
+    },
+    {
+      "run_id": "R12-N5-F10-C4_full",
+      "raw_log_sha256": "50e518916d7506245e808fbf71c0b8602959e1e54d58fca5d916824f62d6a5f6",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 17,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=8363.898909, LB=8363.415464, gap_percent=0.005780, reported_seconds=13.029424",
+      "complete_iterations": {
+        "Phase 1": 4,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 10,
+          "iteration": 3,
+          "lb": "8363.415464",
+          "ub": "8363.880708",
+          "gap_raw": "0.005563%",
+          "algorithm_seconds": 5.0568272,
+          "raw": "Phase 1 iter 3, theta=5071.080708, Q(z)=5071.080708, optimality cut x0, UB=8363.880708, LB=8363.415464, gap=0.005563%, master_ms=90.989700, subproblem_ms=384.390600, elapsed_ms=5056.827200"
+        },
+        "Phase 2": {
+          "line": 14,
+          "iteration": 0,
+          "lb": "8363.415464",
+          "ub": "8363.898909",
+          "gap_raw": "0.005780%",
+          "algorithm_seconds": 13.0294157,
+          "raw": "Phase 2 iter 0, theta=5071.080708, Q(z)=5071.098909, optimality cut x0, UB=8363.898909, LB=8363.415464, gap=0.005780%, master_ms=125.352600, rsp_ms=485.302000, subproblem_ms=2034.218400, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=13029.415700"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 13.452999999979511,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 13.441145,
+      "utc_minus_monotonic_seconds": -0.011854999979510339
+    },
+    {
+      "run_id": "R12-N5-F10-C4_lifted-ils",
+      "raw_log_sha256": "f555b0789eccbd81ceafeb3b3b140a54ca1766af18b94c6eb26c927abf0b1b64",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 22,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=OPTIMAL, has_solution=1, UB=8363.898909, LB=8363.624883, gap_percent=0.003276, reported_seconds=373.633716",
+      "complete_iterations": {
+        "Lifted ILS": 14
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 19,
+          "iteration": 13,
+          "lb": "8363.624883",
+          "ub": "8363.898909",
+          "gap_raw": "0.003276%",
+          "algorithm_seconds": 373.6337095,
+          "raw": "Lifted ILS iter 13, theta=5071.080708, Q(z)=5071.098909, optimality cut x1, UB=8363.898909, LB=8363.624883, gap=0.003276%, master_ms=93.354600, rsp_optimality_cut=0, rsp_ms=772.010500, subproblem_ms=3812.347200, elapsed_ms=373633.709500"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 374.18699999991804,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 374.173009,
+      "utc_minus_monotonic_seconds": -0.013990999918064517
+    },
+    {
+      "run_id": "R12-N5-F10-C4_lifted-two-phase",
+      "raw_log_sha256": "43c9cbba786a62d91cae27b392ac458a3da568dcbef1a3cc10942569a5f463a0",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 17,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=8363.898909, LB=8363.415464, gap_percent=0.005780, reported_seconds=13.029886",
+      "complete_iterations": {
+        "Phase 1": 4,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 10,
+          "iteration": 3,
+          "lb": "8363.415464",
+          "ub": "8363.880708",
+          "gap_raw": "0.005563%",
+          "algorithm_seconds": 5.027186800000001,
+          "raw": "Phase 1 iter 3, theta=5071.080708, Q(z)=5071.080708, optimality cut x0, UB=8363.880708, LB=8363.415464, gap=0.005563%, master_ms=91.950600, subproblem_ms=383.752400, elapsed_ms=5027.186800"
+        },
+        "Phase 2": {
+          "line": 14,
+          "iteration": 0,
+          "lb": "8363.415464",
+          "ub": "8363.898909",
+          "gap_raw": "0.005780%",
+          "algorithm_seconds": 13.029877899999999,
+          "raw": "Phase 2 iter 0, theta=5071.080708, Q(z)=5071.098909, optimality cut x0, UB=8363.898909, LB=8363.415464, gap=0.005780%, master_ms=121.106500, rsp_ms=492.123000, subproblem_ms=2056.328600, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=13029.877900"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 13.468000000109896,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 13.457502,
+      "utc_minus_monotonic_seconds": -0.01049800010989621
+    },
+    {
+      "run_id": "R12-N5-F10-C4_natural-ils",
+      "raw_log_sha256": "f900cdb7f16f0f59c1e6463cd75f91521db97c51ae8cbc6e90496799e71648d7",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 271,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=TIME_LIMIT, has_solution=1, UB=8363.880708, LB=8261.553462, gap_percent=1.223442, reported_seconds=7200.765743",
+      "complete_iterations": {
+        "Natural ILS": 263
+      },
+      "last_complete": {
+        "Natural ILS": {
+          "line": 268,
+          "iteration": 262,
+          "lb": "8261.553462",
+          "ub": "8363.880708",
+          "gap_raw": "1.223442%",
+          "algorithm_seconds": 7175.0104728,
+          "raw": "Natural ILS iter 262, feasibility cut x0, optimality cut x5, UB=8363.880708, LB=8261.553462, gap=1.223442%, master_ms=257.519100, rsp_optimality_cut x0, rsp_ms=519.449200, subproblem_ms=26700.725800, elapsed_ms=7175010.472800"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7201.328000000212,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7201.32467,
+      "utc_minus_monotonic_seconds": -0.003330000212372397
+    },
+    {
+      "run_id": "R12-N5-F20-C4_ef",
+      "raw_log_sha256": "bc52e7d3fa4aa83ba5c5f20c730654fabb0e11bc0386ef8984b681f6fa1d3d6d",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 7,
+      "terminal_raw": "Algorithm termination: algorithm=ef, status=OPTIMAL, has_solution=1, UB=8313.146903, LB=8239.552612, gap_percent=0.885276, reported_seconds=259.890751",
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 262.7029999999795,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 262.712793,
+      "utc_minus_monotonic_seconds": 0.00979300002046557
+    },
+    {
+      "run_id": "R12-N5-F20-C4_full",
+      "raw_log_sha256": "bde23345e70da6963cc4b4bb9d4f226ff33aa5808daa6e71686e49f06b5e4e3c",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 19,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=8279.504224, LB=8279.500646, gap_percent=0.000043, reported_seconds=15.292967",
+      "complete_iterations": {
+        "Phase 1": 6,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 12,
+          "iteration": 5,
+          "lb": "8279.500646",
+          "ub": "8279.500646",
+          "gap_raw": "0.000000%",
+          "algorithm_seconds": 7.0405683,
+          "raw": "Phase 1 iter 5, theta=5146.160646, Q(z)=5146.160646, optimality cut x0, UB=8279.500646, LB=8279.500646, gap=0.000000%, master_ms=132.853900, subproblem_ms=382.838600, elapsed_ms=7040.568300"
+        },
+        "Phase 2": {
+          "line": 16,
+          "iteration": 0,
+          "lb": "8279.500646",
+          "ub": "8279.504224",
+          "gap_raw": "0.000043%",
+          "algorithm_seconds": 15.292959199999999,
+          "raw": "Phase 2 iter 0, theta=5146.160646, Q(z)=5146.164224, optimality cut x0, UB=8279.504224, LB=8279.500646, gap=0.000043%, master_ms=233.343300, rsp_ms=555.105400, subproblem_ms=2067.872300, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=15292.959200"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 15.734999999869615,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 15.739396,
+      "utc_minus_monotonic_seconds": 0.0043960001303844365
+    },
+    {
+      "run_id": "R12-N5-F20-C4_lifted-ils",
+      "raw_log_sha256": "5980a6ad898d921f5f95167dd348fc3bd9a2e6ee8afc58a0981a753aef18a737",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 687,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=OPTIMAL, has_solution=1, UB=8279.522960, LB=8278.239042, gap_percent=0.015507, reported_seconds=1416.823028",
+      "complete_iterations": {
+        "Lifted ILS": 679
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 684,
+          "iteration": 678,
+          "lb": "8278.239042",
+          "ub": "8279.522960",
+          "gap_raw": "0.015507%",
+          "algorithm_seconds": 1416.823022,
+          "raw": "Lifted ILS iter 678, theta=5144.899042, Q(z)=5146.182960, optimality cut x4, UB=8279.522960, LB=8278.239042, gap=0.015507%, master_ms=794.074200, rsp_optimality_cut=1, rsp_ms=800.470500, subproblem_ms=4352.735600, elapsed_ms=1416823.022000"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 1417.3910000000615,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 1417.38962,
+      "utc_minus_monotonic_seconds": -0.0013800000615447061
+    },
+    {
+      "run_id": "R12-N5-F20-C4_lifted-two-phase",
+      "raw_log_sha256": "b71fa42d5e9af5043bf26473ac19ec8092231633e5586cf6e9dbe1a7e9d0d2d4",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 19,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=8279.504224, LB=8279.500646, gap_percent=0.000043, reported_seconds=15.389572",
+      "complete_iterations": {
+        "Phase 1": 6,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 12,
+          "iteration": 5,
+          "lb": "8279.500646",
+          "ub": "8279.500646",
+          "gap_raw": "0.000000%",
+          "algorithm_seconds": 7.0664093,
+          "raw": "Phase 1 iter 5, theta=5146.160646, Q(z)=5146.160646, optimality cut x0, UB=8279.500646, LB=8279.500646, gap=0.000000%, master_ms=141.519100, subproblem_ms=381.823400, elapsed_ms=7066.409300"
+        },
+        "Phase 2": {
+          "line": 16,
+          "iteration": 0,
+          "lb": "8279.500646",
+          "ub": "8279.504224",
+          "gap_raw": "0.000043%",
+          "algorithm_seconds": 15.3895644,
+          "raw": "Phase 2 iter 0, theta=5146.160646, Q(z)=5146.164224, optimality cut x0, UB=8279.504224, LB=8279.500646, gap=0.000043%, master_ms=188.444500, rsp_ms=589.461100, subproblem_ms=2146.877200, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=15389.564400"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 15.844000000040978,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 15.84201,
+      "utc_minus_monotonic_seconds": -0.001990000040978046
+    },
+    {
+      "run_id": "R12-N5-F20-C4_natural-ils",
+      "raw_log_sha256": "9ee59a933a3d8b5dc07f9ac3be4127df632c0e45faa4e202ec43649229424363",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 263,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=TIME_LIMIT, has_solution=1, UB=8298.438277, LB=8154.573648, gap_percent=1.733635, reported_seconds=7200.238443",
+      "complete_iterations": {
+        "Natural ILS": 255
+      },
+      "last_complete": {
+        "Natural ILS": {
+          "line": 260,
+          "iteration": 254,
+          "lb": "8154.573648",
+          "ub": "8298.438277",
+          "gap_raw": "1.733635%",
+          "algorithm_seconds": 7188.4638024000005,
+          "raw": "Natural ILS iter 254, feasibility cut x0, optimality cut x5, UB=8298.438277, LB=8154.573648, gap=1.733635%, master_ms=254.315100, rsp_optimality_cut x0, rsp_ms=548.606600, subproblem_ms=24765.018100, elapsed_ms=7188463.802400"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7200.7029999999795,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7200.714109,
+      "utc_minus_monotonic_seconds": 0.011109000020042004
+    },
+    {
+      "run_id": "R12-N5-F50-C4_ef",
+      "raw_log_sha256": "d96277b9bce76ba6af5e95a33050dcec16edebd237dfb0d546514b2d10d2f24b",
+      "status": "MEMORY_LIMIT_EXTERNAL",
+      "original_bounds_source": "UNRECORDED",
+      "terminal_line": null,
+      "terminal_raw": null,
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 87.20299999997951,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 87.212719,
+      "utc_minus_monotonic_seconds": 0.009719000020496082
+    },
+    {
+      "run_id": "R12-N5-F50-C4_full",
+      "raw_log_sha256": "2ec30fbe793de5eb554c0ec3d935ca4c4e8a4a76a4c3af322fc9810d36295fa9",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 24,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=8197.972066, LB=8197.923779, gap_percent=0.000589, reported_seconds=21.070586",
+      "complete_iterations": {
+        "Phase 1": 11,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 17,
+          "iteration": 10,
+          "lb": "8197.923779",
+          "ub": "8197.923779",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 11.941386399999999,
+          "raw": "Phase 1 iter 10, theta=5293.563779, Q(z)=5293.563779, optimality cut x0, UB=8197.923779, LB=8197.923779, gap=-0.000000%, master_ms=359.902000, subproblem_ms=416.308300, elapsed_ms=11941.386400"
+        },
+        "Phase 2": {
+          "line": 21,
+          "iteration": 0,
+          "lb": "8197.923779",
+          "ub": "8197.972066",
+          "gap_raw": "0.000589%",
+          "algorithm_seconds": 21.0705788,
+          "raw": "Phase 2 iter 0, theta=5293.563779, Q(z)=5293.612066, optimality cut x4, UB=8197.972066, LB=8197.923779, gap=0.000589%, master_ms=476.795500, rsp_ms=569.383900, subproblem_ms=2267.008200, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=21070.578800"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 21.54700000002049,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 21.54657,
+      "utc_minus_monotonic_seconds": -0.00043000002048998454
+    },
+    {
+      "run_id": "R12-N5-F50-C4_lifted-ils",
+      "raw_log_sha256": "515bdaf2591ed0e491c35155650d845bb5cbe4e6cd7d70d0d34ee0990f86c9c1",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 110,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=OPTIMAL, has_solution=1, UB=8198.534757, LB=8193.164801, gap_percent=0.065499, reported_seconds=1236.511227",
+      "complete_iterations": {
+        "Lifted ILS": 102
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 107,
+          "iteration": 101,
+          "lb": "8193.164801",
+          "ub": "8198.534757",
+          "gap_raw": "0.065499%",
+          "algorithm_seconds": 1236.5112205,
+          "raw": "Lifted ILS iter 101, theta=5243.170373, Q(z)=5249.093239, optimality cut x5, UB=8198.534757, LB=8193.164801, gap=0.065499%, master_ms=1083.464100, rsp_optimality_cut=5, rsp_ms=875.187200, subproblem_ms=5060.026900, elapsed_ms=1236511.220500"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 1237.0620000001509,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 1237.061165,
+      "utc_minus_monotonic_seconds": -0.0008350001508006244
+    },
+    {
+      "run_id": "R12-N5-F50-C4_lifted-ils_noVI",
+      "raw_log_sha256": "df0bda05492a9bf3a373220ff4922df6f634440470b146ded3c749638e32d5ba",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 28,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=TIME_LIMIT, has_solution=0, UB=inf, LB=2743.811282, gap_percent=inf, reported_seconds=7200.174581",
+      "complete_iterations": {
+        "Lifted ILS": 19
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 24,
+          "iteration": 18,
+          "lb": "2743.740000",
+          "ub": "inf",
+          "gap_raw": "1",
+          "algorithm_seconds": 6910.9861139,
+          "raw": "Lifted ILS iter 18, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2743.740000, gap=1, master_ms=273494.500900, rsp_ms=44605.515900, vi_excluded=1, vi_violations=5, vi_max_deficit=9.410400, elapsed_ms=6910986.113900"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7200.828000000212,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7199.394949,
+      "utc_minus_monotonic_seconds": -1.43305100021189
+    },
+    {
+      "run_id": "R12-N5-F50-C4_lifted-two-phase",
+      "raw_log_sha256": "7a7d05f34e8f3c90e088b5d0b0a7bc2ddd204ae90249186b1bd0e1b8a4413c9e",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 24,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=8197.972066, LB=8197.923779, gap_percent=0.000589, reported_seconds=21.097199",
+      "complete_iterations": {
+        "Phase 1": 11,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 17,
+          "iteration": 10,
+          "lb": "8197.923779",
+          "ub": "8197.923779",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 11.885014100000001,
+          "raw": "Phase 1 iter 10, theta=5293.563779, Q(z)=5293.563779, optimality cut x0, UB=8197.923779, LB=8197.923779, gap=-0.000000%, master_ms=351.405300, subproblem_ms=390.432000, elapsed_ms=11885.014100"
+        },
+        "Phase 2": {
+          "line": 21,
+          "iteration": 0,
+          "lb": "8197.923779",
+          "ub": "8197.972066",
+          "gap_raw": "0.000589%",
+          "algorithm_seconds": 21.0971911,
+          "raw": "Phase 2 iter 0, theta=5293.563779, Q(z)=5293.612066, optimality cut x4, UB=8197.972066, LB=8197.923779, gap=0.000589%, master_ms=454.748600, rsp_ms=623.704100, subproblem_ms=2347.072900, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=21097.191100"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 21.608999999938533,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 21.594919,
+      "utc_minus_monotonic_seconds": -0.014080999938531846
+    },
+    {
+      "run_id": "R12-N5-F50-C4_natural-ils",
+      "raw_log_sha256": "c1e975a698cc74501a77167d82411c0520d6fe2646401d44ab86f2d15e03f35b",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 287,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=TIME_LIMIT, has_solution=1, UB=8260.380781, LB=8072.076322, gap_percent=2.279610, reported_seconds=7200.097083",
+      "complete_iterations": {
+        "Natural ILS": 279
+      },
+      "last_complete": {
+        "Natural ILS": {
+          "line": 284,
+          "iteration": 278,
+          "lb": "8072.076322",
+          "ub": "8260.380781",
+          "gap_raw": "2.279610%",
+          "algorithm_seconds": 7194.4187606,
+          "raw": "Natural ILS iter 278, feasibility cut x0, optimality cut x5, UB=8260.380781, LB=8072.076322, gap=2.279610%, master_ms=440.487000, rsp_optimality_cut x0, rsp_ms=574.311700, subproblem_ms=25658.341300, elapsed_ms=7194418.760600"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7200.593999999808,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7200.601441,
+      "utc_minus_monotonic_seconds": 0.007441000191647618
+    },
+    {
+      "run_id": "R28-N10-F50-C4_full",
+      "raw_log_sha256": "7d85e7a3ba62b39bc9b3dc1cf4dc0c12dcf9f0bad65d6591fd9827ded861344e",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 60,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=17729.451635, LB=17580.602420, gap_percent=0.839559, reported_seconds=863.431506",
+      "complete_iterations": {
+        "Phase 1": 7,
+        "Phase 2": 2
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 20,
+          "iteration": 6,
+          "lb": "17575.863123",
+          "ub": "17576.631713",
+          "gap_raw": "0.004373%",
+          "algorithm_seconds": 28.5448565,
+          "raw": "Phase 1 iter 6, theta=11305.371713, Q(z)=11305.371713, optimality cut x0, UB=17576.631713, LB=17575.863123, gap=0.004373%, master_ms=272.740300, subproblem_ms=1468.851700, elapsed_ms=28544.856500"
+        },
+        "Phase 2": {
+          "line": 58,
+          "iteration": 1,
+          "lb": "17580.602420",
+          "ub": "17729.451635",
+          "gap_raw": "0.839559%",
+          "algorithm_seconds": 863.4315025,
+          "raw": "Phase 2 iter 1, RSP feasibility cut x5, RSP optimality cut x5, RSP Q(z)=5698.629868, UB=17729.451635, LB=17580.602420, gap=0.839559%, master_ms=1202.990600, rsp_ms=157275.335200, subproblem_ms=39112.501900, repair_probes=41, repair_ms=91709.646900, strengthened_cuts=5, repair_ub=17729.451635, elapsed_ms=863431.502500"
+        }
+      },
+      "search_records": {
+        "Search master": 9,
+        "Search repair": 14,
+        "Search incumbent": 2
+      },
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 866.6410000000615,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 866.632317,
+      "utc_minus_monotonic_seconds": -0.008683000061523671
+    },
+    {
+      "run_id": "R28-N10-F50-C4_lifted-two-phase",
+      "raw_log_sha256": "7f989c8ef023134c6d8c24edf2ea57100897bb685104d4d5dfd8f8aee8d7f46c",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 174,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=TIME_LIMIT, has_solution=0, UB=inf, LB=17633.872359, gap_percent=inf, reported_seconds=7200.157388",
+      "complete_iterations": {
+        "Phase 1": 7,
+        "Phase 2": 74
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 20,
+          "iteration": 6,
+          "lb": "17575.863123",
+          "ub": "17576.631713",
+          "gap_raw": "0.004373%",
+          "algorithm_seconds": 28.6233447,
+          "raw": "Phase 1 iter 6, theta=11305.371713, Q(z)=11305.371713, optimality cut x0, UB=17576.631713, LB=17575.863123, gap=0.004373%, master_ms=235.878200, subproblem_ms=1488.811900, elapsed_ms=28623.344700"
+        },
+        "Phase 2": {
+          "line": 170,
+          "iteration": 73,
+          "lb": "17633.872359",
+          "ub": "inf",
+          "gap_raw": "1",
+          "algorithm_seconds": 7176.3794344,
+          "raw": "Phase 2 iter 73, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=10318.175067, UB=inf, LB=17633.872359, gap=1, master_ms=108886.554600, rsp_ms=3300.915300, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=7176379.434400"
+        }
+      },
+      "search_records": {
+        "Search master": 82
+      },
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7203.859000000171,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7203.858457,
+      "utc_minus_monotonic_seconds": -0.0005430001710919896
+    },
+    {
+      "run_id": "R28-N20-F50-C4_full",
+      "raw_log_sha256": "93e297ad8cc2dfbe7edca680cb7276857ac64f4f08e686ab2cd07a73f39134ed",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 407,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=18057.189789, LB=17878.050225, gap_percent=0.992068, reported_seconds=2950.595091",
+      "complete_iterations": {
+        "Phase 1": 149,
+        "Phase 2": 2
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 304,
+          "iteration": 148,
+          "lb": "17873.866751",
+          "ub": "17874.908861",
+          "gap_raw": "0.005830%",
+          "algorithm_seconds": 1042.8039096,
+          "raw": "Phase 1 iter 148, theta=11510.578861, Q(z)=11510.578861, optimality cut x0, UB=17874.908861, LB=17873.866751, gap=0.005830%, master_ms=3734.101300, subproblem_ms=3329.522000, elapsed_ms=1042803.909600"
+        },
+        "Phase 2": {
+          "line": 404,
+          "iteration": 1,
+          "lb": "17875.528217",
+          "ub": "18057.189789",
+          "gap_raw": "1.006035%",
+          "algorithm_seconds": 2924.1919857000003,
+          "raw": "Phase 2 iter 1, RSP feasibility cut x18, RSP optimality cut x2, RSP Q(z)=1090.007475, UB=18057.189789, LB=17875.528217, gap=1.006035%, master_ms=15590.467200, rsp_ms=614466.658200, subproblem_ms=189393.484400, repair_probes=140, repair_ms=344157.795700, strengthened_cuts=18, repair_ub=18137.106168, elapsed_ms=2924191.985700"
+        }
+      },
+      "search_records": {
+        "Search master": 152,
+        "Search repair": 34,
+        "Search incumbent": 1
+      },
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 2965.78199999989,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 2965.774594,
+      "utc_minus_monotonic_seconds": -0.007405999890124804
+    },
+    {
+      "run_id": "R28-N20-F50-C4_lifted-two-phase",
+      "raw_log_sha256": "e503172400dda3264bc15de87fdd3735b37334ae280eb8a02ba55d43de140852",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 350,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=TIME_LIMIT, has_solution=0, UB=inf, LB=17907.002925, gap_percent=inf, reported_seconds=7206.128500",
+      "complete_iterations": {
+        "Phase 1": 149,
+        "Phase 2": 8
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 304,
+          "iteration": 148,
+          "lb": "17873.866751",
+          "ub": "17874.908861",
+          "gap_raw": "0.005830%",
+          "algorithm_seconds": 1034.1581234999999,
+          "raw": "Phase 1 iter 148, theta=11510.578861, Q(z)=11510.578861, optimality cut x0, UB=17874.908861, LB=17873.866751, gap=0.005830%, master_ms=3757.156100, subproblem_ms=3294.538200, elapsed_ms=1034158.123500"
+        },
+        "Phase 2": {
+          "line": 346,
+          "iteration": 7,
+          "lb": "17904.425628",
+          "ub": "inf",
+          "gap_raw": "1",
+          "algorithm_seconds": 4819.3958317,
+          "raw": "Phase 2 iter 7, RSP feasibility cut x5, RSP optimality cut x15, RSP Q(z)=8559.866183, UB=inf, LB=17904.425628, gap=1, master_ms=1202903.688300, rsp_ms=124071.809600, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=4819395.831700"
+        }
+      },
+      "search_records": {
+        "Search master": 158
+      },
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7231.2660000000615,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7231.274506,
+      "utc_minus_monotonic_seconds": 0.008505999938279274
+    },
+    {
+      "run_id": "R28-N40-F50-C4_full",
+      "raw_log_sha256": "60a01909df9df7ceb59a6051f790de1c23e4ce3a5649ac6410634da332a18423",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 341,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=TIME_LIMIT, has_solution=1, UB=18040.436983, LB=17845.587468, gap_percent=1.080071, reported_seconds=7203.824273",
+      "complete_iterations": {
+        "Phase 1": 88,
+        "Phase 2": 3
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 182,
+          "iteration": 87,
+          "lb": "17839.009725",
+          "ub": "17840.649337",
+          "gap_raw": "0.009190%",
+          "algorithm_seconds": 1446.1161548999999,
+          "raw": "Phase 1 iter 87, theta=11489.564337, Q(z)=11489.564337, optimality cut x0, UB=17840.649337, LB=17839.009725, gap=0.009190%, master_ms=3006.121400, subproblem_ms=9770.578200, elapsed_ms=1446116.154900"
+        },
+        "Phase 2": {
+          "line": 339,
+          "iteration": 2,
+          "lb": "17845.587468",
+          "ub": "18040.436983",
+          "gap_raw": "1.080071%",
+          "algorithm_seconds": 7203.7769124999995,
+          "raw": "Phase 2 iter 2, RSP feasibility cut x19, RSP optimality cut x21, RSP Q(z)=6036.989043, UB=18040.436983, LB=17845.587468, gap=1.080071%, master_ms=65801.784800, rsp_ms=123807.778700, subproblem_ms=1402490.327300, repair_probes=133, repair_ms=756325.939800, strengthened_cuts=19, repair_ub=inf, elapsed_ms=7203776.912500"
+        }
+      },
+      "search_records": {
+        "Search master": 91,
+        "Search repair": 54,
+        "Search incumbent": 1
+      },
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7282.5470000000205,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7282.549288,
+      "utc_minus_monotonic_seconds": 0.00228799997967144
+    },
+    {
+      "run_id": "R28-N40-F50-C4_lifted-two-phase",
+      "raw_log_sha256": "14ca4008470f0e26a5f9437fee33780b355e5754c81e26624ed7898a7f07291e",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 242,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=TIME_LIMIT, has_solution=0, UB=inf, LB=17850.015979, gap_percent=inf, reported_seconds=7202.533909",
+      "complete_iterations": {
+        "Phase 1": 88,
+        "Phase 2": 4
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 182,
+          "iteration": 87,
+          "lb": "17839.009725",
+          "ub": "17840.649337",
+          "gap_raw": "0.009190%",
+          "algorithm_seconds": 1424.6787712,
+          "raw": "Phase 1 iter 87, theta=11489.564337, Q(z)=11489.564337, optimality cut x0, UB=17840.649337, LB=17839.009725, gap=0.009190%, master_ms=2915.632300, subproblem_ms=9761.933100, elapsed_ms=1424678.771200"
+        },
+        "Phase 2": {
+          "line": 238,
+          "iteration": 3,
+          "lb": "17848.449678",
+          "ub": "inf",
+          "gap_raw": "1",
+          "algorithm_seconds": 6081.799718,
+          "raw": "Phase 2 iter 3, feasibility cut x28, UB=inf, LB=17848.449678, gap=1, master_ms=74117.171400, rsp_ms=35873.864000, subproblem_ms=2076246.433100, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=6081799.718000"
+        }
+      },
+      "search_records": {
+        "Search master": 93
+      },
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7289.46800000011,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7289.468742,
+      "utc_minus_monotonic_seconds": 0.0007419998901241343
+    },
+    {
+      "run_id": "R28-N5-F10-C4_ef",
+      "raw_log_sha256": "518d950d8d78cdc771cdcbe36d726dae582120bb4835f4009fb1b8db93e7ee11",
+      "status": "MEMORY_LIMIT_EXTERNAL",
+      "original_bounds_source": "UNRECORDED",
+      "terminal_line": null,
+      "terminal_raw": null,
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 157.9680000001099,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 157.965129,
+      "utc_minus_monotonic_seconds": -0.002871000109905708
+    },
+    {
+      "run_id": "R28-N5-F10-C4_full",
+      "raw_log_sha256": "b3013dfc9459f120dc1116c98d0f6ae68af3a39a0ad53893602e8531d55828f9",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 45,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=17957.279437, LB=17790.492085, gap_percent=0.928801, reported_seconds=396.396901",
+      "complete_iterations": {
+        "Phase 1": 4,
+        "Phase 2": 2
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 14,
+          "iteration": 3,
+          "lb": "17752.566857",
+          "ub": "17752.566857",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 10.2970589,
+          "raw": "Phase 1 iter 3, theta=10877.746857, Q(z)=10877.746857, optimality cut x0, UB=17752.566857, LB=17752.566857, gap=-0.000000%, master_ms=104.791200, subproblem_ms=671.809000, elapsed_ms=10297.058900"
+        },
+        "Phase 2": {
+          "line": 42,
+          "iteration": 1,
+          "lb": "17777.149710",
+          "ub": "17957.279437",
+          "gap_raw": "1.003101%",
+          "algorithm_seconds": 395.9297224,
+          "raw": "Phase 2 iter 1, feasibility cut x4, UB=17957.279437, LB=17777.149710, gap=1.003101%, master_ms=102.630500, rsp_ms=1430.396200, subproblem_ms=76935.381100, repair_probes=20, repair_ms=45022.262000, strengthened_cuts=4, repair_ub=17957.279437, elapsed_ms=395929.722400"
+        }
+      },
+      "search_records": {
+        "Search master": 7,
+        "Search repair": 9,
+        "Search incumbent": 2
+      },
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 397.5,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 397.513817,
+      "utc_minus_monotonic_seconds": 0.013817000000017288
+    },
+    {
+      "run_id": "R28-N5-F10-C4_lifted-ils",
+      "raw_log_sha256": "418e76873b84832a245b915edb1a8b5cd0f8d6dadfc9774adb44872a75e60c92",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 201,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=TIME_LIMIT, has_solution=0, UB=inf, LB=16186.007616, gap_percent=inf, reported_seconds=7200.074925",
+      "complete_iterations": {
+        "Lifted ILS": 191
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 198,
+          "iteration": 190,
+          "lb": "16186.007616",
+          "ub": "inf",
+          "gap_raw": "1",
+          "algorithm_seconds": 7172.9046458,
+          "raw": "Lifted ILS iter 190, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=16186.007616, gap=1, master_ms=75915.439300, rsp_ms=4140.596300, elapsed_ms=7172904.645800"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7201.4839999999385,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7201.487782,
+      "utc_minus_monotonic_seconds": 0.0037820000616193283
+    },
+    {
+      "run_id": "R28-N5-F10-C4_lifted-two-phase",
+      "raw_log_sha256": "141fc9368a69241b94603f3ede91ccb390adb311f7303c115144997e71499fde",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 28,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=17864.432684, LB=17793.272713, gap_percent=0.398333, reported_seconds=329.223240",
+      "complete_iterations": {
+        "Phase 1": 4,
+        "Phase 2": 4
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 14,
+          "iteration": 3,
+          "lb": "17752.566857",
+          "ub": "17752.566857",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 10.2490204,
+          "raw": "Phase 1 iter 3, theta=10877.746857, Q(z)=10877.746857, optimality cut x0, UB=17752.566857, LB=17752.566857, gap=-0.000000%, master_ms=97.134200, subproblem_ms=672.889300, elapsed_ms=10249.020400"
+        },
+        "Phase 2": {
+          "line": 25,
+          "iteration": 3,
+          "lb": "17793.272713",
+          "ub": "17864.432684",
+          "gap_raw": "0.398333%",
+          "algorithm_seconds": 329.223233,
+          "raw": "Phase 2 iter 3, theta=10784.168562, Q(z)=10854.932684, optimality cut x5, UB=17864.432684, LB=17793.272713, gap=0.398333%, master_ms=501.653900, rsp_ms=3167.712600, subproblem_ms=101333.567600, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=329223.233000"
+        }
+      },
+      "search_records": {
+        "Search master": 8
+      },
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 330.39099999982864,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 330.382485,
+      "utc_minus_monotonic_seconds": -0.00851499982866244
+    },
+    {
+      "run_id": "R28-N5-F10-C4_natural-ils",
+      "raw_log_sha256": "22b737dfc4062d20e0bd1749d6fa0e1d5ce73f7ded71d7dfa1fefc0769cde61f",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 8,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=TIME_LIMIT, has_solution=0, UB=inf, LB=0.000000, gap_percent=inf, reported_seconds=7202.586540",
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7204.23499999987,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7204.23834,
+      "utc_minus_monotonic_seconds": 0.0033400001302652527
+    },
+    {
+      "run_id": "R28-N5-F20-C4_ef",
+      "raw_log_sha256": "ef8e09c1539ac750e766d3229d3c4f9cb0064cfd9a3c2c59d1a1aa9e5ba8714c",
+      "status": "MEMORY_LIMIT_EXTERNAL",
+      "original_bounds_source": "UNRECORDED",
+      "terminal_line": null,
+      "terminal_raw": null,
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 154.03099999995902,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 154.026901,
+      "utc_minus_monotonic_seconds": -0.004098999959012417
+    },
+    {
+      "run_id": "R28-N5-F20-C4_full",
+      "raw_log_sha256": "7eaf73a056c4f7093e495b839d0425fd649d410f726d1699c4e9042d96fce339",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 57,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=17893.137665, LB=17723.202900, gap_percent=0.949720, reported_seconds=766.450523",
+      "complete_iterations": {
+        "Phase 1": 4,
+        "Phase 2": 4
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 14,
+          "iteration": 3,
+          "lb": "17682.373471",
+          "ub": "17682.373471",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 10.803936400000001,
+          "raw": "Phase 1 iter 3, theta=10941.253471, Q(z)=10941.253471, optimality cut x0, UB=17682.373471, LB=17682.373471, gap=-0.000000%, master_ms=147.680900, subproblem_ms=767.951200, elapsed_ms=10803.936400"
+        },
+        "Phase 2": {
+          "line": 54,
+          "iteration": 3,
+          "lb": "17723.202900",
+          "ub": "17893.137665",
+          "gap_raw": "0.949720%",
+          "algorithm_seconds": 766.4505159,
+          "raw": "Phase 2 iter 3, feasibility cut x4, UB=17893.137665, LB=17723.202900, gap=0.949720%, master_ms=277.533200, rsp_ms=5200.129200, subproblem_ms=122072.303900, repair_probes=28, repair_ms=75860.115800, strengthened_cuts=4, repair_ub=17893.137665, elapsed_ms=766450.515900"
+        }
+      },
+      "search_records": {
+        "Search master": 8,
+        "Search repair": 12,
+        "Search incumbent": 3
+      },
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 767.6409999998286,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 767.644661,
+      "utc_minus_monotonic_seconds": 0.0036610001714052487
+    },
+    {
+      "run_id": "R28-N5-F20-C4_lifted-ils",
+      "raw_log_sha256": "b01420d15f1401577e7269170aa7a9b0c0e58e248b311b397f771abc3054887a",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 331,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=TIME_LIMIT, has_solution=0, UB=inf, LB=16798.979581, gap_percent=inf, reported_seconds=7200.028213",
+      "complete_iterations": {
+        "Lifted ILS": 323
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 328,
+          "iteration": 322,
+          "lb": "16798.979581",
+          "ub": "inf",
+          "gap_raw": "1",
+          "algorithm_seconds": 7197.3890697,
+          "raw": "Lifted ILS iter 322, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=2020.735681, UB=inf, LB=16798.979581, gap=1, master_ms=6640.732200, rsp_ms=4203.846700, elapsed_ms=7197389.069700"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7201.312999999849,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7201.307559,
+      "utc_minus_monotonic_seconds": -0.005440999849270156
+    },
+    {
+      "run_id": "R28-N5-F20-C4_lifted-two-phase",
+      "raw_log_sha256": "4345b304e5148d4f32281f229ba3c9e25d3ebcd33a95bc901bbdbe80918ee9a6",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 704,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=TIME_LIMIT, has_solution=0, UB=inf, LB=17791.814680, gap_percent=inf, reported_seconds=7200.075061",
+      "complete_iterations": {
+        "Phase 1": 4,
+        "Phase 2": 342
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 14,
+          "iteration": 3,
+          "lb": "17682.373471",
+          "ub": "17682.373471",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 10.936074399999999,
+          "raw": "Phase 1 iter 3, theta=10941.253471, Q(z)=10941.253471, optimality cut x0, UB=17682.373471, LB=17682.373471, gap=-0.000000%, master_ms=150.598600, subproblem_ms=694.846900, elapsed_ms=10936.074400"
+        },
+        "Phase 2": {
+          "line": 700,
+          "iteration": 341,
+          "lb": "17791.814680",
+          "ub": "inf",
+          "gap_raw": "1",
+          "algorithm_seconds": 7169.0981539,
+          "raw": "Phase 2 iter 341, feasibility cut x4, UB=inf, LB=17791.814680, gap=1, master_ms=34002.071500, rsp_ms=4077.527400, subproblem_ms=10926.049200, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=7169098.153900"
+        }
+      },
+      "search_records": {
+        "Search master": 347
+      },
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7201.312000000151,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7201.313711,
+      "utc_minus_monotonic_seconds": 0.0017109998489104328
+    },
+    {
+      "run_id": "R28-N5-F20-C4_natural-ils",
+      "raw_log_sha256": "da4eea88c1b5e694a6265b1190803dc562bddfce7acf0709b83127e08fca25b4",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 8,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=TIME_LIMIT, has_solution=0, UB=inf, LB=0.000000, gap_percent=inf, reported_seconds=7201.840951",
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7203.389999999898,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7203.384201,
+      "utc_minus_monotonic_seconds": -0.005798999897706381
+    },
+    {
+      "run_id": "R28-N5-F50-C2_full",
+      "raw_log_sha256": "b0706d8b1944ca9d443835c2068ecf88566d99ad01db7ea707e1af7225bc733a",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 410,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=TIME_LIMIT, has_solution=1, UB=19390.564830, LB=18003.015124, gap_percent=7.155798, reported_seconds=7206.724270",
+      "complete_iterations": {
+        "Phase 1": 166,
+        "Phase 2": 10
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 338,
+          "iteration": 165,
+          "lb": "17425.712220",
+          "ub": "17426.886092",
+          "gap_raw": "0.006736%",
+          "algorithm_seconds": 203.64819599999998,
+          "raw": "Phase 1 iter 165, theta=11204.546092, Q(z)=11204.546092, optimality cut x0, UB=17426.886092, LB=17425.712220, gap=0.006736%, master_ms=577.936800, subproblem_ms=796.179200, elapsed_ms=203648.196000"
+        },
+        "Phase 2": {
+          "line": 406,
+          "iteration": 9,
+          "lb": "17987.393018",
+          "ub": "19390.564830",
+          "gap_raw": "7.236364%",
+          "algorithm_seconds": 4934.6427518,
+          "raw": "Phase 2 iter 9, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=19390.564830, LB=17987.393018, gap=7.236364%, master_ms=383687.009800, rsp_ms=347104.486500, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=4934642.751800"
+        }
+      },
+      "search_records": {
+        "Search master": 177,
+        "Search repair": 20,
+        "Search incumbent": 3
+      },
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7209.1410000000615,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7209.131413,
+      "utc_minus_monotonic_seconds": -0.00958700006140134
+    },
+    {
+      "run_id": "R28-N5-F50-C2_lifted-two-phase",
+      "raw_log_sha256": "821e07442d90a115e84485c3460eed0e317d81dd18b80929061bf16f07902025",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 370,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=TIME_LIMIT, has_solution=0, UB=inf, LB=18007.233391, gap_percent=inf, reported_seconds=7200.130289",
+      "complete_iterations": {
+        "Phase 1": 166,
+        "Phase 2": 13
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 338,
+          "iteration": 165,
+          "lb": "17425.712220",
+          "ub": "17426.886092",
+          "gap_raw": "0.006736%",
+          "algorithm_seconds": 201.4047727,
+          "raw": "Phase 1 iter 165, theta=11204.546092, Q(z)=11204.546092, optimality cut x0, UB=17426.886092, LB=17425.712220, gap=0.006736%, master_ms=572.793700, subproblem_ms=683.212600, elapsed_ms=201404.772700"
+        },
+        "Phase 2": {
+          "line": 366,
+          "iteration": 12,
+          "lb": "17995.926269",
+          "ub": "inf",
+          "gap_raw": "1",
+          "algorithm_seconds": 6949.8682337,
+          "raw": "Phase 2 iter 12, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=17995.926269, gap=1, master_ms=1340711.884300, rsp_ms=325961.804300, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=6949868.233700"
+        }
+      },
+      "search_records": {
+        "Search master": 180
+      },
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7202.25,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7202.252833,
+      "utc_minus_monotonic_seconds": 0.002832999999554886
+    },
+    {
+      "run_id": "R28-N5-F50-C3_full",
+      "raw_log_sha256": "2d3d1e5b89b389c189f0dbbf6259c244022acb92fc99dc806d49873bcdc3f07f",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 477,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=17886.326205, LB=17716.315484, gap_percent=0.950507, reported_seconds=3046.242265",
+      "complete_iterations": {
+        "Phase 1": 166,
+        "Phase 2": 18
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 338,
+          "iteration": 165,
+          "lb": "17425.712220",
+          "ub": "17426.886092",
+          "gap_raw": "0.006736%",
+          "algorithm_seconds": 208.33582629999998,
+          "raw": "Phase 1 iter 165, theta=11204.546092, Q(z)=11204.546092, optimality cut x0, UB=17426.886092, LB=17425.712220, gap=0.006736%, master_ms=620.288000, subproblem_ms=757.021400, elapsed_ms=208335.826300"
+        },
+        "Phase 2": {
+          "line": 474,
+          "iteration": 17,
+          "lb": "17701.309071",
+          "ub": "17886.326205",
+          "gap_raw": "1.034405%",
+          "algorithm_seconds": 3042.3754602,
+          "raw": "Phase 2 iter 17, RSP feasibility cut x4, RSP optimality cut x1, RSP Q(z)=2070.293611, UB=17886.326205, LB=17701.309071, gap=1.034405%, master_ms=25885.764300, rsp_ms=5512.558500, subproblem_ms=0.000000, repair_probes=6, repair_ms=46686.694700, strengthened_cuts=1, repair_ub=inf, elapsed_ms=3042375.460200"
+        }
+      },
+      "search_records": {
+        "Search master": 185,
+        "Search repair": 45,
+        "Search incumbent": 4
+      },
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 3047.5160000000615,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 3047.523632,
+      "utc_minus_monotonic_seconds": 0.007631999938439549
+    },
+    {
+      "run_id": "R28-N5-F50-C3_lifted-two-phase",
+      "raw_log_sha256": "88d47b3f90693e0af3d5f6c901b2653484c1c39e1b0729128f7b07a41f10780a",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 858,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=TIME_LIMIT, has_solution=0, UB=inf, LB=17689.677711, gap_percent=inf, reported_seconds=7200.141186",
+      "complete_iterations": {
+        "Phase 1": 166,
+        "Phase 2": 257
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 338,
+          "iteration": 165,
+          "lb": "17425.712220",
+          "ub": "17426.886092",
+          "gap_raw": "0.006736%",
+          "algorithm_seconds": 200.072393,
+          "raw": "Phase 1 iter 165, theta=11204.546092, Q(z)=11204.546092, optimality cut x0, UB=17426.886092, LB=17425.712220, gap=0.006736%, master_ms=586.657800, subproblem_ms=688.468200, elapsed_ms=200072.393000"
+        },
+        "Phase 2": {
+          "line": 854,
+          "iteration": 256,
+          "lb": "17689.677711",
+          "ub": "inf",
+          "gap_raw": "1",
+          "algorithm_seconds": 7117.933526600001,
+          "raw": "Phase 2 iter 256, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=17689.677711, gap=1, master_ms=33330.333100, rsp_ms=4894.765300, subproblem_ms=0.000000, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=7117933.526600"
+        }
+      },
+      "search_records": {
+        "Search master": 424
+      },
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7202.030999999959,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7202.036965,
+      "utc_minus_monotonic_seconds": 0.005965000041214807
+    },
+    {
+      "run_id": "R28-N5-F50-C4_ef",
+      "raw_log_sha256": "2404dccbcee3f04c681a78730da918eaab0625156aea368e78c0997eba00f27a",
+      "status": "MEMORY_LIMIT_EXTERNAL",
+      "original_bounds_source": "UNRECORDED",
+      "terminal_line": null,
+      "terminal_raw": null,
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 932.4069999998901,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 932.402677,
+      "utc_minus_monotonic_seconds": -0.004322999890064239
+    },
+    {
+      "run_id": "R28-N5-F50-C4_full",
+      "raw_log_sha256": "929f2772dab37c51bed864e9ccd742249f9ef813ee19fcc18a679d60900d25c8",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 346,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=17478.568951, LB=17425.712220, gap_percent=0.302409, reported_seconds=252.691251",
+      "complete_iterations": {
+        "Phase 1": 166,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 338,
+          "iteration": 165,
+          "lb": "17425.712220",
+          "ub": "17426.886092",
+          "gap_raw": "0.006736%",
+          "algorithm_seconds": 208.6852027,
+          "raw": "Phase 1 iter 165, theta=11204.546092, Q(z)=11204.546092, optimality cut x0, UB=17426.886092, LB=17425.712220, gap=0.006736%, master_ms=602.376800, subproblem_ms=703.771400, elapsed_ms=208685.202700"
+        },
+        "Phase 2": {
+          "line": 343,
+          "iteration": 0,
+          "lb": "17425.712220",
+          "ub": "17478.568951",
+          "gap_raw": "0.302409%",
+          "algorithm_seconds": 252.6912433,
+          "raw": "Phase 2 iter 0, theta=11204.546092, Q(z)=11256.228951, optimality cut x5, UB=17478.568951, LB=17425.712220, gap=0.302409%, master_ms=972.932000, rsp_ms=1808.446700, subproblem_ms=27711.964100, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=252691.243300"
+        }
+      },
+      "search_records": {
+        "Search master": 167
+      },
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 254.0789999999106,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 254.072344,
+      "utc_minus_monotonic_seconds": -0.00665599991060617
+    },
+    {
+      "run_id": "R28-N5-F50-C4_lifted-ils",
+      "raw_log_sha256": "de3617b1f305d6c4c11240e8d7e7ea737bda0f0c587f1660657d58b5c60d1463",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 306,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=TIME_LIMIT, has_solution=0, UB=inf, LB=16934.434787, gap_percent=inf, reported_seconds=7200.676159",
+      "complete_iterations": {
+        "Lifted ILS": 291
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 304,
+          "iteration": 290,
+          "lb": "16934.434787",
+          "ub": "inf",
+          "gap_raw": "1",
+          "algorithm_seconds": 7200.676153599999,
+          "raw": "Lifted ILS iter 290, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=16934.434787, gap=1, master_ms=10640.164500, rsp_ms=4595.830900, elapsed_ms=7200676.153600"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7202.031000000192,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7202.044321,
+      "utc_minus_monotonic_seconds": 0.01332099980845669
+    },
+    {
+      "run_id": "R28-N5-F50-C4_lifted-ils_noVI",
+      "raw_log_sha256": "73a09c9da3a41fa11862724eaeb553082bc79e382c55e0721da434f4d8fc261d",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 12,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=TIME_LIMIT, has_solution=0, UB=inf, LB=5089.153366, gap_percent=inf, reported_seconds=7412.263574",
+      "complete_iterations": {
+        "Lifted ILS": 3
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 8,
+          "iteration": 2,
+          "lb": "4416.490878",
+          "ub": "inf",
+          "gap_raw": "1",
+          "algorithm_seconds": 741.9092482,
+          "raw": "Lifted ILS iter 2, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=4416.490878, gap=1, master_ms=12261.392600, rsp_ms=193961.580300, vi_excluded=1, vi_violations=49, vi_max_deficit=254.678400, elapsed_ms=741909.248200"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7423.1720000000205,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7423.173386,
+      "utc_minus_monotonic_seconds": 0.001385999979902408
+    },
+    {
+      "run_id": "R28-N5-F50-C4_lifted-two-phase",
+      "raw_log_sha256": "aaecf64ea8198d15d63c8391ff18d13cae7d016e0e947d65d6af1c022469f9c9",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 346,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=17478.568951, LB=17425.712220, gap_percent=0.302409, reported_seconds=253.534254",
+      "complete_iterations": {
+        "Phase 1": 166,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 338,
+          "iteration": 165,
+          "lb": "17425.712220",
+          "ub": "17426.886092",
+          "gap_raw": "0.006736%",
+          "algorithm_seconds": 209.20802270000001,
+          "raw": "Phase 1 iter 165, theta=11204.546092, Q(z)=11204.546092, optimality cut x0, UB=17426.886092, LB=17425.712220, gap=0.006736%, master_ms=636.325700, subproblem_ms=791.253500, elapsed_ms=209208.022700"
+        },
+        "Phase 2": {
+          "line": 343,
+          "iteration": 0,
+          "lb": "17425.712220",
+          "ub": "17478.568951",
+          "gap_raw": "0.302409%",
+          "algorithm_seconds": 253.53424710000002,
+          "raw": "Phase 2 iter 0, theta=11204.546092, Q(z)=11256.228951, optimality cut x5, UB=17478.568951, LB=17425.712220, gap=0.302409%, master_ms=1124.221500, rsp_ms=1710.338000, subproblem_ms=27880.589200, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=253534.247100"
+        }
+      },
+      "search_records": {
+        "Search master": 167
+      },
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 254.7960000000894,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 254.786882,
+      "utc_minus_monotonic_seconds": -0.009118000089415546
+    },
+    {
+      "run_id": "R28-N5-F50-C4_natural-ils",
+      "raw_log_sha256": "38767df933cb2fe03b4fbbf0bd8b1171e10ab1c9725432a85b8e747ce2202736",
+      "status": "TIME_LIMIT",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 8,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=TIME_LIMIT, has_solution=0, UB=inf, LB=0.000000, gap_percent=inf, reported_seconds=7201.709598",
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 7203.2970000000205,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 7203.293177,
+      "utc_minus_monotonic_seconds": -0.0038230000209296122
+    },
+    {
+      "run_id": "R3-N5-F10-C4_ef",
+      "raw_log_sha256": "d0350a03f61c5efd11ccc379f9fd99655d6521906152ad975fc12612e0f4e91f",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 7,
+      "terminal_raw": "Algorithm termination: algorithm=ef, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=0.000000, reported_seconds=5.018183",
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 5.891000000061467,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 5.883967,
+      "utc_minus_monotonic_seconds": -0.007033000061467121
+    },
+    {
+      "run_id": "R3-N5-F10-C4_full",
+      "raw_log_sha256": "d136949cad2a506cd941d2eaa897be311e84ac95360b25525783f20730458055",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 15,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=2.525223",
+      "complete_iterations": {
+        "Phase 1": 2,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 8,
+          "iteration": 1,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "0.000000%",
+          "algorithm_seconds": 0.7656215999999999,
+          "raw": "Phase 1 iter 1, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=0.000000%, master_ms=0.468500, subproblem_ms=89.165100, elapsed_ms=765.621600"
+        },
+        "Phase 2": {
+          "line": 12,
+          "iteration": 0,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 2.5251923,
+          "raw": "Phase 2 iter 0, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=-0.000000%, master_ms=1.095800, rsp_ms=99.268700, subproblem_ms=220.220100, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2525.192300"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 2.6870000001508743,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 2.683279,
+      "utc_minus_monotonic_seconds": -0.0037210001508740653
+    },
+    {
+      "run_id": "R3-N5-F10-C4_lifted-ils",
+      "raw_log_sha256": "ab8b46157d1336a37edc5cc97687b3208d5a348b18b275d67c264346c76d243d",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 10,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=2.790584",
+      "complete_iterations": {
+        "Lifted ILS": 2
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 7,
+          "iteration": 1,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 2.7905782,
+          "raw": "Lifted ILS iter 1, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=-0.000000%, master_ms=53.883700, rsp_optimality_cut=0, rsp_ms=176.595400, subproblem_ms=448.941000, elapsed_ms=2790.578200"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 2.9689999998081475,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 2.971306,
+      "utc_minus_monotonic_seconds": 0.002306000191852231
+    },
+    {
+      "run_id": "R3-N5-F10-C4_lifted-two-phase",
+      "raw_log_sha256": "77cc608bb70e0686f2f04b823d9c501b54a1a3394ecf19d1b1c9df8bace15412",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 15,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=2.498052",
+      "complete_iterations": {
+        "Phase 1": 2,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 8,
+          "iteration": 1,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "0.000000%",
+          "algorithm_seconds": 0.7794056,
+          "raw": "Phase 1 iter 1, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=0.000000%, master_ms=0.395100, subproblem_ms=75.309600, elapsed_ms=779.405600"
+        },
+        "Phase 2": {
+          "line": 12,
+          "iteration": 0,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 2.4980438,
+          "raw": "Phase 2 iter 0, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=-0.000000%, master_ms=2.402900, rsp_ms=92.431100, subproblem_ms=196.887200, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2498.043800"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 2.656999999890104,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 2.65365,
+      "utc_minus_monotonic_seconds": -0.003349999890104094
+    },
+    {
+      "run_id": "R3-N5-F10-C4_natural-ils",
+      "raw_log_sha256": "aac8300edaa399e459ee11615fa3179f4a86b8ab7f31d5a0420135e8b885c52c",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 11,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=7.928680",
+      "complete_iterations": {
+        "Natural ILS": 2
+      },
+      "last_complete": {
+        "Natural ILS": {
+          "line": 7,
+          "iteration": 1,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 7.9285792,
+          "raw": "Natural ILS iter 1, feasibility cut x0, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=-0.000000%, master_ms=0.334300, rsp_optimality_cut x0, rsp_ms=119.467900, subproblem_ms=3041.838600, elapsed_ms=7928.579200"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 8.094000000040978,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 8.08526,
+      "utc_minus_monotonic_seconds": -0.008740000040978302
+    },
+    {
+      "run_id": "R3-N5-F20-C4_ef",
+      "raw_log_sha256": "16e290b6549b9315c26b4e66830491addcccc3e700c05dbc06ed0f07ff1af24c",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 7,
+      "terminal_raw": "Algorithm termination: algorithm=ef, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=0.000000, reported_seconds=7.855761",
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 8.719000000040978,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 8.717594,
+      "utc_minus_monotonic_seconds": -0.0014060000409781281
+    },
+    {
+      "run_id": "R3-N5-F20-C4_full",
+      "raw_log_sha256": "7278324f04a740af18a94951cbfdbb4767e6e822cc2216f949344258d6da30d9",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 15,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=2.753137",
+      "complete_iterations": {
+        "Phase 1": 2,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 8,
+          "iteration": 1,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "0.000000%",
+          "algorithm_seconds": 0.8712858,
+          "raw": "Phase 1 iter 1, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=0.000000%, master_ms=0.509400, subproblem_ms=97.399800, elapsed_ms=871.285800"
+        },
+        "Phase 2": {
+          "line": 12,
+          "iteration": 0,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 2.7531293999999997,
+          "raw": "Phase 2 iter 0, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=-0.000000%, master_ms=1.375300, rsp_ms=114.715900, subproblem_ms=222.205500, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2753.129400"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 2.9370000001508743,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 2.941264,
+      "utc_minus_monotonic_seconds": 0.0042639998491256215
+    },
+    {
+      "run_id": "R3-N5-F20-C4_lifted-ils",
+      "raw_log_sha256": "99d6f1b4f53dcaeb92fbdfb44744c630e6ee2e031199f75bcbdcb4c787cc0f6c",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 10,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=3.033727",
+      "complete_iterations": {
+        "Lifted ILS": 2
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 7,
+          "iteration": 1,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 3.0337181,
+          "raw": "Lifted ILS iter 1, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=-0.000000%, master_ms=52.316400, rsp_optimality_cut=0, rsp_ms=205.759500, subproblem_ms=488.887500, elapsed_ms=3033.718100"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 3.219000000040978,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 3.23084,
+      "utc_minus_monotonic_seconds": 0.011839999959021963
+    },
+    {
+      "run_id": "R3-N5-F20-C4_lifted-two-phase",
+      "raw_log_sha256": "37929424abd47d8a11e5ae6ef1646320cec181e33670fc038e96d8d607bc8fe3",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 15,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=2.775139",
+      "complete_iterations": {
+        "Phase 1": 2,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 8,
+          "iteration": 1,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "0.000000%",
+          "algorithm_seconds": 0.8539694,
+          "raw": "Phase 1 iter 1, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=0.000000%, master_ms=1.154200, subproblem_ms=88.789800, elapsed_ms=853.969400"
+        },
+        "Phase 2": {
+          "line": 12,
+          "iteration": 0,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 2.7751313,
+          "raw": "Phase 2 iter 0, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=-0.000000%, master_ms=1.324000, rsp_ms=128.723700, subproblem_ms=241.619700, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2775.131300"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 2.952999999979511,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 2.95298,
+      "utc_minus_monotonic_seconds": -1.999997951074306e-05
+    },
+    {
+      "run_id": "R3-N5-F20-C4_natural-ils",
+      "raw_log_sha256": "76979ebaab2359716088728bbd221a9f74c52411505c5d8413b7af4a281ac602",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 11,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=8.272199",
+      "complete_iterations": {
+        "Natural ILS": 2
+      },
+      "last_complete": {
+        "Natural ILS": {
+          "line": 7,
+          "iteration": 1,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 8.2721093,
+          "raw": "Natural ILS iter 1, feasibility cut x0, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=-0.000000%, master_ms=0.273500, rsp_optimality_cut x0, rsp_ms=115.269900, subproblem_ms=3233.234000, elapsed_ms=8272.109300"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 8.452999999979511,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 8.446954,
+      "utc_minus_monotonic_seconds": -0.006045999979511052
+    },
+    {
+      "run_id": "R3-N5-F50-C4_ef",
+      "raw_log_sha256": "400d444e474e105391ef6a2258a8d29b607b3055d3ce4981651e277b4bfdaf90",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 7,
+      "terminal_raw": "Algorithm termination: algorithm=ef, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=0.000000, reported_seconds=13.648220",
+      "complete_iterations": {},
+      "last_complete": {},
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 14.655999999959022,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 14.645492,
+      "utc_minus_monotonic_seconds": -0.010507999959020964
+    },
+    {
+      "run_id": "R3-N5-F50-C4_full",
+      "raw_log_sha256": "15fdb9f253f3ba7b2eff39e5fecf853e7b742190be504603d2858ab798bcfd8d",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 15,
+      "terminal_raw": "Algorithm termination: algorithm=full, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=2.984479",
+      "complete_iterations": {
+        "Phase 1": 2,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 8,
+          "iteration": 1,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "0.000000%",
+          "algorithm_seconds": 0.9346497,
+          "raw": "Phase 1 iter 1, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=0.000000%, master_ms=0.794900, subproblem_ms=93.206300, elapsed_ms=934.649700"
+        },
+        "Phase 2": {
+          "line": 12,
+          "iteration": 0,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 2.9844711000000004,
+          "raw": "Phase 2 iter 0, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=-0.000000%, master_ms=1.186300, rsp_ms=110.247300, subproblem_ms=239.141300, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=2984.471100"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 3.172000000020489,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 3.162159,
+      "utc_minus_monotonic_seconds": -0.009841000020489155
+    },
+    {
+      "run_id": "R3-N5-F50-C4_lifted-ils",
+      "raw_log_sha256": "30bf3da32bdae78960e948850517d97aa8132d46795cf79a00ecce4f9563599e",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 10,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-ils, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=3.289414",
+      "complete_iterations": {
+        "Lifted ILS": 2
+      },
+      "last_complete": {
+        "Lifted ILS": {
+          "line": 7,
+          "iteration": 1,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 3.2893915000000002,
+          "raw": "Lifted ILS iter 1, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=-0.000000%, master_ms=55.563600, rsp_optimality_cut=0, rsp_ms=194.915100, subproblem_ms=544.474200, elapsed_ms=3289.391500"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 3.515000000130385,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 3.501185,
+      "utc_minus_monotonic_seconds": -0.013815000130385169
+    },
+    {
+      "run_id": "R3-N5-F50-C4_lifted-two-phase",
+      "raw_log_sha256": "b207bdb688adec6fb760e47036bca8048fbbcafb4537d62f2e287194e382020c",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 15,
+      "terminal_raw": "Algorithm termination: algorithm=lifted-two-phase, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=3.114412",
+      "complete_iterations": {
+        "Phase 1": 2,
+        "Phase 2": 1
+      },
+      "last_complete": {
+        "Phase 1": {
+          "line": 8,
+          "iteration": 1,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "0.000000%",
+          "algorithm_seconds": 0.9290193,
+          "raw": "Phase 1 iter 1, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=0.000000%, master_ms=0.492700, subproblem_ms=96.516100, elapsed_ms=929.019300"
+        },
+        "Phase 2": {
+          "line": 12,
+          "iteration": 0,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 3.1144043999999997,
+          "raw": "Phase 2 iter 0, theta=1098.368225, Q(z)=1098.368225, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=-0.000000%, master_ms=1.125000, rsp_ms=117.725500, subproblem_ms=287.059400, repair_probes=0, repair_ms=0.000000, strengthened_cuts=0, repair_ub=inf, elapsed_ms=3114.404400"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 3.297000000020489,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 3.300416,
+      "utc_minus_monotonic_seconds": 0.0034159999795106977
+    },
+    {
+      "run_id": "R3-N5-F50-C4_natural-ils",
+      "raw_log_sha256": "d022979b23529af2f54098e6c90c75269cc1616ff47e9d7fbb87401110062079",
+      "status": "OPTIMAL",
+      "original_bounds_source": "FINAL",
+      "terminal_line": 11,
+      "terminal_raw": "Algorithm termination: algorithm=natural-ils, status=OPTIMAL, has_solution=1, UB=1469.848225, LB=1469.848225, gap_percent=-0.000000, reported_seconds=8.630792",
+      "complete_iterations": {
+        "Natural ILS": 2
+      },
+      "last_complete": {
+        "Natural ILS": {
+          "line": 7,
+          "iteration": 1,
+          "lb": "1469.848225",
+          "ub": "1469.848225",
+          "gap_raw": "-0.000000%",
+          "algorithm_seconds": 8.6306744,
+          "raw": "Natural ILS iter 1, feasibility cut x0, optimality cut x0, UB=1469.848225, LB=1469.848225, gap=-0.000000%, master_ms=0.232000, rsp_optimality_cut x0, rsp_ms=119.488200, subproblem_ms=3182.726100, elapsed_ms=8630.674400"
+        }
+      },
+      "search_records": {},
+      "options_and_solver_header_verified": true,
+      "input_bytes_and_committed_dataset_verified": true,
+      "source_archive_and_committed_source_verified": true,
+      "monotonicity_mismatches": 0,
+      "actual_wall_seconds": 8.858999999938533,
+      "wall_time_source": "controller monotonic timer; UTC timestamps retained separately",
+      "utc_end_minus_start_seconds": 8.848733,
+      "utc_minus_monotonic_seconds": -0.010266999938533417
+    }
+  ],
+  "version_probe_runs": 0,
+  "actual_wall_policy": "Preserve controller monotonic durations, and report UTC timestamp deltas separately",
+  "case_count": 14,
+  "actual_input_and_config_files": 365,
+  "paired_options_verified": true,
+  "final_acceptance": false,
+  "scope": "Selected raw logs, outcomes, options, actual inputs and source/executable correspondence; does not claim all historical archive acceptance gates"
+}

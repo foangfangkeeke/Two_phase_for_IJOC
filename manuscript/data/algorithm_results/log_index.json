@@ -1,0 +1,813 @@
+{
+  "updated_utc": "2026-11-08T06:16:49.598451+00:00",
+  "unique_logs": 57,
+  "record_slots": 65,
+  "index": [
+    {
+      "run_id": "R12-N5-F10-C4_ef",
+      "case_id": "R12-N5-F10-C4",
+      "algorithm": "ef",
+      "log": "logs/R12-N5-F10-C4_ef.log",
+      "record": "records/R12-N5-F10-C4_ef.json",
+      "raw_log_sha256": "699a9d50ce4bfc6553b1edb5394b170d8cf71cbb2f30b212b7fbbf388ffd8050",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R12-N5-F10-C4/ef"
+      ]
+    },
+    {
+      "run_id": "R12-N5-F10-C4_full",
+      "case_id": "R12-N5-F10-C4",
+      "algorithm": "full",
+      "log": "logs/R12-N5-F10-C4_full.log",
+      "record": "records/R12-N5-F10-C4_full.json",
+      "raw_log_sha256": "50e518916d7506245e808fbf71c0b8602959e1e54d58fca5d916824f62d6a5f6",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R12-N5-F10-C4/full"
+      ]
+    },
+    {
+      "run_id": "R12-N5-F10-C4_lifted-ils",
+      "case_id": "R12-N5-F10-C4",
+      "algorithm": "lifted-ils",
+      "log": "logs/R12-N5-F10-C4_lifted-ils.log",
+      "record": "records/R12-N5-F10-C4_lifted-ils.json",
+      "raw_log_sha256": "f555b0789eccbd81ceafeb3b3b140a54ca1766af18b94c6eb26c927abf0b1b64",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R12-N5-F10-C4/lifted-ils"
+      ]
+    },
+    {
+      "run_id": "R12-N5-F10-C4_lifted-two-phase",
+      "case_id": "R12-N5-F10-C4",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R12-N5-F10-C4_lifted-two-phase.log",
+      "record": "records/R12-N5-F10-C4_lifted-two-phase.json",
+      "raw_log_sha256": "43c9cbba786a62d91cae27b392ac458a3da568dcbef1a3cc10942569a5f463a0",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R12-N5-F10-C4/lifted-two-phase"
+      ]
+    },
+    {
+      "run_id": "R12-N5-F10-C4_natural-ils",
+      "case_id": "R12-N5-F10-C4",
+      "algorithm": "natural-ils",
+      "log": "logs/R12-N5-F10-C4_natural-ils.log",
+      "record": "records/R12-N5-F10-C4_natural-ils.json",
+      "raw_log_sha256": "f900cdb7f16f0f59c1e6463cd75f91521db97c51ae8cbc6e90496799e71648d7",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "main_table/R12-N5-F10-C4/natural-ils"
+      ]
+    },
+    {
+      "run_id": "R12-N5-F20-C4_ef",
+      "case_id": "R12-N5-F20-C4",
+      "algorithm": "ef",
+      "log": "logs/R12-N5-F20-C4_ef.log",
+      "record": "records/R12-N5-F20-C4_ef.json",
+      "raw_log_sha256": "bc52e7d3fa4aa83ba5c5f20c730654fabb0e11bc0386ef8984b681f6fa1d3d6d",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R12-N5-F20-C4/ef"
+      ]
+    },
+    {
+      "run_id": "R12-N5-F20-C4_full",
+      "case_id": "R12-N5-F20-C4",
+      "algorithm": "full",
+      "log": "logs/R12-N5-F20-C4_full.log",
+      "record": "records/R12-N5-F20-C4_full.json",
+      "raw_log_sha256": "bde23345e70da6963cc4b4bb9d4f226ff33aa5808daa6e71686e49f06b5e4e3c",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R12-N5-F20-C4/full"
+      ]
+    },
+    {
+      "run_id": "R12-N5-F20-C4_lifted-ils",
+      "case_id": "R12-N5-F20-C4",
+      "algorithm": "lifted-ils",
+      "log": "logs/R12-N5-F20-C4_lifted-ils.log",
+      "record": "records/R12-N5-F20-C4_lifted-ils.json",
+      "raw_log_sha256": "5980a6ad898d921f5f95167dd348fc3bd9a2e6ee8afc58a0981a753aef18a737",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R12-N5-F20-C4/lifted-ils"
+      ]
+    },
+    {
+      "run_id": "R12-N5-F20-C4_lifted-two-phase",
+      "case_id": "R12-N5-F20-C4",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R12-N5-F20-C4_lifted-two-phase.log",
+      "record": "records/R12-N5-F20-C4_lifted-two-phase.json",
+      "raw_log_sha256": "b71fa42d5e9af5043bf26473ac19ec8092231633e5586cf6e9dbe1a7e9d0d2d4",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R12-N5-F20-C4/lifted-two-phase"
+      ]
+    },
+    {
+      "run_id": "R12-N5-F20-C4_natural-ils",
+      "case_id": "R12-N5-F20-C4",
+      "algorithm": "natural-ils",
+      "log": "logs/R12-N5-F20-C4_natural-ils.log",
+      "record": "records/R12-N5-F20-C4_natural-ils.json",
+      "raw_log_sha256": "9ee59a933a3d8b5dc07f9ac3be4127df632c0e45faa4e202ec43649229424363",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "main_table/R12-N5-F20-C4/natural-ils"
+      ]
+    },
+    {
+      "run_id": "R12-N5-F50-C4_ef",
+      "case_id": "R12-N5-F50-C4",
+      "algorithm": "ef",
+      "log": "logs/R12-N5-F50-C4_ef.log",
+      "record": "records/R12-N5-F50-C4_ef.json",
+      "raw_log_sha256": "d96277b9bce76ba6af5e95a33050dcec16edebd237dfb0d546514b2d10d2f24b",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "MEMORY_LIMIT_EXTERNAL",
+      "selected_record_ids": [
+        "main_table/R12-N5-F50-C4/ef"
+      ]
+    },
+    {
+      "run_id": "R12-N5-F50-C4_full",
+      "case_id": "R12-N5-F50-C4",
+      "algorithm": "full",
+      "log": "logs/R12-N5-F50-C4_full.log",
+      "record": "records/R12-N5-F50-C4_full.json",
+      "raw_log_sha256": "2ec30fbe793de5eb554c0ec3d935ca4c4e8a4a76a4c3af322fc9810d36295fa9",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R12-N5-F50-C4/full"
+      ]
+    },
+    {
+      "run_id": "R12-N5-F50-C4_lifted-ils",
+      "case_id": "R12-N5-F50-C4",
+      "algorithm": "lifted-ils",
+      "log": "logs/R12-N5-F50-C4_lifted-ils.log",
+      "record": "records/R12-N5-F50-C4_lifted-ils.json",
+      "raw_log_sha256": "515bdaf2591ed0e491c35155650d845bb5cbe4e6cd7d70d0d34ee0990f86c9c1",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R12-N5-F50-C4/lifted-ils",
+        "vi_validation/R12-N5-F50-C4/VI1"
+      ]
+    },
+    {
+      "run_id": "R12-N5-F50-C4_lifted-ils_noVI",
+      "case_id": "R12-N5-F50-C4",
+      "algorithm": "lifted-ils",
+      "log": "logs/R12-N5-F50-C4_lifted-ils_noVI.log",
+      "record": "records/R12-N5-F50-C4_lifted-ils_noVI.json",
+      "raw_log_sha256": "df0bda05492a9bf3a373220ff4922df6f634440470b146ded3c749638e32d5ba",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "vi_validation/R12-N5-F50-C4/VI0"
+      ]
+    },
+    {
+      "run_id": "R12-N5-F50-C4_lifted-two-phase",
+      "case_id": "R12-N5-F50-C4",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R12-N5-F50-C4_lifted-two-phase.log",
+      "record": "records/R12-N5-F50-C4_lifted-two-phase.json",
+      "raw_log_sha256": "7a7d05f34e8f3c90e088b5d0b0a7bc2ddd204ae90249186b1bd0e1b8a4413c9e",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R12-N5-F50-C4/lifted-two-phase"
+      ]
+    },
+    {
+      "run_id": "R12-N5-F50-C4_natural-ils",
+      "case_id": "R12-N5-F50-C4",
+      "algorithm": "natural-ils",
+      "log": "logs/R12-N5-F50-C4_natural-ils.log",
+      "record": "records/R12-N5-F50-C4_natural-ils.json",
+      "raw_log_sha256": "c1e975a698cc74501a77167d82411c0520d6fe2646401d44ab86f2d15e03f35b",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "main_table/R12-N5-F50-C4/natural-ils"
+      ]
+    },
+    {
+      "run_id": "R28-N10-F50-C4_full",
+      "case_id": "R28-N10-F50-C4",
+      "algorithm": "full",
+      "log": "logs/R28-N10-F50-C4_full.log",
+      "record": "records/R28-N10-F50-C4_full.json",
+      "raw_log_sha256": "7d85e7a3ba62b39bc9b3dc1cf4dc0c12dcf9f0bad65d6591fd9827ded861344e",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "r28_full_l2p_comparison/R28-N10-F50-C4/full"
+      ]
+    },
+    {
+      "run_id": "R28-N10-F50-C4_lifted-two-phase",
+      "case_id": "R28-N10-F50-C4",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R28-N10-F50-C4_lifted-two-phase.log",
+      "record": "records/R28-N10-F50-C4_lifted-two-phase.json",
+      "raw_log_sha256": "7f989c8ef023134c6d8c24edf2ea57100897bb685104d4d5dfd8f8aee8d7f46c",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "r28_full_l2p_comparison/R28-N10-F50-C4/lifted-two-phase"
+      ]
+    },
+    {
+      "run_id": "R28-N20-F50-C4_full",
+      "case_id": "R28-N20-F50-C4",
+      "algorithm": "full",
+      "log": "logs/R28-N20-F50-C4_full.log",
+      "record": "records/R28-N20-F50-C4_full.json",
+      "raw_log_sha256": "93e297ad8cc2dfbe7edca680cb7276857ac64f4f08e686ab2cd07a73f39134ed",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "r28_full_l2p_comparison/R28-N20-F50-C4/full"
+      ]
+    },
+    {
+      "run_id": "R28-N20-F50-C4_lifted-two-phase",
+      "case_id": "R28-N20-F50-C4",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R28-N20-F50-C4_lifted-two-phase.log",
+      "record": "records/R28-N20-F50-C4_lifted-two-phase.json",
+      "raw_log_sha256": "e503172400dda3264bc15de87fdd3735b37334ae280eb8a02ba55d43de140852",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "r28_full_l2p_comparison/R28-N20-F50-C4/lifted-two-phase"
+      ]
+    },
+    {
+      "run_id": "R28-N40-F50-C4_full",
+      "case_id": "R28-N40-F50-C4",
+      "algorithm": "full",
+      "log": "logs/R28-N40-F50-C4_full.log",
+      "record": "records/R28-N40-F50-C4_full.json",
+      "raw_log_sha256": "60a01909df9df7ceb59a6051f790de1c23e4ce3a5649ac6410634da332a18423",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "r28_full_l2p_comparison/R28-N40-F50-C4/full"
+      ]
+    },
+    {
+      "run_id": "R28-N40-F50-C4_lifted-two-phase",
+      "case_id": "R28-N40-F50-C4",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R28-N40-F50-C4_lifted-two-phase.log",
+      "record": "records/R28-N40-F50-C4_lifted-two-phase.json",
+      "raw_log_sha256": "14ca4008470f0e26a5f9437fee33780b355e5754c81e26624ed7898a7f07291e",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "r28_full_l2p_comparison/R28-N40-F50-C4/lifted-two-phase"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F10-C4_ef",
+      "case_id": "R28-N5-F10-C4",
+      "algorithm": "ef",
+      "log": "logs/R28-N5-F10-C4_ef.log",
+      "record": "records/R28-N5-F10-C4_ef.json",
+      "raw_log_sha256": "518d950d8d78cdc771cdcbe36d726dae582120bb4835f4009fb1b8db93e7ee11",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "MEMORY_LIMIT_EXTERNAL",
+      "selected_record_ids": [
+        "main_table/R28-N5-F10-C4/ef"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F10-C4_full",
+      "case_id": "R28-N5-F10-C4",
+      "algorithm": "full",
+      "log": "logs/R28-N5-F10-C4_full.log",
+      "record": "records/R28-N5-F10-C4_full.json",
+      "raw_log_sha256": "b3013dfc9459f120dc1116c98d0f6ae68af3a39a0ad53893602e8531d55828f9",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R28-N5-F10-C4/full",
+        "r28_full_l2p_comparison/R28-N5-F10-C4/full"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F10-C4_lifted-ils",
+      "case_id": "R28-N5-F10-C4",
+      "algorithm": "lifted-ils",
+      "log": "logs/R28-N5-F10-C4_lifted-ils.log",
+      "record": "records/R28-N5-F10-C4_lifted-ils.json",
+      "raw_log_sha256": "418e76873b84832a245b915edb1a8b5cd0f8d6dadfc9774adb44872a75e60c92",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "main_table/R28-N5-F10-C4/lifted-ils"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F10-C4_lifted-two-phase",
+      "case_id": "R28-N5-F10-C4",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R28-N5-F10-C4_lifted-two-phase.log",
+      "record": "records/R28-N5-F10-C4_lifted-two-phase.json",
+      "raw_log_sha256": "141fc9368a69241b94603f3ede91ccb390adb311f7303c115144997e71499fde",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R28-N5-F10-C4/lifted-two-phase",
+        "r28_full_l2p_comparison/R28-N5-F10-C4/lifted-two-phase"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F10-C4_natural-ils",
+      "case_id": "R28-N5-F10-C4",
+      "algorithm": "natural-ils",
+      "log": "logs/R28-N5-F10-C4_natural-ils.log",
+      "record": "records/R28-N5-F10-C4_natural-ils.json",
+      "raw_log_sha256": "22b737dfc4062d20e0bd1749d6fa0e1d5ce73f7ded71d7dfa1fefc0769cde61f",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "main_table/R28-N5-F10-C4/natural-ils"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F20-C4_ef",
+      "case_id": "R28-N5-F20-C4",
+      "algorithm": "ef",
+      "log": "logs/R28-N5-F20-C4_ef.log",
+      "record": "records/R28-N5-F20-C4_ef.json",
+      "raw_log_sha256": "ef8e09c1539ac750e766d3229d3c4f9cb0064cfd9a3c2c59d1a1aa9e5ba8714c",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "MEMORY_LIMIT_EXTERNAL",
+      "selected_record_ids": [
+        "main_table/R28-N5-F20-C4/ef"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F20-C4_full",
+      "case_id": "R28-N5-F20-C4",
+      "algorithm": "full",
+      "log": "logs/R28-N5-F20-C4_full.log",
+      "record": "records/R28-N5-F20-C4_full.json",
+      "raw_log_sha256": "7eaf73a056c4f7093e495b839d0425fd649d410f726d1699c4e9042d96fce339",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R28-N5-F20-C4/full",
+        "r28_full_l2p_comparison/R28-N5-F20-C4/full"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F20-C4_lifted-ils",
+      "case_id": "R28-N5-F20-C4",
+      "algorithm": "lifted-ils",
+      "log": "logs/R28-N5-F20-C4_lifted-ils.log",
+      "record": "records/R28-N5-F20-C4_lifted-ils.json",
+      "raw_log_sha256": "b01420d15f1401577e7269170aa7a9b0c0e58e248b311b397f771abc3054887a",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "main_table/R28-N5-F20-C4/lifted-ils"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F20-C4_lifted-two-phase",
+      "case_id": "R28-N5-F20-C4",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R28-N5-F20-C4_lifted-two-phase.log",
+      "record": "records/R28-N5-F20-C4_lifted-two-phase.json",
+      "raw_log_sha256": "4345b304e5148d4f32281f229ba3c9e25d3ebcd33a95bc901bbdbe80918ee9a6",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "main_table/R28-N5-F20-C4/lifted-two-phase",
+        "r28_full_l2p_comparison/R28-N5-F20-C4/lifted-two-phase"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F20-C4_natural-ils",
+      "case_id": "R28-N5-F20-C4",
+      "algorithm": "natural-ils",
+      "log": "logs/R28-N5-F20-C4_natural-ils.log",
+      "record": "records/R28-N5-F20-C4_natural-ils.json",
+      "raw_log_sha256": "da4eea88c1b5e694a6265b1190803dc562bddfce7acf0709b83127e08fca25b4",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "main_table/R28-N5-F20-C4/natural-ils"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F50-C2_full",
+      "case_id": "R28-N5-F50-C2",
+      "algorithm": "full",
+      "log": "logs/R28-N5-F50-C2_full.log",
+      "record": "records/R28-N5-F50-C2_full.json",
+      "raw_log_sha256": "b0706d8b1944ca9d443835c2068ecf88566d99ad01db7ea707e1af7225bc733a",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "r28_full_l2p_comparison/R28-N5-F50-C2/full"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F50-C2_lifted-two-phase",
+      "case_id": "R28-N5-F50-C2",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R28-N5-F50-C2_lifted-two-phase.log",
+      "record": "records/R28-N5-F50-C2_lifted-two-phase.json",
+      "raw_log_sha256": "821e07442d90a115e84485c3460eed0e317d81dd18b80929061bf16f07902025",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "r28_full_l2p_comparison/R28-N5-F50-C2/lifted-two-phase"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F50-C3_full",
+      "case_id": "R28-N5-F50-C3",
+      "algorithm": "full",
+      "log": "logs/R28-N5-F50-C3_full.log",
+      "record": "records/R28-N5-F50-C3_full.json",
+      "raw_log_sha256": "2d3d1e5b89b389c189f0dbbf6259c244022acb92fc99dc806d49873bcdc3f07f",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "r28_full_l2p_comparison/R28-N5-F50-C3/full"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F50-C3_lifted-two-phase",
+      "case_id": "R28-N5-F50-C3",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R28-N5-F50-C3_lifted-two-phase.log",
+      "record": "records/R28-N5-F50-C3_lifted-two-phase.json",
+      "raw_log_sha256": "88d47b3f90693e0af3d5f6c901b2653484c1c39e1b0729128f7b07a41f10780a",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "r28_full_l2p_comparison/R28-N5-F50-C3/lifted-two-phase"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F50-C4_ef",
+      "case_id": "R28-N5-F50-C4",
+      "algorithm": "ef",
+      "log": "logs/R28-N5-F50-C4_ef.log",
+      "record": "records/R28-N5-F50-C4_ef.json",
+      "raw_log_sha256": "2404dccbcee3f04c681a78730da918eaab0625156aea368e78c0997eba00f27a",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "MEMORY_LIMIT_EXTERNAL",
+      "selected_record_ids": [
+        "main_table/R28-N5-F50-C4/ef"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F50-C4_full",
+      "case_id": "R28-N5-F50-C4",
+      "algorithm": "full",
+      "log": "logs/R28-N5-F50-C4_full.log",
+      "record": "records/R28-N5-F50-C4_full.json",
+      "raw_log_sha256": "929f2772dab37c51bed864e9ccd742249f9ef813ee19fcc18a679d60900d25c8",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R28-N5-F50-C4/full",
+        "r28_full_l2p_comparison/R28-N5-F50-C4/full"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F50-C4_lifted-ils",
+      "case_id": "R28-N5-F50-C4",
+      "algorithm": "lifted-ils",
+      "log": "logs/R28-N5-F50-C4_lifted-ils.log",
+      "record": "records/R28-N5-F50-C4_lifted-ils.json",
+      "raw_log_sha256": "de3617b1f305d6c4c11240e8d7e7ea737bda0f0c587f1660657d58b5c60d1463",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "main_table/R28-N5-F50-C4/lifted-ils",
+        "vi_validation/R28-N5-F50-C4/VI1"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F50-C4_lifted-ils_noVI",
+      "case_id": "R28-N5-F50-C4",
+      "algorithm": "lifted-ils",
+      "log": "logs/R28-N5-F50-C4_lifted-ils_noVI.log",
+      "record": "records/R28-N5-F50-C4_lifted-ils_noVI.json",
+      "raw_log_sha256": "73a09c9da3a41fa11862724eaeb553082bc79e382c55e0721da434f4d8fc261d",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "vi_validation/R28-N5-F50-C4/VI0"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F50-C4_lifted-two-phase",
+      "case_id": "R28-N5-F50-C4",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R28-N5-F50-C4_lifted-two-phase.log",
+      "record": "records/R28-N5-F50-C4_lifted-two-phase.json",
+      "raw_log_sha256": "aaecf64ea8198d15d63c8391ff18d13cae7d016e0e947d65d6af1c022469f9c9",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R28-N5-F50-C4/lifted-two-phase",
+        "r28_full_l2p_comparison/R28-N5-F50-C4/lifted-two-phase"
+      ]
+    },
+    {
+      "run_id": "R28-N5-F50-C4_natural-ils",
+      "case_id": "R28-N5-F50-C4",
+      "algorithm": "natural-ils",
+      "log": "logs/R28-N5-F50-C4_natural-ils.log",
+      "record": "records/R28-N5-F50-C4_natural-ils.json",
+      "raw_log_sha256": "38767df933cb2fe03b4fbbf0bd8b1171e10ab1c9725432a85b8e747ce2202736",
+      "source_commit": "c29cdc570e361a3291bd27c265faa45efb324f7b",
+      "executable_sha256": "a14be609b82aceb66763501b2eacad779592db567dc6382e7656bbbfc0b05fc1",
+      "status": "TIME_LIMIT",
+      "selected_record_ids": [
+        "main_table/R28-N5-F50-C4/natural-ils"
+      ]
+    },
+    {
+      "run_id": "R3-N5-F10-C4_ef",
+      "case_id": "R3-N5-F10-C4",
+      "algorithm": "ef",
+      "log": "logs/R3-N5-F10-C4_ef.log",
+      "record": "records/R3-N5-F10-C4_ef.json",
+      "raw_log_sha256": "d0350a03f61c5efd11ccc379f9fd99655d6521906152ad975fc12612e0f4e91f",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R3-N5-F10-C4/ef"
+      ]
+    },
+    {
+      "run_id": "R3-N5-F10-C4_full",
+      "case_id": "R3-N5-F10-C4",
+      "algorithm": "full",
+      "log": "logs/R3-N5-F10-C4_full.log",
+      "record": "records/R3-N5-F10-C4_full.json",
+      "raw_log_sha256": "d136949cad2a506cd941d2eaa897be311e84ac95360b25525783f20730458055",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R3-N5-F10-C4/full"
+      ]
+    },
+    {
+      "run_id": "R3-N5-F10-C4_lifted-ils",
+      "case_id": "R3-N5-F10-C4",
+      "algorithm": "lifted-ils",
+      "log": "logs/R3-N5-F10-C4_lifted-ils.log",
+      "record": "records/R3-N5-F10-C4_lifted-ils.json",
+      "raw_log_sha256": "ab8b46157d1336a37edc5cc97687b3208d5a348b18b275d67c264346c76d243d",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R3-N5-F10-C4/lifted-ils"
+      ]
+    },
+    {
+      "run_id": "R3-N5-F10-C4_lifted-two-phase",
+      "case_id": "R3-N5-F10-C4",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R3-N5-F10-C4_lifted-two-phase.log",
+      "record": "records/R3-N5-F10-C4_lifted-two-phase.json",
+      "raw_log_sha256": "77cc608bb70e0686f2f04b823d9c501b54a1a3394ecf19d1b1c9df8bace15412",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R3-N5-F10-C4/lifted-two-phase"
+      ]
+    },
+    {
+      "run_id": "R3-N5-F10-C4_natural-ils",
+      "case_id": "R3-N5-F10-C4",
+      "algorithm": "natural-ils",
+      "log": "logs/R3-N5-F10-C4_natural-ils.log",
+      "record": "records/R3-N5-F10-C4_natural-ils.json",
+      "raw_log_sha256": "aac8300edaa399e459ee11615fa3179f4a86b8ab7f31d5a0420135e8b885c52c",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R3-N5-F10-C4/natural-ils"
+      ]
+    },
+    {
+      "run_id": "R3-N5-F20-C4_ef",
+      "case_id": "R3-N5-F20-C4",
+      "algorithm": "ef",
+      "log": "logs/R3-N5-F20-C4_ef.log",
+      "record": "records/R3-N5-F20-C4_ef.json",
+      "raw_log_sha256": "16e290b6549b9315c26b4e66830491addcccc3e700c05dbc06ed0f07ff1af24c",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R3-N5-F20-C4/ef"
+      ]
+    },
+    {
+      "run_id": "R3-N5-F20-C4_full",
+      "case_id": "R3-N5-F20-C4",
+      "algorithm": "full",
+      "log": "logs/R3-N5-F20-C4_full.log",
+      "record": "records/R3-N5-F20-C4_full.json",
+      "raw_log_sha256": "7278324f04a740af18a94951cbfdbb4767e6e822cc2216f949344258d6da30d9",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R3-N5-F20-C4/full"
+      ]
+    },
+    {
+      "run_id": "R3-N5-F20-C4_lifted-ils",
+      "case_id": "R3-N5-F20-C4",
+      "algorithm": "lifted-ils",
+      "log": "logs/R3-N5-F20-C4_lifted-ils.log",
+      "record": "records/R3-N5-F20-C4_lifted-ils.json",
+      "raw_log_sha256": "99d6f1b4f53dcaeb92fbdfb44744c630e6ee2e031199f75bcbdcb4c787cc0f6c",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R3-N5-F20-C4/lifted-ils"
+      ]
+    },
+    {
+      "run_id": "R3-N5-F20-C4_lifted-two-phase",
+      "case_id": "R3-N5-F20-C4",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R3-N5-F20-C4_lifted-two-phase.log",
+      "record": "records/R3-N5-F20-C4_lifted-two-phase.json",
+      "raw_log_sha256": "37929424abd47d8a11e5ae6ef1646320cec181e33670fc038e96d8d607bc8fe3",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R3-N5-F20-C4/lifted-two-phase"
+      ]
+    },
+    {
+      "run_id": "R3-N5-F20-C4_natural-ils",
+      "case_id": "R3-N5-F20-C4",
+      "algorithm": "natural-ils",
+      "log": "logs/R3-N5-F20-C4_natural-ils.log",
+      "record": "records/R3-N5-F20-C4_natural-ils.json",
+      "raw_log_sha256": "76979ebaab2359716088728bbd221a9f74c52411505c5d8413b7af4a281ac602",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R3-N5-F20-C4/natural-ils"
+      ]
+    },
+    {
+      "run_id": "R3-N5-F50-C4_ef",
+      "case_id": "R3-N5-F50-C4",
+      "algorithm": "ef",
+      "log": "logs/R3-N5-F50-C4_ef.log",
+      "record": "records/R3-N5-F50-C4_ef.json",
+      "raw_log_sha256": "400d444e474e105391ef6a2258a8d29b607b3055d3ce4981651e277b4bfdaf90",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R3-N5-F50-C4/ef"
+      ]
+    },
+    {
+      "run_id": "R3-N5-F50-C4_full",
+      "case_id": "R3-N5-F50-C4",
+      "algorithm": "full",
+      "log": "logs/R3-N5-F50-C4_full.log",
+      "record": "records/R3-N5-F50-C4_full.json",
+      "raw_log_sha256": "15fdb9f253f3ba7b2eff39e5fecf853e7b742190be504603d2858ab798bcfd8d",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R3-N5-F50-C4/full"
+      ]
+    },
+    {
+      "run_id": "R3-N5-F50-C4_lifted-ils",
+      "case_id": "R3-N5-F50-C4",
+      "algorithm": "lifted-ils",
+      "log": "logs/R3-N5-F50-C4_lifted-ils.log",
+      "record": "records/R3-N5-F50-C4_lifted-ils.json",
+      "raw_log_sha256": "30bf3da32bdae78960e948850517d97aa8132d46795cf79a00ecce4f9563599e",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R3-N5-F50-C4/lifted-ils"
+      ]
+    },
+    {
+      "run_id": "R3-N5-F50-C4_lifted-two-phase",
+      "case_id": "R3-N5-F50-C4",
+      "algorithm": "lifted-two-phase",
+      "log": "logs/R3-N5-F50-C4_lifted-two-phase.log",
+      "record": "records/R3-N5-F50-C4_lifted-two-phase.json",
+      "raw_log_sha256": "b207bdb688adec6fb760e47036bca8048fbbcafb4537d62f2e287194e382020c",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R3-N5-F50-C4/lifted-two-phase"
+      ]
+    },
+    {
+      "run_id": "R3-N5-F50-C4_natural-ils",
+      "case_id": "R3-N5-F50-C4",
+      "algorithm": "natural-ils",
+      "log": "logs/R3-N5-F50-C4_natural-ils.log",
+      "record": "records/R3-N5-F50-C4_natural-ils.json",
+      "raw_log_sha256": "d022979b23529af2f54098e6c90c75269cc1616ff47e9d7fbb87401110062079",
+      "source_commit": "7d932b99a8fe03e2b4df796e94071b5730dd5ae6",
+      "executable_sha256": "98f7719ab01c599ad37ad556c5f5176d710bfdd753351f2d16888cc4df337a08",
+      "status": "OPTIMAL",
+      "selected_record_ids": [
+        "main_table/R3-N5-F50-C4/natural-ils"
+      ]
+    }
+  ]
+}

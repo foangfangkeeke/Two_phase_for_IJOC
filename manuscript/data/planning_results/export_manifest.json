@@ -1,0 +1,57 @@
+{
+  "created_utc": "2026-11-09T14:47:45.437530+00:00",
+  "source_package_manifest_sha256": "cf216b7e25d77621ec6b92602282fdbeec337af7ba1582965d51f6f583317811",
+  "export_script_sha256": "028764955e619fdf8b19f1150c9320656386f9b9647f14bec89ec30890055cd3",
+  "cost_tolerance": 0.001,
+  "energy_tolerance_kwh": 0.001,
+  "tables": {
+    "run_summary.csv": {
+      "rows": 14,
+      "sha256": "0439d0abf22866eb0d5e37134205c5060ebf4fbc6884fedea74f2325eaf1e2a0"
+    },
+    "ub_reconciliation.csv": {
+      "rows": 14,
+      "sha256": "35f4e8823b9d607d582bcfed05682854b62881a17ef49c1f5e0230797d802e3a"
+    },
+    "final_design_facilities.csv": {
+      "rows": 244,
+      "sha256": "02493bc846455ebee4280a5020df29c722a8c61b3eb30b3b6ea2312a1d3039fc"
+    },
+    "final_design_batteries.csv": {
+      "rows": 1960,
+      "sha256": "4a53bffd10cfdd3447032072a8ba101a87fbcca7443e1bfadf28bbad8daacd79"
+    },
+    "baseline_routes.csv": {
+      "rows": 280,
+      "sha256": "7312984b6b7dbd154548cf299627a3472b236ac6483cee632d50d10cfa12ee14"
+    },
+    "baseline_stations.csv": {
+      "rows": 50,
+      "sha256": "3df886cc456f754d58d6b8f074c70ae13773611d35ffba92781d9b04493a7d83"
+    },
+    "baseline_scenarios.csv": {
+      "rows": 10,
+      "sha256": "dbb571e7d2f075f2e58a3f8bf7a153c290936ba3d1c7a236ebc07aeb5ed6fdc6"
+    },
+    "baseline_route_changes.csv": {
+      "rows": 140,
+      "sha256": "c6e3fdafc6da53835e33d76c412cb5b35bf40fe7a41713231bff419ba3812a14"
+    },
+    "baseline_station_changes.csv": {
+      "rows": 5,
+      "sha256": "0e0894d2d25a5a07adffcdaf0b31845b7f550af167be18cb072f235c4074c7a3"
+    },
+    "baseline_summary.csv": {
+      "rows": 1,
+      "sha256": "79cdc31b3e09e17d8e3e36bca43f79aec5055e44df2e2171b9c8161ffac81ae4"
+    },
+    "battery_cost_sensitivity.csv": {
+      "rows": 5,
+      "sha256": "db130b3089dcb7a545ecf7eca025c2e19b2e95ea26751d00b33ae94b9ca00eca"
+    },
+    "dwc_cost_sensitivity.csv": {
+      "rows": 5,
+      "sha256": "854fb40cc8f1e33000ab82d7441966e8b852eb9a3c67da5e6b2ab2f67f93d465"
+    }
+  }
+}

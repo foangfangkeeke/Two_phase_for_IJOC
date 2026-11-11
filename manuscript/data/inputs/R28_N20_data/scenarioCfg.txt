@@ -1,0 +1,23 @@
+# numScenarios
+20
+# scenario_folder,probability
+base,0.05
+charger_tengah_up10,0.05
+lo10pct,0.05
+route_984_up20,0.05
+route_941_down30,0.05
+route_285_up10,0.05
+route_334_down10,0.05
+route_452_down20,0.05
+route_96_up20,0.05
+charger_clementi_up20,0.05
+charger_btbatok_up10,0.05
+route_334_up10,0.05
+charger_jurongtownhall_up10,0.05
+route_78_down10,0.05
+route_984_up10,0.05
+route_66_up10,0.05
+route_41_up20,0.05
+route_333_up10,0.05
+charger_clementi_up10,0.05
+global_up20,0.05

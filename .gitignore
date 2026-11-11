@@ -15,3 +15,7 @@ gurobi*
 # Exact raw logs selected for the current publication.
 !/experiments/final_2026-11-07/logs/
 !/experiments/final_2026-11-07/logs/*.log
+
+# Published solver logs in the restored manuscript data snapshot.
+!/manuscript/data/algorithm_results/logs/
+!/manuscript/data/algorithm_results/logs/*.log

@@ -1,0 +1,113 @@
+Execution policy: version=final-rsp-skip-2026-11-05, rsp_numerical=skip_screening, original_subproblem=required
+Runtime options: facility_cost_scale=1.000000, energy_scale=1.000000, battery_step=50, scenario_count=5, scenario_start=0, cap=4, dwc_top_n=50, wireless_option=1, rsp=1, rsp_workers=3, rsp_threads=4, preprocess_bounds=0, valid_inequality=1
+Solver options: mip_gap=0.000100, global_gap=0.010000, time_limit=7200.000000, threads=12
+Instance: data=R12_N5, scenario_folders=base;charger_btbatok_up10;global_down10;route_453_up10;route_941_down20, battery_range=[50.000000,600.000000]
+Lifted ILS initialized: master_vars=770, scenarios=5, RSP=on, valid_inequality=on, rsp_workers=3, rsp_threads=4
+Lifted ILS iter 0, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2679.466302, gap=1, master_ms=74.718100, rsp_ms=44252.296700, elapsed_ms=49565.684900
+Lifted ILS iter 1, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2707.600000, gap=1, master_ms=80.882800, rsp_ms=44112.724000, elapsed_ms=93759.954200
+Lifted ILS iter 2, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2724.080000, gap=1, master_ms=210.970500, rsp_ms=45085.765600, elapsed_ms=139057.248500
+Lifted ILS iter 3, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2741.820000, gap=1, master_ms=238.347300, rsp_ms=46273.897700, elapsed_ms=185570.070400
+Lifted ILS iter 4, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2752.000000, gap=1, master_ms=187.775300, rsp_ms=45570.087600, elapsed_ms=231328.439900
+Lifted ILS iter 5, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2767.040000, gap=1, master_ms=300.368300, rsp_ms=44884.463600, elapsed_ms=276513.944900
+Lifted ILS iter 6, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2768.680000, gap=1, master_ms=383.903800, rsp_ms=42977.394500, elapsed_ms=319875.904400
+Lifted ILS iter 7, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2782.300000, gap=1, master_ms=280.778600, rsp_ms=44842.846100, elapsed_ms=365000.270600
+Lifted ILS iter 8, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2795.620000, gap=1, master_ms=437.942000, rsp_ms=44048.167200, elapsed_ms=409486.977000
+Lifted ILS iter 9, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2800.240000, gap=1, master_ms=384.621000, rsp_ms=46823.533900, elapsed_ms=456695.857000
+Lifted ILS iter 10, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2802.740000, gap=1, master_ms=416.107800, rsp_ms=46418.569300, elapsed_ms=503531.048100
+Lifted ILS iter 11, RSP feasibility cut x5, RSP optimality cut x0, RSP Q(z)=0.000000, UB=inf, LB=2807.520000, gap=1, master_ms=270.264800, rsp_ms=47991.323200, elapsed_ms=551793.418800
+Lifted ILS iter 12, RSP feasibility cut x4, RSP optimality cut x1, RSP Q(z)=975.915903, UB=inf, LB=2819.040000, gap=1, master_ms=333.622600, rsp_ms=39847.948200, elapsed_ms=591975.603800
+Lifted ILS iter 13, RSP feasibility cut x4, RSP optimality cut x1, RSP Q(z)=951.417690, UB=inf, LB=3725.212237, gap=1, master_ms=464.511900, rsp_ms=40220.406600, elapsed_ms=632661.188000
+Lifted ILS iter 14, RSP feasibility cut x4, RSP optimality cut x1, RSP Q(z)=978.347830, UB=inf, LB=3797.264690, gap=1, master_ms=376.169900, rsp_ms=41921.352300, elapsed_ms=674959.444300
+Lifted ILS iter 15, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=975.915903, UB=inf, LB=3806.242197, gap=1, master_ms=436.003200, rsp_ms=40321.348900, elapsed_ms=715717.284900
+Lifted ILS iter 16, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=975.915903, UB=inf, LB=3809.295903, gap=1, master_ms=449.153600, rsp_ms=39782.108700, elapsed_ms=755949.134000
+Lifted ILS iter 17, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=975.915903, UB=inf, LB=3810.315903, gap=1, master_ms=396.291800, rsp_ms=41351.916600, elapsed_ms=797697.963400
+Lifted ILS iter 18, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=978.347830, UB=inf, LB=3814.227830, gap=1, master_ms=358.110300, rsp_ms=41390.384800, elapsed_ms=839447.102600
+Lifted ILS iter 19, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=975.915903, UB=inf, LB=3821.615903, gap=1, master_ms=308.147900, rsp_ms=40727.751100, elapsed_ms=880483.754100
+Lifted ILS iter 20, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=975.915903, UB=inf, LB=3823.735903, gap=1, master_ms=292.973600, rsp_ms=41733.574900, elapsed_ms=922510.901200
+Lifted ILS iter 21, RSP feasibility cut x1, RSP optimality cut x3, RSP Q(z)=4187.312161, UB=inf, LB=3832.595903, gap=1, master_ms=240.803800, rsp_ms=18593.236300, elapsed_ms=941345.534800
+Lifted ILS iter 22, RSP feasibility cut x1, RSP optimality cut x4, RSP Q(z)=4033.975422, UB=inf, LB=6642.616229, gap=1, master_ms=234.036500, rsp_ms=19169.456300, elapsed_ms=960749.649200
+Lifted ILS iter 23, RSP feasibility cut x1, RSP optimality cut x4, RSP Q(z)=4158.195661, UB=inf, LB=7028.544553, gap=1, master_ms=305.688800, rsp_ms=18957.790000, elapsed_ms=980013.858600
+Lifted ILS iter 24, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=4187.312161, UB=inf, LB=7045.212161, gap=1, master_ms=246.660900, rsp_ms=19295.630100, elapsed_ms=999556.464600
+Lifted ILS iter 25, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=4187.312161, UB=inf, LB=7046.772161, gap=1, master_ms=284.333900, rsp_ms=18674.433900, elapsed_ms=1018515.723600
+Lifted ILS iter 26, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=4187.312161, UB=inf, LB=7049.472161, gap=1, master_ms=366.750100, rsp_ms=17261.959500, elapsed_ms=1036144.947800
+Lifted ILS iter 27, RSP feasibility cut x1, RSP optimality cut x0, RSP Q(z)=4187.312161, UB=inf, LB=7051.392161, gap=1, master_ms=341.402600, rsp_ms=18608.269800, elapsed_ms=1055094.935300
+Lifted ILS iter 28, theta=4187.312161, Q(z)=5330.194757, optimality cut x4, UB=8198.534757, LB=7055.652161, gap=13.940084%, master_ms=339.939500, rsp_optimality_cut=1, rsp_ms=743.027800, subproblem_ms=4610.349300, elapsed_ms=1060799.655200
+Lifted ILS iter 29, RSP feasibility cut x4, RSP optimality cut x1, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.138792, gap=1.419717%, master_ms=408.623000, rsp_ms=1865.051700, elapsed_ms=1063073.851200
+Lifted ILS iter 30, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=423.149500, rsp_ms=1802.061400, elapsed_ms=1065299.523800
+Lifted ILS iter 31, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=462.852700, rsp_ms=1833.463000, elapsed_ms=1067596.306700
+Lifted ILS iter 32, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=403.741700, rsp_ms=1786.773300, elapsed_ms=1069787.479800
+Lifted ILS iter 33, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=478.602100, rsp_ms=1895.009500, elapsed_ms=1072161.576700
+Lifted ILS iter 34, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=411.202900, rsp_ms=1791.216600, elapsed_ms=1074364.610100
+Lifted ILS iter 35, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=512.223300, rsp_ms=1777.161900, elapsed_ms=1076654.456700
+Lifted ILS iter 36, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=481.179600, rsp_ms=1803.756400, elapsed_ms=1078939.796900
+Lifted ILS iter 37, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=528.110400, rsp_ms=1899.375100, elapsed_ms=1081367.640900
+Lifted ILS iter 38, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=515.382100, rsp_ms=1762.413600, elapsed_ms=1083645.975400
+Lifted ILS iter 39, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=533.260100, rsp_ms=1706.889900, elapsed_ms=1085886.705400
+Lifted ILS iter 40, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=521.182300, rsp_ms=1838.044200, elapsed_ms=1088246.362000
+Lifted ILS iter 41, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=515.262900, rsp_ms=1799.229600, elapsed_ms=1090561.411800
+Lifted ILS iter 42, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=562.435000, rsp_ms=1738.693000, elapsed_ms=1092862.953400
+Lifted ILS iter 43, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=539.894600, rsp_ms=1622.231800, elapsed_ms=1095025.621900
+Lifted ILS iter 44, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=498.020100, rsp_ms=1657.232600, elapsed_ms=1097181.416800
+Lifted ILS iter 45, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=526.316600, rsp_ms=1700.448000, elapsed_ms=1099408.707600
+Lifted ILS iter 46, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=487.006500, rsp_ms=1761.224800, elapsed_ms=1101657.598200
+Lifted ILS iter 47, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=554.228100, rsp_ms=1610.463500, elapsed_ms=1103822.854600
+Lifted ILS iter 48, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=459.630600, rsp_ms=1700.420500, elapsed_ms=1105983.957900
+Lifted ILS iter 49, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=493.919300, rsp_ms=1688.004300, elapsed_ms=1108166.362600
+Lifted ILS iter 50, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=478.142000, rsp_ms=1668.192700, elapsed_ms=1110313.193900
+Lifted ILS iter 51, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=535.094000, rsp_ms=1720.959600, elapsed_ms=1112570.641800
+Lifted ILS iter 52, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=487.141800, rsp_ms=1693.200800, elapsed_ms=1114751.553500
+Lifted ILS iter 53, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=635.663600, rsp_ms=1610.258800, elapsed_ms=1116998.081900
+Lifted ILS iter 54, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=490.536900, rsp_ms=1674.082900, elapsed_ms=1119163.153000
+Lifted ILS iter 55, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=547.396800, rsp_ms=1709.881500, elapsed_ms=1121420.847800
+Lifted ILS iter 56, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=522.642000, rsp_ms=1665.187800, elapsed_ms=1123609.530800
+Lifted ILS iter 57, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=529.528500, rsp_ms=1681.117500, elapsed_ms=1125820.663900
+Lifted ILS iter 58, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=541.942500, rsp_ms=1658.957400, elapsed_ms=1128022.476400
+Lifted ILS iter 59, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=466.185400, rsp_ms=1686.749600, elapsed_ms=1130175.990300
+Lifted ILS iter 60, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=534.338100, rsp_ms=1737.126600, elapsed_ms=1132448.117000
+Lifted ILS iter 61, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=630.363300, rsp_ms=1660.748400, elapsed_ms=1134739.857100
+Lifted ILS iter 62, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=508.784900, rsp_ms=1645.145800, elapsed_ms=1136894.293600
+Lifted ILS iter 63, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=638.428500, rsp_ms=1793.024200, elapsed_ms=1139326.290600
+Lifted ILS iter 64, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=541.797700, rsp_ms=1782.235000, elapsed_ms=1141650.901500
+Lifted ILS iter 65, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=681.163200, rsp_ms=1753.277500, elapsed_ms=1144085.999500
+Lifted ILS iter 66, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=604.248600, rsp_ms=1698.831400, elapsed_ms=1146389.612900
+Lifted ILS iter 67, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=608.181000, rsp_ms=1670.499600, elapsed_ms=1148669.190800
+Lifted ILS iter 68, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=744.755300, rsp_ms=1679.230900, elapsed_ms=1151093.681400
+Lifted ILS iter 69, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=692.016600, rsp_ms=1629.121500, elapsed_ms=1153415.366700
+Lifted ILS iter 70, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=674.891600, rsp_ms=1710.709300, elapsed_ms=1155801.501000
+Lifted ILS iter 71, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=858.251800, rsp_ms=1701.651100, elapsed_ms=1158361.934100
+Lifted ILS iter 72, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=693.880700, rsp_ms=1705.927100, elapsed_ms=1160762.276400
+Lifted ILS iter 73, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=767.026300, rsp_ms=1795.698700, elapsed_ms=1163325.684800
+Lifted ILS iter 74, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=788.203600, rsp_ms=1686.751400, elapsed_ms=1165801.242400
+Lifted ILS iter 75, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=583.685200, rsp_ms=1721.531400, elapsed_ms=1168107.012100
+Lifted ILS iter 76, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=573.584300, rsp_ms=1682.921400, elapsed_ms=1170364.105300
+Lifted ILS iter 77, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=672.420600, rsp_ms=1799.796600, elapsed_ms=1172837.048000
+Lifted ILS iter 78, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=606.168300, rsp_ms=1662.581800, elapsed_ms=1175106.460200
+Lifted ILS iter 79, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=615.304000, rsp_ms=1663.105400, elapsed_ms=1177385.462100
+Lifted ILS iter 80, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=865.215300, rsp_ms=1713.542600, elapsed_ms=1179973.297900
+Lifted ILS iter 81, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=704.004600, rsp_ms=2000.184800, elapsed_ms=1182678.149200
+Lifted ILS iter 82, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=760.841600, rsp_ms=1725.467000, elapsed_ms=1185165.265900
+Lifted ILS iter 83, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=726.899900, rsp_ms=1773.471300, elapsed_ms=1187666.226300
+Lifted ILS iter 84, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=699.350700, rsp_ms=1686.200100, elapsed_ms=1190052.392800
+Lifted ILS iter 85, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=754.082300, rsp_ms=1770.958200, elapsed_ms=1192578.170100
+Lifted ILS iter 86, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=630.259200, rsp_ms=1684.321700, elapsed_ms=1194893.494600
+Lifted ILS iter 87, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=733.240500, rsp_ms=1668.011400, elapsed_ms=1197295.350000
+Lifted ILS iter 88, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=643.689100, rsp_ms=1748.573900, elapsed_ms=1199688.226900
+Lifted ILS iter 89, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=788.539400, rsp_ms=1832.611800, elapsed_ms=1202310.084000
+Lifted ILS iter 90, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=825.345200, rsp_ms=1703.961200, elapsed_ms=1204840.018300
+Lifted ILS iter 91, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=842.647400, rsp_ms=1696.200600, elapsed_ms=1207379.458400
+Lifted ILS iter 92, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=680.774100, rsp_ms=1635.560100, elapsed_ms=1209696.280300
+Lifted ILS iter 93, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=851.081200, rsp_ms=1732.457100, elapsed_ms=1212280.879200
+Lifted ILS iter 94, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=702.790000, rsp_ms=1714.514600, elapsed_ms=1214698.957100
+Lifted ILS iter 95, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=787.600200, rsp_ms=1673.841400, elapsed_ms=1217160.885400
+Lifted ILS iter 96, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=782.321000, rsp_ms=1659.214900, elapsed_ms=1219603.689000
+Lifted ILS iter 97, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=719.021200, rsp_ms=1753.398900, elapsed_ms=1222076.775200
+Lifted ILS iter 98, RSP feasibility cut x4, RSP optimality cut x0, RSP Q(z)=950.909666, UB=8198.534757, LB=8082.778092, gap=1.411919%, master_ms=774.249600, rsp_ms=1656.795800, elapsed_ms=1224508.454600
+Lifted ILS iter 99, RSP feasibility cut x3, RSP optimality cut x1, RSP Q(z)=2052.600245, UB=8198.534757, LB=8083.645590, gap=1.401338%, master_ms=757.085700, rsp_ms=1396.283400, elapsed_ms=1226662.392500
+Lifted ILS iter 100, RSP feasibility cut x4, RSP optimality cut x1, RSP Q(z)=949.113747, UB=8198.534757, LB=8193.164801, gap=0.065499%, master_ms=944.644400, rsp_ms=1871.864400, elapsed_ms=1229479.723900
+Lifted ILS iter 101, theta=5243.170373, Q(z)=5249.093239, optimality cut x5, UB=8198.534757, LB=8193.164801, gap=0.065499%, master_ms=1083.464100, rsp_optimality_cut=5, rsp_ms=875.187200, subproblem_ms=5060.026900, elapsed_ms=1236511.220500
+Lifted ILS converged.
+Lifted ILS final: status=OPTIMAL, UB=8198.534757, LB=8193.164801, gap=0.065499%, elapsed_ms=1236511.226500
+Algorithm termination: algorithm=lifted-ils, status=OPTIMAL, has_solution=1, UB=8198.534757, LB=8193.164801, gap_percent=0.065499, reported_seconds=1236.511227
+Cardinal Optimizer v8.0.7. Build date Sep 20 2026
+Copyright Cardinal Operations 2026. All Rights Reserved
+
