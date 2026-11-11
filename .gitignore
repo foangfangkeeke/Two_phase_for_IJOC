@@ -1,0 +1,31 @@
+# Local scratch files and Python caches
+/tmp/
+# Local transfer bundle for the experiment/figure branch
+/_local_reproduction/
+# Local journal template references
+/manuscript/templates/
+__pycache__/
+*.py[cod]
+/.chapter*-preview-*/
+
+# Rebuildable LaTeX intermediates
+/manuscript/*.aux
+/manuscript/*.bbl
+/manuscript/*.bcf
+/manuscript/*.blg
+/manuscript/*.fdb_latexmk
+/manuscript/*.fls
+/manuscript/*.log
+/manuscript/*.out
+/manuscript/*.run.xml
+/manuscript/*.spl
+/manuscript/*.synctex.gz
+/manuscript/*.toc
+
+# Rebuildable previews; the manuscript uses the corresponding PDFs
+/manuscript/figures/chapter5_l2p_progress.png
+/manuscript/figures/chapter5_repair_phase2.png
+/manuscript/figures/chapter5_repair_overhead.png
+/manuscript/figures/duty_chain.png
+/manuscript/figures/physical_service_mapping.png
+/manuscript/figures/two_phase_framework.png

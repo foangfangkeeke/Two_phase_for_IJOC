@@ -2,18 +2,24 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-This paper studies wireless charging infrastructure planning for electric-bus systems under uncertain future service plans.
-The two-stage formulation separates here-and-now SWC and DWC deployment from scenario-adaptive route battery configuration and representative-day charging decisions.
-Its recourse combines scenario-dependent discrete configurations, route-level energy feasibility, and shared plug-in charger capacity.
-To exploit this structure, we develop an exact integer L-shaped method that lifts the battery configurations into the decomposition master, uses route-level LP recourse to generate lower bounds before exact scenario verification, and strengthens scenario cuts through a joint facility--battery resource order.
-The resulting procedure preserves the original information structure and converges finitely under exact separation.
+This paper studies a two-stage stochastic DWC facility location problem for electric-bus networks under uncertain future service plans.
+We identify two structural properties of its recourse: cross-route coupling arises only from shared plug-in capacity, and operational feasibility is monotone in DWC availability and battery capacity.
+Building on these properties, we develop R-TPILS.
+Its TPILS core combines an equivalent lifted reformulation, energy-budget inequalities, route LP relaxations, and exact scenario verification.
+R-TPILS augments this core with a repair search and monotone feasibility cuts.
 
-The Tower-derived experiments identify the two-phase relaxation--verification scheme as the main computational improvement in the tested method ladder.
-The two-phase variants solve the small, medium, and base three-scenario instances, whereas the standard integer L-shaped variants do not solve even the small instance within the two-hour limit.
-On the base network, the full method solves all cases from 3 to 40 scenarios; the 40-scenario instance terminates in 926.4 seconds with a final gap below 0.004\%.
-The boundary cases also clarify where the method remains expensive: the largest three-scenario network reaches the time limit at a 0.092\% gap, and the tightest plug-in capacity setting fails to complete exact Phase 2 verification.
-Thus, after route-level lower bounding reduces the cost of early separation, exact verification becomes the principal bottleneck when the network is large or shared-capacity coupling is tight.
+Computational results based on the Tower Transit bus network in Singapore support two main conclusions.
+First, the components of R-TPILS address complementary computational bottlenecks.
+The energy-budget inequalities screen infeasible configurations early, and Phase 1 quickly establishes tight lower bounds.
+The repair search helps recover verified feasible solutions on difficult instances, and monotone cuts can further improve lower bounds.
+These benefits vary across instances.
+Overall, R-TPILS reaches the 1\% target on all nine main instances, compared with eight for TPILS and at most six for the remaining methods.
+Second, DWC changes the balance between onboard storage and daytime energy supply.
+Mean battery capacity decreases by about 23\%, while energy supply shifts from overnight toward daytime charging.
 
-The study uses constructed service-plan scenarios on a fixed route network, treats existing plug-in charger capacity as exogenous, and assumes that trip energy consumption is independent of the selected battery capacity.
-Future work could develop data-driven service-plan scenarios, jointly optimize wireless and plug-in capacity expansion, and incorporate battery-weight effects and short-term operational uncertainty.
-From an algorithmic perspective, stronger exact-verification procedures for tightly coupled recourse and tests on other stochastic design problems would help establish how broadly the layered decomposition applies.
+Several extensions appear promising.
+First, accounting for battery weight in energy consumption would make the planning model more realistic by capturing the relationship between battery capacity and energy use.
+Second, repair is valuable when exact feasibility is difficult, whereas its additional search can outweigh the benefit on easier instances.
+Future work could investigate when and how repair should be applied.
+Finally, similar capacity coupling and feasibility monotonicity may arise in other transport planning problems, including berth planning, bus depot planning, and electric-truck charging infrastructure planning.
+The proposed framework could therefore be extended to these settings.

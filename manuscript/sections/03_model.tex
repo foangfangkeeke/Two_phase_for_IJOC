@@ -1,115 +1,82 @@
 \FloatBarrier
-\section{Problem Formulation and Recourse Structure}
+\section{Problem Setting and Formulation}
 \label{sec:model}
 
-This section formulates the wireless charging infrastructure planning problem as a two-stage stochastic program.
-The formulation separates long-lived wireless-facility decisions from scenario-adaptive battery and charging decisions, and then identifies the recourse structure used by the algorithm in Section~\ref{sec:method}.
+This section defines the directed station network and its scheduled traversal events and formulates the DWC facility location problem as a two-stage stochastic program.
+
+\subsection{Problem description}
+\label{subsec:network-scenarios}
+Consider an electric bus system with a set of stations $\mathcal S$ and a set of directed links $\mathcal L$.
+A link connects consecutive stations along a bus duty, including links traversed between consecutive trips.
+Existing plug-in chargers are available at stations in $\mathcal C\subseteq\mathcal S$.
+These chargers have given capacities and are shared by buses in the system.
+DWC facilities may be installed on candidate links in $\mathcal L^{\mathrm D}\subseteq\mathcal L$.
+
+The system operates a set of routes $\mathcal R$.
+For a given service plan, each bus duty consists of an ordered sequence of trips assigned to one bus and any travel between consecutive trips.
+A bus departs from the depot with its battery at the upper state-of-charge limit and then operates its assigned trips in sequence.
+As illustrated in Figure~\ref{fig:daily-duty-operation}, during its duty the bus may use plug-in charging and receive DWC while traversing equipped links.
+After completing its last trip, the bus returns to the depot and is recharged overnight to the upper state-of-charge limit before the next operating day.
+Depot charging capacity is sufficient to recharge all buses overnight.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth]{figures/duty_chain.pdf}
+    \caption{Illustration of a bus duty, its charging opportunities, and a plug-in station shared with other buses.}
+    \label{fig:daily-duty-operation}
+\end{figure}
+
+We consider alternative service plans for a single planning period.
+As shown in Figure~\ref{fig:two-stage-decisions}, the planner first selects the links on which DWC facilities are installed, before the service plan is known.
+For each possible service plan, the planner then chooses a matching route-level battery configuration and representative-day charging plan under the same facility layout.
+The service plan and battery configuration remain fixed throughout the planning period.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\linewidth]{figures/two_stage_decisions.pdf}
+    \caption{Two-stage decisions under alternative service-plan scenarios.}
+    \label{fig:two-stage-decisions}
+\end{figure}
 
 \subsection{Two-stage stochastic formulation}
 \label{subsec:two-stage-formulation}
 
-Let $\Omega$ be the set of service-plan scenarios, and let $p_\omega$ be the probability of scenario $\omega \in \Omega$, where $p_\omega>0$ and $\sum_{\omega\in\Omega}p_\omega=1$.
-Each scenario represents one plausible future service plan and fixes the route frequencies, timetables, bus trip chains, active-fleet requirements, and trip-level energy requirements, while the operated route set $\mathcal{R}$ is common across scenarios.
-The planner first installs long-lived wireless charging facilities before the future service plan is known.
-After a scenario is realized, the second-stage recourse selects route-level battery capacities and determines the corresponding representative-day charging allocation and energy management.
+\subsubsection{Overall formulation and first-stage decisions}
+\label{subsubsec:first-stage}
 
-Let $\mathcal{S}$ be the station set, $\mathcal{L}$ the directed link set between consecutive stations, and $\mathcal{C}\subseteq\mathcal{S}$ the set of existing interchanges or hubs equipped with shared plug-in chargers.
-Stationary wireless charging (SWC) can be installed at any station in $\mathcal{S}\setminus\mathcal{C}$, while dynamic wireless charging (DWC) can be installed on any directed link in $\mathcal{L}$.
-The first-stage binary variables $w_s^{\mathrm{S}}$ and $w_l^{\mathrm{D}}$ indicate whether SWC is installed at station $s\in\mathcal{S}\setminus\mathcal{C}$ and DWC is installed on link $l\in\mathcal{L}$, respectively.
-Stations in $\mathcal{C}$ have fixed, limited plug-in capacity and are not candidates for SWC deployment.
-Figure~\ref{fig:charging-resources} illustrates the three charging resources represented in the formulation.
-
-\begin{figure}[htbp]
-    \centering
-    \begin{minipage}[t]{0.31\textwidth}
-        \centering
-        \includegraphics[width=\linewidth,height=0.16\textheight,keepaspectratio]{figures/illustration_of_SWC.png}\\[-2pt]
-        \small\textbf{(a)} SWC
-    \end{minipage}
-    \hfill
-    \begin{minipage}[t]{0.31\textwidth}
-        \centering
-        \includegraphics[width=\linewidth,height=0.16\textheight,keepaspectratio]{figures/illustration_of_DWC.png}\\[-2pt]
-        \small\textbf{(b)} DWC
-    \end{minipage}
-    \hfill
-    \begin{minipage}[t]{0.31\textwidth}
-        \centering
-        \includegraphics[width=\linewidth,height=0.16\textheight,keepaspectratio]{figures/illustration_of_plug-in.png}\\[-2pt]
-        \small\textbf{(c)} Plug-in charging
-    \end{minipage}
-    \caption{Charging resources represented in the formulation. (a) SWC is installed near selected stations and supplies energy during low-speed station approaches and departures. (b) DWC is installed on selected directed links and supplies energy during link traversals. (c) Existing plug-in chargers at hubs and interchanges provide limited station--time capacity shared across routes.}
-    \label{fig:charging-resources}
-\end{figure}
-
-The compact two-stage stochastic formulation is
-\begin{align}
-    \min_{w^{\mathrm{S}},w^{\mathrm{D}}} \quad
-        & C^{\mathrm{fac}}(w)
-        +
-        \sum_{\omega \in \Omega} p_\omega \Phi_\omega(w)
-        \label{eq:two-stage-model} \\
-    \mathrm{s.t.} \quad
-        & w_s^{\mathrm{S}} \in \{0,1\},
-        && s \in \mathcal{S}\setminus\mathcal{C},
-        \label{eq:swc-domain} \\
-        & w_l^{\mathrm{D}} \in \{0,1\},
-        && l \in \mathcal{L}.
-        \label{eq:dwc-domain}
-\end{align}
-where $w=(w^{\mathrm{S}},w^{\mathrm{D}})$ and
-\[
-    C^{\mathrm{fac}}(w)=\sum_{s \in \mathcal{S}\setminus\mathcal{C}} c_s^{\mathrm{S}} w_s^{\mathrm{S}}+\sum_{l \in \mathcal{L}} c_l^{\mathrm{D}} w_l^{\mathrm{D}}.
-\]
-Here $c_s^{\mathrm{S}}$ and $c_l^{\mathrm{D}}$ denote the equivalent daily infrastructure costs, obtained by annualizing the installation costs over the planning horizon and converting them to a representative-day basis.
-Battery investment costs are converted on the same basis, so that all objective terms are expressed on a common daily scale.
-The vector $w$ is the nonanticipative here-and-now facility decision, and $\Phi_\omega(w)$ is the optimal second-stage value in scenario $\omega$.
-
-Let $z_\omega$ collect the route-level battery selections, $x_\omega$ the plug-in charger occupancy decisions, and $y_\omega$ the charging amounts and battery energy states.
-For a fixed facility layout $w$, the scenario recourse value $\Phi_\omega(w)$ is the minimum scenario cost
+The possible service plans are represented by scenarios $\omega\in\Omega$, each with probability $p_\omega>0$, where $\sum_{\omega\in\Omega}p_\omega=1$.
+All costs are expressed on a representative-day basis, and the notation is summarized in \ref{app:model-details}.
+$C_\omega(u_\omega)$ represents the second-stage cost for scenario $\omega$.
+The binary variable $w_l$ indicates whether DWC is installed on candidate link $l$, and $u_\omega$ represents the battery and charging decisions for scenario $\omega$.
+The model minimizes the DWC facility cost and the expected battery and charging costs:
 \begin{equation}
-    \Phi_\omega(w)
-    =
-    \min_{z_\omega,x_\omega,y_\omega}
-    \left\{
-        C^{\mathrm{bat}}_\omega(z_\omega) + C^{\mathrm{chg}}_\omega(y_\omega):
-        (z_\omega,x_\omega,y_\omega)\in\mathcal{P}_\omega(w)
-    \right\}.
-    \label{eq:recourse-value}
+\begin{aligned}
+    \min_{w,\{u_\omega\}_{\omega\in\Omega}}\quad
+    & C^{\mathrm{fac}}(w)
+    + \sum_{\omega\in\Omega}p_\omega C_\omega(u_\omega) \\
+    \mathrm{s.t.}\quad
+    & w\in\mathcal W, \\
+    & u_\omega\in\mathcal U_\omega(w), \qquad \omega\in\Omega.
+\end{aligned}
+\label{eq:two-stage-model}
 \end{equation}
-Fleet-size adjustment costs and the residual value of the existing batteries are scenario constants and are therefore omitted from $\Phi_\omega(w)$.
-The next subsection expands $\mathcal{P}_\omega(w)$.
+In \eqref{eq:two-stage-model}, $\mathcal W$ is the first-stage feasible set, and $\mathcal U_\omega(w)$ is the second-stage feasible set under scenario $\omega$ and facility layout $w$.
+The first-stage feasible set and facility cost are
+\begin{align}
+    \mathcal W &= \{0,1\}^{|\mathcal L^{\mathrm D}|},
+    \label{eq:dwc-domain} \\
+    C^{\mathrm{fac}}(w) &= \sum_{l\in\mathcal L^{\mathrm D}} c_l^{\mathrm D}w_l, \notag
+\end{align}
+where $c_l^{\mathrm D}$ is the cost of installing DWC on link $l$.
 
-\subsection{Scenario recourse formulation}
-\label{subsec:scenario-recourse-formulation}
+\subsubsection{Second-stage decisions and constraints}
+\label{subsubsec:second-stage}
 
-For a fixed scenario $\omega$ and route $r\in\mathcal R$, let
-$\mathcal M_{\omega,r}$ contain the bus trip chains on route $r$.
-Each chain corresponds to one bus duty consisting of an ordered
-sequence of trips, so
-$n_{\omega,r}=|\mathcal M_{\omega,r}|$ is the route fleet
-requirement in scenario $\omega$.
-The sets $\mathcal V_{\omega,r}$ and $\mathcal A_{\omega,r}$
-collect, respectively, all station-visit and directed-traversal
-event copies generated by these trip chains.
-Each event copy uniquely identifies its trip chain, trip, and
-position within the duty, so explicit event-ownership indices are
-suppressed for notational simplicity.
-Distinct operational occurrences remain separate even when they
-correspond to the same physical station or directed link.
+For scenario $\omega$, write $u_\omega=(z_\omega,x_\omega,y_\omega)$, where $z_\omega$ collects route-level battery selections, $x_\omega$ plug-in charger occupancy decisions, and $y_\omega$ charging amounts and battery energy states.
+The scenario cost is $C_\omega(u_\omega)=C^{\mathrm{bat}}_\omega(z_\omega)+C^{\mathrm{chg}}_\omega(y_\omega)$.
+The following constraints define $\mathcal U_\omega(w)$ for each scenario $\omega\in\Omega$.
 
-Figure~\ref{fig:daily-duty-operation} illustrates the event-level representation of a representative bus duty and the charging opportunities embedded in its sequence of trips.
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.6\linewidth]{figures/problem_description_daily_duty.png}
-    \caption{Event-level representation of a representative bus duty and its charging opportunities. A bus sequentially operates multiple trips composed of ordered station visits and directed traversals. SWC opportunities are associated with eligible station visits, DWC opportunities with equipped traversals, and plug-in charging with eligible terminal or hub visits. Limited plug-in chargers may be shared by buses arriving from different trips or routes.}
-    \label{fig:daily-duty-operation}
-\end{figure}
-
-A consolidated notation table is provided in Appendix~\ref{app:model-details}.
-
-\paragraph{Battery configuration and cost.}
+\paragraph{Battery configuration and cost}
 Battery option $k\in\mathcal K$ has capacity $\beta_k$, and the scenario-dependent binary variable $z_{\omega,r,k}$ indicates whether it is selected for route $r$.
 The route-level battery-choice constraints are
 \begin{align}
@@ -126,88 +93,82 @@ The route-level battery-choice constraints are
     \label{eq:z-domain}
 \end{align}
 Constraints~\eqref{eq:one-battery}--\eqref{eq:z-domain} select one common battery option for all buses assigned to each route and define the induced route battery capacity $B_{\omega,r}$.
-With representative-day equivalent capacity cost $c^{\mathrm{bat}}$, the scenario battery cost is
+For the set $\mathcal M_{\omega,r}$ of bus duties on route $r$, $|\mathcal M_{\omega,r}|$ is the number of buses.
+Let $c^{\mathrm{bat}}$ denote the battery capacity cost per kWh.
+The scenario battery cost is
 \[
     C^{\mathrm{bat}}_\omega(z_\omega)
     =
     c^{\mathrm{bat}}
     \sum_{r \in \mathcal{R}}
-    n_{\omega,r}
+    |\mathcal M_{\omega,r}|
     \sum_{k \in \mathcal{K}}
     \beta_k z_{\omega,r,k}.
 \]
+This term gives the battery capacity cost for all buses required under the service plan; the acquisition or disposal of vehicles and batteries associated with changes in fleet size is not modeled separately.
 
-\paragraph{Shared plug-in charging.}
-Plug-in charger use is modeled over scenario time slots $\mathcal{T}_\omega$.
-For route $r$, $\mathcal{V}^{\mathrm{P}}_{\omega,r}\subseteq\mathcal{V}_{\omega,r}$ contains the visit event copies eligible for plug-in charging.
-An eligible visit event $v$ can use plug-in charging only during $\mathcal{T}_v\subseteq\mathcal{T}_\omega$, and $s(v)$ maps it to its physical station.
-Let $q_v^{\mathrm{P}}$ denote the grid-side plug-in energy supplied during visit $v$.
-The binary variable $x_{v\tau}$ records whether visit $v$ occupies a plug-in charger in time slot $\tau$; each occupied slot delivers up to $\kappa$ units of grid-side energy, and station $s$ has capacity $U_s$.
+Across the service plans, $\mathcal V$ and $\mathcal A$ denote the sets of station-visit and link-traversal events generated by bus duties, respectively.
+Each duty is represented by an ordered sequence of station visits as shown in Figure~\ref{fig:daily-duty-operation}.
+Each visit $v\in\mathcal V$ is a distinct occurrence in a duty, and $s(v)$ is its physical station.
+Each duty, visit, and traversal belongs to a single scenario--route pair.
+Each traversal $a=(v,v')\in\mathcal A$ connects consecutive visits on the same duty and is associated with the physical link $\ell(a)=(s(v),s(v'))$.
+As shown in Figure~\ref{fig:link-event-mapping}, the same physical link may be traversed multiple times by the same bus or by different buses, with each traversal represented by a distinct event.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\linewidth]{figures/physical_service_mapping.pdf}
+    \caption{Mapping from service-network traversal events to a physical link. The three rows represent distinct traversals; dashed lines associate visit events with their physical stations.}
+    \label{fig:link-event-mapping}
+\end{figure}
+\FloatBarrier
+
+\paragraph{Shared plug-in capacity}
+The station visits on route $r$ in scenario $\omega$ are denoted by $\mathcal V_{\omega,r}$, and $\mathcal V^{\mathrm P}_{\omega,r}$ contains the terminal visits eligible for plug-in charging under the service plan.
+An eligible visit $v$ can charge during its available time slots $\mathcal T_v\subseteq\mathcal T_\omega$, where $\mathcal T_\omega$ contains the relevant time slots in scenario $\omega$.
+The variable $q_v^{\mathrm P}$ denotes the grid-side energy supplied and $x_{v\tau}$ indicates whether a visit occupies a charger in slot $\tau$.
 The plug-in charging constraints are
 \begin{align}
-    & 0
-    \leq
-    q_v^{\mathrm{P}}
-    \leq
-    \kappa
-    \sum_{\tau \in \mathcal{T}_v} x_{v\tau},
-    && r \in \mathcal{R},\ v \in \mathcal{V}^{\mathrm{P}}_{\omega,r},
+    & \left\{\begin{aligned}
+        0 \leq q_v^{\mathrm P}
+        &\leq \bar q^{\mathrm P}\sum_{\tau\in\mathcal T_v}x_{v\tau},
+        && r\in\mathcal R,\ v\in\mathcal V^{\mathrm P}_{\omega,r}, \\
+        q_v^{\mathrm P} &= 0,
+        && r\in\mathcal R,\ v\in\mathcal V_{\omega,r}\setminus\mathcal V^{\mathrm P}_{\omega,r},
+    \end{aligned}\right.
     \label{eq:plugin-charge-limit} \\
     & \sum_{r \in \mathcal{R}}
-    \sum_{\substack{v \in \mathcal{V}^{\mathrm{P}}_{\omega,r}:\\ s(v)=s,\ \tau\in\mathcal{T}_v}}
+    \sum_{\substack{v \in \mathcal{V}^{\mathrm{P}}_{\omega,r}:\\ s(v)=c,\ \tau\in\mathcal{T}_v}}
     x_{v\tau}
     \leq
-    U_s,
-    && s \in \mathcal{C},\ \tau \in \mathcal{T}_\omega,
+    N_c,
+    && c \in \mathcal{C},\ \tau \in \mathcal{T}_\omega,
     \label{eq:plugin-capacity} \\
     & x_{v\tau} \in \{0,1\},
     && r \in \mathcal{R},\ v \in \mathcal{V}^{\mathrm{P}}_{\omega,r},\ \tau \in \mathcal{T}_v.
     \label{eq:x-domain}
 \end{align}
-Constraints~\eqref{eq:plugin-charge-limit}--\eqref{eq:x-domain} limit energy delivery during each visit and enforce available plug-in capacity at every station--time pair.
-Constraint~\eqref{eq:plugin-capacity} provides the main cross-route coupling within a scenario.
+Constraint~\eqref{eq:plugin-charge-limit} limits grid-side energy delivery to $\bar q^{\mathrm P}$ per occupied slot and excludes charging at ineligible visits.
+Constraint~\eqref{eq:plugin-capacity} limits simultaneous charger occupancy at station $c$ to the number $N_c$ of existing chargers and couples buses using the same station.
+Constraint~\eqref{eq:x-domain} specifies binary occupancy decisions.
 
-\paragraph{Route-local operations and charging cost.}
-Let $y_\omega$ collect the nonnegative continuous charging and energy-state variables $q_v^{\mathrm{P}}$, $q_v^{\mathrm{S}}$, $q_a^{\mathrm{D}}$, $q_m^{\mathrm{N}}$, $e_v^{\mathrm{arr}}$, and $e_v^{\mathrm{dep}}$.
-For each traversal event $a$, $\ell(a)$ denotes its physical directed link, while $\mathrm{tail}(a)$ and $\mathrm{head}(a)$ denote its departure and arrival visit event copies.
-At daytime and overnight electricity prices $c^{\mathrm{day}}\geq 0$ and $c^{\mathrm{night}}\geq 0$, the scenario charging cost is
-\[
-    C^{\mathrm{chg}}_\omega(y_\omega)
-    =
-    c^{\mathrm{day}}
-    \left(
-    \sum_{r \in \mathcal{R}}
-    \sum_{v \in \mathcal{V}^{\mathrm{P}}_{\omega,r}} q_v^{\mathrm{P}}
-    +
-    \sum_{r \in \mathcal{R}}
-    \sum_{v \in \mathcal{V}^{\mathrm{S}}_{\omega,r}} q_v^{\mathrm{S}}
-    +
-    \sum_{r \in \mathcal{R}}
-    \sum_{a \in \mathcal{A}_{\omega,r}} q_a^{\mathrm{D}}
-    \right)
-    +
-    c^{\mathrm{night}}
-    \sum_{r \in \mathcal{R}}
-    \sum_{m \in \mathcal{M}_{\omega,r}}
-    q_m^{\mathrm{N}}.
-\]
-The parameters $d_a$, $d_m^0$, and $d_m^N$ represent traversal and depot-boundary energy requirements, while $\underline{\rho}$ and $\overline{\rho}$ are the admissible state-of-charge fractions.
-Trip-level energy requirements are exogenous and independent of the selected battery capacity; each trip chain starts at the upper state-of-charge limit, and overnight depot charging is sufficient to restore every bus before the next representative day.
-The route-local operational constraints are
+\paragraph{Other operating constraints and charging cost}
+Let $\mathcal A_{\omega,r}$ denote the link traversals on route $r$ in scenario $\omega$, and $\mathcal A^{\mathrm D}_{\omega,r}$ the subset on candidate DWC links.
+For a traversal $a$, $q_a^{\mathrm D}$ denotes the grid-side DWC energy supplied; for a duty $m\in\mathcal M_{\omega,r}$, $q_m^{\mathrm N}$ denotes the grid-side overnight energy supplied.
+The DWC energy bound $\bar q_a^{\mathrm D}$ is the maximum amount of energy that can be supplied via DWC for a given traversal.
+The battery energy levels upon arrival at and departure from visit $v$ are denoted by $e_v^{\mathrm{arr}}$ and $e_v^{\mathrm{dep}}$, respectively.
+For duty $m$, $v_m^0$ and $v_m^N$ denote its first and last station visits, and $d_m^0$ and $d_m^N$ denote the energy consumed traveling from and to the depot, respectively.
+The consumption $d_a$ is assumed to be known and fixed for each traversal $a$, and $\eta^{\mathrm P}$ and $\eta^{\mathrm D}$ convert grid-side charging energy to battery energy.
+The charging and energy variables in $y_\omega$ are nonnegative.
+For each route $r\in\mathcal R$, the operating constraints are
+\begingroup
+\allowdisplaybreaks[2]
 \begin{align}
-    & 0
-    \leq
-    q_v^{\mathrm{S}}
-    \leq
-    \bar{q}^{\mathrm{S}}_v w_{s(v)}^{\mathrm{S}},
-    && v \in \mathcal{V}^{\mathrm{S}}_{\omega,r},
-    \label{eq:swc-charge-limit} \\
-    & 0
-    \leq
-    q_a^{\mathrm{D}}
-    \leq
-    \bar{q}^{\mathrm{D}}_a w_{\ell(a)}^{\mathrm{D}},
-    && a \in \mathcal{A}_{\omega,r}.
+    & \left\{\begin{aligned}
+        0 \leq q_a^{\mathrm D}
+        &\leq \bar q_a^{\mathrm D}w_{\ell(a)},
+        && a\in\mathcal A^{\mathrm D}_{\omega,r}, \\
+        q_a^{\mathrm D} &= 0,
+        && a\in\mathcal A_{\omega,r}\setminus\mathcal A^{\mathrm D}_{\omega,r},
+    \end{aligned}\right.
     \label{eq:dwc-charge-limit} \\
     & \underline{\rho} B_{\omega,r}
     \leq
@@ -229,25 +190,17 @@ The route-local operational constraints are
     +
     \eta^{\mathrm{P}}
     q_v^{\mathrm{P}},
-    && v \in \mathcal{V}^{\mathrm{P}}_{\omega,r},
+    && v \in \mathcal{V}_{\omega,r},
     \label{eq:station-energy-balance} \\
-    & e^{\mathrm{dep}}_v
+    & e^{\mathrm{arr}}_{v'}
     =
-    e^{\mathrm{arr}}_v
-    +
-    \eta^{\mathrm{S}}
-    q_v^{\mathrm{S}},
-    && v \in \mathcal{V}^{\mathrm{S}}_{\omega,r},
-    \label{eq:swc-energy-balance} \\
-    & e^{\mathrm{arr}}_{\mathrm{head}(a)}
-    =
-    e^{\mathrm{dep}}_{\mathrm{tail}(a)}
+    e^{\mathrm{dep}}_v
     -
     d_a
     +
     \eta^{\mathrm{D}}
     q_a^{\mathrm{D}},
-    && a \in \mathcal{A}_{\omega,r},
+    && a=(v,v') \in \mathcal{A}_{\omega,r},
     \label{eq:link-energy-balance} \\
     & e^{\mathrm{arr}}_{v_m^{0}}
     =
@@ -273,22 +226,25 @@ The route-local operational constraints are
     && m \in \mathcal{M}_{\omega,r}.
     \label{eq:overnight-charge-balance}
 \end{align}
-Constraints~\eqref{eq:swc-charge-limit}--\eqref{eq:dwc-charge-limit} link wireless charging quantities to installed facilities, while constraints~\eqref{eq:soc-arr-bound}--\eqref{eq:soc-dep-bound} bound the energy states relative to $B_{\omega,r}$.
-Constraints~\eqref{eq:station-energy-balance}--\eqref{eq:link-energy-balance} propagate energy through charging and traversals, and constraints~\eqref{eq:initial-boundary-energy}--\eqref{eq:overnight-charge-balance} close each trip chain.
+\endgroup
+Constraint~\eqref{eq:dwc-charge-limit} links DWC charging to facility decisions, and constraints~\eqref{eq:soc-arr-bound}--\eqref{eq:soc-dep-bound} impose the state-of-charge limits $\underline\rho$ and $\overline\rho$.
+Constraints~\eqref{eq:station-energy-balance}--\eqref{eq:overnight-charge-balance} describe energy balances and depot operations for each duty.
 
-\subsection{Recourse structure}
-\label{subsec:recourse-structure}
-
-For a fixed facility layout $w$, the expected recourse term is separable across scenarios.
-This yields a standard integer L-shaped reference in which each scenario is evaluated as a monolithic mixed-integer recourse problem over $(z_\omega,x_\omega,y_\omega)$; we refer to this direct decomposition as Natural ILS.
-
-Within each scenario, battery and charging costs are additive across routes, and all constraints except constraint~\eqref{eq:plugin-capacity} involve variables associated with a single route.
-The latter aggregates plug-in occupancy across routes at each station--time pair.
-That is, the scenario recourse is conditionally route-separable apart from this localized shared-capacity coupling.
-The formulation also induces a facility--battery resource order.
-Because trip-level energy consumption is independent of battery capacity, retaining all installed wireless facilities while adding facilities and/or weakly increasing route battery capacities preserves operational feasibility.
-Moreover, the minimum charging cost under such a resource-dominating configuration is no greater than that under the original configuration.
-
-The recourse structure therefore combines scenario separability, a route-local block structure with limited shared-capacity coupling, and a facility--battery resource order.
-Section~\ref{sec:method} makes the scenario-dependent battery configuration explicit through an equivalent lifted value-function reformulation.
-The resulting representation, conditional on $(w,z_\omega)$, supports both route-level lower bounding and resource-monotonicity strengthening.
+At daytime and overnight electricity prices $c^{\mathrm{day}}\geq 0$ and $c^{\mathrm{night}}\geq 0$, the scenario charging cost is
+\[
+    C^{\mathrm{chg}}_\omega(y_\omega)
+    =
+    c^{\mathrm{day}}
+    \left(
+    \sum_{r \in \mathcal{R}}
+    \sum_{v \in \mathcal{V}^{\mathrm{P}}_{\omega,r}} q_v^{\mathrm{P}}
+    +
+    \sum_{r \in \mathcal{R}}
+    \sum_{a \in \mathcal{A}^{\mathrm D}_{\omega,r}} q_a^{\mathrm{D}}
+    \right)
+    +
+    c^{\mathrm{night}}
+    \sum_{r \in \mathcal{R}}
+    \sum_{m \in \mathcal{M}_{\omega,r}}
+    q_m^{\mathrm{N}}.
+\]

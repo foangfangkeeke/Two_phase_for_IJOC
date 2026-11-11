@@ -2,57 +2,97 @@
 \section{Literature Review}
 \label{sec:literature}
 
-This paper intersects two literature streams.
-The first studies charging infrastructure, battery configuration, and energy-feasible operations for electric buses; the second develops exact decomposition methods for stochastic design problems with mixed-integer recourse.
+Two streams of research inform this study: electric-bus charging facility location and decomposition methods for stochastic programs with mixed-integer recourse.
 
-\subsection{Electric-bus charging and wireless infrastructure planning}
+\subsection{Electric-bus charging facility location}
 \label{subsec:lit-wireless-bus}
 
-% TODO: Cite integrated electric-bus infrastructure, battery-sizing, and scheduling studies.
-Electric-bus planning links strategic infrastructure decisions with tactical battery and charging decisions.
-Charging-site selection and battery capacity determine the resources available to a fleet, while vehicle assignment, charging schedules, and route energy constraints determine whether those resources can support the prescribed service.
-Integrated optimization models therefore evaluate infrastructure and battery investments together with energy-feasible service operations.
+For a given bus service, larger batteries can reduce the need for daytime charging, while more charging opportunities at stations can allow buses to operate with smaller batteries \citep{perumal_review_2022}.
+Daytime charging must fit around scheduled trips, making both travel to charging stations and waiting for a charger relevant to facility planning.
+\citet{bazarnovi_locating_2025} jointly choose station locations and the number of chargers at each station under stochastic charging demand, balancing investment against the time costs of travel to stations, waiting, and charging.
+By supplying energy as buses travel, DWC adds charging opportunities along a route.
+The locations and lengths of equipped road segments affect how much energy a bus can receive and, in turn, the battery capacity needed to serve the route.
+In a system with existing plug-in chargers at depots and terminals, \citet{li_planning_2024} jointly determine DWC deployment, route-level battery capacities, and charging schedules under time-of-use electricity prices.
 
-% TODO: Cite depot, terminal, plug-in, and opportunity-charging studies with limited charger capacity.
-Depot and terminal charging studies focus on the timing of plug-in charging under vehicle schedules, electricity prices, and charger-capacity limits.
-Opportunity-charging models extend this interaction to charging during service, allowing energy to be replenished between trips or at selected stops.
-When chargers have finite capacity, station--time occupancy constraints couple buses or routes that would otherwise admit separate energy-feasibility calculations.
+The operating conditions that determine charging needs can be uncertain.
+\citet{li_mixed_2021} use a two-stage stochastic model to locate refueling facilities and schedule a mixed bus fleet before the driving ranges of electric buses are known.
+Additional services are deployed after the ranges are realized to cover scheduled trips left incomplete because of energy shortages.
+Under uncertain travel times and energy consumption, \citet{wang_reliable_2024} use a two-stage robust model to determine the locations and lengths of DWC facilities and the battery capacities for each route.
+En-route charging is adjusted after the uncertain conditions are realized.
+The service plan itself may also be uncertain when facilities are deployed.
+Different plans may specify different trips and assign them to buses in different ways, changing which DWC-equipped links buses traverse and when they can charge at stations.
 
-% TODO: Cite SWC/DWC planning studies and work jointly considering wireless facilities and battery capacity.
-Wireless charging introduces a further infrastructure layer.
-SWC creates charging opportunities at selected stations, whereas DWC supplies energy while a bus traverses an equipped road segment.
-The associated planning literature examines how the location and extent of these facilities affect battery requirements, route energy feasibility, and investment and charging costs.
-These models establish the facility--battery trade-off that underlies the present application.
+For a given service plan, buses on different routes may need to charge at the same station, where the number of chargers limits how many buses can charge at once.
+Given the trips assigned to each bus, \citet{abdelwahed_opportunity_2020} optimize the timing and duration of charging subject to these limits.
+Other studies jointly assign trips to buses and schedule charging, subject to station capacity limits \citep{gkiotsalitis_multi_depot_2023,devos_capacitated_2024,ricard_battery_2026}.
+Even if a feasible charging schedule exists for each route separately, there may be no feasible schedule for all routes together because buses from different routes compete for the same chargers.
 
-% TODO: Verify the application-level gap after the final electric-bus reference set is assembled.
-Together, these studies provide the main application components of our model: wireless-facility placement, route-level battery configuration, energy-feasible trip chains, and limited plug-in charging resources.
-We combine these components under service-plan uncertainty, with wireless facilities selected before the future service plan is known and battery configurations and charging decisions adapted to its realization.
-This setting links long-term infrastructure planning to shared-resource mixed-integer recourse.
-
-\subsection{Decomposition methods for stochastic design problems}
+\subsection{Decomposition methods for stochastic integer programs}
 \label{subsec:lit-stochastic-decomposition}
 
-% TODO: Cite stochastic facility-location and network-design models with scenario recourse.
-Two-stage stochastic models for facility location and network design separate infrastructure choices made before uncertainty from scenario-dependent recourse.
-Scenario decomposition is particularly attractive when the deterministic equivalent is large, because fixing the first-stage design separates the evaluation of distinct scenarios.
-The computational challenge increases when the recourse contains discrete configuration or operating decisions rather than a continuous linear program.
+Benders decomposition separates an optimization problem into a master problem and subproblems, using cuts from the subproblems to refine the master.
+In classical Benders decomposition, the subproblems are linear programs (LPs) whose dual solutions and rays provide optimality and feasibility cuts.
+For two-stage stochastic programs with continuous linear recourse, the L-shaped method applies this decomposition across scenarios.
+With integer recourse, an LP relaxation may underestimate the recourse cost or fail to detect infeasibility.
+For problems with binary first-stage decisions and complete recourse, the integer L-shaped method uses integer recourse evaluations to construct cuts \citep{laporte_integer_1993}.
+Logic-based Benders decomposition also accommodates integer subproblems, deriving cuts through problem-specific reasoning \citep{hooker_logic_2003}.
+Nevertheless, limited information from cuts can lead to many iterations, while solving the subproblems at each iteration can be costly \citep{rahmaniani_review_2017}.
 
-% TODO: Cite foundational Benders, integer L-shaped, and logic-based Benders methods.
-Benders decomposition and the L-shaped method use subproblem information to iteratively refine a master representation of future cost and feasibility.
-For continuous recourse, linear-programming duality supplies this information directly.
-Mixed-integer recourse instead requires integer L-shaped, logic-based, or related combinatorial mechanisms, and exact scenario evaluation can become the dominant computational burden.
+Reformulations can make recourse information available to the master before cuts are generated.
+Retaining selected scenario subproblems in the master provides an explicit representation of their recourse decisions \citep{crainic_partial_2021,celik_twostep_2025}.
+Moving individual scenario-dependent variables into the master follows the same principle, but can make the master large when there are many scenarios.
+\citet{lai_strengthened_2025} exploits customer choices that coincide across scenarios to reduce this growth.
+Even with a stronger master, evaluating recourse across many scenarios can make cut generation expensive.
+Aggregating scenarios or sampling a subset can reduce the work involved \citep{ramirez_adaptive_2023,bertsimas_stochastic_2025}.
+The aggregation can be refined using subproblem dual solutions, whereas sampled evaluations can be combined through dual averaging to construct valid cuts.
 
-% TODO: Cite enriched-master, partial-decomposition, recourse-relaxation, and nested-decomposition studies.
-One line of research improves this process by changing the decomposition architecture.
-Richer master formulations expose selected recourse decisions or partial recourse descriptions, while lower-bounding relaxations and internal subproblem decompositions reduce the cost of scenario evaluation.
-These choices determine both the strength of the master bound and the computational effort required to generate it.
+Problem structure can provide additional information for the master through valid inequalities and stronger cuts.
+\citet{li_scheduling_location_2022} use processing and release times to bound the makespan and strengthen cuts by identifying smaller sets of assignments that cannot improve the incumbent.
+Similarly, feasibility cuts can be strengthened by removing assignments and re-solving the subproblem to identify a smaller set that remains infeasible \citep{elci_stochastic_2022}.
+For mixed-integer recourse, lower approximations of recourse costs can also support optimality cuts \citep{vanderlaan_converging_2024,baals_milk_runs_2026}.
+Monotonicity is another property that can extend the information obtained from a subproblem evaluation to other master solutions.
+Examples include cuts based on monotone route recourse costs and on simulation evaluations of resource allocations \citep{parada_disaggregated_2024,forbes_simulation_2024}.
 
-% TODO: Cite combinatorial, dominance-based, and monotonicity-based Benders cuts.
-A complementary line of research strengthens the information returned by the subproblems.
-Logic-based and combinatorial cuts exploit discrete feasibility structure, while dominance relations and problem-specific valid inequalities can extend a correction beyond the single configuration at which it was generated.
-Such strengthening depends on a verifiable ordering or implication structure in the underlying recourse model.
+When subproblems are expensive to solve, relaxations can provide cheap information to the master.
+LP relaxations of integer recourse, for example, can generate cuts and eliminate some candidate solutions before integer subproblems are solved \citep{angulo_improving_2016,satici_network_2026}.
+\citet{calik_stations_2019} solve a partially relaxed model and check whether its optimal value can be attained by an integer solution with the same first-stage decisions.
+If not, they continue the search and add combinatorial feasibility cuts for integer-infeasible subproblems.
+Relaxing coupling constraints can also simplify the master problem, but a feasible solution must ultimately satisfy those constraints.
+\citet{chen_integrated_2023} relax the nonanticipativity of the initial vehicle allocation, allowing each scenario to choose its own allocation, and also relax vehicle-flow integrality.
+They then restore a common allocation and use a diving heuristic to construct integer operational solutions.
+Thus, relaxed solutions can support both cut generation and feasible-solution search, while the constraints and integrality requirements of the original problem must still be addressed.
 
-% TODO: Reassess the methodological gap after the final decomposition reference set is assembled.
-These studies show that master representation, subproblem organization, and cut design must be matched to the recourse structure.
-The setting considered here combines scenario-dependent discrete battery configurations, conditionally route-local operations, and limited shared-resource coupling within each scenario.
-This layered structure motivates an exact decomposition method designed around their interaction rather than a direct application of scenario decomposition alone.
+Existing studies have developed reformulations, valid inequalities, strengthened cuts, and relaxation-based procedures to improve Benders decomposition, as summarized in Table~\ref{tab:lit-method-components}.
+In our problem, fixing the DWC deployment leaves a recourse problem in each scenario that selects battery capacities and charging schedules.
+The limited capacity of plug-in stations couples charging decisions across routes, so each scenario subproblem remains a large mixed-integer program.
+In the natural decomposition, the master does not explicitly represent these battery and charging decisions and must learn their feasibility and cost through cuts.
+Repeatedly solving the coupled scenario subproblems can therefore be computationally expensive.
+These difficulties motivate a decomposition method that strengthens the master's representation of recourse and exploits route structure to reduce the burden of scenario evaluation.
+
+\begin{table}[htbp]
+\centering
+\caption{Selected components of decomposition methods}
+\label{tab:lit-method-components}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}p{0.27\linewidth}>{\centering\arraybackslash}p{0.09\linewidth}>{\centering\arraybackslash}p{0.098\linewidth}>{\centering\arraybackslash}p{0.085\linewidth}>{\centering\arraybackslash}p{0.10\linewidth}p{0.162\linewidth}p{0.115\linewidth}@{}}
+\toprule
+\multicolumn{1}{c}{Study} & \multicolumn{1}{c}{\shortstack{Original\\subproblem}} & \multicolumn{1}{c}{\shortstack{Model\\reformulation}} & \multicolumn{1}{c}{\shortstack{Valid\\inequalities}} & \multicolumn{1}{c}{\shortstack{Monotonicity\\usage}} & \multicolumn{1}{c}{Relaxation} & \multicolumn{1}{c}{\shortstack{Relaxation\\postprocessing}} \\
+\midrule
+\citet{angulo_improving_2016} & MILP & & & & Integrality & Cuts \\
+\citet{calik_stations_2019} & ILP & $\checkmark$ & $\checkmark$ & & Integrality & Cuts \\
+\citet{crainic_partial_2021} & LP & $\checkmark$ & $\checkmark$ & & Integrality & Cuts \\
+\citet{chen_integrated_2023} & ILP & & & & Integrality; constraints & Cuts; repair \\
+\citet{ramirez_adaptive_2023} & LP & $\checkmark$ & & & --- & --- \\
+\citet{lai_strengthened_2025} & MILP & $\checkmark$ & & $\checkmark$ & Constraints & Cuts \\
+\citet{celik_twostep_2025} & LP & $\checkmark$ & & & --- & --- \\
+\citet{bertsimas_stochastic_2025} & QP & $\checkmark$ & $\checkmark$ & & Integrality & Cuts \\
+\citet{baals_milk_runs_2026} & MILP & $\checkmark$ & $\checkmark$ & & Constraints; objective & Cuts \\
+\citet{satici_network_2026} & MILP & $\checkmark$ & & & Integrality; constraints & Cuts \\
+This paper & MILP & $\checkmark$ & $\checkmark$ & $\checkmark$ & Integrality; constraints & Cuts; repair \\
+\bottomrule
+\end{tabular}
+\par\smallskip
+\parbox{\linewidth}{\footnotesize\emph{Note.} ILP = integer linear program; QP = quadratic program.}
+\end{table}

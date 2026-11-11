@@ -1,5 +1,16 @@
-\PassOptionsToPackage{margin=1in}{geometry}
-\documentclass[final,3p,times,authoryear]{elsarticle}
+\documentclass[final,3p,12pt,onecolumn,times,authoryear]{elsarticle}
+
+% IJOC submission layout; reset the page dimensions imposed by elsarticle's 3p mode.
+\usepackage{geometry}
+\geometry{reset,margin=1in}
+\usepackage{setspace}
+\onehalfspacing
+
+% Keep the abstract, keywords, body, and references at the submission spacing.
+\AddToHook{env/abstract/begin}{\normalsize\onehalfspacing}
+\AddToHook{env/keyword/begin}{\normalsize\onehalfspacing}
+\AddToHook{env/frontmatter/after}{\normalsize\onehalfspacing}
+\renewcommand{\bibfont}{\normalsize\onehalfspacing}
 
 \usepackage{amsmath,amssymb,amsfonts,amsthm}
 \usepackage{booktabs}
@@ -29,11 +40,24 @@
 \address[inst1]{Affiliation}
 
 \begin{abstract}
-This abstract will be written after the main body is stable.
+Dynamic wireless charging (DWC) can reduce electric-bus battery requirements by supplying energy in transit.
+DWC facilities are long-lived and must be located before future service plans are known.
+This study examines how to coordinate DWC facility locations with scenario-dependent route-level battery configurations and representative-day charging schedules.
+We formulate the problem as a two-stage stochastic program that minimizes facility, battery, and charging costs.
+Directly applying the integer L-shaped method can produce a weak master approximation and require repeated solutions of large mixed-integer scenario problems whose routes share plug-in capacity.
+To solve the problem, we develop a repair-enhanced two-phase integer L-shaped method (R-TPILS).
+An equivalent reformulation lifts battery choices into the master and yields energy-budget valid inequalities.
+Phase 1 relaxes the shared-capacity coupling and generates lower bounds and cuts from independent route-level linear programs.
+In Phase 2, feasibility monotonicity and repair are used to recover feasible solutions and improve lower bounds.
+Computational experiments on the Tower Transit bus network in Singapore compare R-TPILS with four other methods.
+Within the time limit, only R-TPILS meets the 1\% gap target on all nine main instances.
+Component analyses show that the inequalities screen infeasible configurations early and that Phase 1 rapidly establishes tight lower bounds.
+On difficult instances, repair recovers verified feasible solutions and produces stronger monotone cuts, although its net benefit varies across instances.
+In the planning comparison, allowing DWC reduces mean battery capacity by about 23\% and shifts energy supply from overnight to daytime charging.
 \end{abstract}
 
 \begin{keyword}
-Wireless charging \sep electric bus \sep stochastic programming \sep integer L-shaped method \sep Benders decomposition
+wireless charging facility location \sep electric buses \sep two-stage stochastic optimization \sep integer L-shaped method
 \end{keyword}
 
 \end{frontmatter}
@@ -47,8 +71,6 @@ Wireless charging \sep electric bus \sep stochastic programming \sep integer L-s
 
 \appendix
 \input{appendices/appendix_model_details}
-\input{appendices/appendix_proofs}
-\input{appendices/appendix_extra_results}
 
 \FloatBarrier
 \bibliographystyle{elsarticle-harv}
